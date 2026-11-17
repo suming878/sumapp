@@ -1772,34 +1772,33 @@ bootSumoulApp();
     patchCleanMelancholySplash();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 韩系动态流 · 终极精修版（饱满粗体 + 头像状态真小尖角气泡尾巴 + 立体灰白画报卡 + 角色独立）】
+// 🤍 【Sumoul App 韩系动态流 · 终极定稿补丁（纯白无背景头像栏 + 仅User/AI双圆珠云朵泡泡 + SVG定位针）】
 // 用法：直接替换 index.js 最末尾的旧动态补丁！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    function mountKoreanBoldMoments() {
+    function mountKoreanFinalMoments() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const spacePage = topDoc.getElementById("smt-page-space");
         const homePage = topDoc.getElementById("smt-page-home");
         const fsBody = modal?.querySelector(".smt-fs-body");
         if (!modal || !spacePage || !homePage || !fsBody) {
-            setTimeout(mountKoreanBoldMoments, 250);
+            setTimeout(mountKoreanFinalMoments, 250);
             return;
         }
 
-        // 1. 饱满 1.8px 粗线条矢量图标生成器（配合粗体字，告别软塌细线）
-        const mkIco = (d, sz = 17, stroke = "%232C2C32", fill = "none", sw = "1.85") => `<img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${fill}' stroke='${stroke}' stroke-width='${sw}' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E" style="width:${sz}px!important;height:${sz}px!important;display:block!important;pointer-events:none!important;" />`;
+        const mkIco = (d, sz = 17, stroke = "%232C2C32", fill = "none", sw = "1.85") => `<img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${fill}' stroke='${stroke}' stroke-width='${sw}' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E" style="width:${sz}px!important;height:${sz}px!important;display:inline-block!important;vertical-align:middle!important;pointer-events:none!important;" />`;
 
         const KR_ICO = {
             heart: mkIco("%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E", 16, "%232C2C32", "none"),
             heartFill: mkIco("%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E", 16, "%232C2C32", "%232C2C32"),
             cmt: mkIco("%3Cpath d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'/%3E", 15, "%232C2C32", "none"),
-            send: mkIco("%3Cline x1='22' y1='2' x2='11' y2='13'/%3E%3Cpolygon points='22 2 15 22 11 13 2 9 22 2'/%3E", 15, "%232C2C32", "none"),
-            mark: mkIco("%3Cpath d='m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z'/%3E", 16, "%232C2C32", "none"),
             more: mkIco("%3Ccircle cx='12' cy='12' r='1.2'/%3E%3Ccircle cx='19' cy='12' r='1.2'/%3E%3Ccircle cx='5' cy='12' r='1.2'/%3E", 15, "%237A7A85", "none", "2.2"),
             plus: mkIco("%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E", 10, "%23FFFFFF", "none", "2.5"),
+            // 极简 SVG 定位坐标针图标（替代丑陋的📍Emoji）
+            pin: mkIco("%3Cpath d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E", 11, "%238E8E98", "none", "1.8"),
             cam: mkIco("%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E", 20),
             pet: mkIco("%3Cpath d='M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3.1-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z'/%3E%3Cpath d='M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17l-.75-.75Z'/%3E", 20),
             qa: mkIco("%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E", 20),
@@ -1808,7 +1807,6 @@ bootSumoulApp();
             note: mkIco("%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E", 20)
         };
 
-        // 2. 注入「全粗体 + 真气泡尖角尾巴 + 立体灰白画报卡片」CSS
         topDoc.getElementById("sumoul-ins-feed-css")?.remove();
         const st = topDoc.createElement("style");
         st.id = "sumoul-ins-feed-css";
@@ -1826,17 +1824,18 @@ bootSumoulApp();
                 background: #FFFFFF !important;
             }
 
-            /* ── 顶部：带真·小尖角尾巴的气泡 + 双层圆头像栏 ── */
+            /* ── 1. 顶部头像栏：彻底去掉灰色外框背景，直接铺在纯白底上！ ── */
             #seoul-mini-theater-modal .kr-notes-tray {
                 display: flex !important;
                 align-items: flex-end !important;
-                gap: 14px !important;
+                gap: 16px !important;
                 overflow-x: auto !important;
-                padding: 34px 8px 14px 8px !important;
-                background: #F8F8FA !important;
-                border: 1px solid #ECECF2 !important;
-                border-radius: 20px !important;
-                margin-bottom: 10px !important;
+                padding: 32px 6px 12px 6px !important;
+                background: transparent !important;
+                border: none !important;
+                border-bottom: 1px solid #F2F2F6 !important;
+                border-radius: 0 !important;
+                margin-bottom: 8px !important;
                 flex-shrink: 0 !important;
                 scrollbar-width: none !important;
             }
@@ -1849,24 +1848,24 @@ bootSumoulApp();
                 position: relative !important;
                 cursor: pointer !important;
                 flex-shrink: 0 !important;
-                width: 66px !important;
+                width: 62px !important;
             }
 
-            /* 🔥 头顶状态气泡：解除 overflow 裁切，加上朝下指向头像的真·小尖角尾巴 (::after)！ */
-            #seoul-mini-theater-modal .kr-thought-pill {
+            /* ── 2. 真·云朵思绪泡泡 (Instagram Notes 原版双圆珠泡泡质感，仅 User 与 AI 有) ── */
+            #seoul-mini-theater-modal .kr-cloud-bubble {
                 position: absolute !important;
                 top: -24px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 background: #FFFFFF !important;
-                border: 1.2px solid #DCDCE6 !important;
-                border-radius: 11px !important;
-                padding: 3px 8px !important;
+                border: 1px solid #E4E4EC !important;
+                border-radius: 16px !important;
+                padding: 4px 9px !important;
                 z-index: 6 !important;
                 overflow: visible !important;
-                box-shadow: 0 3px 8px rgba(30, 30, 40, 0.05) !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
             }
-            #seoul-mini-theater-modal .kr-thought-pill span {
+            #seoul-mini-theater-modal .kr-cloud-bubble span {
                 display: block !important;
                 font-size: 8.5px !important;
                 font-weight: 700 !important;
@@ -1875,45 +1874,44 @@ bootSumoulApp();
                 max-width: 64px !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
-                line-height: 1.2 !important;
+                line-height: 1.15 !important;
             }
-            /* 气泡正下方朝向头像的实心小尖角尾巴！ */
-            #seoul-mini-theater-modal .kr-thought-pill::after {
+            /* 第一颗小圆珠泡泡（紧贴胶囊左下方） */
+            #seoul-mini-theater-modal .kr-cloud-bubble::before {
                 content: "" !important;
                 position: absolute !important;
-                bottom: -5px !important;
-                left: 50% !important;
-                margin-left: -4px !important;
-                width: 7px !important;
-                height: 7px !important;
+                bottom: -4px !important;
+                left: 12px !important;
+                width: 6px !important;
+                height: 6px !important;
+                border-radius: 50% !important;
                 background: #FFFFFF !important;
-                border-right: 1.2px solid #DCDCE6 !important;
-                border-bottom: 1.2px solid #DCDCE6 !important;
-                transform: rotate(45deg) !important;
+                border: 1px solid #E4E4EC !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
                 z-index: 5 !important;
             }
-            /* TA 的深炭灰重点状态气泡 + 同色小尖角尾巴 */
-            #seoul-mini-theater-modal .kr-thought-pill.active-char {
-                background: #3A3A40 !important;
-                border-color: #3A3A40 !important;
-            }
-            #seoul-mini-theater-modal .kr-thought-pill.active-char span {
-                color: #FFFFFF !important;
-                -webkit-text-fill-color: #FFFFFF !important;
-            }
-            #seoul-mini-theater-modal .kr-thought-pill.active-char::after {
-                background: #3A3A40 !important;
-                border-color: #3A3A40 !important;
+            /* 第二颗微缩圆珠泡泡（向头像方向递减延伸，形成真正的泡泡感！） */
+            #seoul-mini-theater-modal .kr-cloud-bubble::after {
+                content: "" !important;
+                position: absolute !important;
+                bottom: -8px !important;
+                left: 16px !important;
+                width: 3.5px !important;
+                height: 3.5px !important;
+                border-radius: 50% !important;
+                background: #FFFFFF !important;
+                border: 1px solid #E4E4EC !important;
+                z-index: 4 !important;
             }
 
-            /* 圆头像双层高定边框 */
+            /* 圆头像双层留白环 */
             #seoul-mini-theater-modal .kr-ava-ring {
                 width: 56px !important;
                 height: 56px !important;
                 border-radius: 50% !important;
                 padding: 2.5px !important;
                 background: #FFFFFF !important;
-                border: 1.5px solid #DCDCE6 !important;
+                border: 1.4px solid #E2E2EA !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -1921,14 +1919,14 @@ bootSumoulApp();
                 position: relative !important;
             }
             #seoul-mini-theater-modal .kr-ava-ring.unread {
-                border: 2px solid #3A3A40 !important;
+                border: 1.8px solid #3A3A40 !important;
             }
             #seoul-mini-theater-modal .kr-ava-inner {
                 width: 100% !important;
                 height: 100% !important;
                 border-radius: 50% !important;
                 overflow: hidden !important;
-                background: #EFEFF4 !important;
+                background: #F4F4F8 !important;
             }
             #seoul-mini-theater-modal .kr-ava-inner img {
                 width: 100% !important;
@@ -1951,26 +1949,24 @@ bootSumoulApp();
                 z-index: 4 !important;
             }
             #seoul-mini-theater-modal .kr-unit-name {
-                font-size: 9.2px !important;
+                font-size: 9px !important;
                 font-weight: 700 !important;
                 color: #2C2C32 !important;
                 margin-top: 6px !important;
                 white-space: nowrap !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
-                max-width: 64px !important;
+                max-width: 62px !important;
             }
 
-            /* ── 次顶栏：饱满粗体胶囊导航条 ── */
+            /* ── 次顶栏与下方动态卡片（保持刚才好看的立体灰白画报结构） ── */
             #seoul-mini-theater-modal .kr-sub-nav {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                padding: 4px 2px 10px 2px !important;
+                padding: 2px 2px 10px 2px !important;
                 flex-shrink: 0 !important;
             }
-
-            /* ── 立体灰白圆角画报动态卡片 (Korean Editorial Card) ── */
             #seoul-mini-theater-modal .kr-clean-post {
                 background: #F8F8FA !important;
                 border: 1px solid #EAEAF0 !important;
@@ -1989,7 +1985,7 @@ bootSumoulApp();
                 align-items: center !important;
                 gap: 9px !important;
             }
-            #seoul-mini-theater-modal .kr-post-user img {
+            #seoul-mini-theater-modal .kr-post-user img.post-ava {
                 width: 36px !important;
                 height: 36px !important;
                 border-radius: 50% !important;
@@ -1997,8 +1993,6 @@ bootSumoulApp();
                 border: 2px solid #FFFFFF !important;
                 background: #FFFFFF !important;
             }
-
-            /* 纯白内嵌拍立得画报框 */
             #seoul-mini-theater-modal .kr-film-frame {
                 background: #FFFFFF !important;
                 border: 1px solid #EAEAF0 !important;
@@ -2040,8 +2034,6 @@ bootSumoulApp();
                 padding-left: 10px !important;
                 border-left: 2.5px solid #484852 !important;
             }
-
-            /* 底部粗体正文与互动胶囊栏 */
             #seoul-mini-theater-modal .kr-post-caption {
                 font-size: 11.5px !important;
                 font-weight: 600 !important;
@@ -2089,7 +2081,6 @@ bootSumoulApp();
         `;
         topDoc.head.appendChild(st);
 
-        // 3. 更新底部第 2 栏名称为「动态」
         const tab2 = modal.querySelector('.smt-tab-item[data-page="space"]');
         if (tab2) {
             tab2.setAttribute("data-title", "SUMOUL FEED · 피드");
@@ -2098,7 +2089,7 @@ bootSumoulApp();
             if (txtEl) txtEl.textContent = "动态";
         }
 
-        // 4. 确保主页已挂载独立的【情侣空间 App (#smt-page-couple_app)】
+        // 确保主页已挂载独立的【情侣空间 App (#smt-page-couple_app)】
         let coupleAppPage = topDoc.getElementById("smt-page-couple_app");
         if (!coupleAppPage) {
             coupleAppPage = topDoc.createElement("div");
@@ -2158,9 +2149,8 @@ bootSumoulApp();
             }
         }
 
-        // 5. 构建第 2 栏【韩系饱满粗体 + 带尖角尾巴气泡 + 立体灰白动态流】HTML
         spacePage.innerHTML = `
-            <!-- ① 顶部：带真·小尖角尾巴的状态气泡 + 圆头像快拍栏 -->
+            <!-- ① 顶部：纯白无外框头像栏（仅 User 与 AI 头顶有双圆珠云朵泡泡） -->
             <div class="kr-notes-tray" id="smt-ins-stories-bar"></div>
 
             <!-- 点击圆头像弹出的「限时快拍 Story 预览卡」 -->
@@ -2193,7 +2183,6 @@ bootSumoulApp();
             <div id="smt-mom-stream" style="flex:1;min-height:0;overflow-y:auto;padding-bottom:16px;"></div>
         `;
 
-        // 6. 严格按角色隔离的上下文读取器
         function getCtx() {
             let userName = "ME", charName = "", charScopeId = "";
             let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
@@ -2281,13 +2270,13 @@ bootSumoulApp();
         function createDefaultFeed(charName) {
             return {
                 owner: charName,
-                myNote: "放空中...",
+                myNote: "",
                 charNote: "想你了",
                 charStory: `凌晨 · ${charName} 随手拍下窗外灰白色的街景，玻璃上映出半张侧脸，配文：“又到了会想起你的时间。”`,
                 friends: [
-                    { name: "서윤 · 摄影", note: "洗胶卷中", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `【摄影师 서윤 的快拍】刚冲洗出来的黑白胶卷，其中有一张是上次在街角抓拍到的 ${charName} 看向你的眼神。` },
-                    { name: "汉南洞 Cafe", note: "今日特调", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `【汉南洞 Cafe 快拍】玻璃窗上的雨痕与刚萃好的浓缩咖啡。刚才 ${charName} 来店里打包了一份你爱吃的甜点。` },
-                    { name: "夜雨电台", note: "FM 94.5", ava: "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", story: `【凌晨电台 FM 94.5】“今夜首尔气温 14°C，有微雨。祝那个还没睡的人，能梦到想见的人。”` }
+                    { name: "서윤 · 摄影", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `【摄影师 서윤 的快拍】刚冲洗出来的黑白胶卷，其中有一张是上次在街角抓拍到的 ${charName} 看向你的眼神。` },
+                    { name: "汉南洞 Cafe", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `【汉南洞 Cafe 快拍】玻璃窗上的雨痕与刚萃好的浓缩咖啡。刚才 ${charName} 来店里打包了一份你爱吃的甜点。` },
+                    { name: "夜雨电台", ava: "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", story: `【凌晨电台 FM 94.5】“今夜首尔气温 14°C，有微雨。祝那个还没睡的人，能梦到想见的人。”` }
                 ],
                 posts: [
                     {
@@ -2333,7 +2322,6 @@ bootSumoulApp();
         let currentFilter = "all";
         let observedCharScope = "";
 
-        // 7. 渲染顶部带小尖角尾巴的圆头像栏 + 下方立体灰白画报卡片
         function renderKrMoments() {
             const c = getCtx(), data = getFeedData();
             observedCharScope = c.safeScope;
@@ -2344,10 +2332,14 @@ bootSumoulApp();
             const friends = data.friends || createDefaultFeed(c.charName).friends;
             const storiesBar = topDoc.getElementById("smt-ins-stories-bar");
 
+            // 仅 User（自定义非空时）与 AI 显示双圆珠云朵泡泡！其余好友不冒泡！
+            const myBubbleHtml = data.myNote ? `<div class="kr-cloud-bubble"><span>${data.myNote}</span></div>` : "";
+            const charBubbleHtml = `<div class="kr-cloud-bubble"><span>${data.charNote || "想你了"}</span></div>`;
+
             storiesBar.innerHTML = `
-                <!-- 1. 我的圆头像 + 带小尖角尾巴的气泡 -->
-                <div class="kr-note-unit" id="smt-story-me">
-                    <div class="kr-thought-pill"><span>${data.myNote || "状态"}</span></div>
+                <!-- 1. 我的圆头像（点击可自定义冒泡文字，留空则隐藏泡泡） -->
+                <div class="kr-note-unit" id="smt-story-me" title="点击自定义我的头顶泡泡">
+                    ${myBubbleHtml}
                     <div class="kr-ava-ring">
                         <div class="kr-ava-inner"><img src="${c.userAvatar}" /></div>
                         <span class="kr-ava-badge">${KR_ICO.plus}</span>
@@ -2355,19 +2347,18 @@ bootSumoulApp();
                     <div class="kr-unit-name">${c.userName}</div>
                 </div>
 
-                <!-- 2. TA 的圆头像 + 深炭灰带尖角尾巴的重点气泡 -->
+                <!-- 2. TA 的圆头像（带双圆珠云朵思绪泡泡） -->
                 <div class="kr-note-unit" id="smt-story-char">
-                    <div class="kr-thought-pill active-char"><span>${data.charNote || "想你了"}</span></div>
+                    ${charBubbleHtml}
                     <div class="kr-ava-ring unread">
                         <div class="kr-ava-inner"><img src="${c.charAvatar}" /></div>
                     </div>
                     <div class="kr-unit-name">${c.charName}</div>
                 </div>
 
-                <!-- 3~5. 氛围好友/电台圆头像（全部带尖角尾巴气泡） -->
+                <!-- 3~5. 好友/电台圆头像（干净无泡泡，点击看快拍） -->
                 ${friends.map((fr, idx) => `
                     <div class="kr-note-unit" data-fridx="${idx}">
-                        <div class="kr-thought-pill"><span>${fr.note}</span></div>
                         <div class="kr-ava-ring">
                             <div class="kr-ava-inner"><img src="${fr.ava}" /></div>
                         </div>
@@ -2376,14 +2367,12 @@ bootSumoulApp();
                 `).join("")}
             `;
 
-            // 点击我的圆头像：改头顶气泡文字
             topDoc.getElementById("smt-story-me").onclick = () => {
                 const d = getFeedData();
-                const v = prompt("修改你头顶的气泡状态（6字以内）：", d.myNote || "放空中");
-                if (v && v.trim()) { d.myNote = v.trim().slice(0, 8); saveFeedData(d); renderKrMoments(); }
+                const v = prompt("自定义你头顶的云朵泡泡文字（留空确定则隐藏泡泡）：", d.myNote || "");
+                if (v !== null) { d.myNote = v.trim().slice(0, 8); saveFeedData(d); renderKrMoments(); }
             };
 
-            // 点击 TA 的圆头像：展开看 TA 的限时快拍 Story
             const viewer = topDoc.getElementById("smt-story-viewer");
             topDoc.getElementById("smt-story-char").onclick = () => {
                 const d = getFeedData();
@@ -2405,7 +2394,7 @@ bootSumoulApp();
                 viewer.querySelector("#smt-story-ai-gen").onclick = async (ev) => {
                     ev.target.textContent = "⏳ 刷新中...";
                     try {
-                        const raw = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `请生成一条你在社交软件顶部 24 小时限时快拍(Story)里随手发的画面，以及你头顶的5字以内气泡状态词。严格只输出JSON：{"note":"5字以内状态词(如:想见你/刚下班)","story":"55字以内描述你拍下的快拍画面与配文"}`);
+                        const raw = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `请生成一条你在社交软件顶部 24 小时限时快拍(Story)里随手发的画面，以及你头顶的5字以内云朵泡泡状态词。严格只输出JSON：{"note":"5字以内状态词(如:想见你/刚下班)","story":"55字以内描述你拍下的快拍画面与配文"}`);
                         const m = raw.match(/\{[\s\S]*\}/);
                         if (m) {
                             const obj = JSON.parse(m[0]), latest = getFeedData();
@@ -2435,7 +2424,7 @@ bootSumoulApp();
                 };
             });
 
-            // 渲染下方立体灰白圆角画报动态卡片
+            // 渲染下方动态卡片（定位符号采用极简 SVG 坐标针 KR_ICO.pin）
             const stream = topDoc.getElementById("smt-mom-stream");
             const posts = (data.posts || []).filter((p) => currentFilter === "all" || !p.isMe);
             if (!posts.length) {
@@ -2455,16 +2444,17 @@ bootSumoulApp();
                     <div class="kr-clean-post">
                         <div class="kr-post-head">
                             <div class="kr-post-user">
-                                <img src="${ava}" />
+                                <img class="post-ava" src="${ava}" />
                                 <div>
                                     <div style="font-size:11.5px;font-weight:800;color:#2C2C32;">${name}</div>
-                                    <div style="font-size:8.5px;font-weight:600;color:#8E8E98;margin-top:1px;">📍 ${p.loc || "SEOUL"} · ${p.time || "刚刚"}</div>
+                                    <div style="display:flex;align-items:center;gap:3px;font-size:8.5px;font-weight:600;color:#8E8E98;margin-top:2px;">
+                                        ${KR_ICO.pin}<span>${p.loc || "SEOUL"} · ${p.time || "刚刚"}</span>
+                                    </div>
                                 </div>
                             </div>
                             <span data-insdel="${p.id}" style="cursor:pointer;padding:4px;" title="删除">${KR_ICO.more}</span>
                         </div>
 
-                        <!-- 纯白内嵌拍立得画报卡 -->
                         <div class="kr-film-frame">
                             <div class="kr-film-meta">
                                 <span class="kr-film-tag">${p.filmNo || `FILM · 0${idx + 1}`}</span>
@@ -2474,12 +2464,10 @@ bootSumoulApp();
                             ${p.photoDesc ? `<div class="kr-film-scene">${p.photoDesc.replace(/</g, "&lt;")}</div>` : ""}
                         </div>
 
-                        <!-- 饱满粗体配文 -->
                         <div class="kr-post-caption">
                             <div style="white-space:pre-wrap;">${(p.text || "").replace(/</g, "&lt;")}</div>
                         </div>
 
-                        <!-- 胶囊式互动操作栏 -->
                         <div class="kr-post-bar">
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <span class="kr-act-pill" data-inslike="${p.id}">
@@ -2542,7 +2530,6 @@ bootSumoulApp();
             });
         }
 
-        // 8. 切换筛选、发布动态与 AI 生成新帖
         spacePage.querySelectorAll("[data-feedfilter]").forEach((b) => b.onclick = () => {
             spacePage.querySelectorAll("[data-feedfilter]").forEach((x) => x.classList.remove("dark"));
             b.classList.add("dark");
@@ -2603,7 +2590,7 @@ bootSumoulApp();
             try {
                 const raw = await askAI(
                     `你是${c.charName}。人设：${c.charDesc.slice(0, 1100)}\n近期剧情：${c.recentChat}`,
-                    `请在你的个人社交主页发一条新动态（韩国清冷白灰文艺风，暗戳戳或直接与${c.userName}有关）。严格只输出JSON：{"loc":"首尔地点","note":"你头顶的5字以内气泡状态词","photoDesc":"45字以内的照片画面细腻描写","text":"动态正文(含1句韩文+中文翻译)","friendName":"1位共同好友的名字","friendComment":"该好友在底下的评论"}`
+                    `请在你的个人社交主页发一条新动态（韩国清冷白灰文艺风，暗戳戳或直接与${c.userName}有关）。严格只输出JSON：{"loc":"首尔地点","note":"你头顶的5字以内云朵泡泡状态词","photoDesc":"45字以内的照片画面细腻描写","text":"动态正文(含1句韩文+中文翻译)","friendName":"1位共同好友的名字","friendComment":"该好友在底下的评论"}`
                 );
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
@@ -2630,7 +2617,6 @@ bootSumoulApp();
             finally { e.target.textContent = "✦ 让TA发新帖"; }
         };
 
-        // 9. 绑定主页【情侣空间 App】跳转与角色切换自动刷新
         function openStandaloneCoupleApp() {
             topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
             coupleAppPage.classList.add("active");
@@ -2677,5 +2663,5 @@ bootSumoulApp();
         renderKrMoments();
     }
 
-    mountKoreanBoldMoments();
+    mountKoreanFinalMoments();
 })();
