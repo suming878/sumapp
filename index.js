@@ -1772,126 +1772,207 @@ bootSumoulApp();
     patchCleanMelancholySplash();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 情侣空间 · 极简大留白美学重塑补丁（直接粘在 index.js 最末尾！）】
-// 砍掉所有杂乱九宫格与深灰角标！只保留：1.极简留白双人明信片 + 2.纯净 3×2 柔雾灰小图标矩阵
+// 🤍 【Sumoul App 架构升级补丁：底部第2栏改为「韩系白灰动态流」+「情侣空间」移入主页独立App】
+// 用法：直接粘贴在 index.js 最末尾！自动完成迁移与韩系动态流挂载，零冲突！
 // ==========================================================================
 (function () {
-    const topDoc = (window.parent || window).document;
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
 
-    function patchMinimalistCoupleSpace() {
-        const spacePage = topDoc.getElementById("smt-page-space");
-        if (!spacePage) { setTimeout(patchMinimalistCoupleSpace, 250); return; }
+    function mountMomentsAndMoveCoupleApp() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        const spacePage = topDoc.getElementById("smt-page-space"); // 原第2栏页面 -> 现改造为【韩系动态流】
+        const homePage = topDoc.getElementById("smt-page-home");   // 第3栏主页 -> 新增【情侣空间】独立App入口
+        const fsBody = modal?.querySelector(".smt-fs-body");
+        if (!modal || !spacePage || !homePage || !fsBody) {
+            setTimeout(mountMomentsAndMoveCoupleApp, 250);
+            return;
+        }
 
-        // 1. 极细 1.3px 几何线条图标生成器（干净克制，绝不杂乱）
-        const minIco = (d) => `<img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23484852' stroke-width='1.35' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E" style="width:21px!important;height:21px!important;display:block!important;pointer-events:none!important;" />`;
+        // 防止重复挂载
+        if (topDoc.getElementById("smt-page-couple_app")) return;
 
-        const M_ICO = {
-            pet: minIco("%3Cpath d='M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3.1-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z'/%3E%3Cpath d='M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17l-.75-.75Z'/%3E"),
-            cam: minIco("%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E"),
-            qa: minIco("%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E%3Cpath d='M12 17h.01'/%3E"),
-            wave: minIco("%3Cpath d='M22 12h-4l-3 9L9 3l-3 9H2'/%3E"),
-            ticket: minIco("%3Cpath d='M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z'/%3E%3Cpath d='M13 5v2M13 17v2M13 11v2'/%3E"),
-            note: minIco("%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E")
+        // 1. 极简 1.35px 线性 SVG 图标库
+        const mkIco = (d, sz = 21, stroke = "%233A3A40") => `<img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='${stroke}' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E" style="width:${sz}px!important;height:${sz}px!important;display:block!important;pointer-events:none!important;" />`;
+
+        const K_ICO = {
+            couple: mkIco("%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E"),
+            pet: mkIco("%3Cpath d='M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3.1-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z'/%3E%3Cpath d='M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17l-.75-.75Z'/%3E"),
+            cam: mkIco("%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E"),
+            qa: mkIco("%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E%3Cpath d='M12 17h.01'/%3E"),
+            wave: mkIco("%3Cpath d='M22 12h-4l-3 9L9 3l-3 9H2'/%3E"),
+            ticket: mkIco("%3Cpath d='M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z'/%3E%3Cpath d='M13 5v2M13 17v2M13 11v2'/%3E"),
+            note: mkIco("%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E"),
+            heart: mkIco("%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E", 13, "%2355555E"),
+            comment: mkIco("%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/%3E", 13, "%2355555E"),
+            trash: mkIco("%3Cpath d='M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'/%3E", 12, "%239A9AA5")
         };
 
-        // 2. 注入极简留白专属 CSS
-        topDoc.getElementById("sumoul-minimal-space-css")?.remove();
+        // 2. 注入韩国社交软件级「极简白灰动态流 + 独立情侣空间 App」CSS
+        topDoc.getElementById("sumoul-moments-css")?.remove();
         const st = topDoc.createElement("style");
-        st.id = "sumoul-minimal-space-css";
+        st.id = "sumoul-moments-css";
         st.innerHTML = `
-            #seoul-mini-theater-modal #smt-page-space {
-                padding: 14px 10px 24px 10px !important;
-                background: #FFFFFF !important;
-                gap: 26px !important;
+            /* 底部第2栏图标改为韩系动态相机/星芒样式 */
+            #seoul-mini-theater-modal .smt-tab-item[data-page="space"] .smt-tab-ico {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A7A85' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='4'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E") !important;
             }
-            /* 极简留白双人明信片 */
-            #seoul-mini-theater-modal .sm-pure-card {
+            #seoul-mini-theater-modal .smt-tab-item[data-page="space"].active .smt-tab-ico {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232C2C32' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='4'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E") !important;
+            }
+
+            /* ── 韩系极简白灰动态流 (Korean Monochrome Feed) ── */
+            #seoul-mini-theater-modal #smt-page-space {
+                padding: 4px 2px 20px 2px !important;
+                gap: 12px !important;
+                background: #FFFFFF !important;
+            }
+            #seoul-mini-theater-modal .kr-feed-header {
+                background: #F8F8FA !important;
+                border: 1px solid #ECECF2 !important;
+                border-radius: 18px !important;
+                padding: 14px 15px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                flex-shrink: 0 !important;
+            }
+            #seoul-mini-theater-modal .kr-feed-card {
+                background: #FFFFFF !important;
+                border: 1px solid #ECECF2 !important;
+                border-radius: 18px !important;
+                padding: 15px !important;
+                margin-bottom: 11px !important;
+            }
+            #seoul-mini-theater-modal .kr-feed-top {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                margin-bottom: 11px !important;
+            }
+            #seoul-mini-theater-modal .kr-feed-author {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+            }
+            #seoul-mini-theater-modal .kr-feed-ava {
+                width: 38px !important;
+                height: 38px !important;
+                border-radius: 50% !important;
+                object-fit: cover !important;
+                border: 1px solid #EAEAF0 !important;
+                background: #F8F8FA !important;
+            }
+            /* 韩国软件特有的灰白氛围配图卡 (Photo Frame) */
+            #seoul-mini-theater-modal .kr-feed-photo {
+                background: #F8F8FA !important;
+                border: 1px solid #EFEFF4 !important;
+                border-radius: 13px !important;
+                padding: 14px !important;
+                margin: 10px 0 !important;
+                font-size: 10.5px !important;
+                color: #55555E !important;
+                line-height: 1.65 !important;
+                position: relative !important;
+            }
+            #seoul-mini-theater-modal .kr-feed-photo img {
+                width: 100% !important;
+                max-height: 210px !important;
+                object-fit: cover !important;
+                border-radius: 9px !important;
+                display: block !important;
+                margin-bottom: 8px !important;
+            }
+            #seoul-mini-theater-modal .kr-feed-actions {
+                display: flex !important;
+                align-items: center !important;
+                gap: 14px !important;
+                padding-top: 9px !important;
+                border-top: 1px solid #F5F5F8 !important;
+                margin-top: 8px !important;
+                font-size: 10px !important;
+                color: #6E6E77 !important;
+            }
+            #seoul-mini-theater-modal .kr-act-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                cursor: pointer !important;
+                padding: 3px 8px !important;
+                border-radius: 99px !important;
+                background: #F8F8FA !important;
+                border: 1px solid #EFEFF4 !important;
+                font-size: 9.5px !important;
+                font-weight: 600 !important;
+            }
+            #seoul-mini-theater-modal .kr-cmt-box {
+                background: #F8F8FA !important;
+                border-radius: 11px !important;
+                padding: 9px 11px !important;
+                margin-top: 9px !important;
+                font-size: 10px !important;
+                line-height: 1.6 !important;
+            }
+
+            /* ── 独立情侣空间 App 内部极简白灰样式 (#smt-page-couple_app) ── */
+            #seoul-mini-theater-modal .cp-pure-card {
                 background: #F8F8FA !important;
                 border: 1px solid #EAEAEF !important;
                 border-radius: 20px !important;
-                padding: 26px 20px 22px 20px !important;
+                padding: 22px 18px !important;
                 text-align: center !important;
-                position: relative !important;
+                margin-bottom: 22px !important;
                 background-size: cover !important;
                 background-position: center !important;
             }
-            #seoul-mini-theater-modal .sm-pure-inner {
-                background: rgba(255, 255, 255, 0.92) !important;
+            #seoul-mini-theater-modal .cp-pure-inner {
+                background: rgba(255, 255, 255, 0.94) !important;
                 border: 1px solid #EFEFF4 !important;
                 border-radius: 16px !important;
-                padding: 24px 16px 18px 16px !important;
+                padding: 22px 14px 16px 14px !important;
             }
-            #seoul-mini-theater-modal .sm-pure-avas {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 18px !important;
-                margin-bottom: 16px !important;
-            }
-            #seoul-mini-theater-modal .sm-pure-avas img {
-                width: 54px !important;
-                height: 54px !important;
-                border-radius: 50% !important;
-                object-fit: cover !important;
-                border: 1.5px solid #EAEAEF !important;
-                background: #FFFFFF !important;
-                padding: 2px !important;
-            }
-            #seoul-mini-theater-modal .sm-pure-line {
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                min-width: 76px !important;
-            }
-            /* 3×2 纯净无框感图标矩阵 */
-            #seoul-mini-theater-modal .sm-pure-grid {
+            #seoul-mini-theater-modal .cp-pure-grid {
                 display: grid !important;
                 grid-template-columns: repeat(3, 1fr) !important;
-                row-gap: 24px !important;
-                column-gap: 12px !important;
-                padding: 4px 6px !important;
+                row-gap: 20px !important;
+                column-gap: 10px !important;
             }
-            #seoul-mini-theater-modal .sm-pure-app {
+            #seoul-mini-theater-modal .cp-pure-item {
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 text-align: center !important;
                 cursor: pointer !important;
-                transition: transform 0.15s ease, opacity 0.15s ease !important;
             }
-            #seoul-mini-theater-modal .sm-pure-app:active {
-                transform: scale(0.92) !important;
-                opacity: 0.75 !important;
-            }
-            #seoul-mini-theater-modal .sm-pure-ico {
-                width: 54px !important;
-                height: 54px !important;
-                border-radius: 18px !important;
+            #seoul-mini-theater-modal .cp-pure-ico {
+                width: 52px !important;
+                height: 52px !important;
+                border-radius: 17px !important;
                 background: #F8F8FA !important;
                 border: 1px solid #EAEAEF !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                margin-bottom: 9px !important;
-            }
-            #seoul-mini-theater-modal .sm-pure-name {
-                font-size: 10.5px !important;
-                font-weight: 600 !important;
-                color: #3A3A40 !important;
-                letter-spacing: 0.3px !important;
-            }
-            #seoul-mini-theater-modal .sm-pure-en {
-                font-size: 7.5px !important;
-                color: #A0A0AA !important;
-                letter-spacing: 0.8px !important;
-                margin-top: 2px !important;
+                margin-bottom: 7px !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        // 3. 保留原代码中 renderCoupleSpaceAll 需要的隐藏占位节点（防止原函数找不到 ID 报错），并渲染全新的极简大留白视图
-        spacePage.innerHTML = `
-            <!-- 隐藏兼容槽（完全不可见，仅防止旧渲染器报错） -->
+        // 3. 把底部第 2 栏导航按钮文字改成「动态」
+        const tab2 = modal.querySelector('.smt-tab-item[data-page="space"]');
+        if (tab2) {
+            tab2.setAttribute("data-title", "MOMENTS · 소식");
+            tab2.setAttribute("data-sub", "Korean Social Feed · 动态");
+            const txtEl = tab2.querySelector(".smt-tab-txt");
+            if (txtEl) txtEl.textContent = "动态";
+        }
+
+        // 4. 新建独立的【全屏情侣空间 App 页面 (#smt-page-couple_app)】，把原来的情侣空间完整搬进去！
+        const coupleAppPage = topDoc.createElement("div");
+        coupleAppPage.id = "smt-page-couple_app";
+        coupleAppPage.className = "smt-page";
+        coupleAppPage.innerHTML = `
+            <!-- 隐藏兼容槽（防止旧函数报错） -->
             <div style="display:none!important;">
                 <span id="smt-sp-char-scope-tag"></span><span id="smt-stat-pet"></span><span id="smt-stat-petname"></span>
                 <span id="smt-stat-fund"></span><span id="smt-badge-pet"></span><span id="smt-badge-bpm"></span>
@@ -1899,73 +1980,428 @@ bootSumoulApp();
                 <div id="smt-ins-detail-pop"></div><span id="smt-ins-user-add"></span><span id="smt-ins-ai-add"></span>
             </div>
 
-            <!-- 1. 上半屏：极简留白双人记忆明信片 -->
-            <div class="sm-pure-card" id="smt-sp-hero-card">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-                    <span style="font-size:8px;color:#9A9AA5;letter-spacing:1.8px;font-family:monospace;">SUMOUL ARCHIVE</span>
-                    <div style="display:flex;gap:6px;">
-                        <span class="smt-pill-btn" id="smt-sp-bg-btn" style="height:20px!important;font-size:8px!important;color:#8E8E98!important;">背景</span>
-                        <span class="smt-pill-btn" id="smt-sp-mood" style="height:20px!important;font-size:8px!important;color:#8E8E98!important;">36.7°C</span>
-                        <span class="smt-pill-btn" id="smt-sp-reset-char" style="height:20px!important;font-size:8px!important;color:#8E8E98!important;">重置</span>
+            <div class="cp-pure-card" id="smt-sp-hero-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <span style="font-size:8px;color:#9A9AA5;letter-spacing:1.6px;font-family:monospace;">COUPLE SPACE · 커플앱</span>
+                    <div style="display:flex;gap:5px;">
+                        <span class="smt-pill-btn" id="smt-sp-bg-btn" style="height:20px!important;font-size:8px!important;">背景</span>
+                        <span class="smt-pill-btn" id="smt-sp-mood" style="height:20px!important;font-size:8px!important;">36.7°C</span>
+                        <span class="smt-pill-btn" id="smt-sp-reset-char" style="height:20px!important;font-size:8px!important;">重置</span>
                     </div>
                 </div>
-
-                <div class="sm-pure-inner">
-                    <div class="sm-pure-avas">
-                        <img id="smt-sp-uava" src="" />
-                        <div class="sm-pure-line" id="smt-sp-edit-date" style="cursor:pointer;" title="点击修改纪念日">
-                            <div style="font-size:17px;font-weight:600;color:#2C2C32;letter-spacing:1px;" id="smt-sp-days">D+100</div>
-                            <div style="width:64px;height:1px;border-bottom:1px dashed #D0D0DA;margin:6px 0;"></div>
-                            <div style="font-size:7.5px;color:#A0A0AA;letter-spacing:1.4px;">TOGETHER</div>
+                <div class="cp-pure-inner">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:14px;">
+                        <img id="smt-sp-uava" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:1.5px solid #EAEAEF;padding:2px;background:#FFF;" />
+                        <div id="smt-sp-edit-date" style="cursor:pointer;min-width:74px;">
+                            <div style="font-size:17px;font-weight:700;color:#2C2C32;letter-spacing:.8px;" id="smt-sp-days">D+100</div>
+                            <div style="width:60px;height:1px;border-bottom:1px dashed #D0D0DA;margin:5px auto;"></div>
+                            <div style="font-size:7.5px;color:#A0A0AA;letter-spacing:1.2px;">ANNIVERSARY ✎</div>
                         </div>
-                        <img id="smt-sp-cava" src="" />
+                        <img id="smt-sp-cava" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:1.5px solid #EAEAEF;padding:2px;background:#FFF;" />
                     </div>
-
-                    <div style="font-size:11px;font-weight:600;color:#3A3A40;letter-spacing:0.8px;margin-bottom:6px;" id="smt-sp-couple-names">ME &amp; PARTNER</div>
-                    <div style="font-size:9.2px;color:#8E8E98;line-height:1.6;cursor:pointer;" id="smt-sp-refresh-live" title="点击刷新TA此刻状态">
-                        <span id="smt-sp-live-bio">正在安静地陪在你身边</span> <span style="font-size:8px;color:#B0B0BA;">↻</span>
+                    <div style="font-size:11px;font-weight:600;color:#3A3A40;margin-bottom:5px;" id="smt-sp-couple-names">ME &amp; PARTNER</div>
+                    <div style="font-size:9px;color:#8E8E98;cursor:pointer;" id="smt-sp-refresh-live">
+                        <span id="smt-sp-live-bio">正在安静地陪在你身边</span> <span style="font-size:8px;">↻</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. 下半屏：纯净 3×2 柔雾灰桌面图标矩阵（无杂乱角标、无多余边框） -->
-            <div>
-                <div style="text-align:center;font-size:8px;color:#B0B0BA;letter-spacing:2.2px;margin-bottom:18px;">COUPLE SPACE · 06 APPS</div>
-                <div class="sm-pure-grid">
-                    <div class="sm-pure-app" data-openapp="sp_pet">
-                        <div class="sm-pure-ico">${M_ICO.pet}</div>
-                        <div class="sm-pure-name">云养萌宠</div>
-                        <div class="sm-pure-en">PET HOUSE</div>
-                    </div>
-                    <div class="sm-pure-app" data-openapp="sp_4cut">
-                        <div class="sm-pure-ico">${M_ICO.cam}</div>
-                        <div class="sm-pure-name">人生四格</div>
-                        <div class="sm-pure-en">LIFE 4 CUT</div>
-                    </div>
-                    <div class="sm-pure-app" data-openapp="sp_qa">
-                        <div class="sm-pure-ico">${M_ICO.qa}</div>
-                        <div class="sm-pure-name">灵魂百问</div>
-                        <div class="sm-pure-en">CAPSULE Q&amp;A</div>
-                    </div>
-                    <div class="sm-pure-app" data-openapp="sp_mood">
-                        <div class="sm-pure-ico">${M_ICO.wave}</div>
-                        <div class="sm-pure-name">同居波频</div>
-                        <div class="sm-pure-en">HEARTBEAT</div>
-                    </div>
-                    <div class="sm-pure-app" data-openapp="sp_coupon">
-                        <div class="sm-pure-ico">${M_ICO.ticket}</div>
-                        <div class="sm-pure-name">恋爱兑换券</div>
-                        <div class="sm-pure-en">COUPONS</div>
-                    </div>
-                    <div class="sm-pure-app" data-openapp="sp_guest">
-                        <div class="sm-pure-ico">${M_ICO.note}</div>
-                        <div class="sm-pure-name">留言与心愿</div>
-                        <div class="sm-pure-en">GUESTBOOK</div>
-                    </div>
+            <div class="cp-pure-grid">
+                <div class="cp-pure-item" data-cpopen="sp_pet">
+                    <div class="cp-pure-ico">${K_ICO.pet}</div>
+                    <div style="font-size:10.5px;font-weight:600;color:#3A3A40;">云养萌宠</div>
+                    <div style="font-size:7.5px;color:#A0A0AA;margin-top:2px;">PET HOUSE</div>
+                </div>
+                <div class="cp-pure-item" data-cpopen="sp_4cut">
+                    <div class="cp-pure-ico">${K_ICO.cam}</div>
+                    <div style="font-size:10.5px;font-weight:600;color:#3A3A40;">人生四格</div>
+                    <div style="font-size:7.5px;color:#A0A0AA;margin-top:2px;">LIFE 4 CUT</div>
+                </div>
+                <div class="cp-pure-item" data-cpopen="sp_qa">
+                    <div class="cp-pure-ico">${K_ICO.qa}</div>
+                    <div style="font-size:10.5px;font-weight:600;color:#3A3A40;">灵魂百问</div>
+                    <div style="font-size:7.5px;color:#A0A0AA;margin-top:2px;">CAPSULE Q&amp;A</div>
+                </div>
+                <div class="cp-pure-item" data-cpopen="sp_mood">
+                    <div class="cp-pure-ico">${K_ICO.wave}</div>
+                    <div style="font-size:10.5px;font-weight:600;color:#3A3A40;">同居波频</div>
+                    <div style="font-size:7.5px;color:#A0A0AA;margin-top:2px;">HEARTBEAT</div>
+                </div>
+                <div class="cp-pure-item" data-cpopen="sp_coupon">
+                    <div class="cp-pure-ico">${K_ICO.ticket}</div>
+                    <div style="font-size:10.5px;font-weight:600;color:#3A3A40;">恋爱兑换券</div>
+                    <div style="font-size:7.5px;color:#A0A0AA;margin-top:2px;">COUPONS</div>
+                </div>
+                <div class="cp-pure-item" data-cpopen="sp_guest">
+                    <div class="cp-pure-ico">${K_ICO.note}</div>
+                    <div style="font-size:10.5px;font-weight:600;color:#3A3A40;">留言与心愿</div>
+                    <div style="font-size:7.5px;color:#A0A0AA;margin-top:2px;">GUESTBOOK</div>
                 </div>
             </div>
         `;
+        fsBody.appendChild(coupleAppPage);
+
+        // 5. 在第 3 栏「主页/应用」的 App 坞里加入第 1 个独立软件：【情侣空间】！
+        const homeDockGrid = homePage.querySelector(".ab-dock-grid");
+        if (homeDockGrid) {
+            homeDockGrid.style.setProperty("grid-template-columns", "repeat(4, 1fr)", "important");
+            const cpAppBtn = topDoc.createElement("div");
+            cpAppBtn.className = "ab-app-item";
+            cpAppBtn.id = "smt-home-open-couple-app";
+            cpAppBtn.innerHTML = `
+                <div class="ab-app-squircle">${K_ICO.couple}</div>
+                <div class="ab-app-title">情侣空间</div>
+                <div class="ab-app-kr">COUPLE APP</div>
+            `;
+            homeDockGrid.prepend(cpAppBtn);
+        }
+
+        // 6. 将原本的第 2 栏 (`#smt-page-space`) 彻底改造成【韩国社交软件级 · 白灰动态流 (MOMENTS · 소식)】！
+        spacePage.innerHTML = `
+            <div class="kr-feed-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <img id="smt-mom-uava" src="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1.5px solid #FFF;" />
+                    <div>
+                        <div style="font-size:11px;font-weight:700;color:#2C2C32;" id="smt-mom-uname">MY FEED</div>
+                        <div style="font-size:8px;color:#8E8E98;letter-spacing:.4px;">DAILY MOMENTS · 일상 기록</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:5px;">
+                    <span class="smt-pill-btn" id="smt-mom-user-post">＋ 发动态</span>
+                    <span class="smt-pill-btn dark" id="smt-mom-ai-post">✦ 让TA发动态</span>
+                </div>
+            </div>
+
+            <!-- 发动态展开抽屉 -->
+            <div id="smt-mom-post-drawer" class="smt-section-box" style="display:none;flex-shrink:0;">
+                <div style="font-size:9.5px;font-weight:700;margin-bottom:6px;">새 게시물 · 发布我的新动态 (发布后TA会自动点赞评论)</div>
+                <textarea id="smt-mom-post-txt" style="width:100%;height:56px;background:#FFF;border:1px solid #E4E4EC;border-radius:9px;padding:7px;font-size:10.5px;box-sizing:border-box;resize:none;margin-bottom:6px;outline:none;" placeholder="写下此刻的心情或日常..."></textarea>
+                <input type="text" id="smt-mom-post-img" class="smt-wx-input" style="width:100%;height:26px!important;font-size:9.5px!important;box-sizing:border-box;margin-bottom:7px;" placeholder="配图画面描述 或 粘贴图片URL (选填)..." />
+                <div style="display:flex;justify-content:flex-end;gap:5px;">
+                    <span class="smt-pill-btn" id="smt-mom-post-cancel">取消</span>
+                    <span class="smt-pill-btn dark" id="smt-mom-post-submit">发布并让TA互动</span>
+                </div>
+            </div>
+
+            <!-- 动态流容器 -->
+            <div id="smt-mom-stream" style="flex:1;min-height:0;overflow-y:auto;padding-bottom:10px;"></div>
+        `;
+
+        // 7. 动态流数据读写与 AI 互动引擎（按角色独立分库！）
+        function getCtx() {
+            let userName = "ME", charName = "PARTNER", userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg", charDesc = "", recentChat = "";
+            try {
+                const st = topWin.SillyTavern?.getContext?.();
+                if (st) {
+                    userName = st.name1 || userName;
+                    if (st.characterId !== undefined && st.characters?.[st.characterId]) {
+                        const c = st.characters[st.characterId];
+                        charName = c.name || st.name2 || charName;
+                        if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
+                        charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
+                    }
+                    if (Array.isArray(st.chat) && st.chat.length) {
+                        recentChat = st.chat.slice(-8).map((m) => `${m.is_user ? userName : charName}: ${m.mes}`).join("\n");
+                    }
+                }
+            } catch (e) {}
+            const aiMes = topDoc.querySelectorAll('#chat .mes:not([is_user="true"]):not(.is_user)');
+            if (aiMes.length) {
+                const last = aiMes[aiMes.length - 1];
+                charName = last.querySelector(".name_text")?.textContent?.trim() || charName;
+                charAvatar = last.querySelector(".avatar img")?.src || charAvatar;
+            }
+            const uMes = topDoc.querySelectorAll('#chat .mes[is_user="true"], #chat .mes.is_user');
+            if (uMes.length) {
+                const last = uMes[uMes.length - 1];
+                userName = last.querySelector(".name_text")?.textContent?.trim() || userName;
+                userAvatar = last.querySelector(".avatar img")?.src || userAvatar;
+            }
+            const safeScope = String(charName).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+            try {
+                const wRaw = localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`);
+                if (wRaw) {
+                    const wc = JSON.parse(wRaw);
+                    if (wc.myNick) userName = wc.myNick;
+                    if (wc.remark) charName = wc.remark;
+                    if (wc.myAva) userAvatar = wc.myAva;
+                    if (wc.charAva) charAvatar = wc.charAva;
+                }
+            } catch (e) {}
+            return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat };
+        }
+
+        async function askAI(sys, usr) {
+            const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
+            const k = topDoc.getElementById("smt-api-key")?.value?.trim();
+            const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
+            if (!u || !k) {
+                topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click();
+                throw new Error("请先在【05.API设置】填写独立 API 地址与 Key！");
+            }
+            const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
+            const r = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` },
+                body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })
+            });
+            if (!r.ok) throw new Error(`API HTTP ${r.status}`);
+            const d = await r.json();
+            return d?.choices?.[0]?.message?.content?.trim() || "";
+        }
+
+        function getMomentsList() {
+            const c = getCtx(), key = `sumoul_v16_moments__${c.safeScope}`;
+            try {
+                const raw = localStorage.getItem(key);
+                if (raw) return JSON.parse(raw);
+            } catch (e) {}
+            return [
+                {
+                    id: 1,
+                    isMe: false,
+                    author: c.charName,
+                    loc: "SEOUL · 凌晨街角",
+                    time: "刚刚",
+                    text: "오늘도 늦게까지 잠이 안 오네. 네 생각하다가.",
+                    photoDesc: "车窗外掠过的首尔灰白街灯，副驾驶座上还留着你上次落下的小发卡。",
+                    imgUrl: "",
+                    liked: true,
+                    likesCount: 12,
+                    comments: [
+                        { who: c.charName, text: "下次见面记得拿回去，或者就一直留在这。" }
+                    ]
+                }
+            ];
+        }
+        function saveMomentsList(list) {
+            localStorage.setItem(`sumoul_v16_moments__${getCtx().safeScope}`, JSON.stringify(list.slice(0, 60)));
+        }
+
+        function renderMomentsFeed() {
+            const c = getCtx(), list = getMomentsList();
+            topDoc.getElementById("smt-mom-uava").src = c.userAvatar;
+            topDoc.getElementById("smt-mom-uname").textContent = `${c.userName} & ${c.charName}`;
+
+            const box = topDoc.getElementById("smt-mom-stream");
+            if (!list.length) {
+                box.innerHTML = `<div style="text-align:center;padding:40px 16px;font-size:10px;color:#9A9AA5;">暂无动态，点击右上角「让TA发动态」或「发动态」吧</div>`;
+                return;
+            }
+
+            box.innerHTML = list.map((p, idx) => {
+                const ava = p.isMe ? c.userAvatar : c.charAvatar;
+                const name = p.isMe ? c.userName : c.charName;
+                const photoHtml = (p.imgUrl || p.photoDesc) ? `
+                    <div class="kr-feed-photo">
+                        ${p.imgUrl && /^https?:|^data:/.test(p.imgUrl) ? `<img src="${p.imgUrl}" />` : ""}
+                        ${p.photoDesc ? `<div><span style="font-size:8px;font-weight:700;color:#8E8E98;letter-spacing:.8px;display:block;margin-bottom:3px;">SCENE · 画面定格</span>${p.photoDesc.replace(/</g, "&lt;")}</div>` : ""}
+                    </div>` : "";
+
+                const cmtsHtml = (p.comments && p.comments.length) ? `
+                    <div class="kr-cmt-box">
+                        ${p.comments.map((cm) => `<div style="margin-bottom:3px;"><b style="color:#2C2C32;">${cm.who}：</b><span style="color:#484852;">${cm.text.replace(/</g, "&lt;")}</span></div>`).join("")}
+                    </div>` : "";
+
+                return `
+                    <div class="kr-feed-card">
+                        <div class="kr-feed-top">
+                            <div class="kr-feed-author">
+                                <img class="kr-feed-ava" src="${ava}" />
+                                <div>
+                                    <div style="font-size:11px;font-weight:700;color:#2C2C32;">${name}</div>
+                                    <div style="font-size:8px;color:#9A9AA5;margin-top:1px;">${p.loc || "SEOUL"} · ${p.time || "刚刚"}</div>
+                                </div>
+                            </div>
+                            <span data-momdel="${idx}" style="cursor:pointer;padding:4px;" title="删除此条动态">${K_ICO.trash}</span>
+                        </div>
+
+                        <div style="font-size:11.5px;line-height:1.65;color:#2C2C32;white-space:pre-wrap;margin-bottom:4px;">${(p.text || "").replace(/</g, "&lt;")}</div>
+                        ${photoHtml}
+
+                        <div class="kr-feed-actions">
+                            <span class="kr-act-btn" data-momlike="${idx}" style="${p.liked ? "background:#484852!important;color:#FFF!important;-webkit-text-fill-color:#FFF!important;" : ""}">
+                                ♡ <span>${p.likesCount || 1}</span>
+                            </span>
+                            <span class="kr-act-btn" data-momcmt="${idx}">
+                                ${K_ICO.comment} <span>评论 (${(p.comments || []).length})</span>
+                            </span>
+                        </div>
+                        ${cmtsHtml}
+                    </div>
+                `;
+            }).join("");
+
+            // 点赞
+            box.querySelectorAll("[data-momlike]").forEach((el) => el.onclick = () => {
+                const i = Number(el.getAttribute("data-momlike")), arr = getMomentsList();
+                if (!arr[i]) return;
+                arr[i].liked = !arr[i].liked;
+                arr[i].likesCount = Math.max(0, (arr[i].likesCount || 1) + (arr[i].liked ? 1 : -1));
+                saveMomentsList(arr); renderMomentsFeed();
+            });
+
+            // 删除动态
+            box.querySelectorAll("[data-momdel]").forEach((el) => el.onclick = () => {
+                const i = Number(el.getAttribute("data-momdel")), arr = getMomentsList();
+                arr.splice(i, 1); saveMomentsList(arr); renderMomentsFeed();
+            });
+
+            // 评论并触发 TA 自动回复评论
+            box.querySelectorAll("[data-momcmt]").forEach((el) => el.onclick = async () => {
+                const i = Number(el.getAttribute("data-momcmt")), arr = getMomentsList(), target = arr[i];
+                if (!target) return;
+                const replyTxt = prompt(`评论 ${target.author} 的动态：`);
+                if (!replyTxt || !replyTxt.trim()) return;
+                const ctx = getCtx();
+                target.comments = target.comments || [];
+                target.comments.push({ who: ctx.userName, text: replyTxt.trim() });
+                saveMomentsList(arr); renderMomentsFeed();
+
+                try {
+                    const aiCmt = await askAI(
+                        `你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 1000)}\n近期剧情：${ctx.recentChat}`,
+                        `在社交动态「${target.text}（画面：${target.photoDesc || "无"}）」下方，${ctx.userName}刚刚评论了：“${replyTxt.trim()}”。请以${ctx.charName}的口吻直接回复一条简短评论(35字以内，不要引号)：`
+                    );
+                    const latest = getMomentsList();
+                    if (latest[i]) {
+                        latest[i].comments.push({ who: `${ctx.charName} 回复 ${ctx.userName}`, text: aiCmt });
+                        saveMomentsList(latest); renderMomentsFeed();
+                    }
+                } catch (e) {}
+            });
+        }
+
+        // 发布我的动态 + AI 自动点赞与评论
+        const postDrawer = topDoc.getElementById("smt-mom-post-drawer");
+        topDoc.getElementById("smt-mom-user-post").onclick = () => {
+            postDrawer.style.display = postDrawer.style.display === "none" ? "block" : "none";
+        };
+        topDoc.getElementById("smt-mom-post-cancel").onclick = () => { postDrawer.style.display = "none"; };
+        topDoc.getElementById("smt-mom-post-submit").onclick = async (e) => {
+            const txt = topDoc.getElementById("smt-mom-post-txt").value.trim();
+            const imgInput = topDoc.getElementById("smt-mom-post-img").value.trim();
+            if (!txt && !imgInput) return alert("请写一点动态内容或配图描述！");
+            const c = getCtx(), arr = getMomentsList();
+            const isUrl = /^https?:|^data:/.test(imgInput);
+            const newPost = {
+                id: Date.now(),
+                isMe: true,
+                author: c.userName,
+                loc: "SEOUL",
+                time: "刚刚",
+                text: txt,
+                imgUrl: isUrl ? imgInput : "",
+                photoDesc: isUrl ? "" : imgInput,
+                liked: true,
+                likesCount: 1,
+                comments: []
+            };
+            arr.unshift(newPost);
+            saveMomentsList(arr);
+            topDoc.getElementById("smt-mom-post-txt").value = "";
+            topDoc.getElementById("smt-mom-post-img").value = "";
+            postDrawer.style.display = "none";
+            renderMomentsFeed();
+
+            // 让 TA 自动来给你的动态点赞并留一条评论
+            try {
+                const aiReply = await askAI(
+                    `你是${c.charName}。人设：${c.charDesc.slice(0, 1000)}\n近期剧情：${c.recentChat}`,
+                    `${c.userName}刚刚发了一条社交动态：“${txt}”${imgInput ? `（配图：${imgInput}）` : ""}。请以${c.charName}的身份在底下留一条评论(40字以内，不要加名字前缀)：`
+                );
+                const curArr = getMomentsList();
+                if (curArr[0] && curArr[0].id === newPost.id) {
+                    curArr[0].likesCount = 2;
+                    curArr[0].comments.push({ who: c.charName, text: aiReply });
+                    saveMomentsList(curArr);
+                    renderMomentsFeed();
+                }
+            } catch (err) {}
+        };
+
+        // 让 TA 主动发一条韩系白灰氛围动态
+        topDoc.getElementById("smt-mom-ai-post").onclick = async (e) => {
+            const c = getCtx();
+            e.target.textContent = "⏳ 正在发布...";
+            try {
+                const raw = await askAI(
+                    `你是${c.charName}。人设：${c.charDesc.slice(0, 1100)}\n近期剧情：${c.recentChat}`,
+                    `请在你的个人社交主页发一条新动态（带一点韩国文艺/忧郁或暗戳戳与${c.userName}有关的日常氛围）。严格只输出JSON格式：{"loc":"发布地点(如:汉江边/书房)","text":"动态正文(可带1句韩文+中文，60字以内)","photoDesc":"配图画面描写(40字以内)","firstComment":"你自己或共同好友在底下的1条简短评论(选填)"}`
+                );
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) {
+                    const obj = JSON.parse(m[0]), arr = getMomentsList();
+                    arr.unshift({
+                        id: Date.now(),
+                        isMe: false,
+                        author: c.charName,
+                        loc: obj.loc || "SEOUL",
+                        time: "刚刚",
+                        text: obj.text || "",
+                        photoDesc: obj.photoDesc || "",
+                        imgUrl: "",
+                        liked: false,
+                        likesCount: Math.floor(Math.random() * 20) + 5,
+                        comments: obj.firstComment ? [{ who: c.charName, text: obj.firstComment }] : []
+                    });
+                    saveMomentsList(arr);
+                    renderMomentsFeed();
+                }
+            } catch (err) { alert(err.message); }
+            finally { e.target.textContent = "✦ 让TA发动态"; }
+        };
+
+        // 8. 绑定主页【情侣空间】独立 App 的打开与子页面返回逻辑
+        let inCoupleAppFlow = false;
+        let inCoupleSubApp = false;
+
+        function openStandaloneCoupleApp() {
+            inCoupleAppFlow = true;
+            inCoupleSubApp = false;
+            topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
+            coupleAppPage.classList.add("active");
+            topDoc.getElementById("smt-back-text").textContent = "이전 · 返回主页";
+            topDoc.getElementById("smt-top-title").textContent = "COUPLE SPACE · 情侣空间";
+            topDoc.getElementById("smt-top-sub").textContent = "Standalone Couple App";
+        }
+
+        topDoc.getElementById("smt-home-open-couple-app")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openStandaloneCoupleApp();
+        });
+
+        coupleAppPage.querySelectorAll("[data-cpopen]").forEach((item) => {
+            item.onclick = () => {
+                const subId = item.getAttribute("data-cpopen");
+                inCoupleAppFlow = true;
+                inCoupleSubApp = true;
+                topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
+                topDoc.getElementById(`smt-page-${subId}`)?.classList.add("active");
+                topDoc.getElementById("smt-back-text").textContent = "이전 · 返回情侣空间";
+            };
+        });
+
+        // 拦截左上角返回按钮：若在情侣空间子功能里 -> 退回情侣空间App；若在情侣空间App -> 退回第3栏「主页/应用」
+        topDoc.getElementById("smt-header-back-btn").addEventListener("click", (e) => {
+            const subIds = ["sp_pet", "sp_4cut", "sp_qa", "sp_mood", "sp_coupon", "sp_guest"];
+            const isSubActive = subIds.some((k) => topDoc.getElementById(`smt-page-${k}`)?.classList.contains("active"));
+            if (isSubActive) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                openStandaloneCoupleApp();
+            } else if (coupleAppPage.classList.contains("active")) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                inCoupleAppFlow = false;
+                topDoc.querySelector('.smt-tab-item[data-page="home"]')?.click();
+            }
+        }, true);
+
+        // 点击底部「动态」Tab 时自动刷新动态流
+        tab2?.addEventListener("click", () => setTimeout(renderMomentsFeed, 30));
+        renderMomentsFeed();
     }
 
-    patchMinimalistCoupleSpace();
+    mountMomentsAndMoveCoupleApp();
 })();
