@@ -1771,3 +1771,201 @@ bootSumoulApp();
     }
     patchCleanMelancholySplash();
 })();
+// ==========================================================================
+// 🤍 【Sumoul App 情侣空间 · 极简大留白美学重塑补丁（直接粘在 index.js 最末尾！）】
+// 砍掉所有杂乱九宫格与深灰角标！只保留：1.极简留白双人明信片 + 2.纯净 3×2 柔雾灰小图标矩阵
+// ==========================================================================
+(function () {
+    const topDoc = (window.parent || window).document;
+
+    function patchMinimalistCoupleSpace() {
+        const spacePage = topDoc.getElementById("smt-page-space");
+        if (!spacePage) { setTimeout(patchMinimalistCoupleSpace, 250); return; }
+
+        // 1. 极细 1.3px 几何线条图标生成器（干净克制，绝不杂乱）
+        const minIco = (d) => `<img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23484852' stroke-width='1.35' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E" style="width:21px!important;height:21px!important;display:block!important;pointer-events:none!important;" />`;
+
+        const M_ICO = {
+            pet: minIco("%3Cpath d='M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3.1-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z'/%3E%3Cpath d='M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17l-.75-.75Z'/%3E"),
+            cam: minIco("%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E"),
+            qa: minIco("%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E%3Cpath d='M12 17h.01'/%3E"),
+            wave: minIco("%3Cpath d='M22 12h-4l-3 9L9 3l-3 9H2'/%3E"),
+            ticket: minIco("%3Cpath d='M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z'/%3E%3Cpath d='M13 5v2M13 17v2M13 11v2'/%3E"),
+            note: minIco("%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E")
+        };
+
+        // 2. 注入极简留白专属 CSS
+        topDoc.getElementById("sumoul-minimal-space-css")?.remove();
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-minimal-space-css";
+        st.innerHTML = `
+            #seoul-mini-theater-modal #smt-page-space {
+                padding: 14px 10px 24px 10px !important;
+                background: #FFFFFF !important;
+                gap: 26px !important;
+            }
+            /* 极简留白双人明信片 */
+            #seoul-mini-theater-modal .sm-pure-card {
+                background: #F8F8FA !important;
+                border: 1px solid #EAEAEF !important;
+                border-radius: 20px !important;
+                padding: 26px 20px 22px 20px !important;
+                text-align: center !important;
+                position: relative !important;
+                background-size: cover !important;
+                background-position: center !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-inner {
+                background: rgba(255, 255, 255, 0.92) !important;
+                border: 1px solid #EFEFF4 !important;
+                border-radius: 16px !important;
+                padding: 24px 16px 18px 16px !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-avas {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 18px !important;
+                margin-bottom: 16px !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-avas img {
+                width: 54px !important;
+                height: 54px !important;
+                border-radius: 50% !important;
+                object-fit: cover !important;
+                border: 1.5px solid #EAEAEF !important;
+                background: #FFFFFF !important;
+                padding: 2px !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-line {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                min-width: 76px !important;
+            }
+            /* 3×2 纯净无框感图标矩阵 */
+            #seoul-mini-theater-modal .sm-pure-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                row-gap: 24px !important;
+                column-gap: 12px !important;
+                padding: 4px 6px !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-app {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                cursor: pointer !important;
+                transition: transform 0.15s ease, opacity 0.15s ease !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-app:active {
+                transform: scale(0.92) !important;
+                opacity: 0.75 !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-ico {
+                width: 54px !important;
+                height: 54px !important;
+                border-radius: 18px !important;
+                background: #F8F8FA !important;
+                border: 1px solid #EAEAEF !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin-bottom: 9px !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-name {
+                font-size: 10.5px !important;
+                font-weight: 600 !important;
+                color: #3A3A40 !important;
+                letter-spacing: 0.3px !important;
+            }
+            #seoul-mini-theater-modal .sm-pure-en {
+                font-size: 7.5px !important;
+                color: #A0A0AA !important;
+                letter-spacing: 0.8px !important;
+                margin-top: 2px !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        // 3. 保留原代码中 renderCoupleSpaceAll 需要的隐藏占位节点（防止原函数找不到 ID 报错），并渲染全新的极简大留白视图
+        spacePage.innerHTML = `
+            <!-- 隐藏兼容槽（完全不可见，仅防止旧渲染器报错） -->
+            <div style="display:none!important;">
+                <span id="smt-sp-char-scope-tag"></span><span id="smt-stat-pet"></span><span id="smt-stat-petname"></span>
+                <span id="smt-stat-fund"></span><span id="smt-badge-pet"></span><span id="smt-badge-bpm"></span>
+                <span id="smt-badge-coupon"></span><span id="smt-badge-todo"></span><div id="smt-ab-ins-grid"></div>
+                <div id="smt-ins-detail-pop"></div><span id="smt-ins-user-add"></span><span id="smt-ins-ai-add"></span>
+            </div>
+
+            <!-- 1. 上半屏：极简留白双人记忆明信片 -->
+            <div class="sm-pure-card" id="smt-sp-hero-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                    <span style="font-size:8px;color:#9A9AA5;letter-spacing:1.8px;font-family:monospace;">SUMOUL ARCHIVE</span>
+                    <div style="display:flex;gap:6px;">
+                        <span class="smt-pill-btn" id="smt-sp-bg-btn" style="height:20px!important;font-size:8px!important;color:#8E8E98!important;">背景</span>
+                        <span class="smt-pill-btn" id="smt-sp-mood" style="height:20px!important;font-size:8px!important;color:#8E8E98!important;">36.7°C</span>
+                        <span class="smt-pill-btn" id="smt-sp-reset-char" style="height:20px!important;font-size:8px!important;color:#8E8E98!important;">重置</span>
+                    </div>
+                </div>
+
+                <div class="sm-pure-inner">
+                    <div class="sm-pure-avas">
+                        <img id="smt-sp-uava" src="" />
+                        <div class="sm-pure-line" id="smt-sp-edit-date" style="cursor:pointer;" title="点击修改纪念日">
+                            <div style="font-size:17px;font-weight:600;color:#2C2C32;letter-spacing:1px;" id="smt-sp-days">D+100</div>
+                            <div style="width:64px;height:1px;border-bottom:1px dashed #D0D0DA;margin:6px 0;"></div>
+                            <div style="font-size:7.5px;color:#A0A0AA;letter-spacing:1.4px;">TOGETHER</div>
+                        </div>
+                        <img id="smt-sp-cava" src="" />
+                    </div>
+
+                    <div style="font-size:11px;font-weight:600;color:#3A3A40;letter-spacing:0.8px;margin-bottom:6px;" id="smt-sp-couple-names">ME &amp; PARTNER</div>
+                    <div style="font-size:9.2px;color:#8E8E98;line-height:1.6;cursor:pointer;" id="smt-sp-refresh-live" title="点击刷新TA此刻状态">
+                        <span id="smt-sp-live-bio">正在安静地陪在你身边</span> <span style="font-size:8px;color:#B0B0BA;">↻</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 下半屏：纯净 3×2 柔雾灰桌面图标矩阵（无杂乱角标、无多余边框） -->
+            <div>
+                <div style="text-align:center;font-size:8px;color:#B0B0BA;letter-spacing:2.2px;margin-bottom:18px;">COUPLE SPACE · 06 APPS</div>
+                <div class="sm-pure-grid">
+                    <div class="sm-pure-app" data-openapp="sp_pet">
+                        <div class="sm-pure-ico">${M_ICO.pet}</div>
+                        <div class="sm-pure-name">云养萌宠</div>
+                        <div class="sm-pure-en">PET HOUSE</div>
+                    </div>
+                    <div class="sm-pure-app" data-openapp="sp_4cut">
+                        <div class="sm-pure-ico">${M_ICO.cam}</div>
+                        <div class="sm-pure-name">人生四格</div>
+                        <div class="sm-pure-en">LIFE 4 CUT</div>
+                    </div>
+                    <div class="sm-pure-app" data-openapp="sp_qa">
+                        <div class="sm-pure-ico">${M_ICO.qa}</div>
+                        <div class="sm-pure-name">灵魂百问</div>
+                        <div class="sm-pure-en">CAPSULE Q&amp;A</div>
+                    </div>
+                    <div class="sm-pure-app" data-openapp="sp_mood">
+                        <div class="sm-pure-ico">${M_ICO.wave}</div>
+                        <div class="sm-pure-name">同居波频</div>
+                        <div class="sm-pure-en">HEARTBEAT</div>
+                    </div>
+                    <div class="sm-pure-app" data-openapp="sp_coupon">
+                        <div class="sm-pure-ico">${M_ICO.ticket}</div>
+                        <div class="sm-pure-name">恋爱兑换券</div>
+                        <div class="sm-pure-en">COUPONS</div>
+                    </div>
+                    <div class="sm-pure-app" data-openapp="sp_guest">
+                        <div class="sm-pure-ico">${M_ICO.note}</div>
+                        <div class="sm-pure-name">留言与心愿</div>
+                        <div class="sm-pure-en">GUESTBOOK</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    patchMinimalistCoupleSpace();
+})();
