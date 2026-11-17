@@ -1,21 +1,21 @@
 (function () {
 const topWin = window.parent || window, topDoc = topWin.document;
 
-/* 👑 作者专属云端配置区（改完贴回 GitHub 全网生效） */
+/* 👑 Sumoul App 作者专属配置区（改完贴回 GitHub 全网生效） */
 const AUTH_CONFIG = {
     ADMIN_PIN: "0520",                     // 1. 管理员后台密码
-    SECRET_SALT: "SEOUL_GRAY_RAIN_2025",   // 2. 一Q一码加密盐值
-    PASSWORDS: ["SEOUL2025", "GRAY0520"],  // 3. 免私信群发口令（填任意口令+QQ号即可通过）
+    SECRET_SALT: "SUMOUL_APP_GRAY_2025",   // 2. 一Q一码加密盐值
+    PASSWORDS: ["SUMOUL2025", "GRAY0520"], // 3. 免私信群发口令（填任意口令+QQ号即可通过）
     WHITELIST: ["10001"],                  // 4. 免密白名单QQ号
-    BLACKLIST: ["999999"],                 // 5. 永久拉黑封杀QQ号（永远无法进入）
+    BLACKLIST: ["999999"],                 // 5. 永久拉黑封杀QQ号
     CLOUD_SYNC_URL: ""                     // 6. 选填：云端 JSON 同步链接
 };
 
-function bootSeoulOS() {
-if (!topDoc || !topDoc.body) { setTimeout(bootSeoulOS, 300); return; }
+function bootSumoulApp() {
+if (!topDoc || !topDoc.body) { setTimeout(bootSumoulApp, 250); return; }
 ["seoul-mini-theater-btn", "seoul-mini-theater-modal", "seoul-mini-theater-style", "seoul-wx-custom-style", "seoul-ext-settings-panel", "seoul-wand-menu-item"].forEach((id) => topDoc.getElementById(id)?.remove());
 
-const K_API = "seoul_v13_api", K_WX_CSS = "seoul_v13_wx_css", K_MUSIC = "seoul_v13_music", K_HTML = "seoul_v13_html", K_SYNC = "seoul_v13_sync", K_STICKERS = "seoul_v13_stickers", K_AUTH = "seoul_v13_auth_user", K_ADMIN_DB = "seoul_v13_admin_db";
+const K_API = "sumoul_v16_api", K_WX_CSS = "sumoul_v16_wx_css", K_MUSIC = "sumoul_v16_music", K_HTML = "sumoul_v16_html", K_SYNC = "sumoul_v16_sync", K_STICKERS = "sumoul_v16_stickers", K_AUTH = "sumoul_v16_auth_user", K_ADMIN_DB = "sumoul_v16_admin_db";
 
 const svgUri = (d, s = "%23484852", v = "0 0 24 24", w = "1.5") => `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='${v}' fill='none' stroke='${s}' stroke-width='${w}' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E")`;
 const inlineSvg = (d, c = "#484852", sz = 12) => `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block!important;visibility:visible!important;width:${sz}px!important;height:${sz}px!important;flex-shrink:0!important;vertical-align:middle!important;pointer-events:none!important;">${d}</svg>`;
@@ -139,7 +139,7 @@ function getSTContext(maxMes = 8) {
 
 function getSafeScopedKey(baseKey) { return `${baseKey}__${getSTContext(1).charScopeId}`; }
 
-const NEW_DEFAULT_WX_CSS = `/* 🎨 微信专属 CSS 美化工作台 */
+const NEW_DEFAULT_WX_CSS = `/* 🎨 Sumoul App 微信专属 CSS 美化工作台 */
 #seoul-mini-theater-modal #smt-page-talk {
     --我的气泡底色: #F8F8F8; --我的气泡字色: #3A3A40; --我的气泡边框: #EAEAF0;
     --对方气泡底色: #FFFFFF; --对方气泡字色: #333338; --对方气泡边框: #EAEAF0;
@@ -157,13 +157,13 @@ const NEW_DEFAULT_WX_CSS = `/* 🎨 微信专属 CSS 美化工作台 */
 
 function getApiCfg() { try { return Object.assign({ url: "https://api.openai.com/v1", key: "", model: "gpt-4o-mini", ctxCount: 8 }, JSON.parse(localStorage.getItem(K_API) || "{}")); } catch (e) { return { url: "https://api.openai.com/v1", key: "", model: "gpt-4o-mini", ctxCount: 8 }; } }
 function saveApiCfg(c) { localStorage.setItem(K_API, JSON.stringify(c)); }
-function getChatList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_wx")) || "[]"); } catch (e) { return []; } }
-function saveChatList(list) { localStorage.setItem(getSafeScopedKey("seoul_v13_wx"), JSON.stringify(list.slice(-150))); }
+function getChatList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("sumoul_v16_wx")) || "[]"); } catch (e) { return []; } }
+function saveChatList(list) { localStorage.setItem(getSafeScopedKey("sumoul_v16_wx"), JSON.stringify(list.slice(-150))); }
 function getWxCfg() {
-    try { return Object.assign({ myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" }, JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_wxcfg")) || "{}")); }
+    try { return Object.assign({ myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" }, JSON.parse(localStorage.getItem(getSafeScopedKey("sumoul_v16_wxcfg")) || "{}")); }
     catch (e) { return { myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" }; }
 }
-function saveWxCfg(cfg) { try { localStorage.setItem(getSafeScopedKey("seoul_v13_wxcfg"), JSON.stringify(cfg)); } catch (e) {} }
+function saveWxCfg(cfg) { try { localStorage.setItem(getSafeScopedKey("sumoul_v16_wxcfg"), JSON.stringify(cfg)); } catch (e) {} }
 function getWxCss() { return localStorage.getItem(K_WX_CSS) || NEW_DEFAULT_WX_CSS; }
 function saveWxCss(css) { localStorage.setItem(K_WX_CSS, css); }
 function getSyncMode() { return localStorage.getItem(K_SYNC) === "true"; }
@@ -173,8 +173,8 @@ function getStickerList() {
     catch (e) { return []; }
 }
 function saveStickerList(l) { localStorage.setItem(K_STICKERS, JSON.stringify(l.slice(0, 150))); }
-function getArchive() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_arch")) || "[]"); } catch (e) { return []; } }
-function saveArchive(l) { localStorage.setItem(getSafeScopedKey("seoul_v13_arch"), JSON.stringify(l.slice(0, 150))); }
+function getArchive() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("sumoul_v16_arch")) || "[]"); } catch (e) { return []; } }
+function saveArchive(l) { localStorage.setItem(getSafeScopedKey("sumoul_v16_arch"), JSON.stringify(l.slice(0, 150))); }
 function pushArchive(title, content, isHtml = false) { const l = getArchive(); l.unshift({ id: Date.now(), title, content, isHtml, time: nowTimeStr() }); saveArchive(l); }
 
 async function requestStandaloneAI(systemText, userText) {
@@ -195,7 +195,6 @@ async function requestStandaloneAI(systemText, userText) {
     return data?.choices?.[0]?.message?.content?.trim() || "";
 }
 
-/* 🔐 管理员数据库与一Q一码计算引擎 */
 function getAdminDB() {
     const def = { passwords: [...AUTH_CONFIG.PASSWORDS], whitelist: [...AUTH_CONFIG.WHITELIST], blacklist: [...AUTH_CONFIG.BLACKLIST], pending: [] };
     try {
@@ -211,14 +210,14 @@ function getAdminDB() {
 function saveAdminDB(db) { localStorage.setItem(K_ADMIN_DB, JSON.stringify(db)); }
 
 function computeQQCode(qq) {
-    const raw = `${String(qq).trim()}::${AUTH_CONFIG.SECRET_SALT}::SEOUL_MELANCHOLY`;
+    const raw = `${String(qq).trim()}::${AUTH_CONFIG.SECRET_SALT}::SUMOUL_MELANCHOLY`;
     let h1 = 0x811c9dc5, h2 = 0x1b873593;
     for (let i = 0; i < raw.length; i++) {
         const ch = raw.charCodeAt(i);
         h1 = Math.imul(h1 ^ ch, 0x01000193);
         h2 = Math.imul(h2 ^ (ch * (i + 1)), 0x5bd1e995);
     }
-    return `SL-${(h1 >>> 0).toString(36).toUpperCase().slice(-3)}${(h2 >>> 0).toString(36).toUpperCase().slice(-3)}`;
+    return `SM-${(h1 >>> 0).toString(36).toUpperCase().slice(-3)}${(h2 >>> 0).toString(36).toUpperCase().slice(-3)}`;
 }
 
 async function checkQQPermission(qq, passOrCode) {
@@ -239,21 +238,21 @@ async function checkQQPermission(qq, passOrCode) {
             }
         } catch (e) {}
     }
-    if (db.blacklist.includes(cleanQQ)) return { status: "banned", msg: "🚫 ACCESS DENIED · 该 QQ 号已被永久拉黑封禁，禁止进入系统！" };
+    if (db.blacklist.includes(cleanQQ)) return { status: "banned", msg: "🚫 ACCESS DENIED · 该 QQ 号已被永久拉黑封禁，禁止进入 Sumoul App！" };
     if (db.whitelist.includes(cleanQQ)) return { status: "ok", role: "白名单免密通行" };
     if (cleanPass && db.passwords.includes(cleanPass)) return { status: "ok", role: "群发口令核验通过" };
     if (cleanPass && cleanPass.toUpperCase() === computeQQCode(cleanQQ)) return { status: "ok", role: "专属激活码通过" };
     return { status: "denied", msg: "该 QQ 尚未通过审核，请输入群发口令/通行码，或点击下方「提交申请」等待作者通过！" };
 }
 
-/* 注入精简高权重全局 CSS */
 const styleEl = topDoc.createElement("style");
 styleEl.id = "seoul-mini-theater-style";
 styleEl.innerHTML = `
-#seoul-mini-theater-btn{position:fixed!important;right:12px!important;bottom:88px!important;z-index:2147483640!important;display:inline-flex!important;align-items:center!important;gap:6px!important;height:32px!important;padding:0 12px!important;background:#FFF!important;border:1.2px solid #E4E4EC!important;border-radius:999px!important;cursor:pointer!important;user-select:none!important;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","PingFang SC",sans-serif!important}
+#seoul-mini-theater-btn{position:fixed!important;right:14px!important;bottom:92px!important;z-index:2147483645!important;display:inline-flex!important;align-items:center!important;gap:6px!important;height:34px!important;padding:0 13px!important;background:#FFF!important;border:1.5px solid #3A3A40!important;border-radius:999px!important;cursor:pointer!important;user-select:none!important;pointer-events:auto!important;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","PingFang SC",sans-serif!important}
+#seoul-mini-theater-btn *{pointer-events:none!important}
 #seoul-mini-theater-btn .smt-ico-entry{width:14px!important;height:14px!important;display:inline-block!important;background-image:${ICO.chatAct}!important;background-size:contain!important;background-repeat:no-repeat!important}
-#seoul-mini-theater-btn .smt-btn-kr{font-size:9.8px!important;font-weight:700!important;color:#3A3A40!important;-webkit-text-fill-color:#3A3A40!important}
-#seoul-mini-theater-modal{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:2147483646!important;background:#FFF!important;display:none;flex-direction:column!important;box-sizing:border-box!important;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","PingFang SC",sans-serif!important;color:#3A3A40!important;overflow:hidden!important}
+#seoul-mini-theater-btn .smt-btn-kr{font-size:10px!important;font-weight:700!important;color:#2C2C32!important;-webkit-text-fill-color:#2C2C32!important}
+#seoul-mini-theater-modal{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:2147483647!important;background:#FFF!important;display:none;flex-direction:column!important;box-sizing:border-box!important;pointer-events:auto!important;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","PingFang SC",sans-serif!important;color:#3A3A40!important;overflow:hidden!important}
 #seoul-mini-theater-modal.smt-open{display:flex!important}
 #seoul-mini-theater-modal .smt-fs-header{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important;height:48px!important;min-height:48px!important;margin-top:env(safe-area-inset-top,0px)!important;padding:0 14px!important;background:#FFF!important;border-bottom:1px solid #F2F2F6!important;flex-shrink:0!important}
 #seoul-mini-theater-modal .smt-exit-btn{display:inline-flex!important;align-items:center!important;gap:3px!important;height:28px!important;padding:0 10px 0 6px!important;background:#F8F8F8!important;border:1px solid #ECECF2!important;border-radius:999px!important;font-size:9.8px!important;font-weight:700!important;color:#3A3A40!important;cursor:pointer!important;z-index:2!important}
@@ -355,12 +354,11 @@ styleEl.innerHTML = `
 #seoul-mini-theater-modal .smt-disc-spin{animation:smtSpin 12s linear infinite!important}
 #seoul-mini-theater-modal #seoul-boot-lock-layer{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:2147483647!important;background:linear-gradient(180deg,#FFF 0%,#F4F4F7 55%,#ECECEF 100%)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;padding:max(20px,env(safe-area-inset-top,20px)) 18px max(24px,env(safe-area-inset-bottom,24px)) 18px!important;box-sizing:border-box!important;transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .55s ease!important;overflow-y:auto!important}
 #seoul-mini-theater-modal #seoul-boot-lock-layer.smt-unlocked-hide{transform:translateY(-102%)!important;opacity:0!important;pointer-events:none!important}
-#seoul-mini-theater-modal #smt-boot-splash{position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFF 0%,#F2F2F5 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity .65s ease!important;padding:24px!important;text-align:center!important}
+#seoul-mini-theater-modal #smt-boot-splash{position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFF 0%,#F2F2F5 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity .65s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important}
 #seoul-mini-theater-modal #smt-boot-splash.fade-out{opacity:0!important;pointer-events:none!important}
 @keyframes smtRainDrop{0%{transform:translateY(-15px);opacity:0}50%{opacity:.45}100%{transform:translateY(15px);opacity:0}}
-@keyframes smtThinLine{0%{width:0%;opacity:.3}100%{width:100%;opacity:1}}
-#seoul-mini-theater-modal .smt-melancholy-frame{border:1px solid #E2E2E8!important;border-radius:2px!important;padding:34px 26px!important;background:rgba(255,255,255,.75)!important;max-width:280px!important;width:100%!important;position:relative!important}
-#seoul-mini-theater-modal .smt-rain-line{width:1px!important;height:28px!important;background:#9A9AA5!important;margin:0 auto 18px auto!important;animation:smtRainDrop 2.2s ease-in-out infinite!important}
+#seoul-mini-theater-modal .smt-melancholy-frame{border:1px solid #DCDCE4!important;border-radius:16px!important;padding:30px 22px 24px 22px!important;background:linear-gradient(180deg,#FFF 0%,#F6F6F9 100%)!important;max-width:292px!important;width:100%!important;position:relative!important}
+#seoul-mini-theater-modal .smt-rain-line{width:1px!important;height:32px!important;background:#9A9AA5!important;margin:0 auto!important;animation:smtRainDrop 2.4s ease-in-out infinite!important}
 #seoul-mini-theater-modal .smt-auth-card{width:100%!important;max-width:350px!important;background:rgba(255,255,255,.92)!important;border:1px solid #E6E6EC!important;border-radius:20px!important;padding:20px 18px!important;box-sizing:border-box!important;text-align:center!important}
 #seoul-mini-theater-modal .smt-qq-ava-ring{width:62px!important;height:62px!important;border-radius:50%!important;background:#F8F8F8!important;border:1.5px solid #E2E2EA!important;padding:3px!important;margin:0 auto 10px auto!important;box-sizing:border-box!important;filter:grayscale(25%) contrast(98%)!important}
 #seoul-mini-theater-modal .smt-qq-ava-ring img{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;display:block!important}
@@ -381,59 +379,82 @@ applyWxCustomCss();
 
 const btn = topDoc.createElement("div");
 btn.id = "seoul-mini-theater-btn";
-btn.innerHTML = `<span class="smt-ico-entry"></span><span class="smt-btn-kr">SEOUL OS</span>`;
+btn.innerHTML = `<span class="smt-ico-entry"></span><span class="smt-btn-kr">Sumoul App</span>`;
 
 const modal = topDoc.createElement("div");
 modal.id = "seoul-mini-theater-modal";
 modal.innerHTML = `
+<!-- 🌧️ Sumoul App · 忧郁白灰 35mm 胶片开屏（手动点击才唤醒进入） -->
 <div id="seoul-boot-lock-layer">
-    <div id="smt-boot-splash">
-        <div class="smt-melancholy-frame">
-            <div style="font-size:8px;color:#9A9AA5;letter-spacing:2px;margin-bottom:14px;">SEOUL · 37°33'N 126°58'E</div>
-            <div class="smt-rain-line"></div>
-            <div style="font-size:15px;font-weight:600;letter-spacing:3px;color:#3A3A40;margin-bottom:8px;">회색빛 서울의 새벽</div>
-            <div style="font-size:9.5px;color:#7A7A85;line-height:1.8;letter-spacing:.5px;">“ 灰白首尔的黎明，你记忆停驻之处 ”<br><span style="font-size:8px;color:#A0A0AA;">MONOCHROME MEMORY ARCHIVE</span></div>
-            <div style="width:100%;height:1px;background:#EBEBF0;margin:20px 0 8px 0;overflow:hidden;"><div id="smt-splash-bar" style="height:100%;background:#55555E;animation:smtThinLine 1.4s ease forwards;"></div></div>
-            <div style="font-size:7.5px;color:#A0A0AA;letter-spacing:1.5px;">INITIALIZING PRIVATE TERMINAL...</div>
+    <div id="smt-boot-splash" title="点击唤醒 Sumoul App">
+        <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;opacity:.55;">
+            <div class="smt-rain-line" style="position:absolute;left:18%;top:12%;height:42px;animation-duration:2.6s;"></div>
+            <div class="smt-rain-line" style="position:absolute;left:38%;top:28%;height:32px;animation-duration:3.1s;animation-delay:.5s;"></div>
+            <div class="smt-rain-line" style="position:absolute;left:64%;top:16%;height:48px;animation-duration:2.4s;animation-delay:1.1s;"></div>
+            <div class="smt-rain-line" style="position:absolute;left:82%;top:34%;height:36px;animation-duration:2.9s;animation-delay:.3s;"></div>
         </div>
+        <div class="smt-melancholy-frame">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;color:#9A9AA5;letter-spacing:1.6px;border-bottom:1px solid #ECECF2;padding-bottom:8px;margin-bottom:20px;font-family:monospace;">
+                <span>FILM · 35MM</span><span>SUMOUL ARCHIVE</span><span>#04:12 AM</span>
+            </div>
+            <div style="width:74px;height:74px;margin:0 auto 18px auto;border-radius:50%;background:#F4F4F8;border:1px solid #E4E4EC;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 64 64" width="44" height="44" fill="none" stroke="#55555E" stroke-width="1.1" stroke-linecap="round">
+                    <circle cx="32" cy="32" r="22" stroke-dasharray="2 3" stroke="#9A9AA5"/>
+                    <path d="M36 16a16 16 0 1 0 0 32 14 14 0 0 1 0-32z" stroke="#3A3A40" stroke-width="1.3"/>
+                    <line x1="20" y1="44" x2="20" y2="54" stroke="#8E8E98"/>
+                    <line x1="32" y1="46" x2="32" y2="58" stroke="#8E8E98"/>
+                    <line x1="44" y1="44" x2="44" y2="52" stroke="#8E8E98"/>
+                </svg>
+            </div>
+            <div style="font-size:15px;font-weight:700;letter-spacing:3px;color:#2C2C32;margin-bottom:4px;">Sumoul App</div>
+            <div style="font-size:8px;color:#A0A0AA;letter-spacing:2px;margin-bottom:16px;">회색빛 새벽 · MELANCHOLY MONOCHROME</div>
+            <div id="smt-splash-poem" style="font-size:9.8px;color:#6E6E77;line-height:1.9;letter-spacing:.5px;background:#FFF;border:1px solid #EFEFF4;border-radius:10px;padding:12px;margin-bottom:20px;font-style:italic;">
+                “ 우울한 회색빛 새벽,<br>네가 없는 시간은 조용히 멈춰있다. ”<br>
+                <span style="font-size:8.5px;color:#9A9AA5;font-style:normal;display:block;margin-top:4px;">在忧郁的灰白黎明，没有你的时间悄然静止。</span>
+            </div>
+            <div id="smt-splash-enter-btn" style="display:inline-flex;align-items:center;justify-content:center;width:100%;height:36px;background:#3A3A40;color:#FFF;-webkit-text-fill-color:#FFF;border-radius:999px;font-size:9.5px;font-weight:600;letter-spacing:1.6px;cursor:pointer;">
+                <span>TOUCH TO WAKE · 触碰唤醒</span>
+            </div>
+        </div>
+        <div style="font-size:7.5px;color:#A0A0AA;letter-spacing:1.8px;margin-top:18px;">CLICK TO ENTER SUMOUL APP · 点击屏幕继续</div>
     </div>
+
     <div style="width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;">
         <span class="smt-pill-btn" id="smt-lock-exit-btn">‹ 나가기 · 退出</span>
         <span class="smt-pill-btn" id="smt-open-admin-btn" style="cursor:pointer;">${WX_ICO.lock}<span>ADMIN · 管理员审核后台</span></span>
     </div>
     <div style="text-align:center;margin:6px 0;">
-        <div style="font-size:8.5px;color:#9A9AA5;letter-spacing:2px;margin-bottom:2px;">SILENT DAWN IN SEOUL</div>
+        <div style="font-size:8.5px;color:#9A9AA5;letter-spacing:2px;margin-bottom:2px;">SUMOUL APP · SILENT DAWN</div>
         <div style="font-size:38px;font-weight:300;color:#3A3A40;letter-spacing:1px;line-height:1.05;" id="smt-lock-big-time">18:04</div>
         <div style="font-size:9.5px;color:#8E8E98;letter-spacing:.5px;margin-top:4px;" id="smt-lock-big-date">“ 빗소리가 머무는 회색의 방 · 雨声停驻的灰白房间 ”</div>
     </div>
     <div class="smt-auth-card" id="smt-user-auth-box">
         <div class="smt-qq-ava-ring"><img id="smt-lock-qq-ava" src="https://i.postimg.cc/rydS6NvG/IMG-3866.jpg" /></div>
-        <div style="font-size:11.5px;font-weight:700;color:#3A3A40;letter-spacing:.6px;margin-bottom:2px;" id="smt-lock-welcome-title">IDENTITY ARCHIVE</div>
+        <div style="font-size:11.5px;font-weight:700;color:#3A3A40;letter-spacing:.6px;margin-bottom:2px;" id="smt-lock-welcome-title">Sumoul App · ACCESS</div>
         <div style="font-size:8.5px;color:#8E8E98;margin-bottom:12px;" id="smt-lock-sub-tip">请输入 QQ 号与群发口令 / 专属通行码进入</div>
         <input type="text" class="smt-auth-inp" id="smt-auth-qq-inp" placeholder="输入你的 QQ 号码 (必填)..." inputmode="numeric" />
         <input type="text" class="smt-auth-inp" id="smt-auth-code-inp" placeholder="输入群发口令密码 或 专属通行码 (白名单免填)" />
         <div id="smt-auth-err-msg" style="font-size:9px;color:#8A5A5A;font-weight:600;min-height:15px;margin-bottom:4px;line-height:1.4;"></div>
-        <div class="smt-auth-btn" id="smt-auth-submit-btn">ENTER TERMINAL · 验证并进入系统</div>
+        <div class="smt-auth-btn" id="smt-auth-submit-btn">ENTER SUMOUL APP · 验证进入</div>
         <div class="smt-auth-btn ghost" id="smt-auth-apply-btn">📩 还没有权限？提交 QQ 号申请审核</div>
     </div>
-    <div style="text-align:center;font-size:8px;color:#9A9AA5;letter-spacing:.5px;">PRIVATE EDITION · 防二传保护已开启 · 严禁未授权二传</div>
+    <div style="text-align:center;font-size:8px;color:#9A9AA5;letter-spacing:.5px;">SUMOUL APP PRIVATE EDITION · 防二传保护已开启</div>
 </div>
 
 <div class="smt-fs-header">
     <div class="smt-exit-btn" id="smt-header-back-btn"><span class="smt-ico-back"></span><span id="smt-back-text">나가기</span></div>
     <div class="smt-header-center">
-        <div class="smt-header-title" id="smt-top-title">SEOUL TALK · 서울톡</div>
+        <div class="smt-header-title" id="smt-top-title">Sumoul App · 서울톡</div>
         <div class="smt-header-sub" id="smt-top-sub">Personal Messenger · KST</div>
     </div>
     <div class="smt-header-right" id="smt-top-badge" title="点击打开管理员审核与拉黑后台">${WX_ICO.lock}<span>管理/锁屏</span></div>
 </div>
 
 <div class="smt-fs-body">
-    <!-- 👑 管理员审核 / 设口令 / 永久拉黑封杀后台 -->
     <div class="smt-page" id="smt-page-admin">
         <div class="smt-section-box" style="background:#FFF!important;border:1.5px solid #484852!important;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <b style="font-size:10.5px;">👑 ADMIN CONSOLE · 管理员审核与拉黑中心</b>
+                <b style="font-size:10.5px;">👑 Sumoul App · 管理员审核与拉黑中心</b>
                 <span class="smt-pill-btn" id="smt-admin-relock-btn">退回开屏锁</span>
             </div>
             <div style="font-size:8.5px;color:#7A7A85;line-height:1.5;">💡 <b>多人免私信最爽用法</b>：在【1.群发口令】设一个口令发在群里，大家填自己的QQ号+该口令直接进！发现有人二传泄密，把他的QQ号加进【2.永久拉黑库】即可永久封死！</div>
@@ -462,7 +483,6 @@ modal.innerHTML = `
         </div>
     </div>
 
-    <!-- 01. 独立微信 -->
     <div class="smt-page active" id="smt-page-talk">
         <div class="smt-wx-top-bar">
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
@@ -597,7 +617,6 @@ modal.innerHTML = `
         </div>
     </div>
 
-    <!-- 02. 情侣空间桌面 (A+B融合版) -->
     <div class="smt-page" id="smt-page-space">
         <div class="ab-profile-shell">
             <div class="ab-room-banner" id="smt-sp-hero-card">
@@ -698,7 +717,6 @@ modal.innerHTML = `
         <div class="smt-section-box"><div class="smt-sec-title"><span>BUCKET LIST · 恋爱百事心愿单</span><span class="smt-pill-btn" id="smt-sp-add-todo">＋ 新增心愿</span></div><div id="smt-sp-todo-list"></div></div>
     </div>
 
-    <!-- 03. 个人主页与应用 -->
     <div class="smt-page" id="smt-page-home">
         <div id="smt-user-html-stage" style="margin-bottom:8px;"></div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:12px;">
@@ -787,7 +805,7 @@ modal.innerHTML = `
     <div class="smt-page" id="smt-page-api">
         <div class="smt-section-box" style="background:#FFF!important;border:1.5px solid #484852!important;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-                <b style="font-size:10.5px;">⚡ 全系统独立 API 引擎</b>
+                <b style="font-size:10.5px;">⚡ Sumoul App 独立 API 引擎</b>
                 <span class="smt-pill-btn dark" id="smt-api-open-admin">👑 管理员审核后台</span>
             </div>
             <div style="font-size:8.8px;color:#7A7A85;" id="smt-api-status-tip">请确认下方已填写你的反代地址与 API Key</div>
@@ -808,7 +826,7 @@ modal.innerHTML = `
 </div>
 
 <div class="smt-bottom-dock">
-    <div class="smt-tab-item active" data-page="talk" data-title="SEOUL TALK · 서울톡" data-sub="Personal Messenger · KST"><span class="smt-tab-ico"></span><span class="smt-tab-txt">微信</span></div>
+    <div class="smt-tab-item active" data-page="talk" data-title="Sumoul App · 서울톡" data-sub="Personal Messenger · KST"><span class="smt-tab-ico"></span><span class="smt-tab-txt">微信</span></div>
     <div class="smt-tab-item" data-page="space" data-title="COUPLE SPACE · 커플공간" data-sub="6 Exclusive Couple Apps"><span class="smt-tab-ico"></span><span class="smt-tab-txt">情侣空间</span></div>
     <div class="smt-tab-item" data-page="home" data-title="MY HOME · 마이페이지" data-sub="Custom HTML &amp; Utility Apps"><span class="smt-tab-ico"></span><span class="smt-tab-txt">主页/应用</span></div>
     <div class="smt-tab-item" data-page="archive" data-title="ARCHIVE · 보관함" data-sub="Saved Records &amp; Cards"><span class="smt-tab-ico"></span><span class="smt-tab-txt">历史</span></div>
@@ -819,7 +837,6 @@ modal.innerHTML = `
 topDoc.body.appendChild(btn);
 topDoc.body.appendChild(modal);
 
-/* ── 路由控制与防二传管理员审核后台逻辑 ── */
 let currentPage = "talk", lastMainPage = "space";
 const SUB_APPS = ["admin", "wx_settings", "sp_pet", "sp_4cut", "sp_qa", "sp_mood", "sp_coupon", "sp_guest", "phone", "music", "diary"];
 
@@ -848,23 +865,27 @@ function navigateToPage(pageId, customTitle, customSub) {
     if (pageId === "diary") renderDiaryApp();
 }
 
+function closeSumoulModal() {
+    modal.classList.remove("smt-open");
+    modal.style.setProperty("display", "none", "important");
+}
+
 topDoc.getElementById("smt-header-back-btn").onclick = () => {
     if (SUB_APPS.includes(currentPage)) {
         const target = currentPage === "wx_settings" ? "talk" : lastMainPage;
         const targetTab = topDoc.querySelector(`.smt-tab-item[data-page="${target}"]`);
         navigateToPage(target, targetTab?.getAttribute("data-title"), targetTab?.getAttribute("data-sub"));
     } else {
-        modal.classList.remove("smt-open");
+        closeSumoulModal();
     }
 };
 topDoc.querySelectorAll(".smt-tab-item").forEach((tab) => tab.onclick = () => navigateToPage(tab.getAttribute("data-page"), tab.getAttribute("data-title"), tab.getAttribute("data-sub")));
-topDoc.querySelectorAll("[data-openapp]").forEach((card) => card.onclick = () => navigateToPage(card.getAttribute("data-openapp"), "SEOUL EXCLUSIVE APP", "Full-Screen Interactive View"));
+topDoc.querySelectorAll("[data-openapp]").forEach((card) => card.onclick = () => navigateToPage(card.getAttribute("data-openapp"), "Sumoul App", "Full-Screen Interactive View"));
 
-/* 👑 管理员后台渲染与审核/拉黑/设口令逻辑 */
 const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
 
 function requestAdminEntry() {
-    const pin = prompt("👑 请输入管理员后台密码：");
+    const pin = prompt("👑 请输入 Sumoul App 管理员后台密码：");
     if (pin === AUTH_CONFIG.ADMIN_PIN) {
         lockLayer.classList.add("smt-unlocked-hide");
         navigateToPage("admin", "ADMIN CONSOLE · 管理员后台", "Access & Blacklist Control");
@@ -883,22 +904,18 @@ topDoc.getElementById("smt-admin-relock-btn").onclick = () => {
 
 function renderAdminConsole() {
     const db = getAdminDB();
-    // 1. 口令列表
     const pwdEl = topDoc.getElementById("smt-adm-pwd-list");
     pwdEl.innerHTML = db.passwords.map((p, i) => `<span class="smt-pill-btn">${p} <b data-delpwd="${i}" style="cursor:pointer;margin-left:4px;color:#8A5A5A;">✕</b></span>`).join("");
     pwdEl.querySelectorAll("[data-delpwd]").forEach((x) => x.onclick = () => { db.passwords.splice(Number(x.getAttribute("data-delpwd")), 1); saveAdminDB(db); renderAdminConsole(); });
 
-    // 2. 黑名单封杀库
     const blkEl = topDoc.getElementById("smt-adm-black-list");
     blkEl.innerHTML = db.blacklist.length ? db.blacklist.map((q, i) => `<span class="smt-pill-btn" style="border-color:#C8A0A0;color:#8A5A5A;">🚫 ${q} <b data-delblk="${i}" style="cursor:pointer;margin-left:4px;">移除</b></span>`).join("") : `<span style="font-size:9px;color:#9A9AA5;">暂无拉黑的 QQ 号</span>`;
     blkEl.querySelectorAll("[data-delblk]").forEach((x) => x.onclick = () => { db.blacklist.splice(Number(x.getAttribute("data-delblk")), 1); saveAdminDB(db); renderAdminConsole(); });
 
-    // 3. 白名单列表
     const whtEl = topDoc.getElementById("smt-adm-white-list");
     whtEl.innerHTML = db.whitelist.map((q, i) => `<span class="smt-pill-btn">✓ ${q} <b data-delwht="${i}" style="cursor:pointer;margin-left:4px;color:#8A5A5A;">✕</b></span>`).join("");
     whtEl.querySelectorAll("[data-delwht]").forEach((x) => x.onclick = () => { db.whitelist.splice(Number(x.getAttribute("data-delwht")), 1); saveAdminDB(db); renderAdminConsole(); });
 
-    // 4. 待审核申请列表
     const pendEl = topDoc.getElementById("smt-adm-pending-list");
     if (!db.pending.length) {
         pendEl.innerHTML = `<div style="text-align:center;padding:12px;font-size:9px;color:#9A9AA5;">暂无待审核的申请记录</div>`;
@@ -934,7 +951,7 @@ function renderAdminConsole() {
 }
 
 topDoc.getElementById("smt-adm-add-pwd").onclick = () => {
-    const v = prompt("输入新增的群发口令密码（如 SEOUL888）：");
+    const v = prompt("输入新增的群发口令密码（如 SUMOUL888）：");
     if (v && v.trim()) { const db = getAdminDB(); db.passwords.push(v.trim()); saveAdminDB(db); renderAdminConsole(); }
 };
 topDoc.getElementById("smt-adm-add-black").onclick = () => {
@@ -966,12 +983,18 @@ topDoc.getElementById("smt-adm-export-cfg").onclick = () => {
     alert("✓ 已复制最新 AUTH_CONFIG 配置代码！直接粘贴替换 GitHub index.js 开头的同名区块即可全网永久生效！");
 };
 
-/* 🌧️ 开屏与锁屏验证交互（不自动跳过，方便白名单作者随时点右上角进后台） */
+/* 🌧️ 忧郁白灰胶片开屏：绝对不自动闪过，只有当你手动点击时才唤醒进入！ */
+const MELANCHOLY_POEMS = [
+    { kr: "우울한 회색빛 새벽,<br>네가 없는 시간은 조용히 멈춰있다.", cn: "在忧郁的灰白黎明，没有你的时间悄然静止。" },
+    { kr: "창밖에 내리는 차가운 빗소리,<br>전하지 못한 말들이 안개처럼 흩어진다.", cn: "窗外落下的冰冷雨声，未曾传达的话语如雾般散去。" },
+    { kr: "무채색의 계절 속에서,<br>오직 너만이 나의 유일한 온도였다.", cn: "在无彩色的季节里，唯有你是我的唯一温度。" },
+    { kr: "기억의 조각들이 회색 도시 위로 가라앉는 밤.", cn: "记忆的碎片沉入这座灰白城市的夜晚。" }
+];
+
 const qqInp = topDoc.getElementById("smt-auth-qq-inp"), codeInp = topDoc.getElementById("smt-auth-code-inp"), avaImg = topDoc.getElementById("smt-lock-qq-ava"), errEl = topDoc.getElementById("smt-auth-err-msg");
 
 function updateLockTime() {
-    const d = new Date();
-    const el = topDoc.getElementById("smt-lock-big-time");
+    const d = new Date(), el = topDoc.getElementById("smt-lock-big-time");
     if (el) el.textContent = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 updateLockTime();
@@ -980,7 +1003,7 @@ qqInp.oninput = () => {
     const val = qqInp.value.trim();
     if (/^[1-9][0-9]{4,11}$/.test(val)) {
         avaImg.src = `https://q1.qlogo.cn/g?b=qq&nk=${val}&s=640`;
-        topDoc.getElementById("smt-lock-welcome-title").textContent = `QQ · ${val}`;
+        topDoc.getElementById("smt-lock-welcome-title").textContent = `Sumoul App · ${val}`;
     }
 };
 
@@ -990,11 +1013,11 @@ try {
         qqInp.value = saved.qq;
         codeInp.value = saved.pass || "";
         avaImg.src = `https://q1.qlogo.cn/g?b=qq&nk=${saved.qq}&s=640`;
-        topDoc.getElementById("smt-lock-welcome-title").textContent = `ARCHIVE · ${saved.qq}`;
+        topDoc.getElementById("smt-lock-welcome-title").textContent = `Sumoul App · ${saved.qq}`;
     }
 } catch (e) {}
 
-topDoc.getElementById("smt-lock-exit-btn").onclick = () => modal.classList.remove("smt-open");
+topDoc.getElementById("smt-lock-exit-btn").onclick = () => closeSumoulModal();
 
 topDoc.getElementById("smt-auth-submit-btn").onclick = async (e) => {
     const qq = qqInp.value.trim(), pass = codeInp.value.trim();
@@ -1006,18 +1029,18 @@ topDoc.getElementById("smt-auth-submit-btn").onclick = async (e) => {
         e.target.textContent = `✓ ${res.role} · ENTERING...`;
         setTimeout(() => {
             lockLayer.classList.add("smt-unlocked-hide");
-            e.target.textContent = "ENTER TERMINAL · 验证并进入系统";
+            e.target.textContent = "ENTER SUMOUL APP · 验证进入";
         }, 240);
     } else {
         errEl.textContent = res.msg;
-        e.target.textContent = res.status === "banned" ? "🚫 已被永久封禁" : "ENTER TERMINAL · 验证并进入系统";
+        e.target.textContent = res.status === "banned" ? "🚫 已被永久封禁" : "ENTER SUMOUL APP · 验证进入";
     }
 };
 
 topDoc.getElementById("smt-auth-apply-btn").onclick = () => {
     const qq = qqInp.value.trim();
     if (!/^[1-9][0-9]{4,11}$/.test(qq)) return alert("请先在上方输入框填写你正确的纯数字 QQ 号！");
-    const note = prompt(`提交【QQ: ${qq}】的审核申请，请输入你的昵称或备注：`, "申请使用插件");
+    const note = prompt(`提交【QQ: ${qq}】的审核申请，请输入你的昵称或备注：`, "申请使用 Sumoul App");
     if (note === null) return;
     const db = getAdminDB();
     if (db.blacklist.includes(qq)) return alert("🚫 你的 QQ 号已被作者拉黑，禁止提交申请！");
@@ -1025,7 +1048,7 @@ topDoc.getElementById("smt-auth-apply-btn").onclick = () => {
         db.pending.unshift({ qq, note: note.trim(), time: nowTimeStr() });
         saveAdminDB(db);
     }
-    const reqTicket = `【SEOUL OS 申请】QQ: ${qq} | 备注: ${note.trim()}`;
+    const reqTicket = `【Sumoul App 申请】QQ: ${qq} | 备注: ${note.trim()}`;
     navigator.clipboard?.writeText(reqTicket);
     errEl.style.color = "#484852";
     errEl.textContent = `✓ 已登记申请并复制申请口令！请发送给作者审核通过或索取群口令。`;
@@ -1034,12 +1057,19 @@ topDoc.getElementById("smt-auth-apply-btn").onclick = () => {
 function playMelancholyBoot() {
     updateLockTime();
     const splash = topDoc.getElementById("smt-boot-splash");
+    const poemEl = topDoc.getElementById("smt-splash-poem");
+    if (poemEl) {
+        const p = MELANCHOLY_POEMS[Math.floor(Math.random() * MELANCHOLY_POEMS.length)];
+        poemEl.innerHTML = `“ ${p.kr} ”<br><span style="font-size:8.5px;color:#9A9AA5;font-style:normal;display:block;margin-top:4px;">${p.cn}</span>`;
+    }
     lockLayer.classList.remove("smt-unlocked-hide");
     splash.classList.remove("fade-out");
-    setTimeout(() => { splash.classList.add("fade-out"); }, 1450);
+    splash.onclick = () => {
+        splash.classList.add("fade-out");
+    };
 }
 
-/* ── 微信模块事件绑定 ── */
+/* 微信模块 */
 const KAOMOJI_LIST = ["૮꒰ ˶• ༝ •˶꒱ა", "(｡•́︿•̀｡)", "♡(˃͈ દ ˂͈ ༶ )", "( ´͈ ᵕ `͈ )◞♡", "(⁎⁍̴̛ᴗ⁍̴̛⁎)", "(¬_¬ )", "( ˘•ω•˘ )", "✧(≖ ◡ ≖✿)", "(っ´ω`c)", "૮ • ﻌ - ა", "(⁄ ⁄•⁄ω⁄•⁄ ⁄)", "(╬▔皿▔)╯", "🥺", "🤍", "😭", "💢"];
 let activeQuoteText = "", activeMenuMsgIdx = -1, activeEditMsgIdx = -1, lastObservedCharScope = "";
 
@@ -1066,7 +1096,7 @@ function renderWeChat() {
 
     topDoc.getElementById("smt-sync-toggle").innerHTML = `${WX_ICO.sync}<span>记忆:${getSyncMode() ? "ON" : "OFF"}</span>`;
     if (currentPage === "talk") {
-        topDoc.getElementById("smt-top-title").textContent = `${displayCharName} · 서울톡`;
+        topDoc.getElementById("smt-top-title").textContent = `${displayCharName} · Sumoul App`;
         topDoc.getElementById("smt-top-sub").textContent = `${wCfg.charBio || "Personal Messenger"} · ${rt.timeStr} ${rt.periodCn}`;
     }
 
@@ -1089,7 +1119,7 @@ function renderWeChat() {
         } else if (m.type === "transfer" || /^\[(微信)?转账/.test(m.text)) {
             const amt = m.amount || m.text.match(/¥?(\d+(\.\d+)?)/)?.[1] || "520.00";
             const note = m.note || m.text.split("备注:")[1]?.replace("]", "")?.trim() || "给你的零花钱";
-            innerHtml = `<div class="smt-wx-pay-card" data-msgidx="${idx}"><div class="smt-wx-pay-top"><div class="smt-wx-pay-ico"></div><div><div class="smt-wx-pay-amt">₩ / ¥ ${amt}</div><div class="smt-wx-pay-note">${m.accepted ? "✓ 已收款 · " + note : note}</div></div></div><div class="smt-wx-pay-foot"><span>SEOUL PAY</span><span>${m.accepted ? "COMPLETED" : "TRANSFER"}</span></div></div>`;
+            innerHtml = `<div class="smt-wx-pay-card" data-msgidx="${idx}"><div class="smt-wx-pay-top"><div class="smt-wx-pay-ico"></div><div><div class="smt-wx-pay-amt">₩ / ¥ ${amt}</div><div class="smt-wx-pay-note">${m.accepted ? "✓ 已收款 · " + note : note}</div></div></div><div class="smt-wx-pay-foot"><span>SUMOUL PAY</span><span>${m.accepted ? "COMPLETED" : "TRANSFER"}</span></div></div>`;
         } else {
             const qHtml = m.quote ? `<div class="smt-wx-quote-box">「${m.quote.replace(/</g, "&lt;")}」</div>` : "";
             const isMulti = m.quote || (m.text && m.text.length > 22);
@@ -1272,7 +1302,7 @@ function openFullWxSettingsPage() {
     topDoc.getElementById("smt-cfg-bgnote").value = c.customBgNote || "";
 }
 topDoc.getElementById("smt-wx-cfg-btn").onclick = () => openFullWxSettingsPage();
-topDoc.getElementById("smt-wxset-back-chat").onclick = () => navigateToPage("talk", "SEOUL TALK · 서울톡", "Personal Messenger · KST");
+topDoc.getElementById("smt-wxset-back-chat").onclick = () => navigateToPage("talk", "Sumoul App · 서울톡", "Personal Messenger · KST");
 topDoc.getElementById("smt-wxset-time-toggle").onclick = () => { const c = getWxCfg(); c.timeAware = !(c.timeAware !== false); saveWxCfg(c); openFullWxSettingsPage(); };
 topDoc.getElementById("smt-cfg-myava-file").onchange = async (e) => { const f = e.target.files?.[0]; if (f) { const d = await compressFileToDataUrl(f, 200); topDoc.getElementById("smt-cfg-myava").value = d; topDoc.getElementById("smt-cfg-myava-preview").src = d; } };
 topDoc.getElementById("smt-cfg-charava-file").onchange = async (e) => { const f = e.target.files?.[0]; if (f) { const d = await compressFileToDataUrl(f, 200); topDoc.getElementById("smt-cfg-charava").value = d; topDoc.getElementById("smt-cfg-charava-preview").src = d; } };
@@ -1289,7 +1319,7 @@ topDoc.getElementById("smt-cfg-save-btn").onclick = () => {
         timeAware: prev.timeAware !== false,
         customBgNote: topDoc.getElementById("smt-cfg-bgnote").value.trim()
     });
-    navigateToPage("talk", "SEOUL TALK · 서울톡", "Personal Messenger · KST");
+    navigateToPage("talk", "Sumoul App · 서울톡", "Personal Messenger · KST");
 };
 topDoc.getElementById("smt-cfg-reset-btn").onclick = () => { saveWxCfg({ myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" }); openFullWxSettingsPage(); };
 
@@ -1310,7 +1340,7 @@ topDoc.getElementById("smt-wx-css-btn").onclick = () => { const d = topDoc.getEl
 topDoc.getElementById("smt-wx-css-save").onclick = () => { saveWxCss(topDoc.getElementById("smt-wx-css-textarea").value); applyWxCustomCss(); topDoc.getElementById("smt-wx-css-drawer").style.display = "none"; };
 topDoc.getElementById("smt-wx-css-reset").onclick = () => { saveWxCss(NEW_DEFAULT_WX_CSS); topDoc.getElementById("smt-wx-css-textarea").value = NEW_DEFAULT_WX_CSS; applyWxCustomCss(); };
 
-/* ── A+B 融合版情侣空间事件 ── */
+/* A+B 融合版情侣空间事件 */
 const QA_QUESTIONS = [
     "第一次悄悄对彼此产生超越普通关系的占有欲，是在哪个瞬间？",
     "如果今晚首尔突然停电，只有我们两个人被困在家里，最想一起做什么？",
@@ -1320,11 +1350,11 @@ const QA_QUESTIONS = [
 ];
 
 function getSpaceData() {
-    const ctx = getSTContext(1), key = getSafeScopedKey("seoul_v13_space");
+    const ctx = getSTContext(1), key = getSafeScopedKey("sumoul_v16_space");
     const def = {
         startDate: "2024-05-20", mood: "36.7°C · SWEET HOME", bgUrl: "", charNow: "正在小厨房给你热牛奶",
         pet: { name: "모찌 (糯米团)", lv: 2, hunger: 85, mood: 92, lastLog: `与 ${ctx.charName} 共同领养的小宠物正蜷在地毯上打呼噜。` },
-        life4cut: { date: "SEOUL STUDIO", frames: [`点击右上角生成你与 ${ctx.charName} 的专属四连拍`, "第二格画面", "第三格画面", "第四格定格"], sign: `${ctx.charName} & ME` },
+        life4cut: { date: "SUMOUL STUDIO", frames: [`点击右上角生成你与 ${ctx.charName} 的专属四连拍`, "第二格画面", "第三格画面", "第四格定格"], sign: `${ctx.charName} & ME` },
         qaIndex: 0, qaUserAns: "点击此处写下你的回答...", qaCharAns: "点击右上角「让TA作答」揭晓...",
         moodSync: { action: "正看着手机等你的消息", temp: "36.8°C", bpm: "96 BPM", miss: "99%", os: "“怎么还不找我聊天……”" },
         coupons: [
@@ -1342,7 +1372,7 @@ function getSpaceData() {
     };
     try { return Object.assign(def, JSON.parse(localStorage.getItem(key) || "{}")); } catch (e) { return def; }
 }
-function saveSpaceData(d) { localStorage.setItem(getSafeScopedKey("seoul_v13_space"), JSON.stringify(d)); }
+function saveSpaceData(d) { localStorage.setItem(getSafeScopedKey("sumoul_v16_space"), JSON.stringify(d)); }
 function calcTogetherDays() { const diff = Math.max(1, Math.floor((Date.now() - new Date(getSpaceData().startDate || "2024-05-20").getTime()) / 86400000)); return isNaN(diff) ? 100 : diff; }
 
 function renderCoupleSpaceAll() {
@@ -1386,7 +1416,7 @@ function renderCoupleSpaceAll() {
     topDoc.getElementById("smt-pet-mood-txt").textContent = `${pet.mood}%`; topDoc.getElementById("smt-pet-mood-bar").style.width = `${pet.mood}%`;
     topDoc.getElementById("smt-pet-log").textContent = `🐾 ${pet.lastLog}`;
 
-    const cut = sp.life4cut || { date: "SEOUL", frames: [], sign: "" };
+    const cut = sp.life4cut || { date: "SUMOUL", frames: [], sign: "" };
     topDoc.getElementById("smt-4cut-stage").innerHTML = `<div style="background:#FFF;border:1px solid #EAEAF0;border-radius:14px;padding:14px;max-width:290px;margin:0 auto;"><div style="font-size:8.5px;font-weight:700;letter-spacing:1.2px;color:#8E8E98;margin-bottom:10px;">LIFE4CUT · 인생네컷 STUDIO</div>${(cut.frames || []).slice(0, 4).map((f, i) => `<div style="background:#F8F8F8;border:1px solid #ECECF2;border-radius:10px;padding:12px;margin-bottom:8px;text-align:left;"><span style="font-size:8px;font-weight:700;color:#9A9AA5;display:block;margin-bottom:3px;">CUT 0${i + 1}</span><div style="font-size:11px;line-height:1.6;">${f}</div></div>`).join("")}<div style="display:flex;justify-content:space-between;font-size:9px;color:#6E6E77;font-weight:700;"><span>${cut.sign}</span><span>${cut.date}</span></div></div>`;
 
     const qIdx = (sp.qaIndex || 0) % QA_QUESTIONS.length;
@@ -1421,7 +1451,7 @@ function renderCoupleSpaceAll() {
 topDoc.getElementById("smt-sp-bg-btn").onclick = () => { const sp = getSpaceData(), u = prompt("粘贴同居背景横幅图片 URL（留空恢复极简柔灰）：", sp.bgUrl || ""); if (u !== null) { sp.bgUrl = u.trim(); saveSpaceData(sp); renderCoupleSpaceAll(); } };
 topDoc.getElementById("smt-sp-edit-date").onclick = () => { const sp = getSpaceData(), v = prompt("相恋日期(YYYY-MM-DD)：", sp.startDate); if (v) { sp.startDate = v.trim(); saveSpaceData(sp); renderCoupleSpaceAll(); } };
 topDoc.getElementById("smt-sp-mood").onclick = () => { const sp = getSpaceData(), v = prompt("修改今日心情温度：", sp.mood); if (v) { sp.mood = v.trim(); saveSpaceData(sp); renderCoupleSpaceAll(); } };
-topDoc.getElementById("smt-sp-reset-char").onclick = () => { const c = getSTContext(1); if (confirm(`确定重置与【${c.charName}】的情侣空间数据吗？`)) { localStorage.removeItem(getSafeScopedKey("seoul_v13_space")); renderCoupleSpaceAll(); } };
+topDoc.getElementById("smt-sp-reset-char").onclick = () => { const c = getSTContext(1); if (confirm(`确定重置与【${c.charName}】的情侣空间数据吗？`)) { localStorage.removeItem(getSafeScopedKey("sumoul_v16_space")); renderCoupleSpaceAll(); } };
 
 topDoc.getElementById("smt-sp-refresh-live").onclick = async (e) => {
     const ctx = getSTContext(6), sp = getSpaceData(); e.target.textContent = "⏳ 感应中...";
@@ -1449,7 +1479,7 @@ topDoc.getElementById("smt-pet-rename").onclick = () => { const sp = getSpaceDat
 topDoc.getElementById("smt-pet-feed").onclick = () => { const sp = getSpaceData(); sp.pet.hunger = Math.min(100, sp.pet.hunger + 15); sp.pet.lastLog = `你喂了 ${sp.pet.name} 冻干零食，它开心地蹭了蹭你的手心！`; saveSpaceData(sp); renderCoupleSpaceAll(); };
 topDoc.getElementById("smt-pet-pat").onclick = () => { const sp = getSpaceData(); sp.pet.mood = Math.min(100, sp.pet.mood + 15); sp.pet.lastLog = `你揉了揉 ${sp.pet.name} 的脑袋，它舒服地露出肚皮打滚~`; saveSpaceData(sp); renderCoupleSpaceAll(); };
 topDoc.getElementById("smt-pet-ai-play").onclick = async (e) => { const ctx = getSTContext(6), sp = getSpaceData(); e.target.textContent = "互动中..."; try { sp.pet.lastLog = await requestStandaloneAI(`你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 900)}`, `描写你逗弄宠物「${sp.pet.name}」并和身旁的${ctx.userName}亲昵互动的画面(80字左右)：`); saveSpaceData(sp); renderCoupleSpaceAll(); } catch (err) { alert(err.message); } finally { e.target.textContent = "✦ 让TA陪宠物玩"; } };
-topDoc.getElementById("smt-4cut-gen-btn").onclick = async (e) => { const ctx = getSTContext(8); e.target.textContent = "⏳ 连拍中..."; try { const raw = await requestStandaloneAI(`你是摄影师。角色：${ctx.charName}与${ctx.userName}。人设：${ctx.charDesc.slice(0, 1000)}`, `生成两人在自拍亭连拍4张人生四格的画面。严格只输出JSON：{"frames":["第1格","第2格","第3格","第4格亲密定格"],"sign":"手写短句"}`); const m = raw.match(/\{[\s\S]*\}/); if (m) { const obj = JSON.parse(m[0]), sp = getSpaceData(); sp.life4cut = { date: "SEOUL · " + nowTimeStr(), frames: obj.frames || [], sign: obj.sign || "우리의 계절" }; saveSpaceData(sp); renderCoupleSpaceAll(); } } catch (err) { alert(err.message); } finally { e.target.textContent = "✦ 和TA拍一组新四格"; } };
+topDoc.getElementById("smt-4cut-gen-btn").onclick = async (e) => { const ctx = getSTContext(8); e.target.textContent = "⏳ 连拍中..."; try { const raw = await requestStandaloneAI(`你是摄影师。角色：${ctx.charName}与${ctx.userName}。人设：${ctx.charDesc.slice(0, 1000)}`, `生成两人在自拍亭连拍4张人生四格的画面。严格只输出JSON：{"frames":["第1格","第2格","第3格","第4格亲密定格"],"sign":"手写短句"}`); const m = raw.match(/\{[\s\S]*\}/); if (m) { const obj = JSON.parse(m[0]), sp = getSpaceData(); sp.life4cut = { date: "SUMOUL · " + nowTimeStr(), frames: obj.frames || [], sign: obj.sign || "우리의 계절" }; saveSpaceData(sp); renderCoupleSpaceAll(); } } catch (err) { alert(err.message); } finally { e.target.textContent = "✦ 和TA拍一组新四格"; } };
 topDoc.getElementById("smt-qa-next").onclick = () => { const sp = getSpaceData(); sp.qaIndex = ((sp.qaIndex || 0) + 1) % QA_QUESTIONS.length; sp.qaUserAns = "点击填写..."; sp.qaCharAns = "点击让TA作答..."; saveSpaceData(sp); renderCoupleSpaceAll(); };
 topDoc.getElementById("smt-qa-edit-my").onclick = () => { const sp = getSpaceData(), v = prompt("写下你的回答："); if (v) { sp.qaUserAns = v.trim(); saveSpaceData(sp); renderCoupleSpaceAll(); } };
 topDoc.getElementById("smt-qa-ai-ans").onclick = async (e) => { const ctx = getSTContext(6), sp = getSpaceData(), q = QA_QUESTIONS[(sp.qaIndex || 0) % QA_QUESTIONS.length]; e.target.textContent = "思考中..."; try { sp.qaCharAns = await requestStandaloneAI(`你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 1000)}`, `问题：“${q}”(${ctx.userName}答：“${sp.qaUserAns}”)。请用第一人称写下你的回答(70字左右)：`); saveSpaceData(sp); renderCoupleSpaceAll(); } catch (err) { alert(err.message); } finally { e.target.textContent = "✦ 让TA作答"; } };
@@ -1459,7 +1489,7 @@ topDoc.getElementById("smt-sp-note-send").onclick = async () => { const inp = to
 topDoc.getElementById("smt-sp-ai-note").onclick = async () => { const ctx = getSTContext(6); try { const r = await requestStandaloneAI(`你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 800)}`, `主动在情侣空间留言板给${ctx.userName}留一句悄悄话(45字内)：`); const d = getSpaceData(); d.notes.unshift({ author: ctx.charName, text: r, time: nowTimeStr() }); saveSpaceData(d); renderCoupleSpaceAll(); } catch (err) { alert(err.message); } };
 topDoc.getElementById("smt-sp-add-todo").onclick = () => { const v = prompt("新增心愿："); if (v) { const d = getSpaceData(); d.todos.push({ text: v.trim(), done: false }); saveSpaceData(d); renderCoupleSpaceAll(); } };
 
-/* ── 网易云、查手机、交换日记、HTML主页与独立 API 设置 ── */
+/* 网易云、查手机、交换日记、HTML主页与独立 API 设置 */
 function getMusicData() {
     try { return Object.assign({ liked: [{ id: "2076931657", name: "Love Lee", artist: "AKMU", cover: "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", url: "https://music.163.com/song/media/outer/url?id=2076931657.mp3" }, { id: "2007335243", name: "Ditto", artist: "NewJeans", cover: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", url: "https://music.163.com/song/media/outer/url?id=2007335243.mp3" }], currentTrack: null }, JSON.parse(localStorage.getItem(K_MUSIC) || "{}")); }
     catch (e) { return { liked: [], currentTrack: null }; }
@@ -1549,8 +1579,8 @@ topDoc.getElementById("smt-ncm-ai-listen").onclick = async () => {
 };
 
 let currentPhoneTab = "ins";
-function getPhoneCache() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_phone")) || "{}"); } catch (e) { return {}; } }
-function savePhoneCache(p) { localStorage.setItem(getSafeScopedKey("seoul_v13_phone"), JSON.stringify(p)); }
+function getPhoneCache() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("sumoul_v16_phone")) || "{}"); } catch (e) { return {}; } }
+function savePhoneCache(p) { localStorage.setItem(getSafeScopedKey("sumoul_v16_phone"), JSON.stringify(p)); }
 function renderFullPhoneApp() {
     const c = getSTContext(1), cache = getPhoneCache(), stage = topDoc.getElementById("smt-ph-stage");
     topDoc.getElementById("smt-ph-ava").src = c.charAvatar; topDoc.getElementById("smt-ph-owner").textContent = `${c.charName} 的 iPhone`;
@@ -1569,8 +1599,8 @@ async function generateFullPhoneContent(type) {
 topDoc.querySelectorAll("[data-phtab]").forEach((b) => b.onclick = () => { topDoc.querySelectorAll("[data-phtab]").forEach((x) => x.classList.remove("dark")); b.classList.add("dark"); currentPhoneTab = b.getAttribute("data-phtab"); renderFullPhoneApp(); });
 topDoc.getElementById("smt-ph-refresh-btn").onclick = () => generateFullPhoneContent(currentPhoneTab);
 
-function getDiaryList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_diary")) || "[]"); } catch (e) { return []; } }
-function saveDiaryList(l) { localStorage.setItem(getSafeScopedKey("seoul_v13_diary"), JSON.stringify(l)); }
+function getDiaryList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("sumoul_v16_diary")) || "[]"); } catch (e) { return []; } }
+function saveDiaryList(l) { localStorage.setItem(getSafeScopedKey("sumoul_v16_diary"), JSON.stringify(l)); }
 function renderDiaryApp() {
     topDoc.getElementById("smt-diary-list").innerHTML = getDiaryList().map((d) => `<div style="background:#F8F8F8;border:1px solid #ECECF2;border-radius:14px;padding:12px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:9px;color:#7A7A85;margin-bottom:5px;"><b>[${d.author}] ${d.title}</b><span>${d.time}</span></div><div style="font-size:11px;line-height:1.68;white-space:pre-wrap;">${d.content.replace(/</g, "&lt;")}</div></div>`).join("");
 }
@@ -1580,7 +1610,7 @@ topDoc.getElementById("smt-diary-ai-write").onclick = async (e) => { const c = g
 const HTML_TPLS = {
     coupleId: `<div style="background:#F8F8F8;border:1px solid #ECECF2;border-radius:18px;padding:16px;"><div style="display:flex;justify-content:space-around;align-items:center;background:#FFF;border-radius:14px;padding:15px;"><div style="text-align:center;"><img src="{{avatar}}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;"/><div style="font-size:10px;font-weight:700;margin-top:5px;">{{user}}</div></div><div style="font-size:14px;font-weight:700;">D+{{days}}</div><div style="text-align:center;"><img src="{{charAvatar}}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;"/><div style="font-size:10px;font-weight:700;margin-top:5px;">{{char}}</div></div></div></div>`,
     polaroid: `<div style="background:#F8F8F8;border:1px solid #ECECF2;border-radius:18px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div style="background:#FFF;padding:7px;border-radius:11px;text-align:center;"><img src="{{avatar}}" style="width:100%;height:86px;object-fit:cover;border-radius:7px;"/><div style="font-size:10px;font-weight:700;margin-top:4px;">{{user}}</div></div><div style="background:#FFF;padding:7px;border-radius:11px;text-align:center;"><img src="{{charAvatar}}" style="width:100%;height:86px;object-fit:cover;border-radius:7px;"/><div style="font-size:10px;font-weight:700;margin-top:4px;">{{char}}</div></div></div>`,
-    receipt: `<div style="background:#F8F8F8;border:1px dashed #D5D5DE;border-radius:14px;padding:14px;font-family:monospace;text-align:center;"><b>SEOUL RECEIPT · {{user}} &amp; {{char}} (D+{{days}})</b></div>`
+    receipt: `<div style="background:#F8F8F8;border:1px dashed #D5D5DE;border-radius:14px;padding:14px;font-family:monospace;text-align:center;"><b>SUMOUL RECEIPT · {{user}} &amp; {{char}} (D+{{days}})</b></div>`
 };
 function getUserHtml() { return localStorage.getItem(K_HTML) || HTML_TPLS.coupleId; }
 function saveUserHtml(h) { localStorage.setItem(K_HTML, h); }
@@ -1628,17 +1658,30 @@ topDoc.getElementById("smt-fetch-models").onclick = async (e) => {
     } catch (err) { e.target.textContent = "拉取失败"; }
 };
 
-function openSeoulModal() {
+/* 🔥 强制破壁唤醒函数（同时设置 class 与 inline display:flex !important，手机/电脑 100% 必弹出！） */
+function openSumoulModal() {
     renderWeChat();
     renderCoupleSpaceAll();
     renderHomeHtml();
     modal.classList.add("smt-open");
+    modal.style.setProperty("display", "flex", "important");
     playMelancholyBoot();
 }
 
-btn.onclick = () => openSeoulModal();
+btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); openSumoulModal(); };
+btn.addEventListener("touchend", (e) => { e.preventDefault(); e.stopPropagation(); openSumoulModal(); }, { passive: false });
 
-/* 三重打开入口守护器（右下角悬浮球 + 酒馆扩展面板大按钮 + 聊天框魔法棒菜单） */
+/* 全局捕获级点击监听（确保点悬浮球、扩展面板按钮、魔法棒菜单 100% 响应！） */
+topDoc.addEventListener("click", (e) => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
+        e.preventDefault();
+        e.stopPropagation();
+        openSumoulModal();
+    }
+}, true);
+
 function ensureTavernExtensionButtons() {
     if (!topDoc.getElementById("seoul-mini-theater-btn")) topDoc.body.appendChild(btn);
     if (!topDoc.getElementById("seoul-mini-theater-modal")) topDoc.body.appendChild(modal);
@@ -1650,17 +1693,16 @@ function ensureTavernExtensionButtons() {
         panel.className = "inline-drawer";
         panel.innerHTML = `
             <div class="inline-drawer-toggle inline-drawer-header">
-                <b>🤍 SEOUL OS · 韩系全屏手机系统</b>
+                <b>🤍 Sumoul App</b>
                 <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
             </div>
             <div class="inline-drawer-content" style="display:block;padding:10px;">
-                <div style="font-size:12px;margin-bottom:8px;opacity:.85;">独立微信 · A+B情侣空间 · 网易云一起听 · 防二传审核</div>
+                <div style="font-size:12px;margin-bottom:8px;opacity:.85;">独立微信 · A+B情侣空间 · 网易云同听 · 防二传审核</div>
                 <div id="seoul-ext-open-btn" class="menu_button" style="width:100%;text-align:center;padding:8px 0;font-weight:700;cursor:pointer;">
-                    📱 立即打开 SEOUL OS 全屏系统
+                    📱 立即打开 Sumoul App
                 </div>
             </div>`;
         extSettings.prepend(panel);
-        topDoc.getElementById("seoul-ext-open-btn")?.addEventListener("click", () => openSeoulModal());
     }
 
     const wandMenu = topDoc.getElementById("extensionsMenu");
@@ -1669,8 +1711,7 @@ function ensureTavernExtensionButtons() {
         item.id = "seoul-wand-menu-item";
         item.className = "list-group-item flex-container flexGap5 interactable";
         item.style.cursor = "pointer";
-        item.innerHTML = `<span>🤍</span><span>打开 SEOUL OS 手机系统</span>`;
-        item.addEventListener("click", () => openSeoulModal());
+        item.innerHTML = `<span>🤍</span><span>打开 Sumoul App</span>`;
         wandMenu.prepend(item);
     }
 }
@@ -1691,6 +1732,5 @@ setInterval(() => {
 renderWeChat();
 }
 
-bootSeoulOS();
+bootSumoulApp();
 })();
-
