@@ -1695,14 +1695,14 @@
 
     // 2. 你自己的作者 QQ 号（填在这里的 QQ 号无需激活码可直接免密登录）
     const BUILTIN_WHITELIST_QQ = [
-        "10001" // 👈 把这里改成你自己的 QQ 号
+        "3425740873" // 👈 把这里改成你自己的 QQ 号
     ];
 
     // 3. GitHub 云端白名单地址（选填：如果你在 GitHub 仓库建了一个 allow.json 写上 ["qq1","qq2"]，把 raw 链接填在这即可云端实时放行）
     const CLOUD_WHITELIST_URL = "";
 
     // 4. 作者内置发卡器密码（在锁屏页连续点击顶部小锁图标 5 下，输入此密码即可打开算号器给别人生成激活码！）
-    const AUTHOR_ADMIN_PIN = "0520";
+    const AUTHOR_ADMIN_PIN = "1102";
 
     // 5. 锁屏底部显示的作者联系方式提示
     const AUTHOR_CONTACT_TIP = "本系统已开启防二传保护 · 请联系作者审核通过你的 QQ 号";
