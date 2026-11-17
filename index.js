@@ -1772,7 +1772,7 @@ bootSumoulApp();
     patchCleanMelancholySplash();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 韩系动态流 · 原生 IG Notes 微压贴合浮云泡泡版】
+// 🤍 【Sumoul App 韩系动态流 · 读取酒馆真实Char列表 + 省略号收尾 + 无边框放大椭圆泡泡版】
 // 用法：直接替换 index.js 最末尾的旧动态补丁！
 // ==========================================================================
 (function () {
@@ -1796,6 +1796,7 @@ bootSumoulApp();
             heartFill: mkIco("%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E", 16, "%232C2C32", "%232C2C32"),
             cmt: mkIco("%3Cpath d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'/%3E", 15, "%232C2C32", "none"),
             more: mkIco("%3Ccircle cx='12' cy='12' r='1.2'/%3E%3Ccircle cx='19' cy='12' r='1.2'/%3E%3Ccircle cx='5' cy='12' r='1.2'/%3E", 15, "%237A7A85", "none", "2.2"),
+            dots: mkIco("%3Ccircle cx='12' cy='12' r='1.5' fill='%2355555E'/%3E%3Ccircle cx='18' cy='12' r='1.5' fill='%2355555E'/%3E%3Ccircle cx='6' cy='12' r='1.5' fill='%2355555E'/%3E", 20, "%2355555E", "none", "2"),
             plus: mkIco("%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E", 10, "%23FFFFFF", "none", "2.5"),
             pin: mkIco("%3Cpath d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E", 11, "%238E8E98", "none", "1.8"),
             cam: mkIco("%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E", 20),
@@ -1829,7 +1830,7 @@ bootSumoulApp();
                 align-items: flex-end !important;
                 gap: 15px !important;
                 overflow-x: auto !important;
-                padding: 20px 6px 12px 6px !important;
+                padding: 24px 6px 12px 6px !important;
                 background: transparent !important;
                 border: none !important;
                 border-bottom: 1px solid #F2F2F6 !important;
@@ -1846,94 +1847,97 @@ bootSumoulApp();
                 position: relative !important;
                 cursor: pointer !important;
                 flex-shrink: 0 !important;
-                width: 62px !important;
+                width: 64px !important;
             }
 
-            /* ── 2. 原生 Instagram Notes 微压贴合式柔和浮云泡泡 ── */
+            /* ── 2. 无边框 + 稍微放大一点点的柔和椭圆云朵冒泡 (Borderless Soft Pill) ── */
             #seoul-mini-theater-modal .ig-note-cloud {
                 position: absolute !important;
-                top: -11px !important;
+                top: -14px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 background: #FFFFFF !important;
-                border: 1px solid rgba(220, 220, 230, 0.75) !important;
-                border-radius: 14px !important;
-                padding: 3.5px 8.5px !important;
+                border: none !important;
+                border-radius: 20px !important;
+                padding: 5px 11px !important;
                 z-index: 6 !important;
-                box-shadow: 0 3px 9px rgba(25, 25, 35, 0.08), 0 1px 2px rgba(25, 25, 35, 0.04) !important;
+                box-shadow: 0 4px 14px rgba(20, 20, 30, 0.10), 0 1px 4px rgba(20, 20, 30, 0.05) !important;
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                min-width: 38px !important;
             }
             #seoul-mini-theater-modal .ig-note-cloud span {
                 display: block !important;
-                font-size: 8.2px !important;
+                font-size: 9.2px !important;
                 font-weight: 700 !important;
                 color: #2C2C32 !important;
                 white-space: nowrap !important;
-                max-width: 60px !important;
+                max-width: 68px !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
-                line-height: 1.15 !important;
-                letter-spacing: -0.1px !important;
+                line-height: 1.2 !important;
             }
-            /* 云朵左下方一体成形的无边框感柔和小水滴（自然贴合在头像额头处） */
+            /* 无边框一体感小水滴底座 */
             #seoul-mini-theater-modal .ig-note-cloud::before {
                 content: "" !important;
                 position: absolute !important;
-                bottom: -3.5px !important;
-                left: 11px !important;
-                width: 6.5px !important;
-                height: 6.5px !important;
+                bottom: -4px !important;
+                left: 13px !important;
+                width: 7.5px !important;
+                height: 7.5px !important;
                 border-radius: 50% !important;
                 background: #FFFFFF !important;
-                box-shadow: 0 2px 3px rgba(25, 25, 35, 0.07) !important;
+                border: none !important;
+                box-shadow: 0 3px 5px rgba(20, 20, 30, 0.07) !important;
                 z-index: -1 !important;
             }
             #seoul-mini-theater-modal .ig-note-cloud::after {
                 content: "" !important;
                 position: absolute !important;
-                bottom: -6.5px !important;
-                left: 15px !important;
-                width: 3.8px !important;
-                height: 3.8px !important;
+                bottom: -8px !important;
+                left: 17px !important;
+                width: 4.2px !important;
+                height: 4.2px !important;
                 border-radius: 50% !important;
                 background: #FFFFFF !important;
-                box-shadow: 0 1px 2px rgba(25, 25, 35, 0.08) !important;
+                border: none !important;
+                box-shadow: 0 2px 3px rgba(20, 20, 30, 0.08) !important;
                 z-index: -2 !important;
             }
-            /* 当 User 还没填状态时的极简浅灰半透明微胶囊 */
+            /* User 未填状态时的轻柔浅灰提示椭圆 */
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint {
-                background: rgba(246, 246, 250, 0.92) !important;
-                padding: 2.5px 6px !important;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+                background: #F6F6FA !important;
+                padding: 4px 9px !important;
+                box-shadow: 0 3px 10px rgba(20, 20, 30, 0.06) !important;
             }
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint span {
                 color: #9A9AA5 !important;
-                font-size: 7.5px !important;
+                font-size: 8.2px !important;
                 font-weight: 600 !important;
             }
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint::before,
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint::after {
-                background: rgba(246, 246, 250, 0.92) !important;
+                background: #F6F6FA !important;
             }
 
-            /* 圆头像双层留白环 */
+            /* ── 3. Char 圆头像边框：稍微淡一点的柔炭黑 (Soft Charcoal Ring) ── */
             #seoul-mini-theater-modal .kr-ava-ring {
                 width: 56px !important;
                 height: 56px !important;
                 border-radius: 50% !important;
                 padding: 2.5px !important;
                 background: #FFFFFF !important;
-                border: 1.4px solid #E2E2EA !important;
+                border: 1.5px solid rgba(58, 58, 64, 0.24) !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 box-sizing: border-box !important;
                 position: relative !important;
             }
+            /* 当前激活 Char 的边框：稍微淡一点的柔炭黑 (0.52 透明度，不刺眼不死黑) */
             #seoul-mini-theater-modal .kr-ava-ring.unread {
-                border: 1.8px solid #3A3A40 !important;
+                border: 1.6px solid rgba(58, 58, 64, 0.52) !important;
             }
             #seoul-mini-theater-modal .kr-ava-inner {
                 width: 100% !important;
@@ -1941,6 +1945,9 @@ bootSumoulApp();
                 border-radius: 50% !important;
                 overflow: hidden !important;
                 background: #F4F4F8 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
             #seoul-mini-theater-modal .kr-ava-inner img {
                 width: 100% !important;
@@ -1955,7 +1962,7 @@ bootSumoulApp();
                 width: 18px !important;
                 height: 18px !important;
                 border-radius: 50% !important;
-                background: #3A3A40 !important;
+                background: #484852 !important;
                 border: 2px solid #FFFFFF !important;
                 display: flex !important;
                 align-items: center !important;
@@ -2190,10 +2197,14 @@ bootSumoulApp();
             <div id="smt-mom-stream" style="flex:1;min-height:0;overflow-y:auto;padding-bottom:16px;"></div>
         `;
 
+        // 读取当前角色与酒馆全部角色列表 (`otherChars`)
         function getCtx() {
             let userName = "ME", charName = "", charScopeId = "";
             let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
             let charDesc = "", recentChat = "";
+            let otherChars = [];
+            let totalOtherCount = 0;
+
             try {
                 const st = topWin.SillyTavern?.getContext?.();
                 if (st) {
@@ -2214,8 +2225,33 @@ bootSumoulApp();
                     if (Array.isArray(st.chat) && st.chat.length) {
                         recentChat = st.chat.slice(-8).map((m) => `${m.is_user ? userName : (charName || "TA")}: ${m.mes}`).join("\n");
                     }
+                    // 🔥 读取酒馆里的所有角色卡，过滤掉当前角色，只取前 3 个展示，剩余计入省略号！
+                    if (Array.isArray(st.characters) && st.characters.length > 0) {
+                        const allOthers = st.characters.filter((ch, idx) => ch && ch.name && String(idx) !== String(st.characterId) && ch.name !== charName);
+                        totalOtherCount = allOthers.length;
+                        otherChars = allOthers.slice(0, 3).map((ch) => ({
+                            name: ch.name,
+                            ava: ch.avatar ? `/characters/${encodeURIComponent(ch.avatar)}` : "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg",
+                            story: `【${ch.name} 的限时快拍】刚刚更新了一条日常随手拍动态。`
+                        }));
+                    }
                 }
             } catch (e) {}
+
+            // 若酒馆角色列表还在加载，尝试从 DOM 里的角色卡片抓取
+            if (otherChars.length === 0) {
+                const domCards = topDoc.querySelectorAll(".character_select");
+                if (domCards.length > 0) {
+                    const temp = [];
+                    domCards.forEach((el) => {
+                        const n = el.querySelector(".ch_name")?.textContent?.trim();
+                        const a = el.querySelector("img")?.src;
+                        if (n && n !== charName) temp.push({ name: n, ava: a || "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `【${n} 的快拍】更新了一条日常状态。` });
+                    });
+                    totalOtherCount = temp.length;
+                    otherChars = temp.slice(0, 3);
+                }
+            }
 
             const selCh = topDoc.querySelector("#rm_button_selected_ch h2, #character_name_pole");
             if (!charName && selCh?.textContent?.trim()) charName = selCh.textContent.trim();
@@ -2248,7 +2284,7 @@ bootSumoulApp();
                     if (wc.charAva) charAvatar = wc.charAva;
                 }
             } catch (e) {}
-            return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat };
+            return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat, otherChars, totalOtherCount };
         }
 
         async function askAI(sys, usr) {
@@ -2280,11 +2316,6 @@ bootSumoulApp();
                 myNote: "",
                 charNote: "想你了",
                 charStory: `凌晨 · ${charName} 随手拍下窗外灰白色的街景，玻璃上映出半张侧脸，配文：“又到了会想起你的时间。”`,
-                friends: [
-                    { name: "서윤 · 摄影", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `【摄影师 서윤 的快拍】刚冲洗出来的黑白胶卷，其中有一张是上次在街角抓拍到的 ${charName} 看向你的眼神。` },
-                    { name: "汉南洞 Cafe", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `【汉南洞 Cafe 快拍】玻璃窗上的雨痕与刚萃好的浓缩咖啡。刚才 ${charName} 来店里打包了一份你爱吃的甜点。` },
-                    { name: "夜雨电台", ava: "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", story: `【凌晨电台 FM 94.5】“今夜首尔气温 14°C，有微雨。祝那个还没睡的人，能梦到想见的人。”` }
-                ],
                 posts: [
                     {
                         id: 1,
@@ -2336,17 +2367,21 @@ bootSumoulApp();
             const filterCharBtn = topDoc.getElementById("smt-filter-char-btn");
             if (filterCharBtn) filterCharBtn.textContent = `只看 ${c.charName}`;
 
-            const friends = data.friends || createDefaultFeed(c.charName).friends;
-            const storiesBar = topDoc.getElementById("smt-ins-stories-bar");
+            // 如果酒馆里还有其他角色，展示前 3 个角色；若只有当前 1 个角色，用 2 个默认摄影号兜底
+            const extraList = c.otherChars.length > 0 ? c.otherChars : [
+                { name: "서윤", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `刚冲洗出来的黑白胶卷。` },
+                { name: "한남동", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `玻璃窗上的雨痕与浓缩咖啡。` }
+            ];
+            const remainCount = Math.max(0, c.totalOtherCount - extraList.length);
 
-            // 原生 IG Notes 微压贴合浮云泡泡：User 没填时显示轻巧的“想法+”，填了则显示文字泡泡；AI 显示它的实时心声泡泡
+            const storiesBar = topDoc.getElementById("smt-ins-stories-bar");
             const myBubbleHtml = data.myNote
                 ? `<div class="ig-note-cloud"><span>${data.myNote}</span></div>`
                 : `<div class="ig-note-cloud empty-hint"><span>想法...</span></div>`;
             const charBubbleHtml = `<div class="ig-note-cloud"><span>${data.charNote || "想你了"}</span></div>`;
 
             storiesBar.innerHTML = `
-                <!-- 1. 我的圆头像 -->
+                <!-- 1. 我的圆头像（无边框微放大椭圆泡泡） -->
                 <div class="kr-note-unit" id="smt-story-me" title="点击修改我的状态泡泡">
                     ${myBubbleHtml}
                     <div class="kr-ava-ring">
@@ -2356,7 +2391,7 @@ bootSumoulApp();
                     <div class="kr-unit-name">${c.userName}</div>
                 </div>
 
-                <!-- 2. TA 的圆头像（微压贴合式浮云泡泡） -->
+                <!-- 2. 当前 Char 的圆头像（柔炭黑边框 + 无边框微放大椭圆泡泡） -->
                 <div class="kr-note-unit" id="smt-story-char">
                     ${charBubbleHtml}
                     <div class="kr-ava-ring unread">
@@ -2365,15 +2400,23 @@ bootSumoulApp();
                     <div class="kr-unit-name">${c.charName}</div>
                 </div>
 
-                <!-- 3~5. 好友/电台圆头像（干净无泡泡） -->
-                ${friends.map((fr, idx) => `
-                    <div class="kr-note-unit" data-fridx="${idx}">
+                <!-- 3~5. 自动读取的酒馆其他 Char 头像（干净不冒泡，柔淡灰黑细环） -->
+                ${extraList.map((ch, idx) => `
+                    <div class="kr-note-unit" data-otheridx="${idx}">
                         <div class="kr-ava-ring">
-                            <div class="kr-ava-inner"><img src="${fr.ava}" /></div>
+                            <div class="kr-ava-inner"><img src="${ch.ava}" /></div>
                         </div>
-                        <div class="kr-unit-name">${fr.name}</div>
+                        <div class="kr-unit-name">${ch.name}</div>
                     </div>
                 `).join("")}
+
+                <!-- 6. 末尾省略号圆圈 (...) -->
+                <div class="kr-note-unit" id="smt-story-more-dots" title="更多酒馆角色">
+                    <div class="kr-ava-ring">
+                        <div class="kr-ava-inner" style="background:#F6F6FA!important;">${KR_ICO.dots}</div>
+                    </div>
+                    <div class="kr-unit-name" style="color:#8E8E98!important;">${remainCount > 0 ? `+${remainCount} 更多` : "···"}</div>
+                </div>
             `;
 
             topDoc.getElementById("smt-story-me").onclick = () => {
@@ -2417,21 +2460,38 @@ bootSumoulApp();
                 };
             };
 
-            storiesBar.querySelectorAll("[data-fridx]").forEach((el) => {
+            storiesBar.querySelectorAll("[data-otheridx]").forEach((el) => {
                 el.onclick = () => {
-                    const idx = Number(el.getAttribute("data-fridx")), fr = friends[idx];
-                    if (!fr) return;
+                    const idx = Number(el.getAttribute("data-otheridx")), ch = extraList[idx];
+                    if (!ch) return;
                     viewer.style.display = "block";
                     viewer.innerHTML = `
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                            <b style="font-size:10px;color:#2C2C32;">${fr.name} · 限时快拍</b>
+                            <div style="display:flex;align-items:center;gap:7px;">
+                                <img src="${ch.ava}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" />
+                                <b style="font-size:10px;color:#2C2C32;">${ch.name} · 角色快拍</b>
+                            </div>
                             <span id="smt-fr-st-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span>
                         </div>
-                        <div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#484852;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:11px 12px;">${fr.story}</div>
+                        <div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#484852;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:11px 12px;">${ch.story}（在酒馆切换到该角色卡即可进入 TA 的专属动态主页）</div>
                     `;
                     viewer.querySelector("#smt-fr-st-close").onclick = () => (viewer.style.display = "none");
                 };
             });
+
+            topDoc.getElementById("smt-story-more-dots").onclick = () => {
+                viewer.style.display = "block";
+                viewer.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <b style="font-size:10px;color:#2C2C32;">ALL CHARACTERS · 酒馆角色列表</b>
+                        <span id="smt-dots-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span>
+                    </div>
+                    <div style="font-size:10px;font-weight:600;line-height:1.6;color:#55555E;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:10px 12px;">
+                        当前动态流已绑定角色 <b>${c.charName}</b>（共检测到酒馆内还有 ${c.totalOtherCount} 位其他角色）。在酒馆切换任意角色卡后，Sumoul App 会自动切换为对应角色的独立微信、动态与情侣空间。
+                    </div>
+                `;
+                viewer.querySelector("#smt-dots-close").onclick = () => (viewer.style.display = "none");
+            };
 
             const stream = topDoc.getElementById("smt-mom-stream");
             const posts = (data.posts || []).filter((p) => currentFilter === "all" || !p.isMe);
