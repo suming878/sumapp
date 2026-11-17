@@ -739,10 +739,928 @@
     topDoc.body.appendChild(modal);
 
     /* ══════════════════════════════════════════════════════════════════════
-       【PART 4：💬 独立微信模块 (仿真转账卡片 + 引用回复 + 单条消息删除 + 连发不秒回)】
+       【PART 4：💬 独立微信模块 (修复设置保存无反应Bug + 新增表情包批量导入面板 + 头像气泡顶部对齐)】
        ══════════════════════════════════════════════════════════════════════ */
+
+    // 4-0. 内置防报错角色作用域 Key 生成器（即使未替换 PART 1 也 100% 正常工作绝不报错！）
+    function getSafeScopedKey(baseKey) {
+        if (typeof scopedKey === "function") {
+            try { return scopedKey(baseKey); } catch (e) {}
+        }
+        const ctx = getSTContext(1);
+        const rawId = ctx.charScopeId || ctx.charName || "default";
+        const safeId = String(rawId).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+        return `${baseKey}__${safeId}`;
+    }
+
+    // 默认微信 CSS 美化模板（包含：长圆形 #F8F8F8 气泡 + 我与对方两个完全独立的自定义气泡尾巴 URL）
+    const NEW_DEFAULT_WX_CSS = `/* 🎨 【微信专属 CSS 美化工作台】
+   💡 提示：头像本地上传、昵称、备注、真实时间感知请点击旁边的「个人/聊天设置」全屏页！
+   👇 下方专门用来改【长圆形气泡颜色】与【我 / 对方两个独立的气泡尾巴图片 URL】 👇 */
+
+#seoul-mini-theater-modal #smt-page-talk {
+    /* 1. 双方气泡颜色与长圆形圆角（999px 为标准长圆形胶囊） */
+    --我的气泡底色: #F8F8F8;
+    --我的气泡字色: #3A3A40;
+    --我的气泡边框: #EAEAF0;
+
+    --对方气泡底色: #FFFFFF;
+    --对方气泡字色: #333338;
+    --对方气泡边框: #EAEAF0;
+
+    --气泡长圆角: 999px;
+
+    /* 2. 气泡尾巴自定义图片 URL（把 none 改成 url("你的透明尾巴图链接") 即可分别显示！） */
+    --我的气泡尾巴-url: none;
+    --对方的气泡尾巴-url: none;
+
+    /* 3. 气泡尾巴尺寸与位置微调 */
+    --我的尾巴宽: 13px;
+    --我的尾巴高: 13px;
+    --我的尾巴右侧偏移: -6px;
+    --我的尾巴底部偏移: 2px;
+
+    --对方尾巴宽: 13px;
+    --对方尾巴高: 13px;
+    --对方尾巴左侧偏移: -6px;
+    --对方尾巴底部偏移: 2px;
+}
+
+/* ── 微信聊天背景框（可加 background-image 换聊天壁纸） ── */
+#smt-wx-stream {
+    background-color: #FFFFFF !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+/* ── 我(User)的右侧 #F8F8F8 长圆形气泡 ── */
+#seoul-mini-theater-modal #smt-wx-stream .smt-wx-row.me .smt-wx-bubble {
+    background-color: var(--我的气泡底色, #F8F8F8) !important;
+    color: var(--我的气泡字色, #3A3A40) !important;
+    -webkit-text-fill-color: var(--我的气泡字色, #3A3A40) !important;
+    border: 1px solid var(--我的气泡边框, #EAEAF0) !important;
+    border-radius: var(--气泡长圆角, 999px) !important;
+}
+
+/* ── 对方(AI)的左侧 #FFFFFF 长圆形气泡 ── */
+#seoul-mini-theater-modal #smt-wx-stream .smt-wx-row.ai .smt-wx-bubble {
+    background-color: var(--对方气泡底色, #FFFFFF) !important;
+    color: var(--对方气泡字色, #333338) !important;
+    -webkit-text-fill-color: var(--对方气泡字色, #333338) !important;
+    border: 1px solid var(--对方气泡边框, #EAEAF0) !important;
+    border-radius: var(--气泡长圆角, 999px) !important;
+}
+
+/* 多行长文本自动平滑过渡为 20px 胶囊圆角 */
+#seoul-mini-theater-modal #smt-wx-stream .smt-wx-bubble.multiline {
+    border-radius: 20px !important;
+}
+
+/* ── 独立挂载 1：我(User)的右侧气泡尾巴 ── */
+#seoul-mini-theater-modal #smt-wx-stream .smt-wx-row.me .smt-wx-bubble::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    right: var(--我的尾巴右侧偏移, -6px) !important;
+    bottom: var(--我的尾巴底部偏移, 2px) !important;
+    width: var(--我的尾巴宽, 13px) !important;
+    height: var(--我的尾巴高, 13px) !important;
+    background-image: var(--我的气泡尾巴-url, none) !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    pointer-events: none !important;
+    z-index: 3 !important;
+}
+
+/* ── 独立挂载 2：对方(AI)的左侧气泡尾巴 ── */
+#seoul-mini-theater-modal #smt-wx-stream .smt-wx-row.ai .smt-wx-bubble::before {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    left: var(--对方尾巴左侧偏移, -6px) !important;
+    bottom: var(--对方尾巴底部偏移, 2px) !important;
+    width: var(--对方尾巴宽, 13px) !important;
+    height: var(--对方尾巴高, 13px) !important;
+    background-image: var(--对方的气泡尾巴-url, none) !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    pointer-events: none !important;
+    z-index: 3 !important;
+}`;
+
+    if (!localStorage.getItem(K_WX_CSS) || !localStorage.getItem(K_WX_CSS).includes("--我的气泡尾巴-url")) {
+        saveWxCss(NEW_DEFAULT_WX_CSS);
+    }
+    applyWxCustomCss();
+
+    // 4-1. 存储：全屏个人设置 & 全局自定义 URL 表情包库
+    const K_WX_CFG_BASE = "seoul_v10_wx_profile_cfg";
+    const K_STICKERS_GLOBAL = "seoul_v10_wx_stickers_global";
+
+    function getWxCfg() {
+        try {
+            return Object.assign({
+                myNick: "",
+                myBio: "連線中 · Personal Inbox",
+                myAva: "",
+                remark: "",
+                charBio: "随时在线 · 置顶联系人",
+                charAva: "",
+                avaSize: 33,
+                timeAware: true,
+                customBgNote: ""
+            }, JSON.parse(localStorage.getItem(getSafeScopedKey(K_WX_CFG_BASE)) || "{}"));
+        } catch (e) {
+            return { myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" };
+        }
+    }
+    function saveWxCfg(cfg) {
+        try {
+            localStorage.setItem(getSafeScopedKey(K_WX_CFG_BASE), JSON.stringify(cfg));
+        } catch (err) {
+            alert("保存提示：头像图片过大，已自动为你优化存储空间");
+        }
+    }
+
+    function getStickerList() {
+        try {
+            return JSON.parse(localStorage.getItem(K_STICKERS_GLOBAL) || JSON.stringify([
+                { name: "猫猫探头", url: "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg" },
+                { name: "委屈巴巴", url: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg" }
+            ]));
+        } catch (e) { return []; }
+    }
+    function saveStickerList(list) { localStorage.setItem(K_STICKERS_GLOBAL, JSON.stringify(list.slice(0, 150))); }
+
+    const KAOMOJI_LIST = [
+        "૮꒰ ˶• ༝ •˶꒱ა", "(｡•́︿•̀｡)", "♡(˃͈ દ ˂͈ ༶ )", "( ´͈ ᵕ `͈ )◞♡",
+        "(⁎⁍̴̛ᴗ⁍̴̛⁎)", "(¬_¬ )", "( ˘•ω•˘ )", "✧(≖ ◡ ≖✿)",
+        "(っ´ω`c)", "૮ • ﻌ - ა", "(⁄ ⁄•⁄ω⁄•⁄ ⁄)", "(╬▔皿▔)╯",
+        "🥺", "🤍", "😭", "💢", "✨", "🐾", "🫂", "💤"
+    ];
+
+    // 4-2. 统一 1.5px 极细韩系矢量 SVG 图标库
+    function inlineSvg(pathD, color = "#484852", size = 12) {
+        return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block !important;visibility:visible !important;opacity:1 !important;width:${size}px !important;height:${size}px !important;min-width:${size}px !important;flex-shrink:0 !important;vertical-align:middle !important;margin:0 !important;padding:0 !important;pointer-events:none !important;">${pathD}</svg>`;
+    }
+
+    const WX_ICO = {
+        userSet: inlineSvg(`<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`),
+        sum: inlineSvg(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>`),
+        skin: inlineSvg(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`),
+        del: inlineSvg(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, "#9A6868"),
+        quote: inlineSvg(`<path d="M9 14L4 9l5-5"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/>`),
+        edit: inlineSvg(`<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>`),
+        reroll: inlineSvg(`<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>`),
+        copy: inlineSvg(`<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>`),
+        poke: inlineSvg(`<path d="M18 11V6a2 2 0 0 0-4 0v4"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>`),
+        card: inlineSvg(`<rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/>`),
+        cam: inlineSvg(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`),
+        mic: inlineSvg(`<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>`),
+        smile: inlineSvg(`<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>`),
+        folder: inlineSvg(`<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>`),
+        sync: inlineSvg(`<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>`),
+        backLeft: inlineSvg(`<path d="M15 18l-6-6 6-6"/>`, "#3A3A40", 14),
+        sunMorning: inlineSvg(`<path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>`, "#55555E", 13),
+        sunDay: inlineSvg(`<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>`, "#55555E", 13),
+        sunDusk: inlineSvg(`<path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="23" y2="18"/>`, "#55555E", 13),
+        moonNight: inlineSvg(`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`, "#55555E", 13)
+    };
+
+    function getRealTimeInfo() {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mm = String(now.getMinutes()).padStart(2, "0");
+        const daysKr = ["일요일(周日)", "월요일(周一)", "화요일(周二)", "수요일(周三)", "목요일(周四)", "금요일(周五)", "토요일(周六)"];
+        const dayStr = daysKr[now.getDay()];
+        const h = now.getHours();
+
+        let periodKr = "심야 · 深夜", periodCn = "深夜", icon = WX_ICO.moonNight;
+        if (h >= 5 && h < 11) { periodKr = "아침 · 清晨"; periodCn = "清晨"; icon = WX_ICO.sunMorning; }
+        else if (h >= 11 && h < 17) { periodKr = "낮 · 白昼"; periodCn = "白天"; icon = WX_ICO.sunDay; }
+        else if (h >= 17 && h < 20) { periodKr = "저녁 · 傍晚"; periodCn = "傍晚"; icon = WX_ICO.sunDusk; }
+        else if (h >= 20 && h <= 23) { periodKr = "밤 · 夜晚"; periodCn = "夜晚"; icon = WX_ICO.moonNight; }
+
+        return {
+            timeStr: `${hh}:${mm}`,
+            fullDateStr: `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${dayStr}`,
+            periodKr, periodCn, icon,
+            promptContext: `【真实时间感知：当前现实时间是 ${now.getMonth() + 1}月${now.getDate()}日 ${dayStr} ${periodCn} ${hh}:${mm}。请自然贴合这个时间点聊天】`
+        };
+    }
+
+    // 4-3. 注入核心样式
+    const wxExtraStyle = topDoc.createElement("style");
+    wxExtraStyle.innerHTML = `
+        html body #seoul-mini-theater-modal .smt-pill-btn {
+            height: 24px !important;
+            padding: 0 8px !important;
+            margin: 0 !important;
+            border-radius: 999px !important;
+            font-size: 9px !important;
+            font-weight: 600 !important;
+            line-height: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 3.5px !important;
+            text-indent: 0 !important;
+            box-sizing: border-box !important;
+        }
+        html body #seoul-mini-theater-modal .smt-pill-btn span {
+            margin: 0 !important;
+            padding: 0 !important;
+            text-indent: 0 !important;
+            line-height: 1 !important;
+        }
+
+        /* 头像与气泡顶部对齐 */
+        html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-row {
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            max-width: 82% !important;
+        }
+        html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-ava {
+            margin-top: 1px !important;
+            flex-shrink: 0 !important;
+        }
+        html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-bubble {
+            padding: 7px 15px !important;
+            font-size: 12px !important;
+            line-height: 1.48 !important;
+            position: relative !important;
+            overflow: visible !important;
+            word-break: break-word !important;
+            cursor: pointer !important;
+            box-sizing: border-box !important;
+        }
+
+        /* 表情包纯图片消息样式 */
+        html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-sticker-msg {
+            display: inline-block !important;
+            cursor: pointer !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            border: 1px solid #EFEFF4 !important;
+            background: transparent !important;
+        }
+        html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-sticker-msg img {
+            max-width: 108px !important;
+            max-height: 108px !important;
+            width: auto !important;
+            height: auto !important;
+            display: block !important;
+            object-fit: contain !important;
+            border-radius: 11px !important;
+        }
+
+        /* 底部双栏表情包抽屉 */
+        html body #seoul-mini-theater-modal #smt-wx-emoji-drawer {
+            display: none;
+            background: #F8F8F8 !important;
+            border: 1px solid #ECECF2 !important;
+            border-radius: 14px !important;
+            padding: 9px 10px !important;
+            margin-bottom: 6px !important;
+            flex-shrink: 0 !important;
+        }
+        html body #seoul-mini-theater-modal .smt-kaomoji-grid {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 5px !important;
+            max-height: 118px !important;
+            overflow-y: auto !important;
+        }
+        html body #seoul-mini-theater-modal .smt-kaomoji-item {
+            background: #FFFFFF !important;
+            border: 1px solid #EAEAF0 !important;
+            border-radius: 8px !important;
+            padding: 6px 2px !important;
+            font-size: 10px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            color: #3A3A40 !important;
+        }
+        html body #seoul-mini-theater-modal .smt-sticker-grid {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 7px !important;
+            max-height: 115px !important;
+            overflow-y: auto !important;
+            margin-bottom: 7px !important;
+        }
+        html body #seoul-mini-theater-modal .smt-sticker-card {
+            position: relative !important;
+            background: #FFFFFF !important;
+            border: 1px solid #EAEAF0 !important;
+            border-radius: 10px !important;
+            padding: 4px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+        }
+        html body #seoul-mini-theater-modal .smt-sticker-card img {
+            width: 100% !important;
+            height: 48px !important;
+            object-fit: contain !important;
+            border-radius: 6px !important;
+            display: block !important;
+        }
+        html body #seoul-mini-theater-modal .smt-sticker-card .smt-st-name {
+            font-size: 8px !important;
+            color: #7A7A85 !important;
+            margin-top: 2px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        html body #seoul-mini-theater-modal .smt-sticker-card .smt-st-del {
+            position: absolute !important;
+            top: 2px !important;
+            right: 2px !important;
+            width: 14px !important;
+            height: 14px !important;
+            border-radius: 50% !important;
+            background: rgba(255,255,255,0.92) !important;
+            border: 1px solid #E4E4EC !important;
+            font-size: 8px !important;
+            line-height: 13px !important;
+            color: #9A6868 !important;
+        }
+
+        html body #seoul-mini-theater-modal .smt-wx-quote-box {
+            margin-bottom: 4px !important; padding: 3px 8px !important;
+            border-left: 2px solid #9A9AA5 !important; border-radius: 6px !important;
+            background: rgba(0, 0, 0, 0.035) !important; font-size: 9.5px !important; color: #6E6E77 !important;
+        }
+        html body #seoul-mini-theater-modal .smt-wx-act-pop {
+            display: inline-flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 2px !important;
+            margin-top: 4px !important; padding: 2px 5px !important;
+            background: #FFFFFF !important; border: 1px solid #E4E4EC !important; border-radius: 999px !important; z-index: 20 !important;
+        }
+        html body #seoul-mini-theater-modal .smt-wx-act-item {
+            display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 3px !important;
+            padding: 3px 6px !important; border-radius: 999px !important;
+            font-size: 8.5px !important; font-weight: 600 !important; color: #484852 !important;
+            cursor: pointer !important; white-space: nowrap !important; line-height: 1 !important;
+        }
+        html body #seoul-mini-theater-modal .smt-wx-idx-tag {
+            font-size: 7.5px !important; font-weight: 700 !important; color: #A0A0AA !important;
+            background: #F8F8F8 !important; border: 1px solid #ECECF2 !important; border-radius: 99px !important; padding: 0px 5px !important;
+        }
+        html body #seoul-mini-theater-modal .smt-wx-edit-box {
+            width: 220px !important; max-width: 100% !important; margin-top: 4px !important;
+            background: #FFFFFF !important; border: 1px solid #D0D0DA !important; border-radius: 12px !important; padding: 7px !important; box-sizing: border-box !important;
+        }
+        html body #seoul-mini-theater-modal .smt-wx-edit-area {
+            width: 100% !important; min-height: 48px !important; background: #F8F8F8 !important;
+            border: 1px solid #E6E6EC !important; border-radius: 8px !important; padding: 5px 7px !important;
+            font-size: 10.5px !important; line-height: 1.45 !important; color: #3A3A40 !important;
+            box-sizing: border-box !important; resize: vertical !important; outline: none !important; margin-bottom: 5px !important;
+        }
+
+        html body #seoul-mini-theater-modal .smt-prof-card {
+            background: #F8F8F8 !important; border: 1px solid #ECECF2 !important;
+            border-radius: 16px !important; padding: 13px !important; margin-bottom: 10px !important;
+        }
+        html body #seoul-mini-theater-modal .smt-prof-row {
+            display: flex !important; align-items: center !important; gap: 12px !important;
+            background: #FFFFFF !important; border: 1px solid #EFEFF4 !important;
+            border-radius: 13px !important; padding: 11px 12px !important; margin-bottom: 8px !important;
+        }
+        html body #seoul-mini-theater-modal .smt-prof-ava-wrap {
+            position: relative !important; width: 54px !important; height: 54px !important; flex-shrink: 0 !important; cursor: pointer !important;
+        }
+        html body #seoul-mini-theater-modal .smt-prof-ava-wrap img {
+            width: 54px !important; height: 54px !important; border-radius: 50% !important; object-fit: cover !important; border: 1.5px solid #EAEAF0 !important; display: block !important;
+        }
+        html body #seoul-mini-theater-modal .smt-prof-cam-badge {
+            position: absolute !important; right: -2px !important; bottom: -2px !important; width: 20px !important; height: 20px !important;
+            border-radius: 50% !important; background: #FFFFFF !important; border: 1px solid #DCDCE6 !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+        }
+    `;
+    topDoc.head.appendChild(wxExtraStyle);
+
+    // 4-4. 主线后台记忆联动更新
+    function refreshSyncedMemoryPool() {
+        const list = getChatList().filter((m) => m.role !== "sys").slice(-12);
+        const ctxInfo = getSTContext(1);
+        const memoryBlock = (getSyncMode() && list.length > 0)
+            ? `[近期手机微信私聊记忆 (${ctxInfo.userName} 与 ${ctxInfo.charName} 在线上聊过的内容)：${list.map((m) => `${m.role === "user" ? ctxInfo.userName : ctxInfo.charName}: ${m.text}`).join(" | ")}]`
+            : "";
+        try {
+            const stCtx = topWin.SillyTavern?.getContext?.();
+            if (stCtx?.setExtensionPrompt) stCtx.setExtensionPrompt("SEOUL_WECHAT_MEMORY", memoryBlock, 1, 2);
+        } catch (e) {}
+    }
+
+    // 4-5. 挂载微信顶栏、快捷栏与【双栏表情包 + 批量导入抽屉】
+    const wxPage = topDoc.getElementById("smt-page-talk");
+    const wxTopBar = wxPage.querySelector(".smt-wx-top-bar");
+    wxTopBar.innerHTML = `
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+            <span class="smt-pill-btn" id="smt-sync-toggle"></span>
+            <span class="smt-pill-btn" id="smt-wx-cfg-btn">${WX_ICO.userSet}<span>个人/聊天设置</span></span>
+            <span class="smt-pill-btn" id="smt-wx-sum-btn">${WX_ICO.sum}<span>总结</span></span>
+            <span class="smt-pill-btn" id="smt-wx-css-btn">${WX_ICO.skin}<span>CSS美化</span></span>
+        </div>
+        <div style="display:flex;gap:4px;">
+            <span class="smt-pill-btn" id="smt-wx-clear">${WX_ICO.del}<span>清空</span></span>
+        </div>
+    `;
+
+    ["smt-wx-cfg-drawer", "smt-wx-sum-drawer", "smt-wx-emoji-drawer", "smt-page-wx_settings"].forEach((id) => topDoc.getElementById(id)?.remove());
+
+    // 创建全屏个人设置页 (#smt-page-wx_settings)
+    const fsBody = modal.querySelector(".smt-fs-body");
+    const wxSettingsPage = topDoc.createElement("div");
+    wxSettingsPage.id = "smt-page-wx_settings";
+    wxSettingsPage.className = "smt-page";
+    wxSettingsPage.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#F8F8F8 !important;border:1px solid #ECECF2 !important;border-radius:13px;padding:8px 11px;margin-bottom:10px;flex-shrink:0;">
+            <span class="smt-pill-btn" id="smt-wxset-back-chat" style="height:26px !important;padding:0 10px !important;font-weight:700 !important;">
+                ${WX_ICO.backLeft}<span>대화방으로 · 返回聊天界面</span>
+            </span>
+            <div class="smt-pill-btn" id="smt-wxset-time-pill" style="background:#FFFFFF !important;pointer-events:none;"></div>
+        </div>
+
+        <div style="flex:1;min-height:0;overflow-y:auto;padding-bottom:12px;">
+            <div class="smt-prof-card">
+                <div class="smt-sec-title" style="margin-bottom:8px !important;">
+                    <span id="smt-wxset-time-title" style="display:inline-flex;align-items:center;gap:5px;"></span>
+                    <span class="smt-pill-btn dark" id="smt-wxset-time-toggle"></span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;background:#FFFFFF !important;border:1px solid #EFEFF4 !important;border-radius:11px;padding:9px 12px;font-size:10px;color:#55555E !important;">
+                    <div>
+                        <div style="font-weight:700;color:#2C2C32 !important;" id="smt-wxset-clock-big"></div>
+                        <div style="font-size:8.5px;color:#8E8E98 !important;margin-top:2px;">开启后，TA在微信聊天中会实时感知你手机当前的真实时间与昼夜时段</div>
+                    </div>
+                    <span style="font-size:8.5px;font-weight:700;background:#F8F8F8 !important;border:1px solid #ECECF2 !important;padding:3px 8px;border-radius:99px;">REAL-TIME KST</span>
+                </div>
+            </div>
+
+            <div class="smt-prof-card">
+                <div class="smt-sec-title">
+                    <span>${WX_ICO.userSet} MY PROFILE · 我的个人信息设置</span>
+                    <label class="smt-pill-btn" style="cursor:pointer;">
+                        ${WX_ICO.cam}<span>本地导入我的头像</span>
+                        <input type="file" id="smt-cfg-myava-file" accept="image/*" style="display:none;" />
+                    </label>
+                </div>
+                <div class="smt-prof-row">
+                    <label class="smt-prof-ava-wrap" title="点击直接从本地相册更换我的头像">
+                        <img id="smt-cfg-myava-preview" src="" />
+                        <span class="smt-prof-cam-badge">${WX_ICO.cam}</span>
+                        <input type="file" id="smt-cfg-myava-file2" accept="image/*" style="display:none;" />
+                    </label>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:8.5px;font-weight:700;color:#7A7A85 !important;margin-bottom:3px;">我的微信昵称 (留空则使用酒馆原名)</div>
+                        <input type="text" id="smt-cfg-mynick" class="smt-wx-input" style="width:100%;height:26px !important;font-size:10.5px !important;box-sizing:border-box;margin-bottom:5px;" placeholder="输入你的微信昵称..." />
+                        <div style="font-size:8.5px;font-weight:700;color:#7A7A85 !important;margin-bottom:3px;">我的状态签名</div>
+                        <input type="text" id="smt-cfg-mybio" class="smt-wx-input" style="width:100%;height:26px !important;font-size:10px !important;box-sizing:border-box;" placeholder="如: 連線中 · Personal Inbox" />
+                    </div>
+                </div>
+                <div style="font-size:8.5px;font-weight:700;color:#7A7A85 !important;margin-bottom:3px;">或粘贴我的头像图片链接 URL (留空默认使用酒馆原头像)</div>
+                <input type="text" id="smt-cfg-myava" class="smt-wx-input" style="width:100%;height:26px !important;font-size:10px !important;box-sizing:border-box;" placeholder="https://..." />
+            </div>
+
+            <div class="smt-prof-card">
+                <div class="smt-sec-title">
+                    <span>${WX_ICO.userSet} PARTNER PROFILE · 对方聊天信息设置</span>
+                    <label class="smt-pill-btn" style="cursor:pointer;">
+                        ${WX_ICO.cam}<span>本地导入TA的头像</span>
+                        <input type="file" id="smt-cfg-charava-file" accept="image/*" style="display:none;" />
+                    </label>
+                </div>
+                <div class="smt-prof-row">
+                    <label class="smt-prof-ava-wrap" title="点击直接从本地相册更换TA的头像">
+                        <img id="smt-cfg-charava-preview" src="" />
+                        <span class="smt-prof-cam-badge">${WX_ICO.cam}</span>
+                        <input type="file" id="smt-cfg-charava-file2" accept="image/*" style="display:none;" />
+                    </label>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:8.5px;font-weight:700;color:#7A7A85 !important;margin-bottom:3px;">TA的专属微信备注名 (留空显示原名)</div>
+                        <input type="text" id="smt-cfg-remark" class="smt-wx-input" style="width:100%;height:26px !important;font-size:10.5px !important;box-sizing:border-box;margin-bottom:5px;" placeholder="给TA设个专属备注..." />
+                        <div style="font-size:8.5px;font-weight:700;color:#7A7A85 !important;margin-bottom:3px;">TA的顶栏状态签名</div>
+                        <input type="text" id="smt-cfg-charbio" class="smt-wx-input" style="width:100%;height:26px !important;font-size:10px !important;box-sizing:border-box;" placeholder="如: 置顶联系人 · 正在想你" />
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 86px;gap:6px;">
+                    <div>
+                        <div style="font-size:8.5px;font-weight:700;color:#7A7A85 !important;margin-bottom:3px;">TA的头像链接 URL (留空用原头像)</div>
+                        <input type="text" id="smt-cfg-charava" class="smt-wx-input" style="width:100%;height:26px !important;font-size:10px !important;box-sizing:border-box;" placeholder="https://..." />
+                    </div>
+                    <div>
+                        <div style="font-size:8.5px;font-weight:700;color:#7A7A85 !important;margin-bottom:3px;">头像尺寸(px)</div>
+                        <input type="number" id="smt-cfg-avasize" class="smt-wx-input" style="width:100%;height:26px !important;font-size:10px !important;text-align:center;box-sizing:border-box;" min="22" max="58" value="33" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="smt-prof-card" style="margin-bottom:0 !important;">
+                <div style="font-size:9px;font-weight:700;color:#55555E !important;margin-bottom:4px;">CHAT CONTEXT · 补充当前微信私聊专属设定 (选填)</div>
+                <textarea id="smt-cfg-bgnote" style="width:100%;height:52px;background:#FFFFFF !important;border:1px solid #E4E4EC !important;border-radius:9px;padding:6px 8px;font-size:10px;color:#3A3A40 !important;box-sizing:border-box;resize:none;margin-bottom:8px;outline:none;" placeholder="例如：两人目前正在冷战期 / 刚刚一起吃完晚饭各自回家..."></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="smt-pill-btn" id="smt-cfg-reset-btn">恢复默认原头像与原名</span>
+                    <span class="smt-pill-btn dark" id="smt-cfg-save-btn" style="height:28px !important;padding:0 16px !important;">✓ 保存并返回微信</span>
+                </div>
+            </div>
+        </div>
+    `;
+    fsBody.appendChild(wxSettingsPage);
+
+    // 挂载区间总结抽屉
+    const sumDrawer = topDoc.createElement("div");
+    sumDrawer.id = "smt-wx-sum-drawer";
+    sumDrawer.className = "smt-section-box";
+    sumDrawer.style.cssText = "display:none;flex-shrink:0;padding:10px !important;";
+    sumDrawer.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;">
+                ${WX_ICO.sum}<span>MEMORY SUMMARY · 微信区间总结</span>
+            </div>
+            <span id="smt-wx-sum-close" style="cursor:pointer;font-size:10px;color:#8E8E98 !important;padding:0 4px;">✕</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:7px;font-size:9px;">
+            <span>#</span>
+            <input type="number" id="smt-sum-from" class="smt-wx-input" style="width:46px !important;height:22px !important;text-align:center;padding:0 2px !important;" min="1" value="1" />
+            <span>至 #</span>
+            <input type="number" id="smt-sum-to" class="smt-wx-input" style="width:46px !important;height:22px !important;text-align:center;padding:0 2px !important;" min="1" value="10" />
+            <span class="smt-pill-btn dark" id="smt-sum-run-btn" style="margin-left:auto;">生成总结</span>
+        </div>
+        <textarea id="smt-sum-result" style="width:100%;height:64px;background:#FFFFFF !important;border:1px solid #E4E4EC !important;border-radius:8px;padding:6px 8px;font-size:9.8px;line-height:1.5;color:#3A3A40 !important;box-sizing:border-box;resize:none;margin-bottom:5px;" placeholder="提炼所选楼层区间(#A~#B)的核心记忆..."></textarea>
+        <div style="display:flex;justify-content:flex-end;gap:4px;">
+            <span class="smt-pill-btn" id="smt-sum-to-arch">存历史</span>
+            <span class="smt-pill-btn dark" id="smt-sum-to-main">注入主线记忆</span>
+        </div>
+    `;
+    wxPage.insertBefore(sumDrawer, topDoc.getElementById("smt-wx-stream"));
+
+    // 底部快捷栏：5大功能
+    const wxQuick = wxPage.querySelector(".smt-wx-quick");
+    wxQuick.innerHTML = `
+        <span class="smt-pill-btn" data-wxact="poke">${WX_ICO.poke}<span>拍一拍</span></span>
+        <span class="smt-pill-btn" data-wxact="transfer">${WX_ICO.card}<span>转账</span></span>
+        <span class="smt-pill-btn" data-wxact="photo">${WX_ICO.cam}<span>照片</span></span>
+        <span class="smt-pill-btn" data-wxact="voice">${WX_ICO.mic}<span>语音</span></span>
+        <span class="smt-pill-btn" id="smt-wx-emoji-btn">${WX_ICO.smile}<span>表情</span></span>
+    `;
+
+    // 创建底部双栏【表情抽屉】（新增：批量导入/导出多行 URL 与相册多选上传！）
+    const emojiDrawer = topDoc.createElement("div");
+    emojiDrawer.id = "smt-wx-emoji-drawer";
+    emojiDrawer.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                <span class="smt-pill-btn dark" data-emtab="kaomoji">颜文字 &amp; Emoji</span>
+                <span class="smt-pill-btn" data-emtab="sticker">图片表情包</span>
+                <span class="smt-pill-btn" data-emtab="batch">${WX_ICO.folder}<span>批量导入</span></span>
+            </div>
+            <span id="smt-wx-emoji-close" style="cursor:pointer;font-size:10px;color:#8E8E98 !important;padding:0 4px;">✕</span>
+        </div>
+
+        <!-- 栏1：颜文字与Emoji网格 -->
+        <div id="smt-em-pane-kaomoji" class="smt-kaomoji-grid"></div>
+
+        <!-- 栏2：URL图片表情包库 + 单张快加 -->
+        <div id="smt-em-pane-sticker" style="display:none;">
+            <div id="smt-sticker-grid" class="smt-sticker-grid"></div>
+            <div style="display:flex;gap:4px;align-items:center;">
+                <input type="text" id="smt-st-name-inp" class="smt-wx-input" style="width:70px !important;flex:none !important;height:25px !important;font-size:9.5px !important;padding:0 7px !important;" placeholder="名称" />
+                <input type="text" id="smt-st-url-inp" class="smt-wx-input" style="flex:1 !important;height:25px !important;font-size:9.5px !important;padding:0 8px !important;" placeholder="粘贴单张表情图片 URL..." />
+                <label class="smt-pill-btn" style="cursor:pointer;height:25px !important;" title="从相册选图">
+                    ${WX_ICO.cam}
+                    <input type="file" id="smt-st-file-inp" accept="image/*" style="display:none;" />
+                </label>
+                <span class="smt-pill-btn dark" id="smt-st-add-btn" style="height:25px !important;">＋添加</span>
+            </div>
+        </div>
+
+        <!-- 栏3：📥 批量导入表情包（支持多行 URL 列表 + 相册一次多选多张图 + 导出备份） -->
+        <div id="smt-em-pane-batch" style="display:none;">
+            <div style="font-size:8.8px;color:#6E6E77 !important;margin-bottom:4px;line-height:1.4;">
+                支持一行一个批量粘贴！格式：<b>表情名字 | 图片URL</b>（或 <b>名字：URL</b>，或直接<b>纯图片URL一行一个</b>）：
+            </div>
+            <textarea id="smt-st-batch-inp" style="width:100%;height:74px;background:#FFFFFF !important;border:1px solid #E4E4EC !important;border-radius:8px;padding:6px 8px;font-size:9.5px;color:#3A3A40 !important;box-sizing:border-box;resize:none;margin-bottom:6px;outline:none;" placeholder="示例：&#10;猫猫亲亲 | https://xxx.com/1.gif&#10;生气捶地 | https://xxx.com/2.png&#10;https://xxx.com/3.jpg"></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
+                <div style="display:flex;gap:4px;">
+                    <label class="smt-pill-btn" style="cursor:pointer;">
+                        ${WX_ICO.cam}<span>相册多选批量导入</span>
+                        <input type="file" id="smt-st-multi-files" accept="image/*" multiple style="display:none;" />
+                    </label>
+                    <span class="smt-pill-btn" id="smt-st-export-btn">导出备份</span>
+                </div>
+                <span class="smt-pill-btn dark" id="smt-st-batch-run">✓ 立即批量导入</span>
+            </div>
+        </div>
+    `;
+    wxPage.insertBefore(emojiDrawer, wxPage.querySelector(".smt-wx-bar"));
+
+    // 渲染表情抽屉内容
+    function renderEmojiDrawer() {
+        const kGrid = topDoc.getElementById("smt-em-pane-kaomoji");
+        kGrid.innerHTML = KAOMOJI_LIST.map((k) => `<div class="smt-kaomoji-item" data-kao="${k}">${k}</div>`).join("");
+        kGrid.querySelectorAll("[data-kao]").forEach((el) => {
+            el.onclick = () => {
+                const inp = topDoc.getElementById("smt-wx-input");
+                inp.value += el.getAttribute("data-kao");
+                inp.focus();
+            };
+        });
+
+        const sGrid = topDoc.getElementById("smt-sticker-grid");
+        const stickers = getStickerList();
+        if (!stickers.length) {
+            sGrid.innerHTML = `<div style="grid-column:span 4;text-align:center;padding:18px 8px;font-size:9px;color:#9A9AA5 !important;">暂无图片表情，可点上方「批量导入」一次添加多张！</div>`;
+        } else {
+            sGrid.innerHTML = stickers.map((st, idx) => `
+                <div class="smt-sticker-card" data-sendst="${idx}" title="点击直接发送此表情">
+                    <img src="${st.url}" />
+                    <div class="smt-st-name">${st.name || "表情"}</div>
+                    <span class="smt-st-del" data-delst="${idx}">✕</span>
+                </div>
+            `).join("");
+
+            sGrid.querySelectorAll("[data-sendst]").forEach((card) => {
+                card.onclick = (e) => {
+                    if (e.target.hasAttribute("data-delst")) return;
+                    const idx = Number(card.getAttribute("data-sendst"));
+                    const st = getStickerList()[idx];
+                    if (st) {
+                        appendWx(`[表情包: ${st.name || "图片表情"}]`, "", { type: "sticker", stickerUrl: st.url, stickerName: st.name || "表情" });
+                        emojiDrawer.style.display = "none";
+                    }
+                };
+            });
+            sGrid.querySelectorAll("[data-delst]").forEach((delBtn) => {
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const idx = Number(delBtn.getAttribute("data-delst"));
+                    const list = getStickerList();
+                    list.splice(idx, 1);
+                    saveStickerList(list);
+                    renderEmojiDrawer();
+                };
+            });
+        }
+    }
+
+    topDoc.getElementById("smt-wx-emoji-btn").onclick = () => {
+        const isShow = emojiDrawer.style.display === "block";
+        emojiDrawer.style.display = isShow ? "none" : "block";
+        if (!isShow) renderEmojiDrawer();
+    };
+    topDoc.getElementById("smt-wx-emoji-close").onclick = () => { emojiDrawer.style.display = "none"; };
+
+    function switchEmojiTab(tabName) {
+        emojiDrawer.querySelectorAll("[data-emtab]").forEach((b) => {
+            b.classList.toggle("dark", b.getAttribute("data-emtab") === tabName);
+        });
+        topDoc.getElementById("smt-em-pane-kaomoji").style.display = tabName === "kaomoji" ? "grid" : "none";
+        topDoc.getElementById("smt-em-pane-sticker").style.display = tabName === "sticker" ? "block" : "none";
+        topDoc.getElementById("smt-em-pane-batch").style.display = tabName === "batch" ? "block" : "none";
+    }
+
+    emojiDrawer.querySelectorAll("[data-emtab]").forEach((tabBtn) => {
+        tabBtn.onclick = () => switchEmojiTab(tabBtn.getAttribute("data-emtab"));
+    });
+
+    // 单张添加
+    topDoc.getElementById("smt-st-add-btn").onclick = () => {
+        const nameInp = topDoc.getElementById("smt-st-name-inp");
+        const urlInp = topDoc.getElementById("smt-st-url-inp");
+        const url = urlInp.value.trim();
+        if (!url) return alert("请粘贴表情图片 URL！");
+        const name = nameInp.value.trim() || "表情";
+        const list = getStickerList();
+        list.unshift({ name, url });
+        saveStickerList(list);
+        nameInp.value = "";
+        urlInp.value = "";
+        renderEmojiDrawer();
+    };
+
+    // 🔥 新增：多行 URL 文本一键批量导入表情包！
+    topDoc.getElementById("smt-st-batch-run").onclick = () => {
+        const raw = topDoc.getElementById("smt-st-batch-inp").value.trim();
+        if (!raw) return alert("请先在文本框中粘贴表情包 URL 列表！");
+        const list = getStickerList();
+        let added = 0;
+
+        // 支持直接粘贴 JSON 数组备份，或者多行文本
+        if (raw.startsWith("[")) {
+            try {
+                const arr = JSON.parse(raw);
+                if (Array.isArray(arr)) {
+                    arr.forEach((item) => {
+                        if (item && item.url) {
+                            list.unshift({ name: item.name || "表情", url: item.url });
+                            added++;
+                        }
+                    });
+                }
+            } catch (e) {}
+        } else {
+            const lines = raw.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+            lines.forEach((line, idx) => {
+                const urlMatch = line.match(/(https?:\/\/[^\s"'<>]+|data:image\/[^\s"'<>]+)/i);
+                if (urlMatch) {
+                    const url = urlMatch[1];
+                    const leftPart = line.replace(url, "").replace(/[|｜:：,\-—]/g, "").trim();
+                    const name = leftPart || `表情 #${idx + 1}`;
+                    list.unshift({ name, url });
+                    added++;
+                }
+            });
+        }
+
+        if (added === 0) return alert("未识别到有效的图片链接（需包含 http:// 或 https://）！");
+        saveStickerList(list);
+        topDoc.getElementById("smt-st-batch-inp").value = "";
+        renderEmojiDrawer();
+        switchEmojiTab("sticker");
+        alert(`✓ 成功批量导入 ${added} 张表情包！`);
+    };
+
+    // 🔥 新增：手机相册一次多选多张图批量导入表情包！
+    function compressImgToDataUrl(file, maxDim = 180) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = topDoc.createElement("canvas");
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
+                    else { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL("image/jpeg", 0.84));
+                };
+                img.onerror = () => resolve("");
+                img.src = String(ev.target?.result || "");
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    topDoc.getElementById("smt-st-file-inp").onchange = async (e) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        const dataUrl = await compressImgToDataUrl(f, 180);
+        if (!dataUrl) return;
+        const name = topDoc.getElementById("smt-st-name-inp").value.trim() || f.name.replace(/\.[^.]+$/, "");
+        const list = getStickerList();
+        list.unshift({ name, url: dataUrl });
+        saveStickerList(list);
+        topDoc.getElementById("smt-st-name-inp").value = "";
+        renderEmojiDrawer();
+    };
+
+    topDoc.getElementById("smt-st-multi-files").onchange = async (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        const list = getStickerList();
+        let count = 0;
+        for (const f of files) {
+            const dataUrl = await compressImgToDataUrl(f, 180);
+            if (dataUrl) {
+                list.unshift({ name: f.name.replace(/\.[^.]+$/, "").slice(0, 10) || "表情", url: dataUrl });
+                count++;
+            }
+        }
+        saveStickerList(list);
+        renderEmojiDrawer();
+        switchEmojiTab("sticker");
+        alert(`✓ 已从相册批量导入 ${count} 张表情包！`);
+    };
+
+    topDoc.getElementById("smt-st-export-btn").onclick = () => {
+        const a = topDoc.createElement("a");
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(getStickerList(), null, 2)], { type: "application/json" }));
+        a.download = "seoul_wechat_stickers.json";
+        a.click();
+    };
+
+    // 4-6. 全屏「个人/聊天设置页」打开、保存与返回逻辑（100% 独立状态管理，绝不因 currentPage 报错卡死！）
+    let isWxSettingsOpen = false;
+
+    function openFullWxSettingsPage() {
+        const ctx = getSTContext(1);
+        const c = getWxCfg();
+        const rt = getRealTimeInfo();
+
+        isWxSettingsOpen = true;
+        topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
+        wxSettingsPage.classList.add("active");
+
+        topDoc.getElementById("smt-back-text").textContent = "이전 · 返回微信";
+        topDoc.getElementById("smt-top-title").textContent = "CHAT & PROFILE · 聊天设置";
+        topDoc.getElementById("smt-top-sub").textContent = `${rt.fullDateStr} · ${rt.timeStr}`;
+
+        topDoc.getElementById("smt-wxset-time-pill").innerHTML = `${rt.icon}<span>${rt.timeStr} · ${rt.periodKr}</span>`;
+        topDoc.getElementById("smt-wxset-time-title").innerHTML = `${rt.icon}<span>REAL-TIME PERCEPTION · 真实时间感知</span>`;
+        topDoc.getElementById("smt-wxset-clock-big").textContent = `${rt.fullDateStr} · ${rt.timeStr} (${rt.periodKr})`;
+
+        const tBtn = topDoc.getElementById("smt-wxset-time-toggle");
+        tBtn.className = `smt-pill-btn ${c.timeAware !== false ? "dark" : ""}`;
+        tBtn.textContent = c.timeAware !== false ? "已开启真实时间感知" : "已关闭时间感知";
+
+        topDoc.getElementById("smt-cfg-myava-preview").src = c.myAva || ctx.userAvatar;
+        topDoc.getElementById("smt-cfg-charava-preview").src = c.charAva || ctx.charAvatar;
+        topDoc.getElementById("smt-cfg-mynick").value = c.myNick || "";
+        topDoc.getElementById("smt-cfg-mybio").value = c.myBio || "連線中 · Personal Inbox";
+        topDoc.getElementById("smt-cfg-myava").value = c.myAva || "";
+        topDoc.getElementById("smt-cfg-remark").value = c.remark || "";
+        topDoc.getElementById("smt-cfg-charbio").value = c.charBio || "随时在线 · 置顶联系人";
+        topDoc.getElementById("smt-cfg-charava").value = c.charAva || "";
+        topDoc.getElementById("smt-cfg-avasize").value = c.avaSize || 33;
+        topDoc.getElementById("smt-cfg-bgnote").value = c.customBgNote || "";
+    }
+
+    function backToWeChatFromSettings() {
+        isWxSettingsOpen = false;
+        topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
+        wxPage.classList.add("active");
+        topDoc.getElementById("smt-back-text").textContent = "나가기";
+        renderWeChat();
+    }
+
+    topDoc.getElementById("smt-wx-cfg-btn").onclick = () => openFullWxSettingsPage();
+    topDoc.getElementById("smt-wxset-back-chat").onclick = () => backToWeChatFromSettings();
+
+    const origBackBtn = topDoc.getElementById("smt-header-back-btn");
+    origBackBtn.addEventListener("click", (e) => {
+        if (isWxSettingsOpen || wxSettingsPage.classList.contains("active")) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            backToWeChatFromSettings();
+        }
+    }, true);
+
+    topDoc.getElementById("smt-wxset-time-toggle").onclick = () => {
+        const c = getWxCfg();
+        c.timeAware = !(c.timeAware !== false);
+        saveWxCfg(c);
+        openFullWxSettingsPage();
+    };
+
+    function handleLocalAvatarUpload(fileInputId, urlInputId, previewImgId) {
+        const inp = topDoc.getElementById(fileInputId);
+        if (!inp) return;
+        inp.onchange = async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const dataUrl = await compressImgToDataUrl(f, 200);
+            if (dataUrl) {
+                topDoc.getElementById(urlInputId).value = dataUrl;
+                topDoc.getElementById(previewImgId).src = dataUrl;
+            }
+        };
+    }
+    handleLocalAvatarUpload("smt-cfg-myava-file", "smt-cfg-myava", "smt-cfg-myava-preview");
+    handleLocalAvatarUpload("smt-cfg-myava-file2", "smt-cfg-myava", "smt-cfg-myava-preview");
+    handleLocalAvatarUpload("smt-cfg-charava-file", "smt-cfg-charava", "smt-cfg-charava-preview");
+    handleLocalAvatarUpload("smt-cfg-charava-file2", "smt-cfg-charava", "smt-cfg-charava-preview");
+
+    // 🔥 修复后的保存按钮：零外部变量依赖，点击立即保存并切回微信聊天页！
+    topDoc.getElementById("smt-cfg-save-btn").onclick = (e) => {
+        const prev = getWxCfg();
+        const newCfg = {
+            myNick: topDoc.getElementById("smt-cfg-mynick").value.trim(),
+            myBio: topDoc.getElementById("smt-cfg-mybio").value.trim(),
+            myAva: topDoc.getElementById("smt-cfg-myava").value.trim(),
+            remark: topDoc.getElementById("smt-cfg-remark").value.trim(),
+            charBio: topDoc.getElementById("smt-cfg-charbio").value.trim(),
+            charAva: topDoc.getElementById("smt-cfg-charava").value.trim(),
+            avaSize: Math.min(58, Math.max(22, Number(topDoc.getElementById("smt-cfg-avasize").value) || 33)),
+            timeAware: prev.timeAware !== false,
+            customBgNote: topDoc.getElementById("smt-cfg-bgnote").value.trim()
+        };
+        saveWxCfg(newCfg);
+        e.target.textContent = "✓ 已保存！";
+        setTimeout(() => {
+            e.target.textContent = "✓ 保存并返回微信";
+            backToWeChatFromSettings();
+        }, 250);
+    };
+
+    topDoc.getElementById("smt-cfg-reset-btn").onclick = () => {
+        saveWxCfg({ myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" });
+        openFullWxSettingsPage();
+    };
+
+    // 4-7. 渲染微信消息流
     let activeQuoteText = "";
     let activeMenuMsgIdx = -1;
+    let activeEditMsgIdx = -1;
+    let lastObservedCharScope = "";
 
     function setQuotePreview(txt) {
         activeQuoteText = txt || "";
@@ -756,22 +1674,58 @@
     }
     topDoc.getElementById("smt-wx-quote-cancel").onclick = () => setQuotePreview("");
 
+    function openSummaryDrawer(defaultFrom, defaultTo) {
+        const total = getChatList().length || 1;
+        sumDrawer.style.display = "block";
+        topDoc.getElementById("smt-sum-from").value = defaultFrom || 1;
+        topDoc.getElementById("smt-sum-to").value = defaultTo || total;
+    }
+
     function renderWeChat() {
-        topDoc.getElementById("smt-sync-toggle").textContent = `主线记忆: ${getSyncMode() ? "ON" : "OFF"}`;
-        const ctx = getSTContext(1), stream = topDoc.getElementById("smt-wx-stream"), list = getChatList();
-        stream.innerHTML = list.length ? "" : `<div class="smt-wx-sys">CONNECTED WITH ${ctx.charName} · 点击任意气泡可【引用】或【删除】</div>`;
+        const ctx = getSTContext(1);
+        const wCfg = getWxCfg();
+        const rt = getRealTimeInfo();
+        lastObservedCharScope = ctx.charScopeId || ctx.charName;
+
+        const displayMyName = wCfg.myNick || ctx.userName;
+        const displayCharName = wCfg.remark || ctx.charName;
+        const displayMyAva = wCfg.myAva || ctx.userAvatar;
+        const displayCharAva = wCfg.charAva || ctx.charAvatar;
+        const avaPx = `${wCfg.avaSize || 33}px`;
+
+        topDoc.getElementById("smt-sync-toggle").innerHTML = `${WX_ICO.sync}<span>记忆:${getSyncMode() ? "ON" : "OFF"}</span>`;
+        if (wxPage.classList.contains("active")) {
+            topDoc.getElementById("smt-top-title").textContent = `${displayCharName} · 서울톡`;
+            topDoc.getElementById("smt-top-sub").textContent = `${wCfg.charBio || "Personal Messenger"} · ${rt.timeStr} ${rt.periodCn}`;
+            topDoc.getElementById("smt-top-badge").innerHTML = `${rt.icon}<span style="margin-left:3px;">${rt.timeStr}</span>`;
+        }
+
+        const stream = topDoc.getElementById("smt-wx-stream"), list = getChatList();
+        stream.innerHTML = list.length ? "" : `<div class="smt-wx-sys">${rt.fullDateStr} ${rt.timeStr} · 与 ${displayCharName} 的独立对话</div>`;
 
         list.forEach((m, idx) => {
+            const floorNum = idx + 1;
             if (m.role === "sys") {
-                const s = topDoc.createElement("div"); s.className = "smt-wx-sys"; s.textContent = m.text;
-                stream.appendChild(s); return;
+                const s = topDoc.createElement("div");
+                s.className = "smt-wx-sys";
+                s.style.cursor = "pointer";
+                s.textContent = `#${floorNum} · ${m.text}`;
+                s.onclick = () => {
+                    const arr = getChatList(); arr.splice(idx, 1); saveChatList(arr); refreshSyncedMemoryPool(); renderWeChat();
+                };
+                stream.appendChild(s);
+                return;
             }
             const isMe = m.role === "user", row = topDoc.createElement("div");
             row.className = `smt-wx-row ${isMe ? "me" : "ai"}`;
 
-            // 识别是否为转账卡片消息
             let innerContentHtml = "";
-            if (m.type === "transfer" || /^\[(微信)?转账/.test(m.text)) {
+            if (m.type === "sticker" && m.stickerUrl) {
+                innerContentHtml = `
+                    <div class="smt-wx-sticker-msg" data-msgidx="${idx}">
+                        <img src="${m.stickerUrl}" alt="${m.stickerName || "表情"}" />
+                    </div>`;
+            } else if (m.type === "transfer" || /^\[(微信)?转账/.test(m.text)) {
                 const amt = m.amount || m.text.match(/¥?(\d+(\.\d+)?)/)?.[1] || "520.00";
                 const note = m.note || m.text.split("备注:")[1]?.replace("]", "")?.trim() || "给你的零花钱";
                 const accepted = m.accepted;
@@ -781,50 +1735,67 @@
                             <div class="smt-wx-pay-ico"></div>
                             <div>
                                 <div class="smt-wx-pay-amt">₩ / ¥ ${amt}</div>
-                                <div class="smt-wx-pay-note">${ accepted ? "✓ 已收款 · " + note : note }</div>
+                                <div class="smt-wx-pay-note">${accepted ? "✓ 已收款 · " + note : note}</div>
                             </div>
                         </div>
                         <div class="smt-wx-pay-foot">
-                            <span>SEOUL PAY · 송금</span>
+                            <span>SEOUL PAY</span>
                             <span>${accepted ? "COMPLETED" : "TRANSFER"}</span>
                         </div>
                     </div>`;
             } else {
                 const qHtml = m.quote ? `<div class="smt-wx-quote-box">「${m.quote.replace(/</g, "&lt;")}」</div>` : "";
-                innerContentHtml = `<div class="smt-wx-bubble" data-msgidx="${idx}">${qHtml}${m.text.replace(/</g, "&lt;")}</div>`;
+                const isMulti = m.quote || (m.text && m.text.length > 22);
+                innerContentHtml = `<div class="smt-wx-bubble ${isMulti ? "multiline" : ""}" data-msgidx="${idx}">${qHtml}${m.text.replace(/</g, "&lt;")}</div>`;
             }
 
-            // 点击气泡弹出的 [引用 / 复制 / 删除] 菜单
             const menuHtml = activeMenuMsgIdx === idx ? `
                 <div class="smt-wx-act-pop">
-                    <span data-wxop="quote" data-idx="${idx}">💬 引用</span>
-                    <span data-wxop="copy" data-idx="${idx}">📋 复制</span>
-                    <span data-wxop="del" data-idx="${idx}" style="color:#B05050 !important;">🗑️ 删除</span>
+                    <span class="smt-wx-act-item" data-wxop="quote" data-idx="${idx}">${WX_ICO.quote}<span>引用</span></span>
+                    <span class="smt-wx-act-item" data-wxop="edit" data-idx="${idx}">${WX_ICO.edit}<span>编辑</span></span>
+                    <span class="smt-wx-act-item" data-wxop="reroll" data-idx="${idx}">${WX_ICO.reroll}<span>重回</span></span>
+                    <span class="smt-wx-act-item" data-wxop="sum" data-idx="${idx}">${WX_ICO.sum}<span>总结</span></span>
+                    <span class="smt-wx-act-item" data-wxop="copy" data-idx="${idx}">${WX_ICO.copy}<span>复制</span></span>
+                    <span class="smt-wx-act-item" data-wxop="del" data-idx="${idx}" style="color:#9A6868 !important;">${WX_ICO.del}<span>删除</span></span>
+                </div>` : "";
+
+            const editBoxHtml = activeEditMsgIdx === idx ? `
+                <div class="smt-wx-edit-box">
+                    <textarea class="smt-wx-edit-area" id="smt-wx-edit-input-${idx}">${m.text.replace(/</g, "&lt;")}</textarea>
+                    <div style="display:flex;justify-content:flex-end;gap:4px;">
+                        <span class="smt-pill-btn" data-editcancel="${idx}">取消</span>
+                        <span class="smt-pill-btn dark" data-editsave="${idx}">保存</span>
+                    </div>
                 </div>` : "";
 
             row.innerHTML = `
-                <img class="smt-wx-ava" src="${isMe ? ctx.userAvatar : ctx.charAvatar}"/>
-                <div style="display:flex;flex-direction:column;align-items:${isMe ? "flex-end" : "flex-start"};">
+                <img class="smt-wx-ava" src="${isMe ? displayMyAva : displayCharAva}" style="width:${avaPx} !important;height:${avaPx} !important;min-width:${avaPx} !important;min-height:${avaPx} !important;"/>
+                <div style="display:flex;flex-direction:column;align-items:${isMe ? "flex-end" : "flex-start"};max-width:100%;">
                     ${innerContentHtml}
                     ${menuHtml}
-                    <div class="smt-wx-meta"><span>${isMe ? "읽음 1" : ctx.charName}</span><span>·</span><span>${m.time || ""}</span></div>
+                    ${editBoxHtml}
+                    <div class="smt-wx-meta">
+                        <span class="smt-wx-idx-tag">#${floorNum}</span>
+                        <span>${isMe ? `${displayMyName} · 읽음 1` : displayCharName}</span>
+                        <span>·</span>
+                        <span>${m.time || ""}</span>
+                    </div>
                 </div>`;
             stream.appendChild(row);
         });
 
-        // 绑定点击气泡展开操作菜单
         stream.querySelectorAll("[data-msgidx]").forEach((el) => {
             el.onclick = (e) => {
                 e.stopPropagation();
                 const i = Number(el.getAttribute("data-msgidx"));
                 activeMenuMsgIdx = activeMenuMsgIdx === i ? -1 : i;
+                activeEditMsgIdx = -1;
                 renderWeChat();
             };
         });
 
-        // 绑定 [引用 / 复制 / 删除] 操作
         stream.querySelectorAll("[data-wxop]").forEach((btnOp) => {
-            btnOp.onclick = (e) => {
+            btnOp.onclick = async (e) => {
                 e.stopPropagation();
                 const op = btnOp.getAttribute("data-wxop");
                 const i = Number(btnOp.getAttribute("data-idx"));
@@ -832,37 +1803,141 @@
                 const target = arr[i];
                 activeMenuMsgIdx = -1;
                 if (!target) return;
+
                 if (op === "quote") {
-                    setQuotePreview(target.text.slice(0, 36));
+                    setQuotePreview(target.text.slice(0, 38));
                     renderWeChat();
                     topDoc.getElementById("smt-wx-input").focus();
+                } else if (op === "edit") {
+                    activeEditMsgIdx = i;
+                    renderWeChat();
+                } else if (op === "reroll") {
+                    let cutIdx = i;
+                    if (target.role === "ai") {
+                        while (cutIdx > 0 && arr[cutIdx - 1].role === "ai") cutIdx--;
+                        saveChatList(arr.slice(0, cutIdx));
+                    } else {
+                        saveChatList(arr.slice(0, i + 1));
+                    }
+                    refreshSyncedMemoryPool();
+                    renderWeChat();
+                    topDoc.getElementById("smt-wx-reply-btn").click();
+                } else if (op === "sum") {
+                    renderWeChat();
+                    openSummaryDrawer(i + 1, arr.length);
                 } else if (op === "copy") {
                     navigator.clipboard?.writeText(target.text);
                     renderWeChat();
                 } else if (op === "del") {
                     arr.splice(i, 1);
                     saveChatList(arr);
+                    refreshSyncedMemoryPool();
                     renderWeChat();
                 }
+            };
+        });
+
+        stream.querySelectorAll("[data-editcancel]").forEach((b) => {
+            b.onclick = (e) => { e.stopPropagation(); activeEditMsgIdx = -1; renderWeChat(); };
+        });
+        stream.querySelectorAll("[data-editsave]").forEach((b) => {
+            b.onclick = (e) => {
+                e.stopPropagation();
+                const i = Number(b.getAttribute("data-editsave"));
+                const inp = topDoc.getElementById(`smt-wx-edit-input-${i}`);
+                if (inp && inp.value.trim()) {
+                    const arr = getChatList();
+                    if (arr[i]) {
+                        arr[i].text = inp.value.trim();
+                        if (arr[i].type === "transfer") {
+                            const amtM = arr[i].text.match(/¥?(\d+(\.\d+)?)/);
+                            if (amtM) arr[i].amount = amtM[1];
+                        }
+                        saveChatList(arr);
+                        refreshSyncedMemoryPool();
+                    }
+                }
+                activeEditMsgIdx = -1;
+                renderWeChat();
             };
         });
 
         stream.scrollTop = stream.scrollHeight;
     }
 
+    setInterval(() => {
+        if (!modal.classList.contains("smt-open")) return;
+        const ctx = getSTContext(1);
+        const curScope = ctx.charScopeId || ctx.charName;
+        if (curScope && curScope !== lastObservedCharScope) {
+            lastObservedCharScope = curScope;
+            activeMenuMsgIdx = -1;
+            activeEditMsgIdx = -1;
+            renderWeChat();
+            if (typeof renderCoupleSpaceAll === "function") renderCoupleSpaceAll();
+            if (typeof renderHomeHtml === "function") renderHomeHtml();
+        }
+    }, 1200);
+
+    // 4-8. 区间总结与发送事件
+    topDoc.getElementById("smt-wx-sum-btn").onclick = () => {
+        if (sumDrawer.style.display === "block") sumDrawer.style.display = "none";
+        else openSummaryDrawer(1, getChatList().length || 1);
+    };
+    topDoc.getElementById("smt-wx-sum-close").onclick = () => { sumDrawer.style.display = "none"; };
+
+    topDoc.getElementById("smt-sum-run-btn").onclick = async (e) => {
+        const list = getChatList();
+        if (!list.length) return alert("当前角色还没有微信记录！");
+        const fromIdx = Math.max(1, Number(topDoc.getElementById("smt-sum-from").value) || 1);
+        const toIdx = Math.min(list.length, Number(topDoc.getElementById("smt-sum-to").value) || list.length);
+        if (fromIdx > toIdx) return alert("起始楼层不能大于结束楼层！");
+
+        const slice = list.slice(fromIdx - 1, toIdx);
+        const ctx = getSTContext(4);
+        const lines = slice.map((m, k) => `#${fromIdx + k} ${m.role === "user" ? ctx.userName : (m.role === "ai" ? ctx.charName : "系统")}: ${m.text}`).join("\n");
+
+        const resBox = topDoc.getElementById("smt-sum-result");
+        e.target.textContent = "提炼中...";
+        try {
+            const reply = await requestStandaloneAI(
+                `请将 ${ctx.userName} 与 ${ctx.charName} 的微信对话浓缩为【阶段记忆摘要】（100~160字）。`,
+                `【对话区间 #${fromIdx} ~ #${toIdx}】：\n${lines}`
+            );
+            resBox.value = `【${ctx.charName} 微信摘要 #${fromIdx}~#${toIdx}】\n${reply}`;
+        } catch (err) {
+            resBox.value = `失败：${err.message}`;
+        } finally {
+            e.target.textContent = "生成总结";
+        }
+    };
+
+    topDoc.getElementById("smt-sum-to-arch").onclick = () => {
+        const val = topDoc.getElementById("smt-sum-result").value.trim();
+        if (!val) return;
+        pushArchive(`[微信总结] ${getSTContext(1).charName}`, val, false);
+        alert("✓ 已存入历史馆！");
+    };
+
+    topDoc.getElementById("smt-sum-to-main").onclick = () => {
+        const val = topDoc.getElementById("smt-sum-result").value.trim();
+        if (!val) return;
+        try {
+            const stCtx = topWin.SillyTavern?.getContext?.();
+            if (stCtx?.setExtensionPrompt) stCtx.setExtensionPrompt("SEOUL_WECHAT_MEMORY", `[微信重要记忆摘要：${val}]`, 1, 2);
+            alert("✓ 已注入主线后台记忆！");
+        } catch (e) {}
+    };
+
     function appendWx(txt, sys = "", extra = {}) {
         const l = getChatList();
         if (sys) l.push({ role: "sys", text: sys, time: nowTimeStr() });
         if (txt) {
-            l.push(Object.assign({
-                role: "user",
-                text: txt,
-                quote: activeQuoteText || "",
-                time: nowTimeStr()
-            }, extra));
+            l.push(Object.assign({ role: "user", text: txt, quote: activeQuoteText || "", time: nowTimeStr() }, extra));
             setQuotePreview("");
         }
         saveChatList(l);
+        refreshSyncedMemoryPool();
         renderWeChat();
     }
 
@@ -881,17 +1956,22 @@
         sub.textContent = "입력 중... 对方正在输入";
         try {
             const ctx = getSTContext(Number(getApiCfg().ctxCount) || 8);
+            const wCfg = getWxCfg();
+            const rt = getRealTimeInfo();
+            const myName = wCfg.myNick || ctx.userName;
             const allChat = getChatList();
             const rec = allChat.slice(-16).map((m) => {
                 if (m.role === "sys") return `[系统提示: ${m.text}]`;
                 const qPrefix = m.quote ? `(引用「${m.quote}」) ` : "";
-                return `${m.role === "user" ? ctx.userName : ctx.charName}: ${qPrefix}${m.text}`;
+                return `${m.role === "user" ? myName : ctx.charName}: ${qPrefix}${m.text}`;
             }).join("\n");
 
-            const sysPrompt = `你是${ctx.charName}，在微信上与${ctx.userName}私聊。\n人设：${ctx.charDesc.slice(0, 1300)}\n近期剧情：${ctx.recentChat.slice(-1300)}\n规则：1. 用日常短句一次连回1~4条气泡，换行分隔。2. 如果对方发了转账卡片，请自然回应并可在单独一行写 [收款] 或主动发 [转账:520:备注]。`;
+            const timeBlock = wCfg.timeAware !== false ? `\n${rt.promptContext}` : "";
+            const bgBlock = wCfg.customBgNote ? `\n【当前私聊补充背景】：${wCfg.customBgNote}` : "";
+
+            const sysPrompt = `你是${ctx.charName}，在微信上与${myName}私聊。${timeBlock}${bgBlock}\n人设：${ctx.charDesc.slice(0, 1300)}\n近期剧情：${ctx.recentChat.slice(-1300)}\n规则：1. 用日常短句一次连回1~4条气泡，换行分隔。2. 如果对方发了转账卡片或表情包，请自然回应。`;
             const raw = await requestStandaloneAI(sysPrompt, `【微信记录】：\n${rec}\n请以 ${ctx.charName} 的口吻回复：`);
 
-            // 若 AI 回复了收款，自动把上一张转账卡标为已收款
             if (raw.includes("收") || raw.includes("谢") || raw.includes("转账")) {
                 allChat.forEach((m) => { if (m.type === "transfer") m.accepted = true; });
                 saveChatList(allChat);
@@ -908,38 +1988,41 @@
                     c.push({ role: "ai", text: b, time: nowTimeStr() });
                 }
                 saveChatList(c);
+                refreshSyncedMemoryPool();
                 renderWeChat();
             }
         } catch (err) { appendWx("", err.message); }
-        finally { sub.textContent = "Personal Messenger · KST"; }
+        finally { renderWeChat(); }
     };
 
-    // 微信底部快捷栏（含自定义金额转账卡片！）
     topDoc.querySelectorAll("[data-wxact]").forEach((b) => b.onclick = () => {
         const a = b.getAttribute("data-wxact"), ctx = getSTContext(1);
-        if (a === "poke") appendWx("", `"${ctx.userName}" 拍了拍 "${ctx.charName}" 的肩膀`);
+        const wCfg = getWxCfg();
+        const myName = wCfg.myNick || ctx.userName;
+        const cName = wCfg.remark || ctx.charName;
+        if (a === "poke") appendWx("", `"${myName}" 拍了拍 "${cName}"`);
         if (a === "transfer") {
             const amt = prompt("输入转账金额：", "520.00");
             if (!amt) return;
-            const note = prompt("输入转账备注：", "给你的零花钱") || "转账给 " + ctx.charName;
+            const note = prompt("输入转账备注：", "给你的零花钱") || "转账给 " + cName;
             appendWx(`[微信转账 ¥${amt} · 备注:${note}]`, "", { type: "transfer", amount: amt, note: note, accepted: false });
         }
         if (a === "photo") {
-            const desc = prompt("描述你发给TA的照片画面：", "刚拍的街角咖啡店随手拍");
+            const desc = prompt("描述照片画面：", "刚拍的随手拍");
             if (desc) appendWx(`[照片: ${desc}]`);
         }
         if (a === "voice") {
-            const v = prompt("输入语音条内容：");
-            if (v) appendWx(`(( 🎙️ 6" · "${v}" ))`);
+            const v = prompt("输入语音内容：");
+            if (v) appendWx(`(( 6" · "${v}" ))`);
         }
     });
 
-    topDoc.getElementById("smt-sync-toggle").onclick = () => { setSyncMode(!getSyncMode()); renderWeChat(); };
-    topDoc.getElementById("smt-wx-clear").onclick = () => { saveChatList([]); renderWeChat(); };
-    topDoc.getElementById("smt-wx-save-snap").onclick = () => { const c = getSTContext(1); pushArchive(`[微信] 与 ${c.charName}`, getChatList().map((m) => `${m.role}: ${m.text}`).join("\n"), false); alert("✓ 已存入历史！"); };
+    topDoc.getElementById("smt-sync-toggle").onclick = () => { setSyncMode(!getSyncMode()); refreshSyncedMemoryPool(); renderWeChat(); };
+    topDoc.getElementById("smt-wx-clear").onclick = () => { saveChatList([]); refreshSyncedMemoryPool(); renderWeChat(); };
     topDoc.getElementById("smt-wx-css-btn").onclick = () => { const d = topDoc.getElementById("smt-wx-css-drawer"); d.style.display = d.style.display === "none" ? "block" : "none"; topDoc.getElementById("smt-wx-css-textarea").value = getWxCss(); };
     topDoc.getElementById("smt-wx-css-save").onclick = () => { saveWxCss(topDoc.getElementById("smt-wx-css-textarea").value); applyWxCustomCss(); topDoc.getElementById("smt-wx-css-drawer").style.display = "none"; };
-    topDoc.getElementById("smt-wx-css-reset").onclick = () => { saveWxCss(DEFAULT_WX_CSS); topDoc.getElementById("smt-wx-css-textarea").value = DEFAULT_WX_CSS; applyWxCustomCss(); };
+    topDoc.getElementById("smt-wx-css-reset").onclick = () => { saveWxCss(NEW_DEFAULT_WX_CSS); topDoc.getElementById("smt-wx-css-textarea").value = NEW_DEFAULT_WX_CSS; applyWxCustomCss(); };
+
     /* ══════════════════════════════════════════════════════════════════════
        【PART 5：🤍 情侣空间与 6 大全屏子 App 逻辑】
        ══════════════════════════════════════════════════════════════════════ */
