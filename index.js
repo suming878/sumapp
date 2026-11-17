@@ -1772,7 +1772,7 @@ bootSumoulApp();
     patchCleanMelancholySplash();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 韩系动态流 · 终极定稿补丁（纯白无背景头像栏 + 仅User/AI双圆珠云朵泡泡 + SVG定位针）】
+// 🤍 【Sumoul App 韩系动态流 · 原生 IG Notes 微压贴合浮云泡泡版】
 // 用法：直接替换 index.js 最末尾的旧动态补丁！
 // ==========================================================================
 (function () {
@@ -1797,10 +1797,9 @@ bootSumoulApp();
             cmt: mkIco("%3Cpath d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'/%3E", 15, "%232C2C32", "none"),
             more: mkIco("%3Ccircle cx='12' cy='12' r='1.2'/%3E%3Ccircle cx='19' cy='12' r='1.2'/%3E%3Ccircle cx='5' cy='12' r='1.2'/%3E", 15, "%237A7A85", "none", "2.2"),
             plus: mkIco("%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E", 10, "%23FFFFFF", "none", "2.5"),
-            // 极简 SVG 定位坐标针图标（替代丑陋的📍Emoji）
             pin: mkIco("%3Cpath d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E", 11, "%238E8E98", "none", "1.8"),
             cam: mkIco("%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E", 20),
-            pet: mkIco("%3Cpath d='M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3.1-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z'/%3E%3Cpath d='M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17l-.75-.75Z'/%3E", 20),
+            pet: mkIco("%3Cpath d='M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 12 21s-9-3.1-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z'/%3E%3Cpath d='M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17l-.75-.75Z'/%3E", 20),
             qa: mkIco("%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E", 20),
             wave: mkIco("%3Cpath d='M22 12h-4l-3 9L9 3l-3 9H2'/%3E", 20),
             ticket: mkIco("%3Cpath d='M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z'/%3E%3Cpath d='M13 5v2M13 17v2M13 11v2'/%3E", 20),
@@ -1824,17 +1823,16 @@ bootSumoulApp();
                 background: #FFFFFF !important;
             }
 
-            /* ── 1. 顶部头像栏：彻底去掉灰色外框背景，直接铺在纯白底上！ ── */
+            /* ── 1. 顶部纯白无背景头像栏 ── */
             #seoul-mini-theater-modal .kr-notes-tray {
                 display: flex !important;
                 align-items: flex-end !important;
-                gap: 16px !important;
+                gap: 15px !important;
                 overflow-x: auto !important;
-                padding: 32px 6px 12px 6px !important;
+                padding: 20px 6px 12px 6px !important;
                 background: transparent !important;
                 border: none !important;
                 border-bottom: 1px solid #F2F2F6 !important;
-                border-radius: 0 !important;
                 margin-bottom: 8px !important;
                 flex-shrink: 0 !important;
                 scrollbar-width: none !important;
@@ -1851,57 +1849,73 @@ bootSumoulApp();
                 width: 62px !important;
             }
 
-            /* ── 2. 真·云朵思绪泡泡 (Instagram Notes 原版双圆珠泡泡质感，仅 User 与 AI 有) ── */
-            #seoul-mini-theater-modal .kr-cloud-bubble {
+            /* ── 2. 原生 Instagram Notes 微压贴合式柔和浮云泡泡 ── */
+            #seoul-mini-theater-modal .ig-note-cloud {
                 position: absolute !important;
-                top: -24px !important;
+                top: -11px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 background: #FFFFFF !important;
-                border: 1px solid #E4E4EC !important;
-                border-radius: 16px !important;
-                padding: 4px 9px !important;
+                border: 1px solid rgba(220, 220, 230, 0.75) !important;
+                border-radius: 14px !important;
+                padding: 3.5px 8.5px !important;
                 z-index: 6 !important;
-                overflow: visible !important;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+                box-shadow: 0 3px 9px rgba(25, 25, 35, 0.08), 0 1px 2px rgba(25, 25, 35, 0.04) !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
-            #seoul-mini-theater-modal .kr-cloud-bubble span {
+            #seoul-mini-theater-modal .ig-note-cloud span {
                 display: block !important;
-                font-size: 8.5px !important;
+                font-size: 8.2px !important;
                 font-weight: 700 !important;
                 color: #2C2C32 !important;
                 white-space: nowrap !important;
-                max-width: 64px !important;
+                max-width: 60px !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
                 line-height: 1.15 !important;
+                letter-spacing: -0.1px !important;
             }
-            /* 第一颗小圆珠泡泡（紧贴胶囊左下方） */
-            #seoul-mini-theater-modal .kr-cloud-bubble::before {
+            /* 云朵左下方一体成形的无边框感柔和小水滴（自然贴合在头像额头处） */
+            #seoul-mini-theater-modal .ig-note-cloud::before {
                 content: "" !important;
                 position: absolute !important;
-                bottom: -4px !important;
-                left: 12px !important;
-                width: 6px !important;
-                height: 6px !important;
+                bottom: -3.5px !important;
+                left: 11px !important;
+                width: 6.5px !important;
+                height: 6.5px !important;
                 border-radius: 50% !important;
                 background: #FFFFFF !important;
-                border: 1px solid #E4E4EC !important;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
-                z-index: 5 !important;
+                box-shadow: 0 2px 3px rgba(25, 25, 35, 0.07) !important;
+                z-index: -1 !important;
             }
-            /* 第二颗微缩圆珠泡泡（向头像方向递减延伸，形成真正的泡泡感！） */
-            #seoul-mini-theater-modal .kr-cloud-bubble::after {
+            #seoul-mini-theater-modal .ig-note-cloud::after {
                 content: "" !important;
                 position: absolute !important;
-                bottom: -8px !important;
-                left: 16px !important;
-                width: 3.5px !important;
-                height: 3.5px !important;
+                bottom: -6.5px !important;
+                left: 15px !important;
+                width: 3.8px !important;
+                height: 3.8px !important;
                 border-radius: 50% !important;
                 background: #FFFFFF !important;
-                border: 1px solid #E4E4EC !important;
-                z-index: 4 !important;
+                box-shadow: 0 1px 2px rgba(25, 25, 35, 0.08) !important;
+                z-index: -2 !important;
+            }
+            /* 当 User 还没填状态时的极简浅灰半透明微胶囊 */
+            #seoul-mini-theater-modal .ig-note-cloud.empty-hint {
+                background: rgba(246, 246, 250, 0.92) !important;
+                padding: 2.5px 6px !important;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+            }
+            #seoul-mini-theater-modal .ig-note-cloud.empty-hint span {
+                color: #9A9AA5 !important;
+                font-size: 7.5px !important;
+                font-weight: 600 !important;
+            }
+            #seoul-mini-theater-modal .ig-note-cloud.empty-hint::before,
+            #seoul-mini-theater-modal .ig-note-cloud.empty-hint::after {
+                background: rgba(246, 246, 250, 0.92) !important;
             }
 
             /* 圆头像双层留白环 */
@@ -1959,7 +1973,7 @@ bootSumoulApp();
                 max-width: 62px !important;
             }
 
-            /* ── 次顶栏与下方动态卡片（保持刚才好看的立体灰白画报结构） ── */
+            /* ── 次顶栏与下方动态卡片 ── */
             #seoul-mini-theater-modal .kr-sub-nav {
                 display: flex !important;
                 align-items: center !important;
@@ -2089,7 +2103,6 @@ bootSumoulApp();
             if (txtEl) txtEl.textContent = "动态";
         }
 
-        // 确保主页已挂载独立的【情侣空间 App (#smt-page-couple_app)】
         let coupleAppPage = topDoc.getElementById("smt-page-couple_app");
         if (!coupleAppPage) {
             coupleAppPage = topDoc.createElement("div");
@@ -2150,13 +2163,9 @@ bootSumoulApp();
         }
 
         spacePage.innerHTML = `
-            <!-- ① 顶部：纯白无外框头像栏（仅 User 与 AI 头顶有双圆珠云朵泡泡） -->
             <div class="kr-notes-tray" id="smt-ins-stories-bar"></div>
-
-            <!-- 点击圆头像弹出的「限时快拍 Story 预览卡」 -->
             <div id="smt-story-viewer" style="display:none;background:#F8F8FA!important;border:1px solid #E6E6EC!important;border-radius:16px!important;padding:12px 14px!important;margin-bottom:10px!important;flex-shrink:0!important;"></div>
 
-            <!-- ② 次顶栏：饱满粗体胶囊筛选 + 发帖按钮 -->
             <div class="kr-sub-nav">
                 <div style="display:flex;gap:5px;">
                     <span class="smt-pill-btn dark" data-feedfilter="all">全部动态</span>
@@ -2168,7 +2177,6 @@ bootSumoulApp();
                 </div>
             </div>
 
-            <!-- 发动态展开抽屉 -->
             <div id="smt-mom-post-drawer" class="smt-section-box" style="display:none;margin-bottom:10px!important;flex-shrink:0;">
                 <div style="font-size:9.5px;font-weight:700;color:#2C2C32;margin-bottom:6px;">새 게시물 · 发布我的新动态 (发布后TA与好友会自动回复)</div>
                 <textarea id="smt-mom-post-txt" style="width:100%;height:52px;background:#FFF;border:1px solid #E4E4EC;border-radius:9px;padding:7px;font-size:10.5px;font-weight:600;box-sizing:border-box;resize:none;margin-bottom:6px;outline:none;" placeholder="写下一句心情..."></textarea>
@@ -2179,7 +2187,6 @@ bootSumoulApp();
                 </div>
             </div>
 
-            <!-- ③ 下方：立体灰白圆角画报动态流 -->
             <div id="smt-mom-stream" style="flex:1;min-height:0;overflow-y:auto;padding-bottom:16px;"></div>
         `;
 
@@ -2332,13 +2339,15 @@ bootSumoulApp();
             const friends = data.friends || createDefaultFeed(c.charName).friends;
             const storiesBar = topDoc.getElementById("smt-ins-stories-bar");
 
-            // 仅 User（自定义非空时）与 AI 显示双圆珠云朵泡泡！其余好友不冒泡！
-            const myBubbleHtml = data.myNote ? `<div class="kr-cloud-bubble"><span>${data.myNote}</span></div>` : "";
-            const charBubbleHtml = `<div class="kr-cloud-bubble"><span>${data.charNote || "想你了"}</span></div>`;
+            // 原生 IG Notes 微压贴合浮云泡泡：User 没填时显示轻巧的“想法+”，填了则显示文字泡泡；AI 显示它的实时心声泡泡
+            const myBubbleHtml = data.myNote
+                ? `<div class="ig-note-cloud"><span>${data.myNote}</span></div>`
+                : `<div class="ig-note-cloud empty-hint"><span>想法...</span></div>`;
+            const charBubbleHtml = `<div class="ig-note-cloud"><span>${data.charNote || "想你了"}</span></div>`;
 
             storiesBar.innerHTML = `
-                <!-- 1. 我的圆头像（点击可自定义冒泡文字，留空则隐藏泡泡） -->
-                <div class="kr-note-unit" id="smt-story-me" title="点击自定义我的头顶泡泡">
+                <!-- 1. 我的圆头像 -->
+                <div class="kr-note-unit" id="smt-story-me" title="点击修改我的状态泡泡">
                     ${myBubbleHtml}
                     <div class="kr-ava-ring">
                         <div class="kr-ava-inner"><img src="${c.userAvatar}" /></div>
@@ -2347,7 +2356,7 @@ bootSumoulApp();
                     <div class="kr-unit-name">${c.userName}</div>
                 </div>
 
-                <!-- 2. TA 的圆头像（带双圆珠云朵思绪泡泡） -->
+                <!-- 2. TA 的圆头像（微压贴合式浮云泡泡） -->
                 <div class="kr-note-unit" id="smt-story-char">
                     ${charBubbleHtml}
                     <div class="kr-ava-ring unread">
@@ -2356,7 +2365,7 @@ bootSumoulApp();
                     <div class="kr-unit-name">${c.charName}</div>
                 </div>
 
-                <!-- 3~5. 好友/电台圆头像（干净无泡泡，点击看快拍） -->
+                <!-- 3~5. 好友/电台圆头像（干净无泡泡） -->
                 ${friends.map((fr, idx) => `
                     <div class="kr-note-unit" data-fridx="${idx}">
                         <div class="kr-ava-ring">
@@ -2369,7 +2378,7 @@ bootSumoulApp();
 
             topDoc.getElementById("smt-story-me").onclick = () => {
                 const d = getFeedData();
-                const v = prompt("自定义你头顶的云朵泡泡文字（留空确定则隐藏泡泡）：", d.myNote || "");
+                const v = prompt("写下你头像上方的想法小泡泡（留空则恢复默认提示）：", d.myNote || "");
                 if (v !== null) { d.myNote = v.trim().slice(0, 8); saveFeedData(d); renderKrMoments(); }
             };
 
@@ -2424,7 +2433,6 @@ bootSumoulApp();
                 };
             });
 
-            // 渲染下方动态卡片（定位符号采用极简 SVG 坐标针 KR_ICO.pin）
             const stream = topDoc.getElementById("smt-mom-stream");
             const posts = (data.posts || []).filter((p) => currentFilter === "all" || !p.isMe);
             if (!posts.length) {
