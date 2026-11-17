@@ -1,10 +1,3 @@
-// ==========================================================================
-// 🤍 【SEOUL OS V14 · 零语法错误校验通过版 · 一次复制完整闭合无需拼接】
-// 包含：1. 忧郁白灰开屏动画 + QQ防二传锁 + 管理员审核/群发口令/永久拉黑后台
-//       2. 微信(#F8F8F8长圆气泡/头像顶部对齐/双尾巴CSS/6合1菜单/区间总结/双栏表情批量导入/全屏设置页)
-//       3. 情侣空间(A+B融合版：同居小屋横幅 + iPad圆润图标坞 + INS九宫格墙 + 6大全屏子App)
-//       4. 旋转黑胶网易云同听 + 突击查手机 + 交换日记 + HTML主页 + 三重打开入口
-// ==========================================================================
 (function () {
 const topWin = window.parent || window, topDoc = topWin.document;
 
@@ -22,7 +15,7 @@ function bootSeoulOS() {
 if (!topDoc || !topDoc.body) { setTimeout(bootSeoulOS, 300); return; }
 ["seoul-mini-theater-btn", "seoul-mini-theater-modal", "seoul-mini-theater-style", "seoul-wx-custom-style", "seoul-ext-settings-panel", "seoul-wand-menu-item"].forEach((id) => topDoc.getElementById(id)?.remove());
 
-const K_API = "seoul_v14_api", K_WX_CSS = "seoul_v14_wx_css", K_MUSIC = "seoul_v14_music", K_HTML = "seoul_v14_html", K_SYNC = "seoul_v14_sync", K_STICKERS = "seoul_v14_stickers", K_AUTH = "seoul_v14_auth_user", K_ADMIN_DB = "seoul_v14_admin_db";
+const K_API = "seoul_v13_api", K_WX_CSS = "seoul_v13_wx_css", K_MUSIC = "seoul_v13_music", K_HTML = "seoul_v13_html", K_SYNC = "seoul_v13_sync", K_STICKERS = "seoul_v13_stickers", K_AUTH = "seoul_v13_auth_user", K_ADMIN_DB = "seoul_v13_admin_db";
 
 const svgUri = (d, s = "%23484852", v = "0 0 24 24", w = "1.5") => `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='${v}' fill='none' stroke='${s}' stroke-width='${w}' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E")`;
 const inlineSvg = (d, c = "#484852", sz = 12) => `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block!important;visibility:visible!important;width:${sz}px!important;height:${sz}px!important;flex-shrink:0!important;vertical-align:middle!important;pointer-events:none!important;">${d}</svg>`;
@@ -164,13 +157,13 @@ const NEW_DEFAULT_WX_CSS = `/* 🎨 微信专属 CSS 美化工作台 */
 
 function getApiCfg() { try { return Object.assign({ url: "https://api.openai.com/v1", key: "", model: "gpt-4o-mini", ctxCount: 8 }, JSON.parse(localStorage.getItem(K_API) || "{}")); } catch (e) { return { url: "https://api.openai.com/v1", key: "", model: "gpt-4o-mini", ctxCount: 8 }; } }
 function saveApiCfg(c) { localStorage.setItem(K_API, JSON.stringify(c)); }
-function getChatList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v14_wx")) || "[]"); } catch (e) { return []; } }
-function saveChatList(list) { localStorage.setItem(getSafeScopedKey("seoul_v14_wx"), JSON.stringify(list.slice(-150))); }
+function getChatList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_wx")) || "[]"); } catch (e) { return []; } }
+function saveChatList(list) { localStorage.setItem(getSafeScopedKey("seoul_v13_wx"), JSON.stringify(list.slice(-150))); }
 function getWxCfg() {
-    try { return Object.assign({ myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" }, JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v14_wxcfg")) || "{}")); }
+    try { return Object.assign({ myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" }, JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_wxcfg")) || "{}")); }
     catch (e) { return { myNick: "", myBio: "連線中 · Personal Inbox", myAva: "", remark: "", charBio: "随时在线 · 置顶联系人", charAva: "", avaSize: 33, timeAware: true, customBgNote: "" }; }
 }
-function saveWxCfg(cfg) { try { localStorage.setItem(getSafeScopedKey("seoul_v14_wxcfg"), JSON.stringify(cfg)); } catch (e) {} }
+function saveWxCfg(cfg) { try { localStorage.setItem(getSafeScopedKey("seoul_v13_wxcfg"), JSON.stringify(cfg)); } catch (e) {} }
 function getWxCss() { return localStorage.getItem(K_WX_CSS) || NEW_DEFAULT_WX_CSS; }
 function saveWxCss(css) { localStorage.setItem(K_WX_CSS, css); }
 function getSyncMode() { return localStorage.getItem(K_SYNC) === "true"; }
@@ -180,8 +173,8 @@ function getStickerList() {
     catch (e) { return []; }
 }
 function saveStickerList(l) { localStorage.setItem(K_STICKERS, JSON.stringify(l.slice(0, 150))); }
-function getArchive() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v14_arch")) || "[]"); } catch (e) { return []; } }
-function saveArchive(l) { localStorage.setItem(getSafeScopedKey("seoul_v14_arch"), JSON.stringify(l.slice(0, 150))); }
+function getArchive() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_arch")) || "[]"); } catch (e) { return []; } }
+function saveArchive(l) { localStorage.setItem(getSafeScopedKey("seoul_v13_arch"), JSON.stringify(l.slice(0, 150))); }
 function pushArchive(title, content, isHtml = false) { const l = getArchive(); l.unshift({ id: Date.now(), title, content, isHtml, time: nowTimeStr() }); saveArchive(l); }
 
 async function requestStandaloneAI(systemText, userText) {
@@ -253,7 +246,7 @@ async function checkQQPermission(qq, passOrCode) {
     return { status: "denied", msg: "该 QQ 尚未通过审核，请输入群发口令/通行码，或点击下方「提交申请」等待作者通过！" };
 }
 
-/* 注入全局 CSS */
+/* 注入精简高权重全局 CSS */
 const styleEl = topDoc.createElement("style");
 styleEl.id = "seoul-mini-theater-style";
 styleEl.innerHTML = `
@@ -436,6 +429,7 @@ modal.innerHTML = `
 </div>
 
 <div class="smt-fs-body">
+    <!-- 👑 管理员审核 / 设口令 / 永久拉黑封杀后台 -->
     <div class="smt-page" id="smt-page-admin">
         <div class="smt-section-box" style="background:#FFF!important;border:1.5px solid #484852!important;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
@@ -468,6 +462,7 @@ modal.innerHTML = `
         </div>
     </div>
 
+    <!-- 01. 独立微信 -->
     <div class="smt-page active" id="smt-page-talk">
         <div class="smt-wx-top-bar">
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
@@ -602,6 +597,7 @@ modal.innerHTML = `
         </div>
     </div>
 
+    <!-- 02. 情侣空间桌面 (A+B融合版) -->
     <div class="smt-page" id="smt-page-space">
         <div class="ab-profile-shell">
             <div class="ab-room-banner" id="smt-sp-hero-card">
@@ -702,6 +698,7 @@ modal.innerHTML = `
         <div class="smt-section-box"><div class="smt-sec-title"><span>BUCKET LIST · 恋爱百事心愿单</span><span class="smt-pill-btn" id="smt-sp-add-todo">＋ 新增心愿</span></div><div id="smt-sp-todo-list"></div></div>
     </div>
 
+    <!-- 03. 个人主页与应用 -->
     <div class="smt-page" id="smt-page-home">
         <div id="smt-user-html-stage" style="margin-bottom:8px;"></div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:12px;">
@@ -822,7 +819,7 @@ modal.innerHTML = `
 topDoc.body.appendChild(btn);
 topDoc.body.appendChild(modal);
 
-/* 路由与管理员后台逻辑 */
+/* ── 路由控制与防二传管理员审核后台逻辑 ── */
 let currentPage = "talk", lastMainPage = "space";
 const SUB_APPS = ["admin", "wx_settings", "sp_pet", "sp_4cut", "sp_qa", "sp_mood", "sp_coupon", "sp_guest", "phone", "music", "diary"];
 
@@ -863,6 +860,7 @@ topDoc.getElementById("smt-header-back-btn").onclick = () => {
 topDoc.querySelectorAll(".smt-tab-item").forEach((tab) => tab.onclick = () => navigateToPage(tab.getAttribute("data-page"), tab.getAttribute("data-title"), tab.getAttribute("data-sub")));
 topDoc.querySelectorAll("[data-openapp]").forEach((card) => card.onclick = () => navigateToPage(card.getAttribute("data-openapp"), "SEOUL EXCLUSIVE APP", "Full-Screen Interactive View"));
 
+/* 👑 管理员后台渲染与审核/拉黑/设口令逻辑 */
 const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
 
 function requestAdminEntry() {
@@ -885,18 +883,22 @@ topDoc.getElementById("smt-admin-relock-btn").onclick = () => {
 
 function renderAdminConsole() {
     const db = getAdminDB();
+    // 1. 口令列表
     const pwdEl = topDoc.getElementById("smt-adm-pwd-list");
     pwdEl.innerHTML = db.passwords.map((p, i) => `<span class="smt-pill-btn">${p} <b data-delpwd="${i}" style="cursor:pointer;margin-left:4px;color:#8A5A5A;">✕</b></span>`).join("");
     pwdEl.querySelectorAll("[data-delpwd]").forEach((x) => x.onclick = () => { db.passwords.splice(Number(x.getAttribute("data-delpwd")), 1); saveAdminDB(db); renderAdminConsole(); });
 
+    // 2. 黑名单封杀库
     const blkEl = topDoc.getElementById("smt-adm-black-list");
     blkEl.innerHTML = db.blacklist.length ? db.blacklist.map((q, i) => `<span class="smt-pill-btn" style="border-color:#C8A0A0;color:#8A5A5A;">🚫 ${q} <b data-delblk="${i}" style="cursor:pointer;margin-left:4px;">移除</b></span>`).join("") : `<span style="font-size:9px;color:#9A9AA5;">暂无拉黑的 QQ 号</span>`;
     blkEl.querySelectorAll("[data-delblk]").forEach((x) => x.onclick = () => { db.blacklist.splice(Number(x.getAttribute("data-delblk")), 1); saveAdminDB(db); renderAdminConsole(); });
 
+    // 3. 白名单列表
     const whtEl = topDoc.getElementById("smt-adm-white-list");
     whtEl.innerHTML = db.whitelist.map((q, i) => `<span class="smt-pill-btn">✓ ${q} <b data-delwht="${i}" style="cursor:pointer;margin-left:4px;color:#8A5A5A;">✕</b></span>`).join("");
     whtEl.querySelectorAll("[data-delwht]").forEach((x) => x.onclick = () => { db.whitelist.splice(Number(x.getAttribute("data-delwht")), 1); saveAdminDB(db); renderAdminConsole(); });
 
+    // 4. 待审核申请列表
     const pendEl = topDoc.getElementById("smt-adm-pending-list");
     if (!db.pending.length) {
         pendEl.innerHTML = `<div style="text-align:center;padding:12px;font-size:9px;color:#9A9AA5;">暂无待审核的申请记录</div>`;
@@ -964,10 +966,12 @@ topDoc.getElementById("smt-adm-export-cfg").onclick = () => {
     alert("✓ 已复制最新 AUTH_CONFIG 配置代码！直接粘贴替换 GitHub index.js 开头的同名区块即可全网永久生效！");
 };
 
+/* 🌧️ 开屏与锁屏验证交互（不自动跳过，方便白名单作者随时点右上角进后台） */
 const qqInp = topDoc.getElementById("smt-auth-qq-inp"), codeInp = topDoc.getElementById("smt-auth-code-inp"), avaImg = topDoc.getElementById("smt-lock-qq-ava"), errEl = topDoc.getElementById("smt-auth-err-msg");
 
 function updateLockTime() {
-    const d = new Date(), el = topDoc.getElementById("smt-lock-big-time");
+    const d = new Date();
+    const el = topDoc.getElementById("smt-lock-big-time");
     if (el) el.textContent = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 updateLockTime();
@@ -1035,7 +1039,7 @@ function playMelancholyBoot() {
     setTimeout(() => { splash.classList.add("fade-out"); }, 1450);
 }
 
-/* 微信模块 */
+/* ── 微信模块事件绑定 ── */
 const KAOMOJI_LIST = ["૮꒰ ˶• ༝ •˶꒱ა", "(｡•́︿•̀｡)", "♡(˃͈ દ ˂͈ ༶ )", "( ´͈ ᵕ `͈ )◞♡", "(⁎⁍̴̛ᴗ⁍̴̛⁎)", "(¬_¬ )", "( ˘•ω•˘ )", "✧(≖ ◡ ≖✿)", "(っ´ω`c)", "૮ • ﻌ - ა", "(⁄ ⁄•⁄ω⁄•⁄ ⁄)", "(╬▔皿▔)╯", "🥺", "🤍", "😭", "💢"];
 let activeQuoteText = "", activeMenuMsgIdx = -1, activeEditMsgIdx = -1, lastObservedCharScope = "";
 
@@ -1306,7 +1310,7 @@ topDoc.getElementById("smt-wx-css-btn").onclick = () => { const d = topDoc.getEl
 topDoc.getElementById("smt-wx-css-save").onclick = () => { saveWxCss(topDoc.getElementById("smt-wx-css-textarea").value); applyWxCustomCss(); topDoc.getElementById("smt-wx-css-drawer").style.display = "none"; };
 topDoc.getElementById("smt-wx-css-reset").onclick = () => { saveWxCss(NEW_DEFAULT_WX_CSS); topDoc.getElementById("smt-wx-css-textarea").value = NEW_DEFAULT_WX_CSS; applyWxCustomCss(); };
 
-/* A+B 融合版情侣空间事件 */
+/* ── A+B 融合版情侣空间事件 ── */
 const QA_QUESTIONS = [
     "第一次悄悄对彼此产生超越普通关系的占有欲，是在哪个瞬间？",
     "如果今晚首尔突然停电，只有我们两个人被困在家里，最想一起做什么？",
@@ -1316,7 +1320,7 @@ const QA_QUESTIONS = [
 ];
 
 function getSpaceData() {
-    const ctx = getSTContext(1), key = getSafeScopedKey("seoul_v14_space");
+    const ctx = getSTContext(1), key = getSafeScopedKey("seoul_v13_space");
     const def = {
         startDate: "2024-05-20", mood: "36.7°C · SWEET HOME", bgUrl: "", charNow: "正在小厨房给你热牛奶",
         pet: { name: "모찌 (糯米团)", lv: 2, hunger: 85, mood: 92, lastLog: `与 ${ctx.charName} 共同领养的小宠物正蜷在地毯上打呼噜。` },
@@ -1338,7 +1342,7 @@ function getSpaceData() {
     };
     try { return Object.assign(def, JSON.parse(localStorage.getItem(key) || "{}")); } catch (e) { return def; }
 }
-function saveSpaceData(d) { localStorage.setItem(getSafeScopedKey("seoul_v14_space"), JSON.stringify(d)); }
+function saveSpaceData(d) { localStorage.setItem(getSafeScopedKey("seoul_v13_space"), JSON.stringify(d)); }
 function calcTogetherDays() { const diff = Math.max(1, Math.floor((Date.now() - new Date(getSpaceData().startDate || "2024-05-20").getTime()) / 86400000)); return isNaN(diff) ? 100 : diff; }
 
 function renderCoupleSpaceAll() {
@@ -1417,7 +1421,7 @@ function renderCoupleSpaceAll() {
 topDoc.getElementById("smt-sp-bg-btn").onclick = () => { const sp = getSpaceData(), u = prompt("粘贴同居背景横幅图片 URL（留空恢复极简柔灰）：", sp.bgUrl || ""); if (u !== null) { sp.bgUrl = u.trim(); saveSpaceData(sp); renderCoupleSpaceAll(); } };
 topDoc.getElementById("smt-sp-edit-date").onclick = () => { const sp = getSpaceData(), v = prompt("相恋日期(YYYY-MM-DD)：", sp.startDate); if (v) { sp.startDate = v.trim(); saveSpaceData(sp); renderCoupleSpaceAll(); } };
 topDoc.getElementById("smt-sp-mood").onclick = () => { const sp = getSpaceData(), v = prompt("修改今日心情温度：", sp.mood); if (v) { sp.mood = v.trim(); saveSpaceData(sp); renderCoupleSpaceAll(); } };
-topDoc.getElementById("smt-sp-reset-char").onclick = () => { const c = getSTContext(1); if (confirm(`确定重置与【${c.charName}】的情侣空间数据吗？`)) { localStorage.removeItem(getSafeScopedKey("seoul_v14_space")); renderCoupleSpaceAll(); } };
+topDoc.getElementById("smt-sp-reset-char").onclick = () => { const c = getSTContext(1); if (confirm(`确定重置与【${c.charName}】的情侣空间数据吗？`)) { localStorage.removeItem(getSafeScopedKey("seoul_v13_space")); renderCoupleSpaceAll(); } };
 
 topDoc.getElementById("smt-sp-refresh-live").onclick = async (e) => {
     const ctx = getSTContext(6), sp = getSpaceData(); e.target.textContent = "⏳ 感应中...";
@@ -1455,7 +1459,7 @@ topDoc.getElementById("smt-sp-note-send").onclick = async () => { const inp = to
 topDoc.getElementById("smt-sp-ai-note").onclick = async () => { const ctx = getSTContext(6); try { const r = await requestStandaloneAI(`你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 800)}`, `主动在情侣空间留言板给${ctx.userName}留一句悄悄话(45字内)：`); const d = getSpaceData(); d.notes.unshift({ author: ctx.charName, text: r, time: nowTimeStr() }); saveSpaceData(d); renderCoupleSpaceAll(); } catch (err) { alert(err.message); } };
 topDoc.getElementById("smt-sp-add-todo").onclick = () => { const v = prompt("新增心愿："); if (v) { const d = getSpaceData(); d.todos.push({ text: v.trim(), done: false }); saveSpaceData(d); renderCoupleSpaceAll(); } };
 
-/* 网易云、查手机、交换日记、HTML主页与独立 API 设置 */
+/* ── 网易云、查手机、交换日记、HTML主页与独立 API 设置 ── */
 function getMusicData() {
     try { return Object.assign({ liked: [{ id: "2076931657", name: "Love Lee", artist: "AKMU", cover: "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", url: "https://music.163.com/song/media/outer/url?id=2076931657.mp3" }, { id: "2007335243", name: "Ditto", artist: "NewJeans", cover: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", url: "https://music.163.com/song/media/outer/url?id=2007335243.mp3" }], currentTrack: null }, JSON.parse(localStorage.getItem(K_MUSIC) || "{}")); }
     catch (e) { return { liked: [], currentTrack: null }; }
@@ -1545,8 +1549,8 @@ topDoc.getElementById("smt-ncm-ai-listen").onclick = async () => {
 };
 
 let currentPhoneTab = "ins";
-function getPhoneCache() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v14_phone")) || "{}"); } catch (e) { return {}; } }
-function savePhoneCache(p) { localStorage.setItem(getSafeScopedKey("seoul_v14_phone"), JSON.stringify(p)); }
+function getPhoneCache() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_phone")) || "{}"); } catch (e) { return {}; } }
+function savePhoneCache(p) { localStorage.setItem(getSafeScopedKey("seoul_v13_phone"), JSON.stringify(p)); }
 function renderFullPhoneApp() {
     const c = getSTContext(1), cache = getPhoneCache(), stage = topDoc.getElementById("smt-ph-stage");
     topDoc.getElementById("smt-ph-ava").src = c.charAvatar; topDoc.getElementById("smt-ph-owner").textContent = `${c.charName} 的 iPhone`;
@@ -1565,8 +1569,8 @@ async function generateFullPhoneContent(type) {
 topDoc.querySelectorAll("[data-phtab]").forEach((b) => b.onclick = () => { topDoc.querySelectorAll("[data-phtab]").forEach((x) => x.classList.remove("dark")); b.classList.add("dark"); currentPhoneTab = b.getAttribute("data-phtab"); renderFullPhoneApp(); });
 topDoc.getElementById("smt-ph-refresh-btn").onclick = () => generateFullPhoneContent(currentPhoneTab);
 
-function getDiaryList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v14_diary")) || "[]"); } catch (e) { return []; } }
-function saveDiaryList(l) { localStorage.setItem(getSafeScopedKey("seoul_v14_diary"), JSON.stringify(l)); }
+function getDiaryList() { try { return JSON.parse(localStorage.getItem(getSafeScopedKey("seoul_v13_diary")) || "[]"); } catch (e) { return []; } }
+function saveDiaryList(l) { localStorage.setItem(getSafeScopedKey("seoul_v13_diary"), JSON.stringify(l)); }
 function renderDiaryApp() {
     topDoc.getElementById("smt-diary-list").innerHTML = getDiaryList().map((d) => `<div style="background:#F8F8F8;border:1px solid #ECECF2;border-radius:14px;padding:12px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:9px;color:#7A7A85;margin-bottom:5px;"><b>[${d.author}] ${d.title}</b><span>${d.time}</span></div><div style="font-size:11px;line-height:1.68;white-space:pre-wrap;">${d.content.replace(/</g, "&lt;")}</div></div>`).join("");
 }
@@ -1634,7 +1638,7 @@ function openSeoulModal() {
 
 btn.onclick = () => openSeoulModal();
 
-/* 三重打开入口守护器 */
+/* 三重打开入口守护器（右下角悬浮球 + 酒馆扩展面板大按钮 + 聊天框魔法棒菜单） */
 function ensureTavernExtensionButtons() {
     if (!topDoc.getElementById("seoul-mini-theater-btn")) topDoc.body.appendChild(btn);
     if (!topDoc.getElementById("seoul-mini-theater-modal")) topDoc.body.appendChild(modal);
@@ -1689,3 +1693,4 @@ renderWeChat();
 
 bootSeoulOS();
 })();
+
