@@ -1,7 +1,9 @@
 {
-  "display_name": "SEOUL OS",
-  "name": "sumapp",
-  "version": "1.0.0",
-  "author": "suming878",
-  "js": "index.js"
+    "display_name": "SEOUL OS 韩系全屏系统",
+    "loading_order": 10,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "author": "SEOUL STUDIO",
+    "version": "1.4.0"
 }
