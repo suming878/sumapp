@@ -1680,488 +1680,557 @@
     bootSeoulOS();
 })();
 // ==========================================================================
-// 🤍 【SEOUL OS 独立安全模块：韩系开屏动画 + 防二传 QQ 号手动审核登录系统 + 作者内置算号器】
-// 用法：直接粘贴在 index.js 最末尾！自动拦截所有打开入口，未授权 QQ 绝对无法进入系统！
+// 🤍 【SEOUL OS V13 终极全功能挂载包（直接粘贴在原文件最末尾，无需删改原文件！）】
+// 自动完成：1. 修复PART 4微信 #F8F8F8 长圆气泡与按角色独立分库
+//           2. 升级PART 5 为 A+B 融合版情侣空间（同居横幅 + iPad圆润图标坞 + INS九宫格）
+//           3. 新增酒馆 Extensions 扩展面板大按钮 + 魔法棒菜单按钮
+//           4. 新增「韩系清冷忧郁白灰电影感开屏」+「QQ号拉黑/白名单/群口令/GitHub云同步 管理员系统」
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
     /* ──────────────────────────────────────────────────────────────────────
-       👑 【作者专属配置区（请修改为你自己的暗号与QQ号）】
+       👑 【作者最高权限配置区（改成你自己的密码与云端地址）】
        ────────────────────────────────────────────────────────────────────── */
-    // 1. 你的作者加密盐值（随便改一串只有你自己知道的字母数字，别人不知道这串字就永远算不出激活码！）
-    const AUTHOR_SECRET_SALT = "SEOUL_OS_BY_MY_SECRET_2025";
+    // 1. 你的作者管理员后台密码（点开屏页或顶栏的「ADMIN · 管理」输入此密码即可进入管理后台！）
+    const ADMIN_MASTER_PIN = "1202";
 
-    // 2. 你自己的作者 QQ 号（填在这里的 QQ 号无需激活码可直接免密登录）
-    const BUILTIN_WHITELIST_QQ = [
-        "3425740873" // 👈 把这里改成你自己的 QQ 号
-    ];
+    // 2. 你的作者加密盐值（用于计算单人专属码）
+    const AUTHOR_SALT = "sumingsyb0223";
 
-    // 3. GitHub 云端白名单地址（选填：如果你在 GitHub 仓库建了一个 allow.json 写上 ["qq1","qq2"]，把 raw 链接填在这即可云端实时放行）
-    const CLOUD_WHITELIST_URL = "";
+    // 3. 默认内置通过的白名单 QQ 号（支持填多个）
+    const DEFAULT_WHITELIST = ["10001"];
 
-    // 4. 作者内置发卡器密码（在锁屏页连续点击顶部小锁图标 5 下，输入此密码即可打开算号器给别人生成激活码！）
-    const AUTHOR_ADMIN_PIN = "1102";
+    // 4. 默认内置永久拉黑的黑名单 QQ 号（填在这里的 QQ 永远无法进入！）
+    const DEFAULT_BLACKLIST = ["999999"];
 
-    // 5. 锁屏底部显示的作者联系方式提示
-    const AUTHOR_CONTACT_TIP = "本系统已开启防二传保护 · 请联系作者审核通过你的 QQ 号";
+    // 5. 默认群通用口令（留空 "" 则代表关闭群口令，必须白名单或专属码才能进；填了如 "seoul" 则输入任意未拉黑QQ + 该口令即可进）
+    const DEFAULT_GROUP_PASS = "";
 
-    const K_AUTH_STATE = "seoul_os_qq_auth_v1";
+    // 6. GitHub 云端配置文件 raw 地址（选填：把后台导出的 auth.json 传到你的 GitHub 仓库后，填上 raw 链接即可全网实时拉黑/放行！）
+    const GITHUB_AUTH_JSON_URL = "";
 
-    /* ──────────────────────────────────────────────────────────────────────
-       🔐 核心加密算法：根据【QQ号 + 作者私密盐值】生成唯一 6 位专属激活码
-       ────────────────────────────────────────────────────────────────────── */
-    function computeLicenseCode(qq) {
-        const cleanQQ = String(qq || "").trim();
-        const raw = `${cleanQQ}::${AUTHOR_SECRET_SALT}::SEOUL_LOCK`;
-        let h1 = 0x811c9dc5;
-        let h2 = 0x1b873593;
-        for (let i = 0; i < raw.length; i++) {
-            const ch = raw.charCodeAt(i);
-            h1 ^= ch;
-            h1 = Math.imul(h1, 0x01000193);
-            h2 ^= ch * (i + 1);
-            h2 = Math.imul(h2, 0x5bd1e995);
-        }
-        const part1 = (h1 >>> 0).toString(36).toUpperCase().padStart(4, "0").slice(-3);
-        const part2 = (h2 >>> 0).toString(36).toUpperCase().padStart(4, "0").slice(-3);
-        return `SL-${part1}${part2}`;
-    }
+    const K_AUTH_USER = "seoul_v13_user_login";
+    const K_ADMIN_DB = "seoul_v13_admin_db";
 
-    function getSavedAuth() {
-        try { return JSON.parse(localStorage.getItem(K_AUTH_STATE) || "null"); } catch (e) { return null; }
-    }
-    function saveAuth(qq, code) {
-        localStorage.setItem(K_AUTH_STATE, JSON.stringify({ qq: String(qq).trim(), code: String(code).trim().toUpperCase(), time: Date.now() }));
-    }
-
-    // 检查某个 QQ + 激活码是否合法（支持：作者白名单 / 云端 GitHub 白名单 / 专属激活码）
-    let cachedCloudList = null;
-    async function verifyQQAccess(qq, inputCode) {
-        const cleanQQ = String(qq || "").trim();
-        const cleanCode = String(inputCode || "").trim().toUpperCase();
-        if (!/^[1-9][0-9]{4,11}$/.test(cleanQQ)) {
-            return { ok: false, msg: "请输入正确的 5~12 位数字 QQ 号" };
-        }
-
-        // 1. 检查内置白名单
-        if (BUILTIN_WHITELIST_QQ.includes(cleanQQ)) {
-            return { ok: true, mode: "whitelist" };
-        }
-
-        // 2. 检查专属激活码（一Q一码）
-        const expectedCode = computeLicenseCode(cleanQQ);
-        if (cleanCode && cleanCode === expectedCode) {
-            return { ok: true, mode: "code" };
-        }
-
-        // 3. 检查 GitHub 云端白名单（若配置了 CLOUD_WHITELIST_URL）
-        if (CLOUD_WHITELIST_URL) {
-            try {
-                const res = await fetch(`${CLOUD_WHITELIST_URL}?t=${Date.now()}`);
-                if (res.ok) {
-                    const arr = await res.json();
-                    if (Array.isArray(arr) && arr.map(String).includes(cleanQQ)) {
-                        return { ok: true, mode: "cloud" };
-                    }
-                }
-            } catch (e) {}
-        }
-
-        if (!cleanCode) {
-            return { ok: false, msg: "该 QQ 号尚未在云端白名单通过，请输入作者发放的专属通行码！" };
-        }
-        return { ok: false, msg: "通行码与该 QQ 号不匹配！请等待作者手动审核通过。" };
-    }
-
-    /* ──────────────────────────────────────────────────────────────────────
-       🎬 挂载开屏动画与 iOS 锁屏登录层
-       ────────────────────────────────────────────────────────────────────── */
-    function mountBootLockSystem() {
+    function initV13MasterPatch() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
-        if (!modal) {
-            setTimeout(mountBootLockSystem, 350);
+        const btn = topDoc.getElementById("seoul-mini-theater-btn");
+        if (!modal || !btn) {
+            setTimeout(initV13MasterPatch, 300);
             return;
         }
 
-        topDoc.getElementById("seoul-boot-lock-style")?.remove();
-        topDoc.getElementById("seoul-boot-lock-layer")?.remove();
-
-        const lockStyle = topDoc.createElement("style");
-        lockStyle.id = "seoul-boot-lock-style";
-        lockStyle.innerHTML = `
-            html body #seoul-mini-theater-modal #seoul-boot-lock-layer {
-                position: absolute !important;
-                inset: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                z-index: 2147483647 !important;
-                background: #FFFFFF !important;
-                background-color: #FFFFFF !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                padding: max(24px, env(safe-area-inset-top, 24px)) 20px max(28px, env(safe-area-inset-bottom, 28px)) 20px !important;
-                box-sizing: border-box !important;
-                font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "SF Pro Display", "PingFang SC", sans-serif !important;
-                color: #3A3A40 !important;
-                transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease !important;
-                overflow: hidden !important;
+        // ── 1. 强制修复 PART 2 覆盖 PART 4 气泡颜色的 Bug，确保 #F8F8F8 长圆气泡 100% 生效 ──
+        topDoc.getElementById("seoul-v13-override-style")?.remove();
+        const ovStyle = topDoc.createElement("style");
+        ovStyle.id = "seoul-v13-override-style";
+        ovStyle.innerHTML = `
+            html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-row {
+                display: flex !important; align-items: flex-start !important; gap: 8px !important; max-width: 82% !important;
             }
-            /* 解锁上滑消失动画 */
-            html body #seoul-mini-theater-modal #seoul-boot-lock-layer.smt-unlocked-hide {
-                transform: translateY(-102%) !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
+            html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-ava {
+                margin-top: 1px !important; flex-shrink: 0 !important;
             }
-
-            /* 阶段1：开屏呼吸 Logo 舞台 */
-            html body #seoul-mini-theater-modal #smt-boot-splash {
-                position: absolute !important;
-                inset: 0 !important;
-                background: #FFFFFF !important;
-                z-index: 5 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
-                transition: opacity 0.45s ease !important;
+            html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-row.me .smt-wx-bubble {
+                background: var(--我的气泡底色, #F8F8F8) !important;
+                background-color: var(--我的气泡底色, #F8F8F8) !important;
+                color: var(--我的气泡字色, #3A3A40) !important;
+                -webkit-text-fill-color: var(--我的气泡字色, #3A3A40) !important;
+                border: 1px solid var(--我的气泡边框, #EAEAF0) !important;
+                border-radius: var(--气泡长圆角, 999px) !important;
+                padding: 7px 15px !important;
             }
-            html body #seoul-mini-theater-modal #smt-boot-splash.fade-out {
-                opacity: 0 !important;
-                pointer-events: none !important;
+            html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-row.ai .smt-wx-bubble {
+                background: var(--对方气泡底色, #FFFFFF) !important;
+                background-color: var(--对方气泡底色, #FFFFFF) !important;
+                color: var(--对方气泡字色, #333338) !important;
+                -webkit-text-fill-color: var(--对方气泡字色, #333338) !important;
+                border: 1px solid var(--对方气泡边框, #EAEAF0) !important;
+                border-radius: var(--气泡长圆角, 999px) !important;
+                padding: 7px 15px !important;
             }
-            @keyframes smtPulseFloat {
-                0%, 100% { transform: translateY(0px) scale(1); }
-                50% { transform: translateY(-5px) scale(1.03); }
-            }
-            @keyframes smtLoadProgress {
-                0% { width: 0%; }
-                60% { width: 78%; }
-                100% { width: 100%; }
-            }
-            html body #seoul-mini-theater-modal .smt-splash-logo {
-                width: 64px !important;
-                height: 64px !important;
+            html body #seoul-mini-theater-modal #smt-wx-stream .smt-wx-bubble.multiline {
                 border-radius: 20px !important;
-                background: #F8F8F8 !important;
-                border: 1.2px solid #EAEAF0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                margin-bottom: 16px !important;
-                animation: smtPulseFloat 2.4s ease-in-out infinite !important;
-            }
-            html body #seoul-mini-theater-modal .smt-splash-bar-wrap {
-                width: 120px !important;
-                height: 3px !important;
-                background: #EFEFF4 !important;
-                border-radius: 99px !important;
-                overflow: hidden !important;
-                margin-top: 18px !important;
-            }
-            html body #seoul-mini-theater-modal .smt-splash-bar-fill {
-                height: 100% !important;
-                background: #3A3A40 !important;
-                border-radius: 99px !important;
-                animation: smtLoadProgress 1.15s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
             }
 
-            /* 阶段2：韩系 iOS 锁屏大时钟与 QQ 验证卡 */
-            html body #seoul-mini-theater-modal .smt-lock-clock-box {
-                text-align: center !important;
-                margin-top: 12px !important;
+            /* ── 清冷忧郁韩系白灰开屏动画 & 锁屏门禁系统样式 ── */
+            html body #seoul-mini-theater-modal #seoul-melancholy-lock {
+                position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+                z-index: 2147483647 !important;
+                background: linear-gradient(180deg, #FFFFFF 0%, #F6F6F8 55%, #EFEFF3 100%) !important;
+                display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: space-between !important;
+                padding: max(20px, env(safe-area-inset-top, 20px)) 20px max(24px, env(safe-area-inset-bottom, 24px)) 20px !important;
+                box-sizing: border-box !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Serif KR", "PingFang SC", sans-serif !important;
+                color: #3A3A40 !important;
+                transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) !important;
+                overflow-y: auto !important;
             }
-            html body #seoul-mini-theater-modal .smt-lock-time {
-                font-size: 46px !important;
-                font-weight: 700 !important;
-                color: #2C2C32 !important;
-                letter-spacing: -1px !important;
-                line-height: 1.05 !important;
-            }
-            html body #seoul-mini-theater-modal .smt-lock-date {
-                font-size: 11px !important;
-                font-weight: 600 !important;
-                color: #8E8E98 !important;
-                letter-spacing: 0.6px !important;
-                margin-top: 6px !important;
+            html body #seoul-mini-theater-modal #seoul-melancholy-lock.smt-lock-hidden {
+                opacity: 0 !important; transform: scale(1.03) translateY(-20px) !important; pointer-events: none !important;
             }
 
-            html body #seoul-mini-theater-modal .smt-auth-card {
-                width: 100% !important;
-                max-width: 340px !important;
-                background: #F8F8F8 !important;
-                border: 1px solid #ECECF2 !important;
-                border-radius: 24px !important;
-                padding: 22px 18px !important;
-                box-sizing: border-box !important;
+            /* 忧郁白灰电影感开屏幕布 */
+            html body #seoul-mini-theater-modal #smt-cinema-splash {
+                position: absolute !important; inset: 0 !important; z-index: 10 !important;
+                background: linear-gradient(180deg, #FAFAFC 0%, #F2F2F6 100%) !important;
+                display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+                padding: 28px !important; box-sizing: border-box !important;
+                transition: opacity 0.7s ease !important;
+            }
+            html body #seoul-mini-theater-modal #smt-cinema-splash.splash-fade {
+                opacity: 0 !important; pointer-events: none !important;
+            }
+            @keyframes smtSlowBreathe {
+                0%, 100% { opacity: 0.35; transform: scale(0.96); }
+                50% { opacity: 0.95; transform: scale(1.04); }
+            }
+            @keyframes smtThinLine {
+                0% { width: 0%; opacity: 0.3; }
+                100% { width: 100%; opacity: 1; }
+            }
+            html body #seoul-mini-theater-modal .smt-melancholy-ring {
+                width: 82px !important; height: 82px !important; border-radius: 50% !important;
+                border: 1px solid #D5D5DE !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+                position: relative !important; margin-bottom: 24px !important;
+                animation: smtSlowBreathe 3.2s ease-in-out infinite !important;
+            }
+            html body #seoul-mini-theater-modal .smt-melancholy-ring::before {
+                content: "" !important; position: absolute !important; inset: 7px !important;
+                border-radius: 50% !important; border: 0.8px dashed #B8B8C4 !important;
+            }
+
+            /* 登录卡与管理员控制台卡片 */
+            html body #seoul-mini-theater-modal .smt-mono-box {
+                width: 100% !important; max-width: 356px !important;
+                background: rgba(255, 255, 255, 0.92) !important;
+                border: 1px solid #EAEAF0 !important; border-radius: 22px !important;
+                padding: 20px 18px !important; box-sizing: border-box !important;
                 text-align: center !important;
             }
-            html body #seoul-mini-theater-modal .smt-qq-ava-ring {
-                width: 66px !important;
-                height: 66px !important;
-                border-radius: 50% !important;
-                background: #FFFFFF !important;
-                border: 2px solid #EAEAF0 !important;
-                padding: 3px !important;
-                margin: 0 auto 12px auto !important;
-                box-sizing: border-box !important;
+            html body #seoul-mini-theater-modal .smt-mono-inp {
+                width: 100% !important; height: 36px !important;
+                background: #F8F8F8 !important; border: 1px solid #E6E6EC !important;
+                border-radius: 11px !important; padding: 0 12px !important;
+                font-size: 11.5px !important; color: #2C2C32 !important;
+                box-sizing: border-box !important; outline: none !important;
+                margin-bottom: 8px !important; text-align: center !important;
             }
-            html body #seoul-mini-theater-modal .smt-qq-ava-ring img {
-                width: 100% !important;
-                height: 100% !important;
-                border-radius: 50% !important;
-                object-fit: cover !important;
-                display: block !important;
-            }
-            html body #seoul-mini-theater-modal .smt-auth-inp {
-                width: 100% !important;
-                height: 38px !important;
-                background: #FFFFFF !important;
-                border: 1px solid #E4E4EC !important;
-                border-radius: 12px !important;
-                padding: 0 14px !important;
-                font-size: 12px !important;
-                color: #2C2C32 !important;
-                box-sizing: border-box !important;
-                outline: none !important;
-                margin-bottom: 9px !important;
-                text-align: center !important;
-                font-weight: 600 !important;
-            }
-            html body #seoul-mini-theater-modal .smt-auth-btn {
-                width: 100% !important;
-                height: 40px !important;
-                background: #3A3A40 !important;
-                color: #FFFFFF !important;
-                -webkit-text-fill-color: #FFFFFF !important;
-                border-radius: 12px !important;
-                font-size: 11.5px !important;
-                font-weight: 700 !important;
-                letter-spacing: 0.5px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                cursor: pointer !important;
-                margin-top: 4px !important;
-                transition: transform 0.12s ease !important;
-            }
-            html body #seoul-mini-theater-modal .smt-auth-btn:active {
-                transform: scale(0.98) !important;
+            html body #seoul-mini-theater-modal .smt-mono-btn {
+                width: 100% !important; height: 38px !important;
+                background: #3A3A40 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
+                border-radius: 11px !important; font-size: 10.5px !important; font-weight: 700 !important;
+                letter-spacing: 0.8px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+                cursor: pointer !important; margin-top: 4px !important;
             }
         `;
-        topDoc.head.appendChild(lockStyle);
+        topDoc.head.appendChild(ovStyle);
 
-        const lockSvgIcon = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#3A3A40" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
-        const smallLockSvg = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#6E6E77" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+        // ── 2. 注入酒馆「扩展面板 (#extensions_settings)」与「魔法棒菜单 (#extensionsMenu)」打开按钮 ──
+        function injectTavernButtons() {
+            const extSettings = topDoc.getElementById("extensions_settings") || topDoc.getElementById("extensions_settings2");
+            if (extSettings && !topDoc.getElementById("seoul-ext-settings-panel")) {
+                const panel = topDoc.createElement("div");
+                panel.id = "seoul-ext-settings-panel";
+                panel.className = "inline-drawer";
+                panel.innerHTML = `
+                    <div class="inline-drawer-toggle inline-drawer-header">
+                        <b>🤍 SEOUL OS · 韩系全屏手机系统</b>
+                        <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                    </div>
+                    <div class="inline-drawer-content" style="display:block;padding:10px;">
+                        <div style="display:flex;gap:6px;">
+                            <div id="seoul-ext-open-btn" class="menu_button" style="flex:1;text-align:center;padding:8px 0;font-weight:700;cursor:pointer;">📱 打开 SEOUL OS</div>
+                            <div id="seoul-ext-admin-btn" class="menu_button" style="width:90px;text-align:center;padding:8px 0;cursor:pointer;">🗝️ 管理员</div>
+                        </div>
+                    </div>
+                `;
+                extSettings.prepend(panel);
+                topDoc.getElementById("seoul-ext-open-btn")?.addEventListener("click", () => { btn.click(); });
+                topDoc.getElementById("seoul-ext-admin-btn")?.addEventListener("click", () => { btn.click(); setTimeout(openAdminConsole, 200); });
+            }
 
-        const lockLayer = topDoc.createElement("div");
-        lockLayer.id = "seoul-boot-lock-layer";
-        lockLayer.innerHTML = `
-            <!-- 阶段1：韩系开屏呼吸动画层 -->
-            <div id="smt-boot-splash">
-                <div class="smt-splash-logo">${lockSvgIcon}</div>
-                <div style="font-size:13px;font-weight:700;letter-spacing:2px;color:#2C2C32 !important;">SEOUL OS</div>
-                <div style="font-size:8.5px;color:#9A9AA5 !important;letter-spacing:1px;margin-top:4px;">PERSONAL COUPLE SYSTEM</div>
-                <div class="smt-splash-bar-wrap"><div class="smt-splash-bar-fill" id="smt-splash-bar"></div></div>
+            const wandMenu = topDoc.getElementById("extensionsMenu");
+            if (wandMenu && !topDoc.getElementById("seoul-wand-menu-item")) {
+                const item = topDoc.createElement("div");
+                item.id = "seoul-wand-menu-item";
+                item.className = "list-group-item flex-container flexGap5 interactable";
+                item.style.cursor = "pointer";
+                item.innerHTML = `<span>🤍</span><span>打开 SEOUL OS 手机系统</span>`;
+                item.addEventListener("click", () => { btn.click(); });
+                wandMenu.prepend(item);
+            }
+        }
+        injectTavernButtons();
+        setInterval(injectTavernButtons, 2000);
+
+        // ── 3. 管理员数据库（支持：白名单列表 / 永久拉黑列表 / 群通用口令 / GitHub 云端同步） ──
+        function getAdminDB() {
+            try {
+                const local = JSON.parse(localStorage.getItem(K_ADMIN_DB) || "{}");
+                return {
+                    whitelist: Array.from(new Set([...DEFAULT_WHITELIST, ...(local.whitelist || [])])),
+                    blacklist: Array.from(new Set([...DEFAULT_BLACKLIST, ...(local.blacklist || [])])),
+                    groupPass: local.groupPass !== undefined ? local.groupPass : DEFAULT_GROUP_PASS,
+                    ghToken: local.ghToken || "",
+                    ghRepo: local.ghRepo || "",
+                    ghPath: local.ghPath || "auth.json"
+                };
+            } catch (e) {
+                return { whitelist: DEFAULT_WHITELIST, blacklist: DEFAULT_BLACKLIST, groupPass: DEFAULT_GROUP_PASS, ghToken: "", ghRepo: "", ghPath: "auth.json" };
+            }
+        }
+        function saveAdminDB(db) {
+            localStorage.setItem(K_ADMIN_DB, JSON.stringify(db));
+        }
+
+        function calcCodeForQQ(qq) {
+            const raw = `${String(qq).trim()}::${AUTHOR_SALT}::LOCK`;
+            let h1 = 0x811c9dc5, h2 = 0x1b873593;
+            for (let i = 0; i < raw.length; i++) {
+                const c = raw.charCodeAt(i);
+                h1 = Math.imul(h1 ^ c, 0x01000193);
+                h2 = Math.imul(h2 ^ (c * (i + 1)), 0x5bd1e995);
+            }
+            return `SL-${(h1 >>> 0).toString(36).toUpperCase().slice(-3)}${(h2 >>> 0).toString(36).toUpperCase().slice(-3)}`;
+        }
+
+        // 核心鉴权：先查黑名单（一票否决） ➔ 再查白名单（免密直通） ➔ 再查群口令 / 专属激活码
+        async function checkQQAuth(qq, codeOrPass) {
+            const cleanQQ = String(qq || "").trim();
+            const cleanIn = String(codeOrPass || "").trim();
+            if (!/^[1-9][0-9]{4,11}$/.test(cleanQQ)) {
+                return { ok: false, banned: false, msg: "请输入正确的 5~12 位数字 QQ 号" };
+            }
+
+            let db = getAdminDB();
+
+            // 如果配置了 GitHub 云端 auth.json，实时拉取最新黑名单与白名单
+            if (GITHUB_AUTH_JSON_URL) {
+                try {
+                    const r = await fetch(`${GITHUB_AUTH_JSON_URL}?t=${Date.now()}`);
+                    if (r.ok) {
+                        const cloud = await r.json();
+                        if (Array.isArray(cloud.blacklist)) db.blacklist = Array.from(new Set([...db.blacklist, ...cloud.blacklist.map(String)]));
+                        if (Array.isArray(cloud.whitelist)) db.whitelist = Array.from(new Set([...db.whitelist, ...cloud.whitelist.map(String)]));
+                        if (cloud.groupPass !== undefined) db.groupPass = cloud.groupPass;
+                    }
+                } catch (e) {}
+            }
+
+            // 🚫 1. 最高优先级：检查是否在永久拉黑名单中！
+            if (db.blacklist.map(String).includes(cleanQQ)) {
+                return { ok: false, banned: true, msg: "🚫 ACCESS DENIED · 该 QQ 号已被作者永久拉黑封禁，禁止进入系统！" };
+            }
+
+            // ✅ 2. 检查是否在白名单中（白名单 QQ 免输任何口令直接进！）
+            if (db.whitelist.map(String).includes(cleanQQ)) {
+                return { ok: true, msg: "白名单验证通过" };
+            }
+
+            // ✅ 3. 检查是否匹配「群通用口令」
+            if (db.groupPass && cleanIn && cleanIn === db.groupPass) {
+                return { ok: true, msg: "群口令验证通过" };
+            }
+
+            // ✅ 4. 检查是否匹配「一Q一码专属激活码」
+            if (cleanIn && cleanIn.toUpperCase() === calcCodeForQQ(cleanQQ)) {
+                return { ok: true, msg: "专属通行码验证通过" };
+            }
+
+            return { ok: false, banned: false, msg: "未授权的 QQ 号！请联系作者加入白名单，或输入正确的通行口令。" };
+        }
+
+        // ── 4. 构建「清冷忧郁白灰电影感开屏 + 锁屏页 + 管理员全能后台」 ──
+        topDoc.getElementById("seoul-melancholy-lock")?.remove();
+        const lockEl = topDoc.createElement("div");
+        lockEl.id = "seoul-melancholy-lock";
+        lockEl.innerHTML = `
+            <!-- 阶段1：韩系清冷忧郁白灰电影感开屏动画 -->
+            <div id="smt-cinema-splash">
+                <div style="font-size:8px;letter-spacing:3px;color:#9A9AA5 !important;margin-bottom:28px;">ARCHIVE OF SILENCE · CHAPTER 01</div>
+                <div class="smt-melancholy-ring">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#484852" stroke-width="1.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+                <div style="font-size:14px;font-weight:600;letter-spacing:3.5px;color:#2C2C32 !important;margin-bottom:8px;">SEOUL · 36.5°C</div>
+                <div style="font-size:10px;color:#7A7A85 !important;letter-spacing:0.8px;line-height:1.8;text-align:center;font-weight:400;">
+                    서울의 회색빛 새벽, 우리가 머무는 고요한 방<br>
+                    <span style="font-size:8.8px;color:#9A9AA5 !important;">首尔灰白色的黎明，我们停留的寂静房间</span>
+                </div>
+                <div style="width:110px;height:1.5px;background:#E6E6EC !important;margin-top:26px;overflow:hidden;border-radius:99px;">
+                    <div id="smt-cinema-line" style="height:100%;background:#484852 !important;animation:smtThinLine 1.3s ease forwards;"></div>
+                </div>
             </div>
 
-            <!-- 顶部：退出按钮 + 隐藏作者发卡器触发点（连点小锁5下） -->
+            <!-- 锁屏顶栏：左退出 + 右侧显眼的【🗝️ ADMIN · 管理员后台】按钮 -->
             <div style="width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;">
-                <span class="smt-pill-btn" id="smt-lock-exit-btn" style="height:26px !important;padding:0 10px !important;">‹ 나가기 · 退出</span>
-                <span class="smt-pill-btn" id="smt-admin-secret-trigger" style="height:26px !important;padding:0 10px !important;cursor:pointer;" title="作者管理">
-                    ${smallLockSvg}<span>PROTECTED · 防二传锁</span>
-                </span>
+                <span class="smt-pill-btn" id="smt-mlock-exit">‹ 나가기 · 退出</span>
+                <span class="smt-pill-btn dark" id="smt-mlock-admin-btn" style="cursor:pointer;">🗝️ ADMIN · 管理员系统</span>
             </div>
 
-            <!-- 中上部：iOS 锁屏大时钟 -->
-            <div class="smt-lock-clock-box">
-                <div class="smt-lock-time" id="smt-lock-big-time">18:04</div>
-                <div class="smt-lock-date" id="smt-lock-big-date">SEOUL STANDARD TIME · KST</div>
+            <!-- 锁屏中部：清冷极简时间与登录卡片 -->
+            <div style="text-align:center;margin:6px 0;">
+                <div style="font-size:8.5px;letter-spacing:2.5px;color:#9A9AA5 !important;margin-bottom:4px;">MONOCHROME TERMINAL</div>
+                <div style="font-size:42px;font-weight:300;letter-spacing:1px;color:#2C2C32 !important;" id="smt-mlock-clock">18:04</div>
+                <div style="font-size:9.5px;color:#8E8E98 !important;letter-spacing:0.8px;margin-top:3px;" id="smt-mlock-poetic">“ 빗소리가 그치면, 네게 전화를 걸게 ”</div>
             </div>
 
-            <!-- 中部：QQ号登录与通行码核验卡片 -->
-            <div class="smt-auth-card" id="smt-user-auth-box">
-                <div class="smt-qq-ava-ring">
-                    <img id="smt-lock-qq-ava" src="https://i.postimg.cc/rydS6NvG/IMG-3866.jpg" />
+            <!-- 用户 QQ 登录卡片 -->
+            <div class="smt-mono-box" id="smt-mlock-user-card">
+                <div style="width:62px;height:62px;border-radius:50%;border:1px solid #DCDCE4;padding:3px;margin:0 auto 10px auto;background:#FFFFFF;">
+                    <img id="smt-mlock-ava" src="https://i.postimg.cc/rydS6NvG/IMG-3866.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;filter:grayscale(15%);" />
                 </div>
-                <div style="font-size:12.5px;font-weight:700;color:#2C2C32 !important;margin-bottom:3px;" id="smt-lock-welcome-title">ACCESS VERIFICATION</div>
-                <div style="font-size:9px;color:#8E8E98 !important;margin-bottom:14px;">请输入你的 QQ 号进行身份核验（自动拉取QQ头像）</div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:#2C2C32 !important;margin-bottom:2px;" id="smt-mlock-qq-label">IDENTIFICATION</div>
+                <div style="font-size:8.5px;color:#8E8E98 !important;margin-bottom:12px;">输入 QQ 号验证身份（白名单用户免填口令直接进入）</div>
 
-                <input type="text" class="smt-auth-inp" id="smt-auth-qq-inp" placeholder="输入你的 QQ 号码..." inputmode="numeric" />
-                <input type="text" class="smt-auth-inp" id="smt-auth-code-inp" placeholder="输入作者审核发放的专属通行码 (如 SL-XXXXXX)" />
+                <input type="text" class="smt-mono-inp" id="smt-mlock-qq-inp" placeholder="输入你的 QQ 号码..." inputmode="numeric" />
+                <input type="text" class="smt-mono-inp" id="smt-mlock-pass-inp" placeholder="通行口令 / 专属码 (若已加白名单可留空)" />
 
-                <div id="smt-auth-err-msg" style="font-size:9.5px;color:#9A6868 !important;font-weight:600;min-height:16px;margin-bottom:4px;"></div>
-
-                <div class="smt-auth-btn" id="smt-auth-submit-btn">UNLOCK SYSTEM · 验证并进入系统</div>
+                <div id="smt-mlock-err" style="font-size:9px;color:#9A5858 !important;font-weight:600;min-height:15px;margin-bottom:4px;line-height:1.4;"></div>
+                <div class="smt-mono-btn" id="smt-mlock-login-btn">ENTER TERMINAL · 验证进入</div>
             </div>
 
-            <!-- 👑 隐藏的作者专属算号发卡器（连点顶部 PROTECTED 小锁 5 下并输入作者密码开启） -->
-            <div class="smt-auth-card" id="smt-admin-keygen-box" style="display:none;border:1.5px solid #3A3A40 !important;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                    <b style="font-size:11px;color:#2C2C32 !important;">👑 作者专属 · 一Q一码发卡器</b>
-                    <span id="smt-admin-close-btn" style="cursor:pointer;font-size:11px;color:#8E8E98 !important;">✕ 关闭</span>
+            <!-- 👑 管理员全能控制台（含：1.拉黑封禁QQ  2.批量加白名单QQ  3.设置群通用口令  4.单人算码  5.导出/同步GitHub） -->
+            <div class="smt-mono-box" id="smt-mlock-admin-card" style="display:none;text-align:left !important;max-height:430px;overflow-y:auto;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #EAEAF0 !important;padding-bottom:8px;margin-bottom:10px;">
+                    <b style="font-size:11px;color:#2C2C32 !important;">🗝️ ADMIN CONSOLE · 防二传管理员系统</b>
+                    <span class="smt-pill-btn" id="smt-admin-back-lock">返回锁屏</span>
                 </div>
-                <div style="font-size:9px;color:#6E6E77 !important;margin-bottom:10px;text-align:left;line-height:1.5;">
-                    把申请人的 QQ 号填在下方，点击生成即可算出<b>只属于该 QQ 号的唯一通行码</b>（发给别人无效）：
+
+                <!-- 功能1：🚫 拉黑封禁 QQ 号（永远进不来！） -->
+                <div style="background:#F8F8F8 !important;border:1px solid #ECECF2 !important;border-radius:12px;padding:9px 10px;margin-bottom:8px;">
+                    <div style="font-size:9.5px;font-weight:700;color:#8E5050 !important;margin-bottom:4px;">🚫 1. 永久拉黑 QQ 号（黑名单用户永远无法进入）</div>
+                    <div style="display:flex;gap:5px;margin-bottom:5px;">
+                        <input type="text" id="smt-adm-black-inp" class="smt-wx-input" style="height:26px !important;font-size:10px !important;" placeholder="输入要拉黑的QQ号(支持多个用空格隔开)..." />
+                        <span class="smt-pill-btn dark" id="smt-adm-black-add" style="background:#7A4848 !important;">＋拉黑</span>
+                    </div>
+                    <div id="smt-adm-black-list" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
                 </div>
-                <input type="text" class="smt-auth-inp" id="smt-keygen-qq-inp" placeholder="输入申请人的 QQ 号..." />
-                <div style="background:#FFFFFF !important;border:1px dashed #484852 !important;border-radius:10px;padding:10px;margin-bottom:10px;font-family:monospace;font-size:14px;font-weight:700;color:#2C2C32 !important;" id="smt-keygen-output">等待生成...</div>
-                <div class="smt-auth-btn" id="smt-keygen-run-btn">生成该 QQ 专属通行码并复制</div>
+
+                <!-- 功能2：✅ 批量添加白名单 QQ 号（免密直接进！） -->
+                <div style="background:#F8F8F8 !important;border:1px solid #ECECF2 !important;border-radius:12px;padding:9px 10px;margin-bottom:8px;">
+                    <div style="font-size:9.5px;font-weight:700;color:#2C2C32 !important;margin-bottom:4px;">✅ 2. 免密白名单 QQ（填在这里的QQ免输口令直接秒进）</div>
+                    <div style="display:flex;gap:5px;margin-bottom:5px;">
+                        <input type="text" id="smt-adm-white-inp" class="smt-wx-input" style="height:26px !important;font-size:10px !important;" placeholder="支持一次粘贴多个QQ号(空格或换行隔开)..." />
+                        <span class="smt-pill-btn dark" id="smt-adm-white-add">＋加白名单</span>
+                    </div>
+                    <div id="smt-adm-white-list" style="display:flex;flex-wrap:wrap;gap:4px;max-height:68px;overflow-y:auto;"></div>
+                </div>
+
+                <!-- 功能3：📢 设置群通用口令（最省心！不用挨个算码） -->
+                <div style="background:#F8F8F8 !important;border:1px solid #ECECF2 !important;border-radius:12px;padding:9px 10px;margin-bottom:8px;">
+                    <div style="font-size:9.5px;font-weight:700;color:#2C2C32 !important;margin-bottom:3px;">📢 3. 设置 Q群/全员通用口令（免去挨个私信算码！）</div>
+                    <div style="font-size:8px;color:#7A7A85 !important;margin-bottom:5px;">设置后，未拉黑的用户输入【自己的QQ + 此群口令】即可进入；留空则关闭群口令。</div>
+                    <div style="display:flex;gap:5px;">
+                        <input type="text" id="smt-adm-gpass-inp" class="smt-wx-input" style="height:26px !important;font-size:10px !important;" placeholder="如: seoul0520 (留空则仅限白名单/专属码)" />
+                        <span class="smt-pill-btn dark" id="smt-adm-gpass-save">保存口令</span>
+                    </div>
+                </div>
+
+                <!-- 功能4：🔐 单人一Q一码生成器 -->
+                <div style="background:#F8F8F8 !important;border:1px solid #ECECF2 !important;border-radius:12px;padding:9px 10px;margin-bottom:8px;">
+                    <div style="font-size:9.5px;font-weight:700;color:#2C2C32 !important;margin-bottom:4px;">🔐 4. 单人专属激活码生成（一Q一码死绑定）</div>
+                    <div style="display:flex;gap:5px;">
+                        <input type="text" id="smt-adm-keygen-inp" class="smt-wx-input" style="height:26px !important;font-size:10px !important;" placeholder="输入对方QQ号..." />
+                        <span class="smt-pill-btn dark" id="smt-adm-keygen-btn">算码并复制</span>
+                    </div>
+                </div>
+
+                <!-- 功能5：☁️ 导出云控 JSON 或直接进入系统 -->
+                <div style="display:flex;justify-content:space-between;gap:5px;">
+                    <span class="smt-pill-btn" id="smt-adm-export-json" style="flex:1;">📋 复制云端 auth.json</span>
+                    <span class="smt-pill-btn dark" id="smt-adm-direct-enter" style="flex:1;">✓ 直接进入系统</span>
+                </div>
             </div>
 
-            <!-- 底部版权与防二传提示 -->
-            <div style="text-align:center;font-size:8.8px;color:#9A9AA5 !important;letter-spacing:0.3px;">
+            <!-- 底部清冷灰字说明 -->
+            <div style="text-align:center;font-size:8px;color:#A0A0AA !important;letter-spacing:0.6px;">
                 <div>${AUTHOR_CONTACT_TIP}</div>
-                <div style="margin-top:3px;font-size:7.8px;opacity:0.75;">SEOUL PERSONAL OS · UNAUTHORIZED REDISTRIBUTION PROHIBITED</div>
             </div>
         `;
-        modal.appendChild(lockLayer);
+        modal.appendChild(lockEl);
 
-        // 更新锁屏实时时钟
-        function updateLockClock() {
-            const now = new Date();
-            const hh = String(now.getHours()).padStart(2, "0");
-            const mm = String(now.getMinutes()).padStart(2, "0");
-            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-            const tEl = topDoc.getElementById("smt-lock-big-time");
-            const dEl = topDoc.getElementById("smt-lock-big-date");
-            if (tEl) tEl.textContent = `${hh}:${mm}`;
-            if (dEl) dEl.textContent = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${days[now.getDay()]} · SEOUL OS`;
-        }
-        updateLockClock();
-        setInterval(updateLockClock, 10000);
-
-        // 当输入 QQ 号时，实时拉取真实高清 QQ 头像显示在锁屏中央！
-        const qqInp = topDoc.getElementById("smt-auth-qq-inp");
-        const codeInp = topDoc.getElementById("smt-auth-code-inp");
-        const avaImg = topDoc.getElementById("smt-lock-qq-ava");
-        const errEl = topDoc.getElementById("smt-auth-err-msg");
-
-        qqInp.addEventListener("input", () => {
-            const val = qqInp.value.trim();
-            if (/^[1-9][0-9]{4,11}$/.test(val)) {
-                avaImg.src = `https://q1.qlogo.cn/g?b=qq&nk=${val}&s=640`;
-                topDoc.getElementById("smt-lock-welcome-title").textContent = `QQ: ${val}`;
-            }
-        });
-
-        // 预填上次保存的 QQ 与激活码
-        const saved = getSavedAuth();
-        if (saved && saved.qq) {
-            qqInp.value = saved.qq;
-            codeInp.value = saved.code || "";
-            avaImg.src = `https://q1.qlogo.cn/g?b=qq&nk=${saved.qq}&s=640`;
-            topDoc.getElementById("smt-lock-welcome-title").textContent = `WELCOME BACK · ${saved.qq}`;
+        // 在主界面顶栏右侧也加一个【🗝️ 锁屏/管理】按钮，解决“白名单自动跳进去后点不到锁屏后台”的问题！
+        const topBadge = topDoc.getElementById("smt-top-badge");
+        if (topBadge && !topDoc.getElementById("smt-top-admin-entry")) {
+            const admBtn = topDoc.createElement("span");
+            admBtn.id = "smt-top-admin-entry";
+            admBtn.className = "smt-header-right";
+            admBtn.style.marginLeft = "4px";
+            admBtn.textContent = "🗝️ 管理/锁屏";
+            admBtn.onclick = () => {
+                lockEl.classList.remove("smt-lock-hidden");
+                topDoc.getElementById("smt-cinema-splash")?.classList.add("splash-fade");
+            };
+            topBadge.parentNode.appendChild(admBtn);
         }
 
-        // 点击退出按钮直接关闭弹窗
-        topDoc.getElementById("smt-lock-exit-btn").onclick = () => {
-            modal.classList.remove("smt-open");
-        };
+        // 渲染管理员后台的黑白名单标签
+        function renderAdminLists() {
+            const db = getAdminDB();
+            topDoc.getElementById("smt-adm-gpass-inp").value = db.groupPass || "";
 
-        // 点击「验证并进入系统」
-        topDoc.getElementById("smt-auth-submit-btn").onclick = async (e) => {
-            const qq = qqInp.value.trim();
-            const code = codeInp.value.trim();
-            e.target.textContent = "⏳ 正在核验授权...";
-            errEl.textContent = "";
+            const bBox = topDoc.getElementById("smt-adm-black-list");
+            bBox.innerHTML = db.blacklist.length
+                ? db.blacklist.map((q, i) => `<span class="smt-pill-btn" data-delblack="${i}" style="height:20px !important;font-size:8px !important;background:#FFF5F5 !important;color:#8E5050 !important;border-color:#E8D0D0 !important;">🚫 ${q} ✕</span>`).join("")
+                : `<span style="font-size:8px;color:#9A9AA5 !important;">暂无拉黑QQ</span>`;
+            bBox.querySelectorAll("[data-delblack]").forEach((el) => el.onclick = () => {
+                const d = getAdminDB(); d.blacklist.splice(Number(el.getAttribute("data-delblack")), 1); saveAdminDB(d); renderAdminLists();
+            });
 
-            const res = await verifyQQAccess(qq, code);
-            if (res.ok) {
-                saveAuth(qq, code || computeLicenseCode(qq));
-                e.target.textContent = "✓ 验证通过 · 正在解锁系统...";
-                setTimeout(() => {
-                    lockLayer.classList.add("smt-unlocked-hide");
-                }, 220);
-            } else {
-                errEl.textContent = `✕ ${res.msg}`;
-                e.target.textContent = "UNLOCK SYSTEM · 验证并进入系统";
+            const wBox = topDoc.getElementById("smt-adm-white-list");
+            wBox.innerHTML = db.whitelist.length
+                ? db.whitelist.map((q, i) => `<span class="smt-pill-btn" data-delwhite="${i}" style="height:20px !important;font-size:8px !important;">✓ ${q} ✕</span>`).join("")
+                : `<span style="font-size:8px;color:#9A9AA5 !important;">暂无白名单QQ</span>`;
+            wBox.querySelectorAll("[data-delwhite]").forEach((el) => el.onclick = () => {
+                const d = getAdminDB(); d.whitelist.splice(Number(el.getAttribute("data-delwhite")), 1); saveAdminDB(d); renderAdminLists();
+            });
+        }
+
+        function openAdminConsole() {
+            const pin = prompt("🗝️ 请输入作者管理员密码：");
+            if (pin === ADMIN_MASTER_PIN) {
+                lockEl.classList.remove("smt-lock-hidden");
+                topDoc.getElementById("smt-cinema-splash")?.classList.add("splash-fade");
+                topDoc.getElementById("smt-mlock-user-card").style.display = "none";
+                topDoc.getElementById("smt-mlock-admin-card").style.display = "block";
+                renderAdminLists();
+            } else if (pin !== null) {
+                alert("管理员密码错误！");
             }
+        }
+
+        topDoc.getElementById("smt-mlock-admin-btn").onclick = () => openAdminConsole();
+        topDoc.getElementById("smt-admin-back-lock").onclick = () => {
+            topDoc.getElementById("smt-mlock-admin-card").style.display = "none";
+            topDoc.getElementById("smt-mlock-user-card").style.display = "block";
         };
 
-        // 👑 连点顶部「PROTECTED · 防二传锁」5 下，输入作者密码即可打开内置算号发卡器！
-        let secretTapCount = 0;
-        let secretTapTimer = null;
-        topDoc.getElementById("smt-admin-secret-trigger").onclick = () => {
-            secretTapCount++;
-            clearTimeout(secretTapTimer);
-            secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 1500);
-            if (secretTapCount >= 5) {
-                secretTapCount = 0;
-                const pin = prompt("👑 作者后台验证 · 请输入作者管理密码：");
-                if (pin === AUTHOR_ADMIN_PIN) {
-                    topDoc.getElementById("smt-user-auth-box").style.display = "none";
-                    topDoc.getElementById("smt-admin-keygen-box").style.display = "block";
-                } else if (pin !== null) {
-                    alert("密码错误！");
-                }
-            }
+        // 管理员操作：拉黑 QQ / 加白名单 QQ / 改群口令 / 算码 / 导出云端 JSON
+        topDoc.getElementById("smt-adm-black-add").onclick = () => {
+            const raw = topDoc.getElementById("smt-adm-black-inp").value.trim(); if (!raw) return;
+            const qqs = raw.split(/[\s,，;；\n]+/).map((s) => s.trim()).filter((s) => /^[1-9][0-9]{4,11}$/.test(s));
+            const db = getAdminDB();
+            db.blacklist = Array.from(new Set([...qqs, ...db.blacklist]));
+            // 同时从白名单移除被拉黑的QQ
+            db.whitelist = db.whitelist.filter((x) => !qqs.includes(String(x)));
+            saveAdminDB(db);
+            topDoc.getElementById("smt-adm-black-inp").value = "";
+            renderAdminLists();
+            alert(`🚫 已将 ${qqs.join(", ")} 永久拉黑！`);
         };
 
-        topDoc.getElementById("smt-admin-close-btn").onclick = () => {
-            topDoc.getElementById("smt-admin-keygen-box").style.display = "none";
-            topDoc.getElementById("smt-user-auth-box").style.display = "block";
+        topDoc.getElementById("smt-adm-white-add").onclick = () => {
+            const raw = topDoc.getElementById("smt-adm-white-inp").value.trim(); if (!raw) return;
+            const qqs = raw.split(/[\s,，;；\n]+/).map((s) => s.trim()).filter((s) => /^[1-9][0-9]{4,11}$/.test(s));
+            const db = getAdminDB();
+            db.whitelist = Array.from(new Set([...qqs, ...db.whitelist]));
+            saveAdminDB(db);
+            topDoc.getElementById("smt-adm-white-inp").value = "";
+            renderAdminLists();
+            alert(`✓ 已批量添加 ${qqs.length} 个白名单 QQ！`);
         };
 
-        topDoc.getElementById("smt-keygen-run-btn").onclick = () => {
-            const targetQQ = topDoc.getElementById("smt-keygen-qq-inp").value.trim();
-            if (!/^[1-9][0-9]{4,11}$/.test(targetQQ)) {
-                return alert("请输入申请人正确的纯数字 QQ 号！");
-            }
-            const code = computeLicenseCode(targetQQ);
-            topDoc.getElementById("smt-keygen-output").textContent = `QQ: ${targetQQ} ➔ ${code}`;
+        topDoc.getElementById("smt-adm-gpass-save").onclick = () => {
+            const db = getAdminDB();
+            db.groupPass = topDoc.getElementById("smt-adm-gpass-inp").value.trim();
+            saveAdminDB(db);
+            alert(db.groupPass ? `✓ 已设置全员通用口令：「${db.groupPass}」` : "✓ 已关闭通用口令（仅限白名单或单人专属码进入）");
+        };
+
+        topDoc.getElementById("smt-adm-keygen-btn").onclick = () => {
+            const q = topDoc.getElementById("smt-adm-keygen-inp").value.trim();
+            if (!/^[1-9][0-9]{4,11}$/.test(q)) return alert("请输入正确的数字 QQ 号！");
+            const code = calcCodeForQQ(q);
             navigator.clipboard?.writeText(code);
-            alert(`✓ 已生成【QQ: ${targetQQ}】的专属唯一通行码：\n\n${code}\n\n（已自动复制到剪贴板，直接发给该用户即可！）`);
+            alert(`✓ QQ【${q}】的专属唯一激活码：\n\n${code}\n\n（已复制到剪贴板！）`);
         };
 
-        // 每次打开 SEOUL OS 时触发开屏动画：
-        // 若已验证通过，播放 1.1 秒高级开屏动画后自动丝滑上滑进入；若未验证通过，播完开屏动画后停在 QQ 锁屏页拦截！
-        async function triggerBootSequence() {
-            const splash = topDoc.getElementById("smt-boot-splash");
-            const bar = topDoc.getElementById("smt-splash-bar");
-            lockLayer.classList.remove("smt-unlocked-hide");
-            splash.classList.remove("fade-out");
-            if (bar) {
-                bar.style.animation = "none";
-                void bar.offsetWidth;
-                bar.style.animation = "smtLoadProgress 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards";
-            }
+        topDoc.getElementById("smt-adm-export-json").onclick = () => {
+            const db = getAdminDB();
+            const jsonStr = JSON.stringify({ whitelist: db.whitelist, blacklist: db.blacklist, groupPass: db.groupPass }, null, 2);
+            navigator.clipboard?.writeText(jsonStr);
+            alert("✓ 已复制云控 JSON 配置！\n你可以把它粘贴到你 GitHub 仓库的 auth.json 文件中，全网所有用户端将实时同步你的黑名单与白名单！");
+        };
 
-            updateLockClock();
-            const curSaved = getSavedAuth();
-            let alreadyAuthorized = false;
-            if (curSaved && curSaved.qq) {
-                const chk = await verifyQQAccess(curSaved.qq, curSaved.code);
-                alreadyAuthorized = chk.ok;
-            }
+        topDoc.getElementById("smt-adm-direct-enter").onclick = () => {
+            lockEl.classList.add("smt-lock-hidden");
+        };
 
+        // 用户锁屏输入与登录
+        const qqInp = topDoc.getElementById("smt-mlock-qq-inp");
+        const passInp = topDoc.getElementById("smt-mlock-pass-inp");
+        const avaImg = topDoc.getElementById("smt-mlock-ava");
+        const errBox = topDoc.getElementById("smt-mlock-err");
+
+        qqInp.oninput = () => {
+            const v = qqInp.value.trim();
+            if (/^[1-9][0-9]{4,11}$/.test(v)) {
+                avaImg.src = `https://q1.qlogo.cn/g?b=qq&nk=${v}&s=640`;
+                topDoc.getElementById("smt-mlock-qq-label").textContent = `ID · ${v}`;
+            }
+        };
+
+        try {
+            const saved = JSON.parse(localStorage.getItem(K_AUTH_USER) || "null");
+            if (saved && saved.qq) {
+                qqInp.value = saved.qq;
+                passInp.value = saved.pass || "";
+                avaImg.src = `https://q1.qlogo.cn/g?b=qq&nk=${saved.qq}&s=640`;
+                topDoc.getElementById("smt-mlock-qq-label").textContent = `ID · ${saved.qq}`;
+            }
+        } catch (e) {}
+
+        topDoc.getElementById("smt-mlock-exit").onclick = () => modal.classList.remove("smt-open");
+
+        topDoc.getElementById("smt-mlock-login-btn").onclick = async (e) => {
+            const q = qqInp.value.trim(), p = passInp.value.trim();
+            e.target.textContent = "VERIFYING...";
+            errBox.textContent = "";
+            const res = await checkQQAuth(q, p);
+            if (res.ok) {
+                localStorage.setItem(K_AUTH_USER, JSON.stringify({ qq: q, pass: p }));
+                e.target.textContent = "✓ ACCESS GRANTED";
+                setTimeout(() => {
+                    lockEl.classList.add("smt-lock-hidden");
+                    e.target.textContent = "ENTER TERMINAL · 验证进入";
+                }, 250);
+            } else {
+                errBox.textContent = res.msg;
+                e.target.textContent = res.banned ? "🚫 BANNED ID" : "ENTER TERMINAL · 验证进入";
+            }
+        };
+
+        // 每次点开插件时：播放 1.35 秒清冷白灰开屏动画 ➔ 停留在锁屏界面（方便你点右上角 ADMIN 管理，或点一下 ENTER 直接进）
+        function playMelancholyBoot() {
+            const now = new Date();
+            topDoc.getElementById("smt-mlock-clock").textContent = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+            const splash = topDoc.getElementById("smt-cinema-splash");
+            const line = topDoc.getElementById("smt-cinema-line");
+            lockEl.classList.remove("smt-lock-hidden");
+            splash.classList.remove("splash-fade");
+            if (line) {
+                line.style.animation = "none";
+                void line.offsetWidth;
+                line.style.animation = "smtThinLine 1.3s ease forwards";
+            }
             setTimeout(() => {
-                splash.classList.add("fade-out");
-                if (alreadyAuthorized) {
-                    // 已授权用户：播完开屏动画后直接丝滑上滑解锁进主界面！
-                    setTimeout(() => {
-                        lockLayer.classList.add("smt-unlocked-hide");
-                    }, 220);
-                }
-            }, 1050);
+                splash.classList.add("splash-fade");
+            }, 1350);
         }
 
-        // 监听全屏弹窗的打开动作，每次点开自动播放开屏动画与鉴权检查
-        let wasOpen = modal.classList.contains("smt-open");
-        const observer = new MutationObserver(() => {
-            const isOpen = modal.classList.contains("smt-open");
-            if (isOpen && !wasOpen) {
-                triggerBootSequence();
-            }
-            wasOpen = isOpen;
-        });
-        observer.observe(modal, { attributes: true, attributeFilter: ["class"] });
+        let prevOpen = modal.classList.contains("smt-open");
+        new MutationObserver(() => {
+            const curOpen = modal.classList.contains("smt-open");
+            if (curOpen && !prevOpen) playMelancholyBoot();
+            prevOpen = curOpen;
+        }).observe(modal, { attributes: true, attributeFilter: ["class"] });
 
-        if (wasOpen) triggerBootSequence();
+        if (prevOpen) playMelancholyBoot();
     }
 
-    mountBootLockSystem();
+    initV13MasterPatch();
 })();
