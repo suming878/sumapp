@@ -5561,7 +5561,7 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// ❄️ 【Sumoul App 有情树 · 保留粗壮千年霜白树身 + 6大擎天主枝 + 2600片极茂密繁叶华盖 + 右中留白零遮挡终极版】
+// ❄️ 【Sumoul App 有情树 · 4500片超浓密遮天华盖 + 彻底移除介绍卡片 + 保留粗壮千年霜白树身终极版】
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
@@ -5608,16 +5608,15 @@ bootSumoulApp();
 
     function getTreeKey() { return `sumoul_v16_lush_colossal_tree__${getCtx().safeScope}`; }
 
-    // 默认记忆叶分布在树冠中下层枝头 (Y: 20% ~ 38%, X: 12% ~ 58%)，绝对不碰顶栏，也不碰中右侧标题区！
     function createDefaultTree(charName, userName) {
         return {
             activeId: 101,
             leaves: [
-                { id: 101, title: "初雪揣进口袋的指尖", date: "12.04", author: charName, joy: 96, xPct: 22, yPct: 22, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
-                { id: 102, title: "凌晨三点的秒回", date: "11.28", author: userName, joy: 90, xPct: 42, yPct: 19, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
+                { id: 101, title: "初雪揣进口袋的指尖", date: "12.04", author: charName, joy: 96, xPct: 22, yPct: 20, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
+                { id: 102, title: "凌晨三点的秒回", date: "11.28", author: userName, joy: 90, xPct: 44, yPct: 16, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
                 { id: 103, title: "耳机分你一半的午后", date: "11.20", author: charName, joy: 82, xPct: 14, yPct: 33, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
-                { id: 104, title: "微雨夜屋檐下的对视", date: "11.15", author: charName, joy: 66, xPct: 34, yPct: 30, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
-                { id: 105, title: "吃醋时别扭的沉默", date: "11.09", author: userName, joy: 45, xPct: 54, yPct: 25, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
+                { id: 104, title: "微雨夜屋檐下的对视", date: "11.15", author: charName, joy: 66, xPct: 35, yPct: 29, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
+                { id: 105, title: "吃醋时别扭的沉默", date: "11.09", author: userName, joy: 45, xPct: 58, yPct: 23, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
                 { id: 106, title: "短暂分别时的酸涩", date: "11.02", author: charName, joy: 18, xPct: 26, yPct: 39, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
             ]
         };
@@ -5635,10 +5634,10 @@ bootSumoulApp();
 
     function getLeafStyleByJoy(joy = 85) {
         const j = Math.max(0, Math.min(100, Number(joy) || 85));
-        if (j >= 85) return { grad1: "#FFFFFF", grad2: "#F2F5FA", stroke: "#8E94A4", vein: "#B8C0D0", glow: "drop-shadow(0 0 10px #FFFFFF) drop-shadow(0 3px 7px rgba(70,76,92,0.18))", label: `极开心 ${j}% · 冰魄霜白叶` };
-        if (j >= 65) return { grad1: "#EBF0F7", grad2: "#D2D8E6", stroke: "#767C8E", vein: "#9AA2B4", glow: "drop-shadow(0 0 8px rgba(255,255,255,0.85)) drop-shadow(0 3px 7px rgba(70,76,92,0.18))", label: `愉悦 ${j}% · 雾凇浅银叶` };
-        if (j >= 40) return { grad1: "#B0B6C6", grad2: "#8890A2", stroke: "#525868", vein: "#727888", glow: "drop-shadow(0 4px 10px rgba(70,76,92,0.28))", label: `微涩 ${j}% · 冷月烟灰叶` };
-        return { grad1: "#4C505E", grad2: "#2C2F3A", stroke: "#1C1E26", vein: "#767C8C", glow: "drop-shadow(0 6px 14px rgba(20,22,30,0.45))", label: `思念 ${j}% · 寒夜深炭叶` };
+        if (j >= 85) return { grad1: "#FFFFFF", grad2: "#F2F5FA", stroke: "#8E94A4", vein: "#B8C0D0", glow: "drop-shadow(0 0 10px #FFFFFF) drop-shadow(0 3px 7px rgba(50,56,72,0.22))", label: `极开心 ${j}% · 冰魄霜白叶` };
+        if (j >= 65) return { grad1: "#EBF0F7", grad2: "#D2D8E6", stroke: "#767C8E", vein: "#9AA2B4", glow: "drop-shadow(0 0 8px rgba(255,255,255,0.85)) drop-shadow(0 3px 7px rgba(50,56,72,0.22))", label: `愉悦 ${j}% · 雾凇浅银叶` };
+        if (j >= 40) return { grad1: "#B0B6C6", grad2: "#8890A2", stroke: "#525868", vein: "#727888", glow: "drop-shadow(0 4px 10px rgba(60,66,82,0.32))", label: `微涩 ${j}% · 冷月烟灰叶` };
+        return { grad1: "#4C505E", grad2: "#2C2F3A", stroke: "#1C1E26", vein: "#767C8C", glow: "drop-shadow(0 6px 14px rgba(20,22,30,0.48))", label: `思念 ${j}% · 寒夜深炭叶` };
     }
 
     function renderRealisticLeafSvg(id, joy, isSel, idx) {
@@ -5687,10 +5686,10 @@ bootSumoulApp();
         };
     }
 
-    function mountLushColossalFrostTree() {
+    function mountUltraDenseFrostTree() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountLushColossalFrostTree, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountUltraDenseFrostTree, 200); return; }
 
         topDoc.getElementById("smt-page-memory_tree")?.remove();
         topDoc.getElementById("smt-real-tree-overlay")?.remove();
@@ -5702,7 +5701,7 @@ bootSumoulApp();
             @keyframes mtLeafGentleSway { 0%, 100% { transform: translate(-50%, 0) rotate(-2deg); } 50% { transform: translate(-50%, 0) rotate(2.5deg); } }
             #seoul-mini-theater-modal #smt-real-tree-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: linear-gradient(170deg, #ECEFF6 0%, #F4F6FA 48%, #FFFFFF 100%) !important;
+                background: linear-gradient(170deg, #E8ECF5 0%, #F2F5FA 48%, #FFFFFF 100%) !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
@@ -5712,7 +5711,7 @@ bootSumoulApp();
             #seoul-mini-theater-modal .mt-hanging-leaf { position: absolute !important; transform-origin: top center !important; display: flex !important; flex-direction: column !important; align-items: center !important; cursor: grab !important; touch-action: none !important; pointer-events: auto !important; z-index: 12 !important; animation: mtLeafGentleSway 4.8s ease-in-out infinite !important; }
             #seoul-mini-theater-modal .mt-hanging-leaf.dragging { cursor: grabbing !important; animation: none !important; transform: translate(-50%, 0) scale(1.18) !important; z-index: 60 !important; }
             #seoul-mini-theater-modal .mt-hanging-leaf.selected-leaf { z-index: 45 !important; }
-            #seoul-mini-theater-modal .mt-leaf-label { margin-top: 2px !important; padding: 1.5px 6px !important; border-radius: 99px !important; font-size: 7.5px !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(20,22,30,0.12), 0 0 0 1px #FFFFFF !important; white-space: nowrap !important; pointer-events: none !important; }
+            #seoul-mini-theater-modal .mt-leaf-label { margin-top: 2px !important; padding: 1.5px 6px !important; border-radius: 99px !important; font-size: 7.5px !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(20,22,30,0.14), 0 0 0 1px #FFFFFF !important; white-space: nowrap !important; pointer-events: none !important; }
             #seoul-mini-theater-modal .mt-glass-pill { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; height: 28px !important; padding: 0 11px !important; border-radius: 999px !important; background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important; border: 1px solid #E2E5EE !important; font-size: 9.2px !important; font-weight: 700 !important; color: #3A3D46 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 20, 30, 0.04) !important; }
             #seoul-mini-theater-modal .mt-glass-pill.dark { background: #3A3D46 !important; border-color: #3A3D46 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
             #seoul-mini-theater-modal .mt-float-card { background: rgba(255, 255, 255, 0.94) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important; border: 1px solid #E2E5EE !important; border-radius: 18px !important; padding: 12px 14px !important; box-shadow: 0 12px 36px rgba(20, 20, 35, 0.08) !important; }
@@ -5734,26 +5733,12 @@ bootSumoulApp();
             <canvas id="mt-ancient-canvas"></canvas>
             <div id="mt-leaves-stage"></div>
 
-            <!-- 顶部导航条 -->
+            <!-- 顶部极简导航条（已彻底去掉右侧碍事的介绍卡片！） -->
             <div style="position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top,14px)) 14px 0 14px;pointer-events:none;">
                 <span class="mt-glass-pill" id="mt-close-btn" style="pointer-events:auto;">${MT_ICO.back}<span>返回主页</span></span>
                 <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
                     <span class="mt-glass-pill" style="pointer-events:none;">${MT_ICO.leaf}<span id="mt-count-txt">6 片记忆叶</span></span>
                     <span class="mt-glass-pill" id="mt-list-btn">${MT_ICO.list}<span>叶册名录</span></span>
-                </div>
-            </div>
-
-            <!-- 右侧中下部净空留白区 (top: 45%)：位于茂密树冠正下方、右侧完全空白处，100% 绝不被树枝或叶片挡住！ -->
-            <div style="position:absolute;top:45%;right:16px;z-index:20;text-align:right;pointer-events:none;background:rgba(255,255,255,0.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:9px 12px;border-radius:14px;border:1px solid #E4E7F0;box-shadow:0 4px 16px rgba(20,22,30,0.03);">
-                <div style="font-size:15px;font-weight:800;color:#3A3D46;letter-spacing:3.5px;">千年有情木</div>
-                <div style="font-size:6.8px;font-weight:700;color:#8E94A4;letter-spacing:1.6px;margin-top:2px;">천년의 나무 · SACRED CANOPY</div>
-                <div style="font-size:7.5px;color:#6E7484;margin-top:4px;">点选叶片读回忆 · 按住可拖往任意霜枝</div>
-                <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding-top:4px;border-top:1px solid #ECEEF5;">
-                    <span style="width:6px;height:6px;border-radius:50%;background:#FFFFFF;border:1px solid #969CAC;"></span>
-                    <span style="font-size:7px;font-weight:700;color:#484C58;">开心霜白</span>
-                    <span style="width:10px;height:1px;background:linear-gradient(90deg,#D5D9E4,#323540);"></span>
-                    <span style="width:6px;height:6px;border-radius:50%;background:#323540;"></span>
-                    <span style="font-size:7px;font-weight:700;color:#484C58;">思念寒炭</span>
                 </div>
             </div>
 
@@ -5796,61 +5781,119 @@ bootSumoulApp();
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 🌳 保留认可的粗壮千年霜白树身 + 新增「6条擎天大主枝 + 120根分形细枝 + 2600片茂密三层繁叶华盖」
+        // 🌳 4500片超浓密离屏预渲染树冠华盖 + 粗壮千年霜白树身（彻底封死枝干空隙，100% 浓密厚重！）
         // ══════════════════════════════════════════════════════════════════════════
         const canvas = topDoc.getElementById("mt-ancient-canvas");
         const ctx2d = canvas.getContext("2d");
-        let animId = null, W = 390, H = 780, treeCache = null;
+        let animId = null, W = 390, H = 780;
+        let offBackCanopy = null, offFrontCanopy = null, subBranchesCache = [], iceVinesCache = [], fallingPetals = [];
 
-        function buildLushColossalTree(w, h) {
-            const rng = mulberry32(20260999);
-            const subBranches = [];
-            const backLeaves = [];
-            const midLeaves = [];
-            const frontLeaves = [];
-            const iceVines = [];
+        function drawLeafOnCtx(c, x, y, sz, rot, fill, stroke) {
+            c.save();
+            c.translate(x, y);
+            c.rotate(rot);
+            c.beginPath();
+            c.moveTo(0, 0);
+            c.bezierCurveTo(-sz * 0.56, -sz * 0.35, -sz * 0.48, -sz * 1.05, 0, -sz * 1.48);
+            c.bezierCurveTo(sz * 0.48, -sz * 1.05, sz * 0.56, -sz * 0.35, 0, 0);
+            c.closePath();
+            c.fillStyle = fill;
+            c.fill();
+            if (stroke) {
+                c.strokeStyle = stroke;
+                c.lineWidth = 0.6;
+                c.stroke();
+            }
+            c.restore();
+        }
 
-            // 在每根枝条周围生成密集的真实叶片簇（一共约 2600 片，彻底解决树冠不茂密的问题！）
-            function spawnLeafCluster(cx, cy, radiusX, radiusY, count) {
-                for (let i = 0; i < count; i++) {
-                    const a = rng() * Math.PI * 2;
-                    const r = Math.pow(rng(), 0.6);
-                    const lx = cx + Math.cos(a) * radiusX * r;
-                    const ly = cy + Math.sin(a) * radiusY * r;
-                    const sz = 5.5 + rng() * 6.5;
-                    const rot = (rng() - 0.5) * 2.6;
-                    const ph = rng() * 6.28;
-                    const layerRoll = rng();
-                    if (layerRoll < 0.32) {
-                        // 底层远景冷灰叶（衬托白色树叶，让树冠有立体厚度！）
-                        backLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(138, 145, 162, 0.58)", stroke: "rgba(105, 112, 128, 0.35)", ph });
-                    } else if (layerRoll < 0.68) {
-                        // 中层雾凇浅银叶
-                        midLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(218, 224, 236, 0.85)", stroke: "rgba(150, 156, 172, 0.45)", ph });
+        function buildUltraDenseCanopy(w, h) {
+            const rng = mulberry32(20261225);
+            const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
+
+            offBackCanopy = topDoc.createElement("canvas");
+            offBackCanopy.width = w * dpr; offBackCanopy.height = h * dpr;
+            const bCtx = offBackCanopy.getContext("2d");
+            bCtx.scale(dpr, dpr);
+
+            offFrontCanopy = topDoc.createElement("canvas");
+            offFrontCanopy.width = w * dpr; offFrontCanopy.height = h * dpr;
+            const fCtx = offFrontCanopy.getContext("2d");
+            fCtx.scale(dpr, dpr);
+
+            subBranchesCache = [];
+            iceVinesCache = [];
+
+            // 18 个超大型浓密树冠云团中心，铺满整个左上方与上中部天际，密不透风！
+            const domes = [
+                { x: w * 0.05, y: h * 0.12, rx: w * 0.26, ry: h * 0.13 },
+                { x: w * 0.22, y: h * 0.09, rx: w * 0.28, ry: h * 0.13 },
+                { x: w * 0.42, y: h * 0.11, rx: w * 0.28, ry: h * 0.12 },
+                { x: w * 0.62, y: h * 0.15, rx: w * 0.24, ry: h * 0.11 },
+                { x: w * 0.12, y: h * 0.24, rx: w * 0.28, ry: h * 0.13 },
+                { x: w * 0.32, y: h * 0.22, rx: w * 0.30, ry: h * 0.13 },
+                { x: w * 0.52, y: h * 0.24, rx: w * 0.26, ry: h * 0.12 },
+                { x: w * 0.70, y: h * 0.25, rx: w * 0.20, ry: h * 0.09 },
+                { x: w * 0.06, y: h * 0.36, rx: w * 0.24, ry: h * 0.11 },
+                { x: w * 0.24, y: h * 0.34, rx: w * 0.26, ry: h * 0.11 },
+                { x: w * 0.44, y: h * 0.34, rx: w * 0.24, ry: h * 0.10 },
+                { x: w * 0.60, y: h * 0.33, rx: w * 0.18, ry: h * 0.08 }
+            ];
+
+            // 第一步：在底层画满厚实的深冷灰/雾银叶团柔光底衬（彻底消灭枝条间的空洞感！）
+            domes.forEach((dm) => {
+                const rad = Math.max(dm.rx, dm.ry);
+                const g1 = bCtx.createRadialGradient(dm.x, dm.y, rad * 0.1, dm.x, dm.y, rad);
+                g1.addColorStop(0, "rgba(156, 164, 182, 0.72)");
+                g1.addColorStop(0.65, "rgba(186, 194, 210, 0.45)");
+                g1.addColorStop(1, "rgba(255, 255, 255, 0)");
+                bCtx.fillStyle = g1;
+                bCtx.beginPath();
+                bCtx.arc(dm.x, dm.y, rad, 0, Math.PI * 2);
+                bCtx.fill();
+
+                // 在每个云团内密集铺满 160 片大号底层深灰/中层雾银叶片（尺寸 12~19px，层层叠压不露缝隙！）
+                for (let i = 0; i < 160; i++) {
+                    const a = rng() * Math.PI * 2, r = Math.pow(rng(), 0.65);
+                    const lx = dm.x + Math.cos(a) * dm.rx * r;
+                    const ly = dm.y + Math.sin(a) * dm.ry * r;
+                    const sz = 11.5 + rng() * 7.5, rot = (rng() - 0.5) * 3.14;
+                    const s = rng();
+                    if (s < 0.45) {
+                        drawLeafOnCtx(bCtx, lx, ly, sz, rot, "rgba(130, 138, 156, 0.78)", "rgba(98, 105, 122, 0.4)");
                     } else {
-                        // 顶层受光纯白霜雪叶
-                        frontLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(255, 255, 255, 0.96)", stroke: "rgba(170, 176, 192, 0.5)", ph });
+                        drawLeafOnCtx(bCtx, lx, ly, sz, rot, "rgba(192, 200, 216, 0.88)", "rgba(140, 148, 166, 0.45)");
                     }
                 }
-            }
+            });
 
-            // 递归生长修长舒展的 5 层分形树枝网络
+            // 第二步：递归生成穿插在叶海中的粗壮主枝与分形细枝，并在前景铺满 2400 片纯白霜雪/浅银高光大叶片！
             function growBranches(x1, y1, len, ang, w1, depth) {
-                const w2 = Math.max(0.9, w1 * 0.68);
-                const bend = (rng() - 0.46) * 0.20;
+                const w2 = Math.max(1.0, w1 * 0.68);
+                const bend = (rng() - 0.46) * 0.18;
                 const cx = x1 + Math.cos(ang + bend) * (len * 0.52);
                 const cy = y1 + Math.sin(ang + bend) * (len * 0.52);
                 const x2 = x1 + Math.cos(ang) * len;
                 const y2 = y1 + Math.sin(ang) * len;
 
-                subBranches.push({ x1, y1, cx, cy, x2, y2, w1, w2, depth });
+                subBranchesCache.push({ x1, y1, cx, cy, x2, y2, w1, w2, depth });
 
-                // 从第 4 层开始每一节树枝都长满茂密树叶簇！
                 if (depth <= 4) {
-                    const clusterCnt = depth === 1 ? 32 : (depth === 2 ? 24 : 14);
-                    spawnLeafCluster(x2, y2, 22 + depth * 10, 16 + depth * 7, clusterCnt);
-                    if (depth === 2 && rng() > 0.3) {
-                        iceVines.push({ x: x2, y: y2, len: 50 + rng() * 80, phase: rng() * 6.28 });
+                    const leafCount = depth === 1 ? 52 : (depth === 2 ? 38 : 26);
+                    const radX = 28 + depth * 12, radY = 20 + depth * 9;
+                    for (let k = 0; k < leafCount; k++) {
+                        const a = rng() * Math.PI * 2, r = Math.pow(rng(), 0.62);
+                        const lx = x2 + Math.cos(a) * radX * r;
+                        const ly = y2 + Math.sin(a) * radY * r;
+                        const sz = 11 + rng() * 8, rot = (rng() - 0.5) * 3.14, s = rng();
+                        if (s < 0.38) {
+                            drawLeafOnCtx(fCtx, lx, ly, sz, rot, "rgba(222, 228, 240, 0.92)", "rgba(155, 162, 180, 0.55)");
+                        } else {
+                            drawLeafOnCtx(fCtx, lx, ly, sz, rot, "rgba(255, 255, 255, 0.97)", "rgba(172, 178, 195, 0.6)");
+                        }
+                    }
+                    if (depth === 2 && rng() > 0.25) {
+                        iceVinesCache.push({ x: x2, y: y2, len: 55 + rng() * 85, phase: rng() * 6.28 });
                     }
                 }
                 if (depth <= 1) return;
@@ -5858,25 +5901,25 @@ bootSumoulApp();
                 const subCnt = depth >= 4 ? 3 : 2;
                 for (let i = 0; i < subCnt; i++) {
                     const sp = subCnt === 2 ? (i === 0 ? -0.38 : 0.34) : (i - 1) * 0.36;
-                    growBranches(x2, y2, len * (0.76 + rng() * 0.10), ang + sp + (rng() - 0.5) * 0.14, w2, depth - 1);
+                    growBranches(x2, y2, len * (0.76 + rng() * 0.10), ang + sp + (rng() - 0.5) * 0.12, w2, depth - 1);
                 }
             }
 
-            // 从粗壮树身顶端分出 6 大主干枝，大跨度伸向整个上半屏（形成遮天蔽日的丰满伞状/迎客松状树冠！）
             const mainBoughs = [
-                { x: w * 0.10, y: h * 0.36, len: h * 0.15, ang: -Math.PI * 0.62, w: 22 }, // 左上高枝
-                { x: w * 0.16, y: h * 0.30, len: h * 0.16, ang: -Math.PI * 0.50, w: 26 }, // 正上擎天主枝
-                { x: w * 0.24, y: h * 0.26, len: h * 0.17, ang: -Math.PI * 0.38, w: 25 }, // 中上华盖主枝
-                { x: w * 0.32, y: h * 0.31, len: h * 0.17, ang: -Math.PI * 0.25, w: 24 }, // 右上斜伸巨枝
-                { x: w * 0.42, y: h * 0.35, len: h * 0.16, ang: -Math.PI * 0.14, w: 20 }, // 向右横展迎客长枝
-                { x: w * 0.08, y: h * 0.45, len: h * 0.12, ang: -Math.PI * 0.72, w: 16 }  // 左侧探出枝
+                { x: w * 0.10, y: h * 0.36, len: h * 0.15, ang: -Math.PI * 0.62, w: 22 },
+                { x: w * 0.16, y: h * 0.30, len: h * 0.16, ang: -Math.PI * 0.50, w: 26 },
+                { x: w * 0.24, y: h * 0.26, len: h * 0.17, ang: -Math.PI * 0.38, w: 25 },
+                { x: w * 0.32, y: h * 0.31, len: h * 0.17, ang: -Math.PI * 0.25, w: 24 },
+                { x: w * 0.42, y: h * 0.35, len: h * 0.16, ang: -Math.PI * 0.14, w: 20 },
+                { x: w * 0.08, y: h * 0.45, len: h * 0.12, ang: -Math.PI * 0.72, w: 16 }
             ];
-            mainBoughs.forEach((mb) => {
-                spawnLeafCluster(mb.x, mb.y, 45, 28, 35);
-                growBranches(mb.x, mb.y, mb.len, mb.ang, mb.w, 5);
-            });
+            mainBoughs.forEach((mb) => growBranches(mb.x, mb.y, mb.len, mb.ang, mb.w, 5));
 
-            return { subBranches, backLeaves, midLeaves, frontLeaves, iceVines };
+            // 随风飘舞的 18 片实时动态飞叶
+            fallingPetals = Array.from({ length: 18 }, (_, i) => ({
+                x: w * (0.08 + rng() * 0.82), y: h * (0.12 + rng() * 0.65),
+                sz: 9 + rng() * 5, spX: 7 + rng() * 9, spY: 11 + rng() * 12, rotSp: (rng() - 0.5) * 1.4, ph: i
+            }));
         }
 
         function resizeCanvas() {
@@ -5887,10 +5930,9 @@ bootSumoulApp();
             canvas.width = W * dpr;
             canvas.height = H * dpr;
             ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-            treeCache = buildLushColossalTree(W, H);
+            buildUltraDenseCanopy(W, H);
         }
 
-        // 绘制你认可的粗壮千年霜白树身（100% 保留并无缝衔接上方 6 大粗枝）
         function drawColossalFrostTrunk(w, h, wind) {
             ctx2d.save();
             const barkGrd = ctx2d.createLinearGradient(0, h * 0.55, w * 0.42, h * 0.55);
@@ -5915,7 +5957,6 @@ bootSumoulApp();
             ctx2d.closePath();
             ctx2d.fill();
 
-            // 纵向霜雪树皮沟壑
             for (let i = 0; i < 11; i++) {
                 const rx = w * (0.01 + i * 0.027);
                 ctx2d.beginPath();
@@ -5927,7 +5968,6 @@ bootSumoulApp();
                 ctx2d.stroke();
             }
 
-            // 古树洞
             ctx2d.beginPath();
             ctx2d.ellipse(w * 0.16, h * 0.64, 11, 24, -0.06, 0, Math.PI * 2);
             ctx2d.fillStyle = "rgba(72, 78, 92, 0.58)";
@@ -5959,59 +5999,45 @@ bootSumoulApp();
             ctx2d.fill();
         }
 
-        function drawCanopyLeafBatch(arr, t) {
-            arr.forEach((lf) => {
-                const sw = Math.sin(t * 1.4 + lf.ph) * 2.4;
-                ctx2d.save();
-                ctx2d.translate(lf.x + sw, lf.y);
-                ctx2d.rotate(lf.rot + sw * 0.03);
-                ctx2d.beginPath();
-                ctx2d.moveTo(0, 0);
-                ctx2d.bezierCurveTo(-lf.sz * 0.52, -lf.sz * 0.32, -lf.sz * 0.44, -lf.sz, 0, -lf.sz * 1.45);
-                ctx2d.bezierCurveTo(lf.sz * 0.44, -lf.sz, lf.sz * 0.52, -lf.sz * 0.32, 0, 0);
-                ctx2d.fillStyle = lf.fill;
-                ctx2d.fill();
-                ctx2d.strokeStyle = lf.stroke;
-                ctx2d.lineWidth = 0.5;
-                ctx2d.stroke();
-                ctx2d.restore();
-            });
-        }
-
         function renderCanvasLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
-            if (!treeCache) resizeCanvas();
-            const t = ts * 0.001, wind = Math.sin(t * 1.0) * 2.4;
+            if (!offBackCanopy) resizeCanvas();
+            const t = ts * 0.001, wind = Math.sin(t * 1.05) * 2.6;
 
             ctx2d.clearRect(0, 0, W, H);
-            const { subBranches, backLeaves, midLeaves, frontLeaves, iceVines } = treeCache;
 
-            // 1. 先画底层远景冷灰繁叶簇（打底衬托，让树冠极其浓密厚实！）
-            drawCanopyLeafBatch(backLeaves, t);
+            // 1. 绘制底层超浓密远景叶海图层
+            ctx2d.drawImage(offBackCanopy, wind * 0.6, Math.sin(t * 0.8) * 1.5, W, H);
 
-            // 2. 画粗壮千年霜白树身 + 全部伸展的粗细树枝网络
+            // 2. 绘制粗壮千年霜白树身 + 全部大跨度伸展的主枝与分枝
             drawColossalFrostTrunk(W, H, wind);
-            subBranches.forEach((sb) => drawSubBranch(sb, wind));
+            subBranchesCache.forEach((sb) => drawSubBranch(sb, wind));
 
-            // 3. 画垂落的冰丝气根
-            iceVines.forEach((iv) => {
-                const sw = Math.sin(t * 1.5 + iv.phase) * 6 + wind;
+            // 3. 绘制垂落的冰丝气根
+            iceVinesCache.forEach((iv) => {
+                const sw = Math.sin(t * 1.5 + iv.phase) * 6.5 + wind;
                 const g = ctx2d.createLinearGradient(iv.x, iv.y, iv.x, iv.y + iv.len);
-                g.addColorStop(0, "rgba(150, 158, 176, 0.65)");
+                g.addColorStop(0, "rgba(145, 152, 170, 0.68)");
                 g.addColorStop(1, "rgba(255, 255, 255, 0)");
                 ctx2d.beginPath();
                 ctx2d.moveTo(iv.x, iv.y);
                 ctx2d.quadraticCurveTo(iv.x + sw * 0.4, iv.y + iv.len * 0.5, iv.x + sw, iv.y + iv.len);
                 ctx2d.strokeStyle = g;
-                ctx2d.lineWidth = 1.0;
+                ctx2d.lineWidth = 1.05;
                 ctx2d.stroke();
             });
 
-            // 4. 画中层雾银叶簇 + 顶层纯白受光霜雪叶簇（2600片树叶层层叠叠包裹枝头！）
-            drawCanopyLeafBatch(midLeaves, t);
-            drawCanopyLeafBatch(frontLeaves, t);
+            // 4. 绘制顶层超浓密纯白霜雪/雾银前景叶海图层（与底层叶海交错摆动，浓密厚重感拉满！）
+            ctx2d.drawImage(offFrontCanopy, wind * 1.35, Math.cos(t * 1.1) * 2.0, W, H);
 
-            // 5. 底部仙气白雾消融层
+            // 5. 绘制随风飘落的动态霜叶
+            fallingPetals.forEach((fp) => {
+                const px = (fp.x + t * fp.spX) % W;
+                const py = ((fp.y + t * fp.spY) % (H * 0.78)) + H * 0.08;
+                drawLeafOnCtx(ctx2d, px, py, fp.sz, t * fp.rotSp + fp.ph, "rgba(255,255,255,0.92)", "rgba(150,156,174,0.5)");
+            });
+
+            // 6. 树根底部仙气冷雾消融层
             const mistGrd = ctx2d.createLinearGradient(0, H * 0.82, 0, H);
             mistGrd.addColorStop(0, "rgba(235, 238, 245, 0)");
             mistGrd.addColorStop(0.6, "rgba(242, 244, 249, 0.85)");
@@ -6022,12 +6048,11 @@ bootSumoulApp();
             animId = requestAnimationFrame(renderCanvasLoop);
         }
 
-        // 新生成的记忆叶严格分布在树冠区 (X: 12%~58%, Y: 18%~38%)，绝不挡顶栏与右中标题区！
         function getAutoPos(idx) {
-            const g = idx * 2.39996, r = 7 + (idx % 6) * 3.5;
+            const g = idx * 2.39996, r = 7 + (idx % 6) * 3.8;
             return {
-                xPct: Math.max(12, Math.min(58, Math.round(32 + Math.cos(g) * r * 1.3))),
-                yPct: Math.max(18, Math.min(38, Math.round(27 + Math.sin(g) * r * 0.75)))
+                xPct: Math.max(12, Math.min(64, Math.round(34 + Math.cos(g) * r * 1.35))),
+                yPct: Math.max(15, Math.min(38, Math.round(25 + Math.sin(g) * r * 0.75)))
             };
         }
 
@@ -6058,8 +6083,8 @@ bootSumoulApp();
                     if (Math.hypot(cx - sx, cy - sy) > 6) {
                         moved = true;
                         const rect = stage.getBoundingClientRect();
-                        node.style.left = `${Math.max(8, Math.min(86, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
-                        node.style.top = `${Math.max(12, Math.min(60, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
+                        node.style.left = `${Math.max(8, Math.min(88, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
+                        node.style.top = `${Math.max(12, Math.min(62, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
                     }
                 };
                 const onEnd = () => {
@@ -6068,9 +6093,14 @@ bootSumoulApp();
                     const d = loadTree();
                     if (moved) {
                         const target = d.leaves.find((x) => Number(x.id) === lid);
-                        if (target) { target.xPct = parseFloat(node.style.left); target.yPct = parseFloat(node.style.top); }
+                        if (target) {
+                            target.xPct = parseFloat(node.style.left);
+                            target.yPct = parseFloat(node.style.top);
+                        }
                     }
-                    d.activeId = lid; saveTree(d); renderLeavesAndUI();
+                    d.activeId = lid;
+                    saveTree(d);
+                    renderLeavesAndUI();
                 };
                 node.addEventListener("mousedown", (e) => { e.stopPropagation(); onStart(e.clientX, e.clientY); });
                 topDoc.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY));
@@ -6176,5 +6206,8 @@ bootSumoulApp();
         };
     }
 
-    mountLushColossalFrostTree();
+    mountUltraDenseFrostTree();
 })();
+
+
+
