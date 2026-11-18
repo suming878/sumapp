@@ -3413,247 +3413,221 @@ bootSumoulApp();
 
     forceMountV25();
 })();// ==========================================================================
-// 🤍 【Sumoul App 电影片头级开屏补丁：无框极简水光银丝慢连结 + 同心水纹 + 电影字幕逐字慢显】
-// 用法：直接替换 index.js 最末尾刚才那段开屏补丁即可！
+// 💧 【Sumoul App 终极折线泪痕开屏补丁：JS 实时动态画折线 + 沿途留下泪水轨迹与挂壁泪珠 + 文字慢显】
+// 100% 纯实色与原生路径驱动，零滤镜失效风险，任何浏览器 100% 必显示折线与留下的泪水！
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
 
-    function mountCinemaWaterSplash() {
+    function mountPolylineTearSplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountCinemaWaterSplash, 150);
+            setTimeout(mountPolylineTearSplash, 150);
             return;
         }
 
-        // 清理之前所有的旧开屏样式
         ["sumoul-liquid-tear-css", "sumoul-tear-splash-css", "sumoul-cinema-splash-css"].forEach((id) => topDoc.getElementById(id)?.remove());
 
-        const st = topDoc.createElement("style");
-        st.id = "sumoul-cinema-splash-css";
-        st.innerHTML = `
-            /* 1. 极细水光折线缓慢连结 (5.2秒) */
-            @keyframes cmLineTrace {
-                0% { stroke-dashoffset: 420; opacity: 0; }
-                10% { opacity: 1; }
-                100% { stroke-dashoffset: 0; opacity: 1; }
-            }
-            /* 2. 水光折线上的流光折射 (像眼泪的反光在移动) */
-            @keyframes cmShimmer {
-                0% { stroke-dashoffset: 420; opacity: 0; }
-                20% { opacity: 0.95; }
-                80% { opacity: 0.95; }
-                100% { stroke-dashoffset: -120; opacity: 0; }
-            }
-            /* 3. 节点水晕散开 (Bokeh 柔焦水滴感) */
-            @keyframes cmHaloBloom {
-                0% { transform: scale(0.2); opacity: 0; }
-                50% { transform: scale(1.1); opacity: 0.65; }
-                100% { transform: scale(1); opacity: 0.45; }
-            }
-            /* 4. 末端垂直泪丝缓缓拉长滴落 */
-            @keyframes cmVerticalTear {
-                0% { stroke-dashoffset: 45; opacity: 0; }
-                30% { opacity: 0.85; }
-                100% { stroke-dashoffset: 0; opacity: 0.85; }
-            }
-            /* 5. 水面极细同心涟漪扩散 */
-            @keyframes cmRippleExpand {
-                0% { transform: scale(0.15); opacity: 0.8; }
-                100% { transform: scale(1.65); opacity: 0; }
-            }
+        let animId = null;
 
-            #seoul-mini-theater-modal #smt-boot-splash .cm-trace-base {
-                stroke-dasharray: 420 !important;
-                stroke-dashoffset: 420 !important;
-                animation: cmLineTrace 4.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-trace-glow {
-                stroke-dasharray: 420 !important;
-                stroke-dashoffset: 420 !important;
-                animation: cmLineTrace 4.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-trace-shimmer {
-                stroke-dasharray: 65 360 !important;
-                stroke-dashoffset: 420 !important;
-                animation: cmShimmer 3.8s ease-in-out 0.6s infinite !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-vert-line {
-                stroke-dasharray: 45 !important;
-                stroke-dashoffset: 45 !important;
-                animation: cmVerticalTear 1.6s cubic-bezier(0.4, 0, 0.2, 1) 4.1s forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-halo {
-                transform-box: fill-box !important;
-                transform-origin: center !important;
-                opacity: 0 !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-halo.h1 { animation: cmHaloBloom 1.4s ease 0.2s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-halo.h2 { animation: cmHaloBloom 1.4s ease 1.1s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-halo.h3 { animation: cmHaloBloom 1.4s ease 2.0s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-halo.h4 { animation: cmHaloBloom 1.4s ease 2.9s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-halo.h5 { animation: cmHaloBloom 1.4s ease 3.8s forwards !important; }
+        function playTearPolyline() {
+            if (animId) cancelAnimationFrame(animId);
 
-            #seoul-mini-theater-modal #smt-boot-splash .cm-rip {
-                transform-box: fill-box !important;
-                transform-origin: center !important;
-                opacity: 0 !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-rip.r1 { animation: cmRippleExpand 3.2s cubic-bezier(0.16, 1, 0.3, 1) 5.2s infinite !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-rip.r2 { animation: cmRippleExpand 3.2s cubic-bezier(0.16, 1, 0.3, 1) 6.2s infinite !important; }
-
-            /* 电影字幕单字慢显过渡 */
-            #seoul-mini-theater-modal #smt-boot-splash .cm-char {
-                display: inline-block !important;
-                opacity: 0;
-                filter: blur(5px);
-                transform: translateY(4px);
-                transition: opacity 1.1s ease, filter 1.1s ease, transform 1.1s ease !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .cm-char.show {
-                opacity: 1 !important;
-                filter: blur(0px) !important;
-                transform: translateY(0px) !important;
-            }
-        `;
-        topDoc.head.appendChild(st);
-
-        let timers = [];
-        function clearAllTimers() {
-            timers.forEach((t) => clearTimeout(t));
-            timers = [];
-        }
-
-        function splitToChars(str) {
-            return Array.from(str).map((ch) => ch === " " ? "&nbsp;" : `<span class="cm-char">${ch}</span>`).join("");
-        }
-
-        function playCinemaSplash() {
-            clearAllTimers();
-
-            // 纯净无框全屏渐变：顶部冷白，向底部过渡为极淡的雨雾银灰
-            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 38%, #FFFFFF 0%, #F5F6F9 52%, #EAECEF 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.7s ease!important;padding:max(36px,env(safe-area-inset-top,36px)) 28px max(36px,env(safe-area-inset-bottom,36px)) 28px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;";
-
-            const titleStr = "Sumoul App";
-            const krLine = "유리창을 타고 흐르는 투명한 눈물의 선";
-            const cnLine = "顺着玻璃缓缓滑落的透明泪线，将你我静静连结";
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFFFFF 0%,#F4F5F8 55%,#EAECEF 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity 0.65s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;";
 
             splash.innerHTML = `
-                <!-- 顶部：极简留白刊头 -->
-                <div style="width:100%;max-width:300px;display:flex;justify-content:space-between;align-items:center;font-size:8px;color:#A0A4B0!important;letter-spacing:2.5px;font-family:monospace;">
-                    <span>ARCHIVE · 04:00 AM</span>
-                    <span>SEOUL</span>
-                </div>
-
-                <!-- 中央：无框大画幅「水光银丝折线 + 柔焦水晕 + 垂落泪滴涟漪」 -->
-                <div style="width:100%;max-width:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;">
-                    <svg viewBox="0 0 280 185" width="276" height="182" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;margin-bottom:14px;">
-                        <defs>
-                            <!-- 柔焦水雾光晕滤镜 (Bokeh Water Blur) -->
-                            <filter id="cmWaterGlow" x="-30%" y="-30%" width="160%" height="160%">
-                                <feGaussianBlur stdDeviation="3.5" result="blur" />
-                            </filter>
-                            <!-- 节点水滴柔焦径向渐变 -->
-                            <radialGradient id="cmDropHalo" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1" />
-                                <stop offset="45%" stop-color="#CFD4E0" stop-opacity="0.65" />
-                                <stop offset="100%" stop-color="#9A9AA8" stop-opacity="0" />
-                            </radialGradient>
-                            <!-- 主水线透明银灰渐变 -->
-                            <linearGradient id="cmSilverLine" x1="30" y1="20" x2="225" y2="120" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stop-color="#D5D8E2" stop-opacity="0.4" />
-                                <stop offset="45%" stop-color="#8C92A0" stop-opacity="0.85" />
-                                <stop offset="100%" stop-color="#484C56" stop-opacity="0.95" />
-                            </linearGradient>
-                        </defs>
-
-                        <!-- 0. 背景极细几何坐标十字丝（增强韩国画报的清冷文艺感） -->
-                        <line x1="36" y1="26" x2="244" y2="26" stroke="#EAECEF" stroke-width="0.6" />
-                        <line x1="224" y1="12" x2="224" y2="162" stroke="#EAECEF" stroke-width="0.6" stroke-dasharray="2 3" />
-
-                        <!-- 1. 折线底层：半透明浸润水雾光晕（宽 6px 的高斯模糊水痕） -->
-                        <polyline class="cm-trace-glow" points="38,26 86,68 138,38 184,92 224,70" fill="none" stroke="#C5CAD6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#cmWaterGlow)" opacity="0.55" />
-
-                        <!-- 2. 折线中层：0.95px 极细银灰泪痕主线（缓慢连结） -->
-                        <polyline class="cm-trace-base" points="38,26 86,68 138,38 184,92 224,70" fill="none" stroke="url(#cmSilverLine)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" />
-
-                        <!-- 3. 折线顶层：纯白水光折射亮丝（顺着折线缓缓流淌） -->
-                        <polyline class="cm-trace-shimmer" points="38,26 86,68 138,38 184,92 224,70" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-
-                        <!-- 4. 五个转折点上的「柔焦水晕珠（外圈水雾晕开 + 中心极小纯白晶点）」 -->
-                        <g class="cm-halo h1"><circle cx="38" cy="26" r="9" fill="url(#cmDropHalo)" /><circle cx="38" cy="26" r="1.6" fill="#FFFFFF" stroke="#8C92A0" stroke-width="0.8" /></g>
-                        <g class="cm-halo h2"><circle cx="86" cy="68" r="11" fill="url(#cmDropHalo)" /><circle cx="86" cy="68" r="1.8" fill="#FFFFFF" stroke="#7A808E" stroke-width="0.8" /></g>
-                        <g class="cm-halo h3"><circle cx="138" cy="38" r="9.5" fill="url(#cmDropHalo)" /><circle cx="138" cy="38" r="1.6" fill="#FFFFFF" stroke="#7A808E" stroke-width="0.8" /></g>
-                        <g class="cm-halo h4"><circle cx="184" cy="92" r="12" fill="url(#cmDropHalo)" /><circle cx="184" cy="92" r="2.0" fill="#FFFFFF" stroke="#5A606E" stroke-width="0.9" /></g>
-                        <g class="cm-halo h5"><circle cx="224" cy="70" r="11" fill="url(#cmDropHalo)" /><circle cx="224" cy="70" r="1.8" fill="#FFFFFF" stroke="#484C56" stroke-width="0.9" /></g>
-
-                        <!-- 5. 折线终点处：一道极细的垂直泪丝缓缓向下滑落 (从 y=70 垂落到 y=114) -->
-                        <line class="cm-vert-line" x1="224" y1="70" x2="224" y2="114" stroke="url(#cmSilverLine)" stroke-width="0.9" stroke-linecap="round" />
-
-                        <!-- 6. 泪丝坠落处：极简纤长的针尖水滴 + 双层同心椭圆水纹 -->
-                        <g class="cm-halo h5" style="animation-delay:4.9s!important;">
-                            <path d="M224 111 C224 111 220.8 116.5 220.8 119 C220.8 120.8 222.2 122.2 224 122.2 C225.8 122.2 227.2 120.8 227.2 119 C227.2 116.5 224 111 224 111 Z" fill="#FFFFFF" stroke="#5A606E" stroke-width="0.9" />
-                        </g>
-                        <ellipse class="cm-rip r1" cx="224" cy="134" rx="18" ry="5.5" fill="none" stroke="#9A9EA8" stroke-width="0.8" />
-                        <ellipse class="cm-rip r2" cx="224" cy="134" rx="18" ry="5.5" fill="none" stroke="#B5B9C4" stroke-width="0.6" />
-                    </svg>
-
-                    <!-- 电影片头式逐字慢显文案区 -->
-                    <div id="cm-title-box" style="font-size:16px;font-weight:600;letter-spacing:4.5px;color:#2C2E35!important;margin-bottom:14px;">
-                        ${splitToChars(titleStr)}
+                <div style="border:1px solid #E2E4EC!important;border-radius:14px!important;padding:32px 24px 28px 24px!important;background:rgba(255,255,255,0.88)!important;max-width:292px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 14px 36px rgba(30,35,45,0.04)!important;">
+                    <!-- 顶部编号与实时连结进度 -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:700;color:#9A9EA8!important;letter-spacing:2px;font-family:monospace;border-bottom:1px solid #EFEFF4!important;padding-bottom:8px;margin-bottom:16px;">
+                        <span>SUMOUL APP</span>
+                        <span id=" pl-pct-txt">TEAR LINE · 0%</span>
                     </div>
 
-                    <div id="cm-kr-box" style="font-size:10.2px;font-weight:500;color:#6E7380!important;letter-spacing:1.2px;line-height:1.9;margin-bottom:4px;">
-                        ${splitToChars(krLine)}
+                    <!-- 💧 折线与留下泪水的主舞台 (纯原生 SVG Path 实时绘制，100% 必显示！) -->
+                    <div style="width:100%;height:136px;display:flex;align-items:center;justify-content:center;margin:4px 0 12px 0;">
+                        <svg viewBox="0 0 240 132" width="236" height="130" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
+                            <!-- 1. 底层极淡的折线虚线预瞄轨 -->
+                            <path d="M 24 22 L 68 58 L 112 28 L 156 74 L 190 48 L 214 86" fill="none" stroke="#E4E6EE" stroke-width="1.2" stroke-dasharray="2.5 4" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 2. 留下的半透明宽水痕底色 (随着折线划过永久留在玻璃上！) -->
+                            <path id="pl-water-stain" d="" fill="none" stroke="#D8DCE6" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" />
+
+                            <!-- 3. 留下的深银灰主折线 (清晰利落的折线本体！) -->
+                            <path id="pl-main-line" d="" fill="none" stroke="#5A5E6B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 4. 折线水痕正中央留下的纯白反光亮线 (赋予水感！) -->
+                            <path id="pl-shine-line" d="" fill="none" stroke="#FFFFFF" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 5. 折线划过转折点后，留在每个折角及末端的挂壁泪珠容器 -->
+                            <g id="pl-left-tears"></g>
+
+                            <!-- 6. 正在最前端划出折线的领头泪滴 -->
+                            <g id="pl-moving-drop"></g>
+                        </svg>
                     </div>
 
-                    <div id="cm-cn-box" style="font-size:9px;font-weight:400;color:#9498A4!important;letter-spacing:1.5px;line-height:1.8;">
-                        ${splitToChars(cnLine)}
+                    <!-- 随折线进度慢慢浮现的文字 -->
+                    <div id="pl-txt-1" style="opacity:0;transform:translateY(5px);transition:opacity 1.2s ease, transform 1.2s ease;font-size:15px;font-weight:700;letter-spacing:3px;color:#2C2E35!important;margin-bottom:8px;">
+                        눈물의 궤적 · 泪之轨迹
                     </div>
-                </div>
 
-                <!-- 底部：极简呼吸进入提示（随文字慢显后浮现） -->
-                <div id="cm-enter-hint" style="opacity:0;transition:opacity 1.8s ease;padding-bottom:4px;">
-                    <div style="font-size:8px;font-weight:600;color:#7A7E8A!important;letter-spacing:3.5px;padding:8px 22px;border-bottom:1px solid #D5D8E2;">
-                        TOUCH TO ENTER · 触碰进入
+                    <div style="min-height:50px;margin-bottom:18px;">
+                        <div id="pl-txt-2" style="opacity:0;transform:translateY(5px);transition:opacity 1.4s ease, transform 1.4s ease;font-size:9.8px;font-weight:600;color:#686C78!important;line-height:1.85;letter-spacing:0.4px;">
+                            “ 천천히 꺾이며 이어지는 눈물의 선 ”
+                        </div>
+                        <div id="pl-txt-3" style="opacity:0;transform:translateY(5px);transition:opacity 1.4s ease, transform 1.4s ease;font-size:8.6px;font-weight:500;color:#9498A4!important;line-height:1.8;letter-spacing:0.5px;margin-top:4px;">
+                            缓慢转折连结的泪线，在划过之处留下记忆的水痕。
+                        </div>
+                    </div>
+
+                    <div id="pl-txt-4" style="opacity:0;transform:translateY(4px);transition:opacity 1.2s ease, transform 1.2s ease;">
+                        <div style="display:inline-block;padding:6px 22px;background:#F4F5F8!important;border:1px solid #DCDFE8!important;border-radius:999px;font-size:8px;color:#484C56!important;letter-spacing:2px;font-weight:700;">
+                            TOUCH TO ENTER · 触碰进入
+                        </div>
                     </div>
                 </div>
             `;
 
             splash.onclick = () => {
-                clearAllTimers();
+                if (animId) cancelAnimationFrame(animId);
                 splash.classList.add("fade-out");
             };
 
-            // 🎬 JS 逐字递增点亮所有文字（像泪水浸润纸张一样，一个字一个字慢慢浮现，且永久保持显示！）
-            const allChars = splash.querySelectorAll(".cm-char");
-            allChars.forEach((span, idx) => {
-                const t = setTimeout(() => {
-                    span.classList.add("show");
-                }, 400 + idx * 95); // 每隔 95 毫秒浮现一个字，全程约 5.2 秒与折线同步完成！
-                timers.push(t);
-            });
+            // 6 个折线顶点 + 第 7 个末端垂直滑落泪水轨迹点
+            const pts = [
+                { x: 24, y: 22 },
+                { x: 68, y: 58 },
+                { x: 112, y: 28 },
+                { x: 156, y: 74 },
+                { x: 190, y: 48 },
+                { x: 214, y: 86 },
+                { x: 214, y: 112 } // 最后一段垂直往下淌出的泪痕！
+            ];
 
-            const enterHint = topDoc.getElementById("cm-enter-hint");
-            if (enterHint) {
-                timers.push(setTimeout(() => {
-                    enterHint.style.opacity = "1";
-                }, 4600));
+            const segs = [];
+            let totalLen = 0;
+            for (let i = 0; i < pts.length - 1; i++) {
+                const len = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+                segs.push({ p1: pts[i], p2: pts[i + 1], len, start: totalLen });
+                totalLen += len;
             }
+
+            const stainEl = topDoc.getElementById("pl-water-stain");
+            const mainEl = topDoc.getElementById("pl-main-line");
+            const shineEl = topDoc.getElementById("pl-shine-line");
+            const tearsBox = topDoc.getElementById("pl-left-tears");
+            const leadBox = topDoc.getElementById("pl-moving-drop");
+            const pctTxt = topDoc.getElementById("pl-pct-txt");
+
+            const t1 = topDoc.getElementById("pl-txt-1");
+            const t2 = topDoc.getElementById("pl-txt-2");
+            const t3 = topDoc.getElementById("pl-txt-3");
+            const t4 = topDoc.getElementById("pl-txt-4");
+
+            const DURATION = 4800; // 4.8秒缓慢连结完所有折线并流下最后一滴泪
+            const startT = performance.now();
+
+            // 生成一颗带高光的挂壁泪滴 SVG 字符串
+            function makeTearDropSvg(x, y, scale = 1) {
+                return `
+                    <g transform="translate(${x.toFixed(1)}, ${y.toFixed(1)}) scale(${scale.toFixed(2)})">
+                        <!-- 泪滴底部柔影 -->
+                        <ellipse cx="0.6" cy="5.2" rx="3.8" ry="2.2" fill="#CFD4E0" opacity="0.7" />
+                        <!-- 上尖下圆的泪滴本体 -->
+                        <path d="M 0 -5.5 C 0 -5.5 4.2 0.5 4.2 3.5 C 4.2 5.9 2.3 7.8 0 7.8 C -2.3 7.8 -4.2 5.9 -4.2 3.5 C -4.2 0.5 0 -5.5 0 -5.5 Z" fill="#F0F2F7" stroke="#5A5E6B" stroke-width="1.1" stroke-linejoin="round" />
+                        <!-- 泪滴左上角纯白高光反光点 -->
+                        <circle cx="-1.3" cy="2.2" r="1.1" fill="#FFFFFF" />
+                        <path d="M -2.2 3.8 Q -1.0 6.2 1.2 5.8" fill="none" stroke="#FFFFFF" stroke-width="1.0" stroke-linecap="round" />
+                    </g>
+                `;
+            }
+
+            function animateLine(now) {
+                if (!topDoc.getElementById("pl-main-line")) return;
+                const elapsed = now - startT;
+                const rawP = Math.min(1, elapsed / DURATION);
+                // 平滑缓动
+                const easeP = rawP < 0.5 ? 2 * rawP * rawP : 1 - Math.pow(-2 * rawP + 2, 2) / 2;
+                const curDist = totalLen * easeP;
+
+                if (pctTxt) {
+                    pctTxt.textContent = rawP >= 1 ? "TEAR LINE · 100%" : `TEAR LINE · ${Math.round(rawP * 100)}%`;
+                }
+
+                // 文字随折线进度逐行慢慢显现并永久常驻
+                if (rawP > 0.10 && t1 && t1.style.opacity !== "1") { t1.style.opacity = "1"; t1.style.transform = "translateY(0px)"; }
+                if (rawP > 0.35 && t2 && t2.style.opacity !== "1") { t2.style.opacity = "1"; t2.style.transform = "translateY(0px)"; }
+                if (rawP > 0.62 && t3 && t3.style.opacity !== "1") { t3.style.opacity = "1"; t3.style.transform = "translateY(0px)"; }
+                if (rawP > 0.88 && t4 && t4.style.opacity !== "1") { t4.style.opacity = "1"; t4.style.transform = "translateY(0px)"; }
+
+                // 实时拼接当前已经连结出来的折线路径 d
+                let dPath = `M ${pts[0].x} ${pts[0].y}`;
+                let headX = pts[0].x, headY = pts[0].y;
+
+                for (let i = 0; i < segs.length; i++) {
+                    const sg = segs[i];
+                    if (curDist >= sg.start + sg.len) {
+                        dPath += ` L ${sg.p2.x} ${sg.p2.y}`;
+                        headX = sg.p2.x;
+                        headY = sg.p2.y;
+                    } else if (curDist > sg.start) {
+                        const r = (curDist - sg.start) / sg.len;
+                        headX = sg.p1.x + (sg.p2.x - sg.p1.x) * r;
+                        headY = sg.p1.y + (sg.p2.y - sg.p1.y) * r;
+                        dPath += ` L ${headX.toFixed(1)} ${headY.toFixed(1)}`;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+
+                // 同步更新：1.半透明宽水痕  2.深灰折线本体  3.中央白高光亮线
+                stainEl.setAttribute("d", dPath);
+                mainEl.setAttribute("d", dPath);
+                shineEl.setAttribute("d", dPath);
+
+                // 在折线已经划过的每个转折点上，永久留下挂壁的小水珠与残留泪滴！
+                let leftHtml = "";
+                let acc = 0;
+                for (let i = 0; i < pts.length - 1; i++) {
+                    if (i > 0) acc += segs[i - 1].len;
+                    if (curDist >= acc) {
+                        const p = pts[i];
+                        // 每个折角留下晶莹的小水珠节点
+                        leftHtml += `
+                            <circle cx="${p.x}" cy="${p.y}" r="4.2" fill="#E4E8F2" opacity="0.7" />
+                            <circle cx="${p.x}" cy="${p.y}" r="2.4" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.2" />
+                        `;
+                        // 在第 2、第 4 个低谷折角下方，额外留下一小滴挂在折角处的泪珠！
+                        if (i === 1 || i === 3) {
+                            leftHtml += makeTearDropSvg(p.x, p.y + 5, 0.72);
+                        }
+                    }
+                }
+                tearsBox.innerHTML = leftHtml;
+
+                // 绘制最前端正在滑落的领头大泪滴（连结完成后停留在末端下方轻轻晃动）
+                const floatY = rawP >= 1 ? Math.sin(now * 0.005) * 1.8 : 0;
+                leadBox.innerHTML = makeTearDropSvg(headX, headY + floatY, 1.15);
+
+                animId = requestAnimationFrame(animateLine);
+            }
+
+            animId = requestAnimationFrame(animateLine);
         }
 
-        playCinemaSplash();
+        playTearPolyline();
 
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                playCinemaSplash();
+                playTearPolyline();
             }
         }, true);
     }
 
-    mountCinemaWaterSplash();
+    mountPolylineTearSplash();
 })();
