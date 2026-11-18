@@ -3711,7 +3711,7 @@ bootSumoulApp();
     const topDoc = topWin.document;
 
     // 🔥 【核心第12行】你在管理员后台点一下「自动创建专属云端库」后，把生成的那行网址粘贴替换到这里并上传 GitHub！
-    let MY_REAL_CLOUD_URL = ""; 
+    let MY_REAL_CLOUD_URL = "let MY_REAL_CLOUD_URL = "https://www.npoint.io.new/"; 
 
     const K_LOCAL_CLOUD_URL = "sumoul_v41_real_cloud_url";
 
