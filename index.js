@@ -3413,3 +3413,231 @@ bootSumoulApp();
 
     forceMountV25();
 })();
+// ==========================================================================
+// 💧 【Sumoul App 液态水感折线开屏补丁：SVG گوگل级 Metaball 液态粘连滤镜 + 水珠顺折线动态流淌汇聚】
+// 用法：直接粘贴在 index.js 最末尾最后一行后面！自动覆盖旧开屏，100% 持续动态水感！
+// ==========================================================================
+(function () {
+    const topDoc = (window.parent || window).document;
+
+    function mountLiquidTearSplash() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        const splash = topDoc.getElementById("smt-boot-splash");
+        if (!modal || !splash) {
+            setTimeout(mountLiquidTearSplash, 180);
+            return;
+        }
+
+        // 1. 注入「液态水感流淌 + 水珠粘连滑落」专属 CSS 动画
+        topDoc.getElementById("sumoul-liquid-tear-css")?.remove();
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-liquid-tear-css";
+        st.innerHTML = `
+            /* 主水流折线缓慢延伸铺开 */
+            @keyframes lqMainGrow {
+                0% { stroke-dashoffset: 380; opacity: 0.3; }
+                100% { stroke-dashoffset: 0; opacity: 0.95; }
+            }
+            /* 折线上的高光水滴脉冲：源源不断顺着折线往下流淌（无限循环动态！） */
+            @keyframes lqStreamFlow {
+                0% { stroke-dashoffset: 380; }
+                100% { stroke-dashoffset: 0; }
+            }
+            /* 第二层交错水珠流：营造真实不规则的泪水滑落感 */
+            @keyframes lqBeadsFlow {
+                0% { stroke-dashoffset: 420; }
+                100% { stroke-dashoffset: 0; }
+            }
+            /* 节点水滴被水流充盈时的呼吸膨胀感 */
+            @keyframes lqNodeSwell {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.22); }
+            }
+            /* 终点大泪滴汇聚晃动与水波荡漾 */
+            @keyframes lqDropWobble {
+                0%, 100% { transform: translateY(0px) scale(1, 1); }
+                40% { transform: translateY(3px) scale(0.95, 1.06); }
+                75% { transform: translateY(-1px) scale(1.03, 0.97); }
+            }
+            @keyframes lqWaveRing {
+                0% { r: 3px; opacity: 0.7; stroke-width: 1.5px; }
+                100% { r: 24px; opacity: 0; stroke-width: 0.2px; }
+            }
+
+            /* 底层水痕慢慢连结 */
+            #seoul-mini-theater-modal #smt-boot-splash .lq-base-track {
+                stroke-dasharray: 380 !important;
+                stroke-dashoffset: 380 !important;
+                animation: lqMainGrow 4.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards !important;
+            }
+            /* 持续在折线上流淌的液态高光水波流 */
+            #seoul-mini-theater-modal #smt-boot-splash .lq-water-stream {
+                stroke-dasharray: 22 46 !important;
+                stroke-dashoffset: 380 !important;
+                animation: lqStreamFlow 3.6s linear infinite !important;
+            }
+            /* 顺着折线滑落并与节点发生液态粘连的滚动水珠 */
+            #seoul-mini-theater-modal #smt-boot-splash .lq-rolling-beads {
+                stroke-dasharray: 2 58 !important;
+                stroke-dashoffset: 420 !important;
+                animation: lqBeadsFlow 4.0s linear infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .lq-rolling-beads.delay {
+                stroke-dasharray: 1 74 !important;
+                animation: lqBeadsFlow 5.2s linear infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .lq-node-drop {
+                transform-box: fill-box !important;
+                transform-origin: center !important;
+                animation: lqNodeSwell 3.2s ease-in-out infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .lq-end-tear {
+                transform-box: fill-box !important;
+                transform-origin: center top !important;
+                animation: lqDropWobble 3.4s ease-in-out infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .lq-rip-a {
+                animation: lqWaveRing 3.0s ease-out infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .lq-rip-b {
+                animation: lqWaveRing 3.0s ease-out 1.5s infinite !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        let pctTimer = null;
+
+        function buildLiquidSplash() {
+            clearInterval(pctTimer);
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFFFFF 0%,#F3F4F8 55%,#EAEBF0 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity 0.65s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important;";
+
+            splash.innerHTML = `
+                <div style="border:1px solid rgba(215,215,225,0.85)!important;border-radius:18px!important;padding:32px 24px 26px 24px!important;background:rgba(255,255,255,0.82)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;max-width:292px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 16px 40px rgba(30,30,45,0.05), inset 0 1px 0 #FFFFFF!important;">
+                    <!-- 顶部液态连结状态栏 -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:700;color:#8E8E98!important;letter-spacing:1.8px;font-family:monospace;border-bottom:1px solid #EFEFF5!important;padding-bottom:8px;margin-bottom:14px;">
+                        <span>SUMOUL APP</span>
+                        <span id="lq-pct-txt">LIQUID LINK · 0%</span>
+                    </div>
+
+                    <!-- 💧 核心舞台：带 SVG Gooey 液态粘连滤镜 + 水珠顺折线实时流淌汇聚 -->
+                    <div style="width:100%;height:130px;display:flex;align-items:center;justify-content:center;margin:2px 0 10px 0;position:relative;">
+                        <svg viewBox="0 0 240 126" width="232" height="122" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
+                            <defs>
+                                <!-- 🔥 液态水感核心：Gooey Metaball 粘连融合滤镜（让经过折线的水珠产生拉丝融球水感！） -->
+                                <filter id="liquidGooey" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur in="SourceGraphic" stdDeviation="2.4" result="blur" />
+                                    <feColorMatrix in="blur" mode="matrix" values="
+                                        1 0 0 0 0
+                                        0 1 0 0 0
+                                        0 0 1 0 0
+                                        0 0 0 19 -7" result="goo" />
+                                    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+                                </filter>
+
+                                <!-- 水珠内部高光折射渐变 -->
+                                <linearGradient id="lqWaterGrad" x1="20" y1="10" x2="200" y2="95" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#D0D2DC" />
+                                    <stop offset="50%" stop-color="#8A8C98" />
+                                    <stop offset="100%" stop-color="#3A3A42" />
+                                </linearGradient>
+                                <radialGradient id="lqBeadLight" cx="35%" cy="30%" r="70%">
+                                    <stop offset="0%" stop-color="#FFFFFF" />
+                                    <stop offset="55%" stop-color="#CFD1DC" />
+                                    <stop offset="100%" stop-color="#6E707C" />
+                                </radialGradient>
+                            </defs>
+
+                            <!-- 底层极细干涸折线预瞄轨 -->
+                            <polyline points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#E4E4EE" stroke-width="1.2" stroke-dasharray="2 4" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 🌊 液态粘连层（应用 liquidGooey 滤镜：水珠滑过节点时自动粘连拉丝！） -->
+                            <g filter="url(#liquidGooey)">
+                                <!-- 1. 缓慢连结的主水痕折线 -->
+                                <polyline class="lq-base-track" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="url(#lqWaterGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+
+                                <!-- 2. 在折线上持续流淌的水波段 -->
+                                <polyline class="lq-water-stream" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#9A9CA8" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" />
+
+                                <!-- 3. 顺着折线不断滑落并与转折点粘连融合的液态水珠群 -->
+                                <polyline class="lq-rolling-beads" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#484852" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <polyline class="lq-rolling-beads delay" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#7A7C88" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+
+                                <!-- 4. 折线 5 个转折节点上凝结的饱满水滴 -->
+                                <circle class="lq-node-drop" cx="26" cy="18" r="3.6" fill="url(#lqBeadLight)" />
+                                <circle class="lq-node-drop" cx="72" cy="52" r="4.4" fill="url(#lqBeadLight)" style="animation-delay:0.6s;" />
+                                <circle class="lq-node-drop" cx="114" cy="26" r="3.8" fill="url(#lqBeadLight)" style="animation-delay:1.2s;" />
+                                <circle class="lq-node-drop" cx="156" cy="68" r="4.8" fill="url(#lqBeadLight)" style="animation-delay:1.8s;" />
+                                <circle class="lq-node-drop" cx="186" cy="48" r="4.0" fill="url(#lqBeadLight)" style="animation-delay:2.4s;" />
+
+                                <!-- 5. 终点处不断汇入水流、欲坠未坠的立体大泪滴 -->
+                                <g class="lq-end-tear">
+                                    <path d="M204 76 C204 76 195 88.5 195 94.5 C195 99.6 199 103.5 204 103.5 C209 103.5 213 99.6 213 94.5 C213 88.5 204 76 204 76 Z" fill="url(#lqBeadLight)" stroke="#484852" stroke-width="1" />
+                                </g>
+                            </g>
+
+                            <!-- ✨ 叠加在液态层上方的纯白高光反光点（赋予水珠晶莹剔透的玻璃水感！） -->
+                            <polyline class="lq-water-stream" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#FFFFFF" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
+                            <circle cx="24.8" cy="16.8" r="1.1" fill="#FFFFFF" />
+                            <circle cx="70.5" cy="50.5" r="1.4" fill="#FFFFFF" />
+                            <circle cx="112.8" cy="24.8" r="1.2" fill="#FFFFFF" />
+                            <circle cx="154.5" cy="66.5" r="1.5" fill="#FFFFFF" />
+                            <circle cx="184.8" cy="46.8" r="1.2" fill="#FFFFFF" />
+                            <!-- 终点泪滴的弧形水光反光 -->
+                            <path d="M199.5 91.5 C199 94.2 200.2 97.2 202.5 98.4" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+
+                            <!-- 终点下方的双层扩散水波涟漪 -->
+                            <circle class="lq-rip-a" cx="204" cy="104" r="3" fill="none" stroke="#8E8E98" />
+                            <circle class="lq-rip-b" cx="204" cy="104" r="3" fill="none" stroke="#A5A5B2" />
+                        </svg>
+                    </div>
+
+                    <!-- 标题与水感连结文案 -->
+                    <div style="font-size:14.5px;font-weight:800;letter-spacing:2.5px;color:#2C2C32!important;margin-bottom:6px;">눈물의 결속 · 泪之连结</div>
+                    <div style="font-size:9.5px;font-weight:600;color:#6E6E77!important;line-height:1.85;letter-spacing:0.3px;margin-bottom:18px;">
+                        “ 흐르는 물방울이 선을 따라 이어지고,<br>우리의 기억이 하나로 스며든다. ”<br>
+                        <span style="font-size:8.2px;font-weight:500;color:#9A9AA5!important;display:block;margin-top:4px;">流淌的水珠顺着折线缓慢连结，将记忆浸润合一。</span>
+                    </div>
+
+                    <!-- 底部带水波光泽的点击唤醒胶囊 -->
+                    <div id="lq-enter-pill" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 22px;background:linear-gradient(180deg,#FFFFFF 0%,#F2F3F7 100%)!important;border:1px solid #DCDCE6!important;border-radius:999px;font-size:8.5px;color:#3A3A40!important;letter-spacing:1.8px;font-weight:800;box-shadow:0 4px 12px rgba(30,30,45,0.06)!important;">
+                        <span>💧 TOUCH TO LINK · 触碰连结</span>
+                    </div>
+                </div>
+                <div style="font-size:7.5px;font-weight:600;color:#A0A0AC!important;letter-spacing:1.8px;margin-top:16px;">SUMOUL APP · LIQUID TEAR CONNECTION</div>
+            `;
+
+            // 顶部连结进度从 0% 缓慢跳到 100%（配合 4.2 秒水流折线连结）
+            let curPct = 0;
+            const pctEl = topDoc.getElementById("lq-pct-txt");
+            pctTimer = setInterval(() => {
+                curPct += 4;
+                if (curPct >= 100) {
+                    curPct = 100;
+                    clearInterval(pctTimer);
+                    if (pctEl) pctEl.textContent = "LIQUID LINK · 100% CONNECTED";
+                } else {
+                    if (pctEl) pctEl.textContent = `LIQUID LINK · ${curPct}%`;
+                }
+            }, 150);
+
+            splash.onclick = () => {
+                clearInterval(pctTimer);
+                splash.classList.add("fade-out");
+            };
+        }
+
+        buildLiquidSplash();
+
+        // 每次点击打开 Sumoul App 时，重新触发液态水珠顺折线缓慢连结动画
+        topDoc.addEventListener("click", (e) => {
+            const t = e.target;
+            if (!t || !t.closest) return;
+            if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
+                splash.classList.remove("fade-out");
+                buildLiquidSplash();
+            }
+        }, true);
+    }
+
+    mountLiquidTearSplash();
+})();
