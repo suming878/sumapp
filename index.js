@@ -2755,17 +2755,17 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// 🌧️ 【Sumoul App 极致忧郁版开屏补丁：阴雨铅灰雾调 + 垂直坠落的微折泪丝 + 迷雾慢显电影独白】
+// 🌫️ 【Sumoul App 纯正白雾忧郁版开屏补丁：100%零蓝调纯白灰 + 流动白雾气团 + 垂直坠落微折泪丝】
 // 用法：直接替换 index.js 最末尾刚才那段开屏补丁即可！
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
 
-    function mountMelancholyVerticalSplash() {
+    function mountWhiteMistTearSplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountMelancholyVerticalSplash, 150);
+            setTimeout(mountWhiteMistTearSplash, 150);
             return;
         }
 
@@ -2777,166 +2777,232 @@ bootSumoulApp();
             "sumoul-gallery-splash-css",
             "sumoul-borderless-splash-css",
             "sumoul-master-one-splash-css",
-            "sumoul-melancholy-v28-css"
+            "sumoul-melancholy-v28-css",
+            "sumoul-whitemist-v29-css"
         ].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
-        st.id = "sumoul-melancholy-v28-css";
+        st.id = "sumoul-whitemist-v29-css";
         st.innerHTML = `
-            /* 1. 垂直微折泪丝：从上往下极其缓慢地坠落连结 (5.4秒) */
-            @keyframes mvFallDraw {
-                0% { stroke-dashoffset: 320; opacity: 0; }
-                12% { opacity: 0.85; }
-                100% { stroke-dashoffset: 0; opacity: 0.85; }
+            /* 1. 垂直微折泪丝：从白雾中极其缓慢地向下滑落连结 (5.6秒) */
+            @keyframes wmFallLine {
+                0% { stroke-dashoffset: 340; opacity: 0; }
+                10% { opacity: 0.9; }
+                100% { stroke-dashoffset: 0; opacity: 0.9; }
             }
-            /* 2. 顺着垂直折线往下滑落的微弱水光点 */
-            @keyframes mvTearSlide {
-                0% { stroke-dashoffset: 320; opacity: 0; }
+            /* 2. 顺着折线缓慢往下淌的纯白水光 */
+            @keyframes wmWaterGlint {
+                0% { stroke-dashoffset: 340; opacity: 0; }
                 20% { opacity: 1; }
-                85% { opacity: 1; }
+                80% { opacity: 1; }
                 100% { stroke-dashoffset: -60; opacity: 0; }
             }
-            /* 3. 背景极细雨丝无声飘落 */
-            @keyframes mvRainDrift {
-                0% { transform: translateY(-30px); opacity: 0; }
-                40% { opacity: 0.28; }
-                80% { opacity: 0.28; }
-                100% { transform: translateY(60px); opacity: 0; }
+            /* 3. 漫射纯白雾气团缓慢漂移呼吸 (营造真实白雾感) */
+            @keyframes wmFogFloatA {
+                0%, 100% { transform: translate(-18px, -8px) scale(1); opacity: 0.75; }
+                50% { transform: translate(18px, 10px) scale(1.12); opacity: 0.95; }
             }
-            /* 4. 折线尽头处消散在灰雾里的孤独涟漪 */
-            @keyframes mvSadRipple {
-                0% { transform: scale(0.2); opacity: 0.7; }
-                100% { transform: scale(2.2); opacity: 0; }
+            @keyframes wmFogFloatB {
+                0%, 100% { transform: translate(22px, 12px) scale(1.08); opacity: 0.65; }
+                50% { transform: translate(-16px, -6px) scale(0.95); opacity: 0.9; }
             }
-            /* 5. 电影独白从浓雾失焦中极其缓慢地浮现 */
-            @keyframes mvMistReveal {
-                0% { opacity: 0; filter: blur(10px); transform: translateY(6px); }
+            /* 4. 背景极细银白雨丝无声飘落 */
+            @keyframes wmRainFall {
+                0% { transform: translateY(-35px); opacity: 0; }
+                40% { opacity: 0.32; }
+                80% { opacity: 0.32; }
+                100% { transform: translateY(65px); opacity: 0; }
+            }
+            /* 5. 终点消散在白雾中的双层涟漪 */
+            @keyframes wmMistRipple {
+                0% { transform: scale(0.2); opacity: 0.75; }
+                100% { transform: scale(2.4); opacity: 0; }
+            }
+            /* 6. 文字从纯白浓雾模糊中缓慢浮现 */
+            @keyframes wmTextUnfog {
+                0% { opacity: 0; filter: blur(12px); transform: translateY(6px); }
                 100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
             }
-            @keyframes mvSlowPulse {
-                0%, 100% { opacity: 0.25; }
-                50% { opacity: 0.72; }
+            @keyframes wmSoftBreathe {
+                0%, 100% { opacity: 0.28; }
+                50% { opacity: 0.75; }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .mv-vert-main {
-                stroke-dasharray: 320 !important;
-                stroke-dashoffset: 320 !important;
-                animation: mvFallDraw 5.2s cubic-bezier(0.25, 0.1, 0.2, 1) 0.3s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .wm-line-core {
+                stroke-dasharray: 340 !important;
+                stroke-dashoffset: 340 !important;
+                animation: wmFallLine 5.6s cubic-bezier(0.22, 0.1, 0.18, 1) 0.2s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-vert-glow {
-                stroke-dasharray: 320 !important;
-                stroke-dashoffset: 320 !important;
-                animation: mvFallDraw 5.2s cubic-bezier(0.25, 0.1, 0.2, 1) 0.3s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .wm-line-mist {
+                stroke-dasharray: 340 !important;
+                stroke-dashoffset: 340 !important;
+                animation: wmFallLine 5.6s cubic-bezier(0.22, 0.1, 0.18, 1) 0.2s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-vert-glint {
-                stroke-dasharray: 28 300 !important;
-                stroke-dashoffset: 320 !important;
-                animation: mvTearSlide 4.6s cubic-bezier(0.3, 0, 0.2, 1) 1.2s infinite !important;
+            #seoul-mini-theater-modal #smt-boot-splash .wm-line-shine {
+                stroke-dasharray: 32 310 !important;
+                stroke-dashoffset: 340 !important;
+                animation: wmWaterGlint 4.8s cubic-bezier(0.3, 0, 0.2, 1) 1.0s infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-ripple-ring {
+            #seoul-mini-theater-modal #smt-boot-splash .wm-rip-1 {
                 transform-box: fill-box !important;
                 transform-origin: center !important;
                 opacity: 0;
-                animation: mvSadRipple 3.6s ease-out 4.8s infinite !important;
+                animation: wmMistRipple 3.8s ease-out 5.0s infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-rain {
-                position: absolute !important;
-                width: 1px !important;
-                background: linear-gradient(180deg, transparent 0%, #8E93A0 50%, transparent 100%) !important;
-                pointer-events: none !important;
+            #seoul-mini-theater-modal #smt-boot-splash .wm-rip-2 {
+                transform-box: fill-box !important;
+                transform-origin: center !important;
                 opacity: 0;
-                animation: mvRainDrift 4.5s linear infinite !important;
+                animation: wmMistRipple 3.8s ease-out 6.2s infinite !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-1 {
-                opacity: 0;
-                animation: mvMistReveal 2.6s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards !important;
+            /* 两团在画面中缓慢游走的纯白柔雾层 */
+            #seoul-mini-theater-modal #smt-boot-splash .wm-fog-layer-a {
+                position: absolute !important;
+                width: 260px !important;
+                height: 260px !important;
+                top: 18% !important;
+                left: 50% !important;
+                margin-left: -130px !important;
+                border-radius: 50% !important;
+                background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 55%, transparent 75%) !important;
+                filter: blur(22px) !important;
+                pointer-events: none !important;
+                z-index: 1 !important;
+                animation: wmFogFloatA 9s ease-in-out infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-2 {
-                opacity: 0;
-                animation: mvMistReveal 2.8s cubic-bezier(0.16, 1, 0.3, 1) 2.0s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .wm-fog-layer-b {
+                position: absolute !important;
+                width: 280px !important;
+                height: 220px !important;
+                bottom: 22% !important;
+                left: 50% !important;
+                margin-left: -140px !important;
+                border-radius: 50% !important;
+                background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(250,250,250,0.35) 55%, transparent 75%) !important;
+                filter: blur(26px) !important;
+                pointer-events: none !important;
+                z-index: 1 !important;
+                animation: wmFogFloatB 11s ease-in-out infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-3 {
+
+            #seoul-mini-theater-modal #smt-boot-splash .wm-rain {
+                position: absolute !important;
+                width: 1px !important;
+                background: linear-gradient(180deg, transparent 0%, #9E9E9E 50%, transparent 100%) !important;
+                pointer-events: none !important;
                 opacity: 0;
-                animation: mvMistReveal 2.8s cubic-bezier(0.16, 1, 0.3, 1) 3.2s forwards !important;
+                z-index: 1 !important;
+                animation: wmRainFall 4.8s linear infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-4 {
+
+            #seoul-mini-theater-modal #smt-boot-splash .wm-t1 {
                 opacity: 0;
-                animation: mvMistReveal 2.6s cubic-bezier(0.16, 1, 0.3, 1) 4.4s forwards !important;
+                animation: wmTextUnfog 2.6s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .mv-breathe {
-                animation: mvSlowPulse 3.8s ease-in-out infinite !important;
+            #seoul-mini-theater-modal #smt-boot-splash .wm-t2 {
+                opacity: 0;
+                animation: wmTextUnfog 2.8s cubic-bezier(0.16, 1, 0.3, 1) 2.1s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .wm-t3 {
+                opacity: 0;
+                animation: wmTextUnfog 2.8s cubic-bezier(0.16, 1, 0.3, 1) 3.3s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .wm-t4 {
+                opacity: 0;
+                animation: wmTextUnfog 2.6s cubic-bezier(0.16, 1, 0.3, 1) 4.5s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .wm-breathe {
+                animation: wmSoftBreathe 3.8s ease-in-out infinite !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        function renderMelancholySplash() {
-            // 阴雨天首尔雾灰背景（带柔和胶片暗角，不再是刺眼亮白）
-            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 38%, #F4F5F8 0%, #E6E8EE 56%, #D5D8E2 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.85s ease!important;padding:max(34px,env(safe-area-inset-top,34px)) 28px max(38px,env(safe-area-inset-bottom,38px)) 28px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;";
+        function renderWhiteMistSplash() {
+            // 100% 零蓝调！纯正无彩色白雾渐变背景 (#FFFFFF 纯白雾心 -> #F4F4F4 柔白雾 -> #E8E8E8 浅银灰边)
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 40%, #FFFFFF 0%, #F5F5F5 52%, #E8E8E8 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.85s ease!important;padding:max(34px,env(safe-area-inset-top,34px)) 28px max(38px,env(safe-area-inset-bottom,38px)) 28px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;";
 
             splash.innerHTML = `
-                <!-- 背景极淡的无声细雨丝 -->
-                <div class="mv-rain" style="left:22%;top:18%;height:55px;animation-delay:0.2s;"></div>
-                <div class="mv-rain" style="left:78%;top:28%;height:65px;animation-delay:1.8s;"></div>
-                <div class="mv-rain" style="left:34%;top:62%;height:48px;animation-delay:2.9s;"></div>
-                <div class="mv-rain" style="left:68%;top:54%;height:58px;animation-delay:0.9s;"></div>
+                <!-- 🌫️ 双层缓慢游走的纯白水雾气团 -->
+                <div class="wm-fog-layer-a"></div>
+                <div class="wm-fog-layer-b"></div>
 
-                <!-- 顶部：极简冷灰胶片天头 -->
-                <div style="width:100%;max-width:300px;display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:500;color:#888D9B!important;letter-spacing:3px;font-family:monospace;z-index:2;">
-                    <span>SEOUL · RAIN</span>
-                    <span>04:12 AM</span>
+                <!-- 背景极细的无声银灰雨丝 -->
+                <div class="wm-rain" style="left:20%;top:16%;height:56px;animation-delay:0.3s;"></div>
+                <div class="wm-rain" style="left:80%;top:26%;height:64px;animation-delay:1.9s;"></div>
+                <div class="wm-rain" style="left:32%;top:60%;height:48px;animation-delay:3.1s;"></div>
+                <div class="wm-rain" style="left:70%;top:52%;height:58px;animation-delay:1.1s;"></div>
+
+                <!-- 顶部：纯正中性浅灰胶片刊头 -->
+                <div style="width:100%;max-width:300px;display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:500;color:#999999!important;letter-spacing:3.2px;font-family:monospace;z-index:3;">
+                    <span>WHITE MIST · SEOUL</span>
+                    <span>04:00 AM</span>
                 </div>
 
-                <!-- 中央：从上往下缓慢坠落的「垂直微折泪丝」与失焦独白 -->
-                <div style="width:100%;max-width:310px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:2;">
+                <!-- 中央：在纯白雾气中缓慢向下坠落微折的泪丝与独白 -->
+                <div style="width:100%;max-width:310px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:3;">
                     
-                    <!-- 💧 核心：从上往下垂落、经历 3 次脆弱微折的泪痕细线 -->
-                    <div style="width:100%;height:175px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
-                        <svg viewBox="0 0 160 175" width="160" height="175" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
-                            <!-- 底层极淡的垂直中轴虚线（代表原本笔直的时间线） -->
-                            <line x1="80" y1="6" x2="80" y2="156" stroke="rgba(145,150,165,0.22)" stroke-width="0.7" stroke-dasharray="1.5 3.5" />
+                    <!-- 💧 垂直坠落微折泪丝舞台 -->
+                    <div style="width:100%;height:182px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+                        <svg viewBox="0 0 160 182" width="160" height="182" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
+                            <defs>
+                                <!-- 纯白水雾柔光晕染滤镜 -->
+                                <filter id="wmPureGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="3.2" result="blur" />
+                                </filter>
+                                <!-- 零蓝调纯正灰白水线渐变（上端融于白雾，下端凝为清冷铅灰） -->
+                                <linearGradient id="wmTearGrad" x1="80" y1="6" x2="80" y2="160" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#D6D6D6" stop-opacity="0.3" />
+                                    <stop offset="35%" stop-color="#8C8C8C" stop-opacity="0.8" />
+                                    <stop offset="100%" stop-color="#4A4A4A" stop-opacity="0.95" />
+                                </linearGradient>
+                            </defs>
 
-                            <!-- 1. 垂直折线背后的半透明水雾漫射痕 -->
-                            <path class="mv-vert-glow" d="M 80 8 L 80 38 L 68 66 L 89 98 L 74 128 L 80 154" stroke="rgba(255,255,255,0.75)" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 底层极淡的垂直时间基准虚线 -->
+                            <line x1="80" y1="6" x2="80" y2="162" stroke="rgba(160,160,160,0.22)" stroke-width="0.65" stroke-dasharray="1.5 3.5" />
 
-                            <!-- 2. 主折线：0.95px 铅灰细丝从上往下缓慢坠落微折 -->
-                            <path class="mv-vert-main" d="M 80 8 L 80 38 L 68 66 L 89 98 L 74 128 L 80 154" stroke="#4A4E5A" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 1. 折线外围包裹的纯白水雾光晕（宽 6px 的纯白柔焦水痕） -->
+                            <path class="wm-line-mist" d="M 80 8 L 80 34 L 69 60 L 88 92 L 73 122 L 80 144 L 80 160" stroke="#FFFFFF" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#wmPureGlow)" />
 
-                            <!-- 3. 顺着折线缓缓往下滑落的纯白泪光点 -->
-                            <path class="mv-vert-glint" d="M 80 8 L 80 38 L 68 66 L 89 98 L 74 128 L 80 154" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 2. 主折线：0.95px 纯正中性炭灰细丝从上往下缓慢曲折坠落 -->
+                            <path class="wm-line-core" d="M 80 8 L 80 34 L 69 60 L 88 92 L 73 122 L 80 144 L 80 160" stroke="url(#wmTearGrad)" stroke-width="0.95" stroke-linecap="round" stroke-linejoin="round" />
 
-                            <!-- 4. 转折处凝结的极小空心水珠节点 -->
-                            <circle cx="80" cy="38" r="1.5" fill="#F4F5F8" stroke="#6E7382" stroke-width="0.8" />
-                            <circle cx="68" cy="66" r="1.8" fill="#FFFFFF" stroke="#5A5E6C" stroke-width="0.9" />
-                            <circle cx="89" cy="98" r="1.8" fill="#FFFFFF" stroke="#5A5E6C" stroke-width="0.9" />
-                            <circle cx="74" cy="128" r="1.5" fill="#F4F5F8" stroke="#6E7382" stroke-width="0.8" />
+                            <!-- 3. 顺着折线缓缓往下滑落的纯白晶莹泪光 -->
+                            <path class="wm-line-shine" d="M 80 8 L 80 34 L 69 60 L 88 92 L 73 122 L 80 144 L 80 160" stroke="#FFFFFF" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
 
-                            <!-- 5. 坠落终点 (80, 154) 的微小泪滴与消散在雾中的椭圆水纹 -->
-                            <circle cx="80" cy="154" r="1.8" fill="#4A4E5A" />
-                            <ellipse class="mv-ripple-ring" cx="80" cy="154" rx="12" ry="3.5" fill="none" stroke="#7A7F8E" stroke-width="0.7" />
+                            <!-- 4. 每个微折角处留下的纯白半透明雾珠 -->
+                            <circle cx="80" cy="34" r="1.4" fill="#FFFFFF" stroke="#999999" stroke-width="0.7" />
+                            <circle cx="69" cy="60" r="1.7" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="0.8" />
+                            <circle cx="88" cy="92" r="1.8" fill="#FFFFFF" stroke="#666666" stroke-width="0.8" />
+                            <circle cx="73" cy="122" r="1.6" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="0.8" />
+
+                            <!-- 5. 末端凝结的极简细长水滴与消散在白雾中的双层涟漪 -->
+                            <path d="M 80 156 C 80 156 77.6 160.2 77.6 162 C 77.6 163.4 78.7 164.5 80 164.5 C 81.3 164.5 82.4 163.4 82.4 162 C 82.4 160.2 80 156 80 156 Z" fill="#FFFFFF" stroke="#555555" stroke-width="0.85" />
+                            <ellipse class="wm-rip-1" cx="80" cy="164" rx="13" ry="3.6" fill="none" stroke="#888888" stroke-width="0.7" />
+                            <ellipse class="wm-rip-2" cx="80" cy="164" rx="13" ry="3.6" fill="none" stroke="#FFFFFF" stroke-width="1.1" />
                         </svg>
                     </div>
 
-                    <!-- 疏离清冷的大字距标题 -->
-                    <div class="mv-txt-1" style="font-size:16.5px;font-weight:500;letter-spacing:6.5px;color:#2E313A!important;margin-bottom:6px;font-family:Georgia,'Times New Roman',serif;">
+                    <!-- 零蓝调 · 纯正中性炭灰大字距标题 -->
+                    <div class="wm-t1" style="font-size:17px;font-weight:500;letter-spacing:6.5px;color:#333333!important;margin-bottom:6px;font-family:Georgia,'Times New Roman',serif;">
                         Sumoul App
                     </div>
-                    <div class="mv-txt-1" style="font-size:7.2px;font-weight:500;letter-spacing:3.8px;color:#8A8F9E!important;margin-bottom:24px;">
-                        SILENT TEAR IN GRAY DAWN
+                    <div class="wm-t1" style="font-size:7.2px;font-weight:500;letter-spacing:4px;color:#999999!important;margin-bottom:24px;">
+                        WHITE MIST &amp; TEAR TRACE
                     </div>
 
-                    <!-- 忧郁韩文与中文独白（从迷雾中缓慢浮现） -->
-                    <div class="mv-txt-2" style="font-size:10.2px;font-weight:500;color:#525664!important;line-height:2.1;letter-spacing:1.2px;">
-                        “ 빗물이 유리창을 타고 조용히 꺾여 내리듯,<br>네가 없는 계절은 늘 회색빛으로 번진다. ”
+                    <!-- 从白雾中缓慢浮现的韩中双语忧郁独白 -->
+                    <div class="wm-t2" style="font-size:10.2px;font-weight:500;color:#555555!important;line-height:2.1;letter-spacing:1.2px;">
+                        “ 하얀 안개 속을 천천히 가로질러 내리는 눈물,<br>지워지지 않는 우리의 계절이 맺힌다. ”
                     </div>
-                    <div class="mv-txt-3" style="font-size:8.8px;font-weight:400;color:#7E8392!important;line-height:1.95;letter-spacing:1.5px;margin-top:8px;">
-                        像雨水顺着玻璃悄然曲折滑落，<br>没有你的季节，总是晕染成一片灰白。
+                    <div class="wm-t3" style="font-size:8.8px;font-weight:400;color:#888888!important;line-height:1.95;letter-spacing:1.5px;margin-top:8px;">
+                        穿过苍白迷雾悄然滑落的泪线，<br>凝结成我们未曾褪色的季节。
                     </div>
                 </div>
 
-                <!-- 底部：极其克制的呼吸感触碰提示 -->
-                <div class="mv-txt-4" style="padding-bottom:4px;z-index:2;">
-                    <div class="mv-breathe" style="font-size:7.8px;font-weight:500;color:#686D7C!important;letter-spacing:4px;font-family:monospace;">
+                <!-- 底部：极简呼吸触碰提示 -->
+                <div class="wm-t4" style="padding-bottom:4px;z-index:3;">
+                    <div class="wm-breathe" style="font-size:7.8px;font-weight:500;color:#777777!important;letter-spacing:4px;font-family:monospace;">
                         · &nbsp; TOUCH TO WAKE &nbsp; ·
                     </div>
                 </div>
@@ -2947,17 +3013,17 @@ bootSumoulApp();
             };
         }
 
-        renderMelancholySplash();
+        renderWhiteMistSplash();
 
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                renderMelancholySplash();
+                renderWhiteMistSplash();
             }
         }, true);
     }
 
-    mountMelancholyVerticalSplash();
+    mountWhiteMistTearSplash();
 })();
