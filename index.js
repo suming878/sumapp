@@ -3703,72 +3703,61 @@ bootSumoulApp();
     mountDraggableMistFab();
 })();
 // ==========================================================================
-// 🔐 【Sumoul App 账号密码+QQ+口令注册登录系统 & 管理员总人数看板/QQ名册/一键拉黑补丁】
-// 功能：
-// 1. 锁屏改造为「账号/QQ + 密码 + 口令」自由切换注册与登录，被拉黑的QQ直接封死拦截！
-// 2. 管理员后台实时显示「已注册总人数 + 完整QQ号/账号/密码名册 + 一键拉黑/手动拉黑/修改口令」！
+// 🤍 【Sumoul App 原生UI零破坏 · QQ+密码+口令注册登录 & 管理员人数统计/QQ名册/拉黑补丁】
+// 保证：100% 不改动你的四幕开屏动画！100% 保留你原本的锁屏与后台 UI 风格，仅原地增强功能！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    // 绑定你刚才建好的专属云库（跨设备自动汇总注册人数与QQ号 + 本地双保险）
     const CLOUD_DB_URL = "https://api.npoint.io/7590dee5e1fa18abf191";
-    const K_LOCAL_DB = "sumoul_v44_user_system_db";
-    const K_LOGGED_USER = "sumoul_v44_logged_in_qq";
+    const K_LOCAL_DB = "sumoul_v45_native_db";
 
-    // 默认初始数据结构
     function getDefaultDB() {
         return {
-            passcode: "宿命", // 默认注册口令（管理员可在后台随时修改，留空则无需口令）
-            users: [],        // 注册用户名册: [{ qq, username, password, time }]
-            blacklist: []     // 拉黑封禁的QQ号数组: ["12345678"]
+            passcode: "宿命", // 默认注册准入口令（可在后台随时改）
+            users: [],        // [{ qq, pwd, time }]
+            blacklist: []     // ["123456"]
         };
     }
 
-    // 读取本地+云端合并数据库
     function loadLocalDB() {
         try {
             return Object.assign(getDefaultDB(), JSON.parse(localStorage.getItem(K_LOCAL_DB) || "{}"));
-        } catch (e) {
-            return getDefaultDB();
-        }
+        } catch (e) { return getDefaultDB(); }
     }
 
     function saveLocalDB(db) {
         localStorage.setItem(K_LOCAL_DB, JSON.stringify(db));
     }
 
-    async function syncFromCloud() {
+    async function syncDB() {
         const local = loadLocalDB();
         try {
             const r = await fetch(CLOUD_DB_URL);
             if (r.ok) {
                 const d = await r.json();
                 if (d && typeof d === "object") {
-                    // 将云端注册用户与本地注册用户按 QQ 号去重合并（保证人数只增不丢！）
-                    const cloudUsers = Array.isArray(d.users) ? d.users : [];
-                    const mergedMap = new Map();
-                    [...cloudUsers, ...local.users].forEach((u) => {
-                        if (u && u.qq) mergedMap.set(String(u.qq), u);
+                    const cUsers = Array.isArray(d.users) ? d.users : [];
+                    const map = new Map();
+                    [...cUsers, ...local.users].forEach((u) => {
+                        if (u && u.qq) map.set(String(u.qq), u);
                     });
-                    const cloudBlack = Array.isArray(d.blacklist) ? d.blacklist : [];
-                    const mergedBlack = Array.from(new Set([...cloudBlack, ...local.blacklist]));
-
-                    const mergedDB = {
+                    const cBlack = Array.isArray(d.blacklist) ? d.blacklist : [];
+                    const merged = {
                         passcode: d.passcode !== undefined ? d.passcode : local.passcode,
-                        users: Array.from(mergedMap.values()),
-                        blacklist: mergedBlack
+                        users: Array.from(map.values()),
+                        blacklist: Array.from(new Set([...cBlack, ...local.blacklist]))
                     };
-                    saveLocalDB(mergedDB);
-                    return mergedDB;
+                    saveLocalDB(merged);
+                    return merged;
                 }
             }
         } catch (e) {}
         return local;
     }
 
-    async function pushToCloud(db) {
+    async function pushDB(db) {
         saveLocalDB(db);
         try {
             await fetch(CLOUD_DB_URL, {
@@ -3779,421 +3768,312 @@ bootSumoulApp();
         } catch (e) {}
     }
 
-    function mountAccountAndBlacklistSystem() {
+    function mountNonDestructiveAuth() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
         const adminPage = topDoc.getElementById("smt-page-admin");
-        if (!modal || !lockLayer) {
-            setTimeout(mountAccountAndBlacklistSystem, 200);
+        if (!modal) {
+            setTimeout(mountNonDestructiveAuth, 200);
             return;
         }
 
         // ══════════════════════════════════════════════════════════════════
-        // 1. 全面重塑锁屏界面：支持【账号密码登录】与【QQ+自设密码+口令申请注册】
+        // 1. 在你原本的锁屏 UI 上原地微创改造（完全保留你原本的卡片样式与排版！）
         // ══════════════════════════════════════════════════════════════════
-        if (!lockLayer.getAttribute("data-v44-lock-rebuilt")) {
-            lockLayer.setAttribute("data-v44-lock-rebuilt", "1");
+        const qqInput = topDoc.getElementById("smt-lock-qq-input");
+        const codeInput = topDoc.getElementById("smt-lock-code-input");
+        const applyBtn = topDoc.getElementById("smt-lock-apply-btn");
+        const unlockBtn = topDoc.getElementById("smt-lock-unlock-btn");
+        const statusMsg = topDoc.getElementById("smt-lock-status-msg");
 
-            lockLayer.innerHTML = `
-                <div style="width:100%;max-width:296px;background:rgba(255,255,255,0.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid #E2E4EC;border-radius:20px;padding:24px 20px 20px 20px;box-sizing:border-box;box-shadow:0 18px 46px rgba(30,35,45,0.08);text-align:center;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;">
-                    
-                    <div style="font-size:8px;font-weight:800;color:#9A9EA8;letter-spacing:3px;margin-bottom:4px;">SUMOUL ARCHIVE · 宿命制作</div>
-                    <div style="font-size:16px;font-weight:900;color:#26262C;letter-spacing:1.5px;margin-bottom:14px;">通行证登录与注册</div>
+        if (qqInput && codeInput && applyBtn && unlockBtn && !qqInput.getAttribute("data-v45-bound")) {
+            qqInput.setAttribute("data-v45-bound", "1");
 
-                    <!-- 顶部模式切换Tab：账号密码登录 ⇄ 申请注册新账号 -->
-                    <div style="display:flex;background:#F2F3F7;border-radius:999px;padding:3px;margin-bottom:14px;border:1px solid #E5E6EE;">
-                        <div id="v44-tab-login" style="flex:1;padding:6px 0;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;background:#2C2C34;color:#FFFFFF;-webkit-text-fill-color:#FFFFFF;transition:all 0.2s;">
-                            🔑 账号密码登录
-                        </div>
-                        <div id="v44-tab-reg" style="flex:1;padding:6px 0;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;color:#6E6E78;transition:all 0.2s;">
-                            ✨ 申请注册账号
-                        </div>
-                    </div>
+            // 仅把原本的两个输入框提示词微调为「QQ账号 + 自设密码」，并在下方顺滑插入一个同款风格的「注册口令框」
+            qqInput.placeholder = "输入你的 QQ 号码（账号）...";
+            codeInput.placeholder = "输入你的登录密码（注册时自设）...";
 
-                    <!-- 表单输入区 -->
-                    <div style="display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:12px;">
-                        <div>
-                            <div style="font-size:8.5px;font-weight:800;color:#555560;margin-bottom:3px;padding-left:4px;">🐧 QQ号码（必填 · 用于绑定身份与后台显示）</div>
-                            <input type="text" id="v44-inp-qq" class="smt-wx-input" style="height:34px!important;font-size:11px!important;border-radius:10px!important;" placeholder="请输入你的真实 QQ 号码..." />
-                        </div>
-
-                        <div id="v44-row-user" style="display:none;">
-                            <div style="font-size:8.5px;font-weight:800;color:#555560;margin-bottom:3px;padding-left:4px;">👤 自定义登录账号 / 昵称（选填，不填默认用QQ号）</div>
-                            <input type="text" id="v44-inp-user" class="smt-wx-input" style="height:34px!important;font-size:11px!important;border-radius:10px!important;" placeholder="设置你的专属账号或昵称..." />
-                        </div>
-
-                        <div>
-                            <div style="font-size:8.5px;font-weight:800;color:#555560;margin-bottom:3px;padding-left:4px;" id="v44-lbl-pwd">🔒 登录密码</div>
-                            <input type="password" id="v44-inp-pwd" class="smt-wx-input" style="height:34px!important;font-size:11px!important;border-radius:10px!important;" placeholder="请输入你的密码..." />
-                        </div>
-
-                        <div id="v44-row-token" style="display:none;">
-                            <div style="font-size:8.5px;font-weight:800;color:#555560;margin-bottom:3px;padding-left:4px;">🎫 注册准入口令（向管理员宿命获取）</div>
-                            <input type="text" id="v44-inp-token" class="smt-wx-input" style="height:34px!important;font-size:11px!important;border-radius:10px!important;" placeholder="请输入注册准入口令..." />
-                        </div>
-                    </div>
-
-                    <!-- 提示信息栏 -->
-                    <div id="v44-lock-msg" style="min-height:18px;font-size:9.5px;font-weight:700;color:#686872;margin-bottom:10px;line-height:1.5;">
-                        首次使用请切换至上方「✨ 申请注册账号」设置密码
-                    </div>
-
-                    <!-- 主提交按钮 -->
-                    <div id="v44-submit-btn" style="width:100%;padding:9px 0;border-radius:999px;background:#2C2C34;color:#FFFFFF;-webkit-text-fill-color:#FFFFFF;font-size:11px;font-weight:800;letter-spacing:1.5px;cursor:pointer;box-shadow:0 6px 16px rgba(40,42,54,0.18);">
-                        立即登录进入
-                    </div>
-                </div>
-            `;
-
-            let curMode = "login"; // "login" | "reg"
-            const tabLogin = topDoc.getElementById("v44-tab-login");
-            const tabReg = topDoc.getElementById("v44-tab-reg");
-            const rowUser = topDoc.getElementById("v44-row-user");
-            const rowToken = topDoc.getElementById("v44-row-token");
-            const lblPwd = topDoc.getElementById("v44-lbl-pwd");
-            const inpQQ = topDoc.getElementById("v44-inp-qq");
-            const inpUser = topDoc.getElementById("v44-inp-user");
-            const inpPwd = topDoc.getElementById("v44-inp-pwd");
-            const inpToken = topDoc.getElementById("v44-inp-token");
-            const msgBox = topDoc.getElementById("v44-lock-msg");
-            const submitBtn = topDoc.getElementById("v44-submit-btn");
-
-            function switchMode(m) {
-                curMode = m;
-                if (m === "login") {
-                    tabLogin.style.cssText = "flex:1;padding:6px 0;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;background:#2C2C34;color:#FFFFFF;-webkit-text-fill-color:#FFFFFF;";
-                    tabReg.style.cssText = "flex:1;padding:6px 0;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;color:#6E6E78;";
-                    rowUser.style.display = "none";
-                    rowToken.style.display = "none";
-                    lblPwd.textContent = "🔒 登录密码（或管理员万能口令）";
-                    inpPwd.placeholder = "输入你注册时设置的密码...";
-                    submitBtn.textContent = "立即登录进入";
-                    msgBox.style.color = "#686872";
-                    msgBox.textContent = "请输入已注册的 QQ/账号 与密码登录";
-                } else {
-                    tabReg.style.cssText = "flex:1;padding:6px 0;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;background:#2C2C34;color:#FFFFFF;-webkit-text-fill-color:#FFFFFF;";
-                    tabLogin.style.cssText = "flex:1;padding:6px 0;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;color:#6E6E78;";
-                    rowUser.style.display = "block";
-                    rowToken.style.display = "block";
-                    lblPwd.textContent = "🔒 自己设置一个登录密码（必填）";
-                    inpPwd.placeholder = "请设置你的专属密码（至少4位）...";
-                    submitBtn.textContent = "提交注册并进入";
-                    msgBox.style.color = "#686872";
-                    msgBox.textContent = "填写 QQ 号、自设密码与口令即可完成注册";
-                }
+            let tokenInput = topDoc.getElementById("smt-lock-token-input");
+            if (!tokenInput) {
+                tokenInput = topDoc.createElement("input");
+                tokenInput.type = "text";
+                tokenInput.id = "smt-lock-token-input";
+                tokenInput.className = codeInput.className; // 100% 继承你原本输入框的 class 样式！
+                tokenInput.style.cssText = codeInput.style.cssText + ";margin-top:6px;";
+                tokenInput.placeholder = "首次注册请填口令（已注册直接点登录无需填）";
+                codeInput.parentNode.insertBefore(tokenInput, codeInput.nextSibling);
             }
 
-            tabLogin.onclick = () => switchMode("login");
-            tabReg.onclick = () => switchMode("reg");
+            // 按钮文字保留你原本的按钮外观，仅改为「申请注册」与「密码登录」
+            applyBtn.textContent = "申请注册";
+            unlockBtn.textContent = "密码登录";
 
-            // 检查已登录用户是否后来被管理员拉黑了！如果被拉黑，立即重新锁死踢出！
-            syncFromCloud().then((db) => {
-                const currentQQ = localStorage.getItem(K_LOGGED_USER) || localStorage.getItem("seoul_v15_unlocked_qq") || "";
-                if (currentQQ && db.blacklist.includes(String(currentQQ))) {
-                    localStorage.removeItem(K_LOGGED_USER);
+            // 启动时核验：如果当前已解锁的 QQ 被你拉黑了，立即锁回！
+            syncDB().then((db) => {
+                const curQQ = localStorage.getItem("seoul_v15_unlocked_qq") || "";
+                if (curQQ && db.blacklist.includes(String(curQQ))) {
                     localStorage.removeItem("seoul_v15_unlocked_qq");
-                    lockLayer.classList.remove("smt-unlocked-hide");
-                    msgBox.style.color = "#C5221F";
-                    msgBox.textContent = `🚫 你的 QQ【${currentQQ}】已被管理员拉黑封禁，权限已收回！`;
-                } else if (currentQQ && db.users.some((u) => u.qq === currentQQ)) {
-                    lockLayer.classList.add("smt-unlocked-hide");
+                    lockLayer?.classList.remove("smt-unlocked-hide");
+                    if (statusMsg) statusMsg.textContent = `🚫 QQ【${curQQ}】已被管理员拉黑封禁！`;
                 }
             });
 
-            // 点击登录 / 注册主按钮
-            submitBtn.onclick = async () => {
-                const rawQQ = inpQQ.value.trim();
-                const qq = rawQQ.replace(/\D/g, "");
-                const username = inpUser.value.trim() || qq;
-                const pwd = inpPwd.value.trim();
-                const token = inpToken.value.trim();
+            // 点击左侧【申请注册】按钮（保留你原本的按钮样式）
+            applyBtn.addEventListener("click", async (e) => {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                const qq = (qqInput.value || "").trim().replace(/\D/g, "");
+                const pwd = (codeInput.value || "").trim();
+                const tk = (tokenInput.value || "").trim();
 
                 if (!qq || qq.length < 5 || qq.length > 12) {
-                    msgBox.style.color = "#C5221F";
-                    msgBox.textContent = "⚠️ 请输入正确的 5~12 位数字 QQ 号码！";
+                    if (statusMsg) statusMsg.textContent = "⚠️ 请填写正确的 5~12 位 QQ 号码";
                     return;
                 }
                 if (!pwd) {
-                    msgBox.style.color = "#C5221F";
-                    msgBox.textContent = "⚠️ 密码不能为空！";
+                    if (statusMsg) statusMsg.textContent = "⚠️ 请在第二个框设置你的登录密码";
                     return;
                 }
 
-                submitBtn.textContent = "⏳ 正在核验身份...";
-                const db = await syncFromCloud();
+                applyBtn.textContent = "注册中...";
+                const db = await syncDB();
 
-                // ⛔ 第一优先级：检查该 QQ 是否在管理员黑名单中！
+                // 检查黑名单
                 if (db.blacklist.includes(qq)) {
-                    submitBtn.textContent = curMode === "login" ? "立即登录进入" : "提交注册并进入";
-                    msgBox.style.color = "#C5221F";
-                    msgBox.innerHTML = `🚫 <b>访问被拒绝</b>：QQ【${qq}】已被管理员列入黑名单封禁！`;
+                    applyBtn.textContent = "申请注册";
+                    if (statusMsg) statusMsg.textContent = `🚫 该 QQ【${qq}】已被管理员拉黑，禁止注册！`;
                     return;
                 }
 
-                if (curMode === "reg") {
-                    // ✨ 【申请注册模式】
-                    const requiredToken = (db.passcode || "").trim();
-                    if (requiredToken && token !== requiredToken && token.toUpperCase() !== "SUMOUL" && token !== "0400") {
-                        submitBtn.textContent = "提交注册并进入";
-                        msgBox.style.color = "#C5221F";
-                        msgBox.textContent = "❌ 注册准入口令不正确！请向管理员确认最新口令。";
-                        return;
-                    }
-
-                    const d = new Date();
-                    const timeStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-
-                    const existIdx = db.users.findIndex((u) => u.qq === qq);
-                    if (existIdx >= 0) {
-                        // 更新已有 QQ 的账号密码
-                        db.users[existIdx].username = username;
-                        db.users[existIdx].password = pwd;
-                        db.users[existIdx].time = timeStr;
-                    } else {
-                        // 新增一位注册用户（后台总人数 +1！）
-                        db.users.unshift({ qq, username, password: pwd, time: timeStr });
-                    }
-
-                    await pushToCloud(db);
-                    localStorage.setItem(K_LOGGED_USER, qq);
-                    localStorage.setItem("seoul_v15_unlocked_qq", qq);
-
-                    submitBtn.textContent = "✓ 注册成功";
-                    msgBox.style.color = "#1E7E34";
-                    msgBox.textContent = `🎉 注册成功！你的 QQ【${qq}】已计入后台名册，正在进入...`;
-                    setTimeout(() => {
-                        lockLayer.classList.add("smt-unlocked-hide");
-                        if (window._renderV44Admin) window._renderV44Admin();
-                    }, 500);
-                } else {
-                    // 🔑 【账号密码登录模式】
-                    const foundUser = db.users.find((u) => u.qq === qq || u.username === rawQQ);
-
-                    // 管理员特权直通：如果密码直接填了准入口令或万能码，自动帮他补办注册并登录！
-                    const isMasterPass = (db.passcode && pwd === db.passcode) || pwd.toUpperCase() === "SUMOUL888" || pwd === "0400";
-
-                    if (foundUser && foundUser.password === pwd) {
-                        localStorage.setItem(K_LOGGED_USER, qq);
-                        localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                        submitBtn.textContent = "✓ 登录成功";
-                        msgBox.style.color = "#1E7E34";
-                        msgBox.textContent = `🎉 欢迎回来，QQ【${qq}】验证通过！`;
-                        setTimeout(() => lockLayer.classList.add("smt-unlocked-hide"), 400);
-                    } else if (isMasterPass) {
-                        // 用口令直接登录时，如果名册里还没有他，自动把他加进后台注册名册里（人数+1）！
-                        if (!foundUser) {
-                            const d = new Date();
-                            const timeStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                            db.users.unshift({ qq, username: qq, password: pwd, time: timeStr });
-                            await pushToCloud(db);
-                        }
-                        localStorage.setItem(K_LOGGED_USER, qq);
-                        localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                        submitBtn.textContent = "✓ 口令核验通过";
-                        msgBox.style.color = "#1E7E34";
-                        msgBox.textContent = `🎉 口令验证通过！已登记 QQ【${qq}】进入系统...`;
-                        setTimeout(() => {
-                            lockLayer.classList.add("smt-unlocked-hide");
-                            if (window._renderV44Admin) window._renderV44Admin();
-                        }, 400);
-                    } else if (!foundUser) {
-                        submitBtn.textContent = "立即登录进入";
-                        msgBox.style.color = "#C5221F";
-                        msgBox.textContent = "⚠️ 该 QQ 号尚未注册！请先点击上方「✨ 申请注册账号」。";
-                    } else {
-                        submitBtn.textContent = "立即登录进入";
-                        msgBox.style.color = "#C5221F";
-                        msgBox.textContent = "❌ 登录密码错误！请重试。";
-                    }
+                // 检查注册口令
+                const reqTk = (db.passcode || "").trim();
+                if (reqTk && tk !== reqTk && tk.toUpperCase() !== "SUMOUL" && tk !== "0400") {
+                    applyBtn.textContent = "申请注册";
+                    if (statusMsg) statusMsg.textContent = "❌ 注册口令不正确，请向管理员确认口令";
+                    return;
                 }
-            };
+
+                const d = new Date();
+                const tStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+
+                const idx = db.users.findIndex((u) => String(u.qq) === qq);
+                if (idx >= 0) {
+                    db.users[idx].pwd = pwd;
+                    db.users[idx].time = tStr;
+                } else {
+                    db.users.unshift({ qq, pwd, time: tStr });
+                }
+
+                await pushDB(db);
+                localStorage.setItem("seoul_v15_unlocked_qq", qq);
+
+                applyBtn.textContent = "✓ 注册成功";
+                if (statusMsg) statusMsg.textContent = `🎉 注册成功！QQ【${qq}】已记录，正在进入...`;
+                setTimeout(() => {
+                    lockLayer?.classList.add("smt-unlocked-hide");
+                    if (window._refreshV45Admin) window._refreshV45Admin();
+                }, 450);
+            }, true);
+
+            // 点击右侧【密码登录】按钮（保留你原本的按钮样式）
+            unlockBtn.addEventListener("click", async (e) => {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                const qq = (qqInput.value || "").trim().replace(/\D/g, "");
+                const pwd = (codeInput.value || "").trim();
+
+                if (!qq || !pwd) {
+                    if (statusMsg) statusMsg.textContent = "⚠️ 请输入 QQ 号码与登录密码";
+                    return;
+                }
+
+                unlockBtn.textContent = "核验中...";
+                const db = await syncDB();
+                unlockBtn.textContent = "密码登录";
+
+                // 1. 黑名单拦截
+                if (db.blacklist.includes(qq)) {
+                    if (statusMsg) statusMsg.textContent = `🚫 该 QQ【${qq}】已被管理员拉黑封禁，禁止进入！`;
+                    return;
+                }
+
+                // 2. 校验已注册的账号密码
+                const user = db.users.find((u) => String(u.qq) === qq);
+                if (user && user.pwd === pwd) {
+                    localStorage.setItem("seoul_v15_unlocked_qq", qq);
+                    if (statusMsg) statusMsg.textContent = `🎉 登录成功！欢迎 QQ【${qq}】`;
+                    setTimeout(() => lockLayer?.classList.add("smt-unlocked-hide"), 350);
+                    return;
+                }
+
+                // 3. 如果直接用管理员口令或万能码登录，也自动计入后台注册名册（人数+1）并放行！
+                if ((db.passcode && pwd === db.passcode) || pwd === "0400" || pwd.toUpperCase() === "SUMOUL888") {
+                    if (!user) {
+                        const d = new Date();
+                        const tStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                        db.users.unshift({ qq, pwd, time: tStr });
+                        await pushDB(db);
+                    }
+                    localStorage.setItem("seoul_v15_unlocked_qq", qq);
+                    if (statusMsg) statusMsg.textContent = "🎉 口令核验通过！正在进入...";
+                    setTimeout(() => {
+                        lockLayer?.classList.add("smt-unlocked-hide");
+                        if (window._refreshV45Admin) window._refreshV45Admin();
+                    }, 350);
+                    return;
+                }
+
+                if (statusMsg) {
+                    statusMsg.textContent = user ? "❌ 登录密码错误！" : "⚠️ 该 QQ 尚未注册，请填口令点左侧「申请注册」";
+                }
+            }, true);
         }
 
         // ══════════════════════════════════════════════════════════════════
-        // 2. 全面改造你的【管理员后台 (#smt-page-admin)】：总注册人数 + QQ名册 + 拉黑系统
+        // 2. 在你原本的管理员后台里，恢复所有原版面板，并嵌入同款风格的「人数+QQ名册+拉黑」卡片
         // ══════════════════════════════════════════════════════════════════
-        if (adminPage && !topDoc.getElementById("smt-v44-admin-center")) {
-            // 隐藏旧的无用面板，保持后台清爽干净
+        if (adminPage) {
+            // 恢复你原本被隐藏的所有原生后台面板！
             Array.from(adminPage.children).forEach((ch) => {
-                if (ch.id !== "smt-v44-admin-center") ch.style.display = "none";
+                ch.style.display = "";
             });
+            ["smt-v44-admin-center", "smt-v43-admin-panel", "smt-v42-admin-panel", "smt-v41-admin-panel", "smt-v40-admin-panel"].forEach((id) => topDoc.getElementById(id)?.remove());
 
-            const center = topDoc.createElement("div");
-            center.id = "smt-v44-admin-center";
-            center.innerHTML = `
-                <!-- 📊 顶部：实时总注册人数与拉黑人数大字看板 -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-                    <div style="background:#2C2C34;color:#FFFFFF;border-radius:14px;padding:12px;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,0.08);">
-                        <div style="font-size:8.5px;font-weight:700;color:#B0B0BC;letter-spacing:1px;">📊 已注册总人数</div>
-                        <div id="v44-stat-total" style="font-size:24px;font-weight:900;color:#FFFFFF;margin-top:2px;">0 <span style="font-size:10px;font-weight:700;">人</span></div>
-                    </div>
-                    <div style="background:#FFFFFF;border:1.5px solid #E2E4EC;border-radius:14px;padding:12px;text-align:center;">
-                        <div style="font-size:8.5px;font-weight:800;color:#7A7A85;letter-spacing:1px;">🚫 已拉黑封禁 QQ</div>
-                        <div id="v44-stat-black" style="font-size:24px;font-weight:900;color:#C5221F;margin-top:2px;">0 <span style="font-size:10px;font-weight:700;">人</span></div>
-                    </div>
-                </div>
-
-                <!-- 🎫 准入口令设置与手动添加/刷新 -->
-                <div class="smt-section-box" style="margin-bottom:12px!important;background:#F8F8FA!important;border:1px solid #E2E4EC!important;">
+            if (!topDoc.getElementById("smt-v45-native-box")) {
+                const box = topDoc.createElement("div");
+                box.id = "smt-v45-native-box";
+                box.className = "smt-section-box"; // 100% 使用你原本的卡片 class 样式！
+                box.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#2C2C34;">🎫 注册准入口令设置</span>
-                        <span class="smt-pill-btn dark" id="v44-sync-btn" style="height:22px!important;font-size:8.5px!important;">↻ 刷新同步最新名册</span>
+                        <span style="font-size:10px;font-weight:800;color:#2C2C32;">📊 注册人数统计 · QQ名册 · 拉黑管理</span>
+                        <span class="smt-pill-btn dark" id="v45-sync-btn" style="height:21px!important;font-size:8px!important;">↻ 刷新人数与名册</span>
                     </div>
-                    <div style="display:flex;gap:6px;">
-                        <input type="text" id="v44-set-token-inp" class="smt-wx-input" style="height:28px!important;font-size:10px!important;" placeholder="设置注册口令 (留空则无需口令)..." />
-                        <span class="smt-pill-btn dark" id="v44-save-token-btn" style="height:28px!important;white-space:nowrap;">保存口令</span>
-                    </div>
-                    <div style="font-size:8px;color:#7A7A85;margin-top:5px;">
-                        💡 用户注册时需填写此口令（当前默认口令为：<b>宿命</b>）。每注册一人，上方总人数自动 +1 并显示其 QQ 号。
-                    </div>
-                </div>
 
-                <!-- 📋 已注册用户 QQ 号与账号密码完整名册 -->
-                <div class="smt-section-box" style="margin-bottom:12px!important;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#2C2C34;">📋 已注册用户 QQ 名册 (<span id="v44-list-cnt">0</span>人)</span>
-                        <span class="smt-pill-btn" id="v44-add-user-btn" style="height:21px!important;font-size:8px!important;">+ 手动代注册QQ</span>
-                    </div>
-                    <div id="v44-user-list" style="max-height:210px;overflow-y:auto;"></div>
-                </div>
-
-                <!-- 🚫 黑名单封禁拉黑系统 -->
-                <div class="smt-section-box" style="border:1.5px solid #FAD2CF!important;background:#FFF8F7!important;">
-                    <div style="font-size:10px;font-weight:800;color:#C5221F;margin-bottom:6px;">🚫 黑名单封禁系统（被拉黑的 QQ 永久禁止登录与注册）</div>
+                    <!-- 极简白灰人数统计条 -->
                     <div style="display:flex;gap:6px;margin-bottom:8px;">
-                        <input type="text" id="v44-black-inp" class="smt-wx-input" style="height:28px!important;font-size:10px!important;background:#FFF!important;" placeholder="输入要拉黑封禁的 QQ 号码..." />
-                        <span class="smt-pill-btn dark" id="v44-black-add-btn" style="height:28px!important;background:#C5221F!important;border-color:#C5221F!important;white-space:nowrap;">🚫 立即拉黑</span>
+                        <div style="flex:1;background:#F4F5F8;border:1px solid #E4E6EE;border-radius:10px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:8.5px;font-weight:700;color:#6E6E78;">已注册总人数</span>
+                            <b id="v45-total-num" style="font-size:13px;font-weight:900;color:#2C2C32;">0 人</b>
+                        </div>
+                        <div style="flex:1;background:#F4F5F8;border:1px solid #E4E6EE;border-radius:10px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:8.5px;font-weight:700;color:#6E6E78;">已拉黑封禁</span>
+                            <b id="v45-black-num" style="font-size:13px;font-weight:900;color:#2C2C32;">0 人</b>
+                        </div>
                     </div>
-                    <div id="v44-black-list" style="max-height:120px;overflow-y:auto;"></div>
-                </div>
-            `;
-            adminPage.prepend(center);
 
-            async function renderV44Admin() {
-                const sBtn = topDoc.getElementById("v44-sync-btn");
-                if (sBtn) sBtn.textContent = "⏳ 同步中...";
-                const db = await syncFromCloud();
-                if (sBtn) sBtn.textContent = "↻ 刷新同步最新名册";
+                    <!-- 注册口令修改与手动拉黑输入行 -->
+                    <div style="display:flex;gap:5px;margin-bottom:6px;">
+                        <input type="text" id="v45-token-inp" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="注册准入口令 (默认:宿命)" />
+                        <span class="smt-pill-btn dark" id="v45-token-save" style="height:26px!important;white-space:nowrap;">改口令</span>
+                    </div>
+                    <div style="display:flex;gap:5px;margin-bottom:8px;">
+                        <input type="text" id="v45-black-inp" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="输入要直接拉黑封禁的 QQ 号..." />
+                        <span class="smt-pill-btn dark" id="v45-black-btn" style="height:26px!important;white-space:nowrap;">🚫 拉黑该QQ</span>
+                    </div>
 
-                topDoc.getElementById("v44-stat-total").innerHTML = `${db.users.length} <span style="font-size:10px;font-weight:700;">人</span>`;
-                topDoc.getElementById("v44-stat-black").innerHTML = `${db.blacklist.length} <span style="font-size:10px;font-weight:700;">人</span>`;
-                topDoc.getElementById("v44-list-cnt").textContent = db.users.length;
-                topDoc.getElementById("v44-set-token-inp").value = db.passcode || "";
+                    <!-- 注册用户 QQ 号与密码列表 -->
+                    <div style="font-size:8.5px;font-weight:800;color:#555560;margin-bottom:4px;">📋 已注册用户 QQ 名册（注册一个自动+1）：</div>
+                    <div id="v45-user-list" style="max-height:150px;overflow-y:auto;margin-bottom:6px;"></div>
 
-                const uBox = topDoc.getElementById("v44-user-list");
-                if (!db.users.length) {
-                    uBox.innerHTML = `<div style="text-align:center;padding:16px;font-size:9.5px;color:#9A9EA8;background:#F8F8FA;border-radius:10px;">暂无注册用户 · 有人注册后此处会自动增加人数并显示其 QQ 号</div>`;
-                } else {
-                    uBox.innerHTML = db.users.map((u, i) => {
-                        const isBlocked = db.blacklist.includes(String(u.qq));
-                        return `
-                            <div style="display:flex;justify-content:space-between;align-items:center;background:${isBlocked ? "#FFF0F0" : "#F8F8FA"};border:1px solid ${isBlocked ? "#FAD2CF" : "#EAEAF0"};border-radius:10px;padding:8px 10px;margin-bottom:6px;">
-                                <div>
-                                    <div style="font-size:10.5px;font-weight:800;color:#26262C;">
-                                        #${db.users.length - i} · 🐧 QQ：<span style="user-select:all;color:#1F1F24;">${u.qq}</span>
-                                        ${isBlocked ? `<span style="background:#C5221F;color:#FFF;font-size:7.5px;padding:1px 5px;border-radius:4px;margin-left:4px;">已拉黑</span>` : ""}
+                    <!-- 已拉黑名单 -->
+                    <div id="v45-black-list" style="max-height:80px;overflow-y:auto;"></div>
+                `;
+                adminPage.prepend(box);
+
+                async function refreshV45Admin() {
+                    const btn = topDoc.getElementById("v45-sync-btn");
+                    if (btn) btn.textContent = "同步中...";
+                    const db = await syncDB();
+                    if (btn) btn.textContent = "↻ 刷新人数与名册";
+
+                    topDoc.getElementById("v45-total-num").textContent = `${db.users.length} 人`;
+                    topDoc.getElementById("v45-black-num").textContent = `${db.blacklist.length} 人`;
+                    topDoc.getElementById("v45-token-inp").value = db.passcode || "";
+
+                    const uList = topDoc.getElementById("v45-user-list");
+                    if (!db.users.length) {
+                        uList.innerHTML = `<div style="text-align:center;padding:10px;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;font-size:8.5px;color:#9A9EA8;">暂无注册用户 · 有人注册后会自动显示人数与 QQ 号</div>`;
+                    } else {
+                        uList.innerHTML = db.users.map((u, idx) => {
+                            const isBlk = db.blacklist.includes(String(u.qq));
+                            return `
+                                <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EAEAF0;border-radius:8px;padding:6px 9px;margin-bottom:4px;font-size:9px;">
+                                    <div>
+                                        <b>#${db.users.length - idx} · QQ: ${u.qq}</b>
+                                        <span style="color:#888;margin-left:6px;">密码: ${u.pwd} (${u.time || "刚刚"})</span>
                                     </div>
-                                    <div style="font-size:8.5px;color:#6E6E78;margin-top:2px;">
-                                        账号：<b>${u.username || u.qq}</b> &nbsp;|&nbsp; 密码：<b>${u.password}</b> &nbsp;|&nbsp; ${u.time || "刚刚"}
+                                    <div style="display:flex;gap:4px;">
+                                        ${isBlk
+                                            ? `<span class="smt-pill-btn" data-v45unblk="${u.qq}" style="height:20px!important;font-size:8px!important;">解封</span>`
+                                            : `<span class="smt-pill-btn dark" data-v45blk="${u.qq}" style="height:20px!important;font-size:8px!important;">拉黑</span>`
+                                        }
+                                        <span class="smt-pill-btn" data-v45del="${u.qq}" style="height:20px!important;font-size:8px!important;">删</span>
                                     </div>
                                 </div>
-                                <div style="display:flex;gap:4px;">
-                                    ${isBlocked
-                                        ? `<span class="smt-pill-btn" data-v44unblock="${u.qq}" style="height:22px!important;font-size:8px!important;">解封</span>`
-                                        : `<span class="smt-pill-btn dark" data-v44block="${u.qq}" style="height:22px!important;font-size:8px!important;background:#C5221F!important;border-color:#C5221F!important;">🚫 拉黑</span>`
-                                    }
-                                    <span class="smt-pill-btn" data-v44del="${u.qq}" style="height:22px!important;font-size:8px!important;">删除</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join("");
-                }
+                            `;
+                        }).join("");
+                    }
 
-                const bBox = topDoc.getElementById("v44-black-list");
-                if (!db.blacklist.length) {
-                    bBox.innerHTML = `<div style="text-align:center;padding:8px;font-size:8.5px;color:#9A9EA8;">当前黑名单为空</div>`;
-                } else {
-                    bBox.innerHTML = db.blacklist.map((qq) => `
-                        <div style="display:flex;justify-content:space-between;align-items:center;background:#FFFFFF;border:1px solid #FAD2CF;border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:9.5px;font-weight:800;color:#C5221F;">
-                            <span>🚫 已封禁 QQ：${qq}</span>
-                            <span class="smt-pill-btn" data-v44unblock="${qq}" style="height:20px!important;font-size:8px!important;">解除拉黑</span>
+                    const bList = topDoc.getElementById("v45-black-list");
+                    bList.innerHTML = db.blacklist.map((q) => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:#F8F8FA;border:1px dashed #CCCCCC;border-radius:7px;padding:4px 8px;margin-top:3px;font-size:8.5px;color:#555;">
+                            <span>🚫 已拉黑 QQ：<b>${q}</b></span>
+                            <span data-v45unblk="${q}" style="cursor:pointer;text-decoration:underline;">解除拉黑</span>
                         </div>
                     `).join("");
+
+                    box.querySelectorAll("[data-v45blk]").forEach((b) => b.onclick = async () => {
+                        const q = String(b.getAttribute("data-v45blk"));
+                        const latest = await syncDB();
+                        if (!latest.blacklist.includes(q)) latest.blacklist.unshift(q);
+                        await pushDB(latest);
+                        refreshV45Admin();
+                    });
+                    box.querySelectorAll("[data-v45unblk]").forEach((b) => b.onclick = async () => {
+                        const q = String(b.getAttribute("data-v45unblk"));
+                        const latest = await syncDB();
+                        latest.blacklist = latest.blacklist.filter((x) => x !== q);
+                        await pushDB(latest);
+                        refreshV45Admin();
+                    });
+                    box.querySelectorAll("[data-v45del]").forEach((b) => b.onclick = async () => {
+                        const q = String(b.getAttribute("data-v45del"));
+                        const latest = await syncDB();
+                        latest.users = latest.users.filter((u) => String(u.qq) !== q);
+                        await pushDB(latest);
+                        refreshV45Admin();
+                    });
                 }
 
-                // 绑定一键拉黑事件
-                center.querySelectorAll("[data-v44block]").forEach((btn) => btn.onclick = async () => {
-                    const qNum = String(btn.getAttribute("data-v44block"));
-                    const latest = await syncFromCloud();
-                    if (!latest.blacklist.includes(qNum)) latest.blacklist.unshift(qNum);
-                    await pushToCloud(latest);
-                    renderV44Admin();
+                window._refreshV45Admin = refreshV45Admin;
+                topDoc.getElementById("v45-sync-btn").onclick = () => refreshV45Admin();
+
+                topDoc.getElementById("v45-token-save").onclick = async (e) => {
+                    const latest = await syncDB();
+                    latest.passcode = topDoc.getElementById("v45-token-inp").value.trim();
+                    await pushDB(latest);
+                    e.target.textContent = "✓ 已改";
+                    setTimeout(() => (e.target.textContent = "改口令"), 1000);
+                };
+
+                topDoc.getElementById("v45-black-btn").onclick = async () => {
+                    const q = (topDoc.getElementById("v45-black-inp").value || "").trim().replace(/\D/g, "");
+                    if (!q) return;
+                    topDoc.getElementById("v45-black-inp").value = "";
+                    const latest = await syncDB();
+                    if (!latest.blacklist.includes(q)) latest.blacklist.unshift(q);
+                    await pushDB(latest);
+                    refreshV45Admin();
+                };
+
+                ["smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
+                    topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(refreshV45Admin, 80));
                 });
 
-                // 绑定解除拉黑事件
-                center.querySelectorAll("[data-v44unblock]").forEach((btn) => btn.onclick = async () => {
-                    const qNum = String(btn.getAttribute("data-v44unblock"));
-                    const latest = await syncFromCloud();
-                    latest.blacklist = latest.blacklist.filter((x) => x !== qNum);
-                    await pushToCloud(latest);
-                    renderV44Admin();
-                });
-
-                // 绑定删除名册记录事件
-                center.querySelectorAll("[data-v44del]").forEach((btn) => btn.onclick = async () => {
-                    const qNum = String(btn.getAttribute("data-v44del"));
-                    const latest = await syncFromCloud();
-                    latest.users = latest.users.filter((u) => String(u.qq) !== qNum);
-                    await pushToCloud(latest);
-                    renderV44Admin();
-                });
+                refreshV45Admin();
             }
-
-            window._renderV44Admin = renderV44Admin;
-
-            topDoc.getElementById("v44-sync-btn").onclick = () => renderV44Admin();
-
-            topDoc.getElementById("v44-save-token-btn").onclick = async (e) => {
-                const newToken = topDoc.getElementById("v44-set-token-inp").value.trim();
-                e.target.textContent = "保存中...";
-                const latest = await syncFromCloud();
-                latest.passcode = newToken;
-                await pushToCloud(latest);
-                e.target.textContent = "✓ 已保存";
-                setTimeout(() => (e.target.textContent = "保存口令"), 1200);
-            };
-
-            topDoc.getElementById("v44-black-add-btn").onclick = async () => {
-                const qVal = topDoc.getElementById("v44-black-inp").value.trim().replace(/\D/g, "");
-                if (!qVal || qVal.length < 5) return alert("请输入正确的 QQ 号码！");
-                topDoc.getElementById("v44-black-inp").value = "";
-                const latest = await syncFromCloud();
-                if (!latest.blacklist.includes(qVal)) latest.blacklist.unshift(qVal);
-                await pushToCloud(latest);
-                renderV44Admin();
-            };
-
-            topDoc.getElementById("v44-add-user-btn").onclick = async () => {
-                const qq = prompt("请输入要手动添加的 QQ 号码：");
-                if (!qq || !/^\d{5,12}$/.test(qq.trim())) return;
-                const pwd = prompt(`请为 QQ【${qq.trim()}】设置初始密码：`, "123456");
-                if (!pwd) return;
-                const latest = await syncFromCloud();
-                const d = new Date();
-                const tStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                latest.users = latest.users.filter((u) => u.qq !== qq.trim());
-                latest.users.unshift({ qq: qq.trim(), username: qq.trim(), password: pwd.trim(), time: tStr });
-                await pushToCloud(latest);
-                renderV44Admin();
-            };
-
-            ["smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
-                topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(renderV44Admin, 80));
-            });
-
-            renderV44Admin();
         }
     }
 
-    mountAccountAndBlacklistSystem();
+    mountNonDestructiveAuth();
 })();
