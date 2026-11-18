@@ -1772,8 +1772,8 @@ bootSumoulApp();
     patchCleanMelancholySplash();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 终极防崩修复版补丁：100%解决点击打不开Bug + 纯白泡泡动态流(最近聊天排序) + 满配独立情侣空间App】
-// 用法：直接替换 index.js 最末尾刚才那段补丁即可！
+// 🤍 【Sumoul App 终极防串页修复版补丁：100%根治情侣空间出现在其他页面的Bug！】
+// 包含：1. 路由切换自动清场锁（绝不串页） 2. 纯白无边框泡泡韩系动态流(按最近聊天排序) 3. 满配独立情侣空间App
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -1789,7 +1789,7 @@ bootSumoulApp();
             return;
         }
 
-        // 🛡️ 【核心修复1：挂载旧ID防崩隐形护盾】防止主代码的 renderCoupleSpaceAll() 找不到旧节点报错卡死打开事件！
+        // 🛡️ 1. 挂载旧ID防崩隐形护盾（防止主代码报错）
         if (!topDoc.getElementById("smt-legacy-shield")) {
             const shield = topDoc.createElement("div");
             shield.id = "smt-legacy-shield";
@@ -1896,7 +1896,20 @@ bootSumoulApp();
             #seoul-mini-theater-modal .kr-act-pill { display: inline-flex !important; align-items: center !important; gap: 5px !important; height: 26px !important; padding: 0 10px !important; background: #FFFFFF !important; border: 1px solid #E6E6EC !important; border-radius: 999px !important; font-size: 9.5px !important; font-weight: 700 !important; color: #2C2C32 !important; cursor: pointer !important; }
             #seoul-mini-theater-modal .kr-cmt-list { background: #FFFFFF !important; border: 1px solid #EFEFF4 !important; border-radius: 12px !important; padding: 9px 11px !important; font-size: 10.2px !important; font-weight: 600 !important; line-height: 1.6 !important; }
 
-            #seoul-mini-theater-modal #smt-page-couple_app { padding: 2px 2px 20px 2px !important; gap: 11px !important; }
+            /* 🔥 核心修复：严格控制 #smt-page-couple_app 默认隐藏，只有带 .active 时才显示！ */
+            #seoul-mini-theater-modal #smt-page-couple_app {
+                display: none !important;
+                flex-direction: column !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                padding: 2px 2px 20px 2px !important;
+                gap: 11px !important;
+            }
+            #seoul-mini-theater-modal #smt-page-couple_app.active {
+                display: flex !important;
+            }
+
             #seoul-mini-theater-modal .cp-hero-box { background: #F8F8FA !important; border: 1px solid #EAEAF0 !important; border-radius: 22px !important; padding: 15px !important; background-size: cover !important; background-position: center !important; flex-shrink: 0 !important; }
             #seoul-mini-theater-modal .cp-hero-glass { background: rgba(255, 255, 255, 0.94) !important; border: 1px solid #EFEFF4 !important; border-radius: 17px !important; padding: 16px 12px 13px 12px !important; }
             #seoul-mini-theater-modal .cp-live-row { display: grid !important; grid-template-columns: 1.15fr 0.85fr !important; gap: 9px !important; flex-shrink: 0 !important; }
@@ -2457,7 +2470,7 @@ bootSumoulApp();
             } catch (err) {}
         }
 
-        // 绑定独立情侣空间全部按钮事件
+        // 绑定独立情侣空间按钮事件
         topDoc.getElementById("cp-app-bg-btn").onclick = () => { const d = loadCp(), u = prompt("粘贴情侣空间背景图 URL（留空恢复默认）：", d.bgUrl || ""); if (u !== null) { d.bgUrl = u.trim(); saveCp(d); renderStandaloneCoupleSpace(); } };
         topDoc.getElementById("cp-app-date-btn").onclick = () => { const d = loadCp(), v = prompt("修改相恋起始日 (YYYY-MM-DD)：", d.startDate); if (v) { d.startDate = v.trim(); saveCp(d); renderStandaloneCoupleSpace(); } };
         topDoc.getElementById("cp-app-mood-btn").onclick = () => { const d = loadCp(), v = prompt("修改今日状态温度：", d.mood); if (v) { d.mood = v.trim(); saveCp(d); renderStandaloneCoupleSpace(); } };
@@ -2641,7 +2654,32 @@ bootSumoulApp();
             } catch (err) { alert(err.message); } finally { e.target.textContent = "✦ 让TA发新帖"; }
         };
 
-        // 绑定主页「情侣空间 App」打开、子功能切换与返回导航
+        /* 🛡️ 【核心修复2：防串页全局清场锁】当点击底部任何 Tab 或其他应用时，立刻隐藏 #smt-page-couple_app！ */
+        function hideCoupleAppPage() {
+            coupleAppPage.classList.remove("active");
+            ["sp_pet", "sp_4cut", "sp_qa", "sp_mood", "sp_coupon", "sp_guest"].forEach((k) => {
+                topDoc.getElementById(`smt-page-${k}`)?.classList.remove("active");
+            });
+        }
+
+        // 监听底部 5 个导航栏点击，切换任何主栏时自动关掉情侣空间 App！
+        modal.querySelectorAll(".smt-tab-item").forEach((tab) => {
+            tab.addEventListener("click", () => {
+                hideCoupleAppPage();
+                if (tab.getAttribute("data-page") === "space") {
+                    setTimeout(renderKrMoments, 20);
+                }
+            }, true);
+        });
+
+        // 监听微信设置、管理员后台、查手机、网易云、日记的打开按钮，自动关掉情侣空间 App！
+        ["smt-wx-cfg-btn", "smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
+            topDoc.getElementById(id)?.addEventListener("click", () => hideCoupleAppPage(), true);
+        });
+        homePage.querySelectorAll("[data-openapp]").forEach((el) => {
+            el.addEventListener("click", () => hideCoupleAppPage(), true);
+        });
+
         function openStandaloneCoupleApp() {
             renderStandaloneCoupleSpace();
             topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
@@ -2674,11 +2712,11 @@ bootSumoulApp();
                 openStandaloneCoupleApp();
             } else if (coupleAppPage.classList.contains("active")) {
                 e.stopImmediatePropagation(); e.preventDefault();
+                hideCoupleAppPage();
                 topDoc.querySelector('.smt-tab-item[data-page="home"]')?.click();
             }
         }, true);
 
-        // 🛡️ 【核心修复2：补丁自带独立强制唤醒器】点击悬浮球或扩展菜单 100% 强制打开弹窗！
         function safeForceOpenModal() {
             modal.classList.add("smt-open");
             modal.style.setProperty("display", "flex", "important");
@@ -2710,7 +2748,6 @@ bootSumoulApp();
             }
         }, 1200);
 
-        tab2?.addEventListener("click", () => setTimeout(renderKrMoments, 30));
         renderKrMoments();
         renderStandaloneCoupleSpace();
     }
