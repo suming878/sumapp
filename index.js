@@ -3027,3 +3027,330 @@ bootSumoulApp();
 
     mountWhiteMistTearSplash();
 })();
+// ==========================================================================
+// 🤍 【Sumoul App 悬浮球高定重塑补丁：白雾磨砂星芒圆球 + 自由拖拽移动 + 贴边隐身/彻底隐藏】
+// 用法：直接粘贴在 index.js 最末尾最后一行后面！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+    const K_FAB_POS = "sumoul_v30_fab_pos";
+
+    function mountDraggableMistFab() {
+        const btn = topDoc.getElementById("seoul-mini-theater-btn");
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        if (!btn || !modal) {
+            setTimeout(mountDraggableMistFab, 200);
+            return;
+        }
+
+        // 防止重复初始化
+        if (btn.getAttribute("data-v30-fab") === "1") return;
+        btn.setAttribute("data-v30-fab", "1");
+
+        // 1. 注入高定白雾磨砂悬浮球与贴边隐身条 CSS
+        topDoc.getElementById("sumoul-v30-fab-css")?.remove();
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-v30-fab-css";
+        st.innerHTML = `
+            @keyframes smFabStarBreathe {
+                0%, 100% { transform: scale(0.92) rotate(0deg); opacity: 0.75; }
+                50% { transform: scale(1.08) rotate(8deg); opacity: 1; }
+            }
+
+            /* 正常状态：38x38px 韩系纯白磨砂玻璃灵动圆球 */
+            #seoul-mini-theater-btn {
+                position: fixed !important;
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+                background: rgba(255, 255, 255, 0.84) !important;
+                backdrop-filter: blur(14px) !important;
+                -webkit-backdrop-filter: blur(14px) !important;
+                border: 1px solid rgba(220, 220, 228, 0.9) !important;
+                box-shadow: 0 6px 20px rgba(30, 30, 40, 0.10), inset 0 1px 2px #FFFFFF !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: grab !important;
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                touch-action: none !important;
+                z-index: 2147483645 !important;
+                opacity: 0.82 !important;
+                transition: width 0.28s cubic-bezier(0.22,1,0.36,1), height 0.28s cubic-bezier(0.22,1,0.36,1), border-radius 0.28s ease, opacity 0.25s ease, box-shadow 0.25s ease !important;
+            }
+            #seoul-mini-theater-btn:hover,
+            #seoul-mini-theater-btn.dragging {
+                opacity: 1 !important;
+                box-shadow: 0 8px 26px rgba(30, 30, 40, 0.16), inset 0 1px 2px #FFFFFF !important;
+            }
+            #seoul-mini-theater-btn .sm-fab-core {
+                width: 20px !important;
+                height: 20px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                pointer-events: none !important;
+                animation: smFabStarBreathe 4s ease-in-out infinite !important;
+            }
+
+            /* 悬浮球左上角极小巧的「贴边隐身」微触点（悬停或长按可见） */
+            #seoul-mini-theater-btn .sm-fab-hide-dot {
+                position: absolute !important;
+                top: -3px !important;
+                right: -3px !important;
+                width: 14px !important;
+                height: 14px !important;
+                border-radius: 50% !important;
+                background: #FFFFFF !important;
+                border: 1px solid #DCDCE4 !important;
+                color: #777777 !important;
+                font-size: 8px !important;
+                font-weight: 700 !important;
+                line-height: 12px !important;
+                text-align: center !important;
+                cursor: pointer !important;
+                pointer-events: auto !important;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+                opacity: 0.85 !important;
+            }
+
+            /* ── 贴边隐身状态（变成紧贴屏幕边缘的一根 6x36px 半透明白雾细条，完全不挡视线！） ── */
+            #seoul-mini-theater-btn.sm-docked-edge {
+                width: 8px !important;
+                min-width: 8px !important;
+                height: 40px !important;
+                border-radius: 99px !important;
+                background: rgba(255, 255, 255, 0.65) !important;
+                border: 1px solid rgba(200, 200, 210, 0.8) !important;
+                opacity: 0.55 !important;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+            }
+            #seoul-mini-theater-btn.sm-docked-edge .sm-fab-core,
+            #seoul-mini-theater-btn.sm-docked-edge .sm-fab-hide-dot {
+                display: none !important;
+            }
+
+            /* 彻底隐藏状态 */
+            #seoul-mini-theater-btn.sm-fully-hidden {
+                display: none !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        // 2. 替换悬浮球内部 HTML 为极简星芒微光图标 + 右上角「-」贴边隐身小圆点
+        btn.innerHTML = `
+            <div class="sm-fab-core">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#3A3A40" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.5 L14.4 9.6 L21.5 12 L14.4 14.4 L12 21.5 L9.6 14.4 L2.5 12 L9.6 9.6 Z" fill="rgba(255,255,255,0.7)" />
+                    <circle cx="12" cy="12" r="1.3" fill="#3A3A40" />
+                </svg>
+            </div>
+            <span class="sm-fab-hide-dot" title="点击贴边隐身（长按可彻底隐藏）">−</span>
+        `;
+
+        // 3. 读取保存的坐标与状态
+        function loadFabState() {
+            const def = { left: window.innerWidth - 52, top: window.innerHeight - 130, docked: false, side: "right", hidden: false };
+            try {
+                return Object.assign(def, JSON.parse(localStorage.getItem(K_FAB_POS) || "{}"));
+            } catch (e) { return def; }
+        }
+        function saveFabState(s) {
+            localStorage.setItem(K_FAB_POS, JSON.stringify(s));
+        }
+
+        let state = loadFabState();
+
+        function applyFabPosition() {
+            const vw = topWin.innerWidth || 390;
+            const vh = topWin.innerHeight || 800;
+            state.top = Math.max(16, Math.min(vh - 54, state.top));
+
+            btn.style.setProperty("bottom", "auto", "important");
+            btn.style.setProperty("right", "auto", "important");
+            btn.style.setProperty("top", `${state.top}px`, "important");
+
+            if (state.hidden) {
+                btn.classList.add("sm-fully-hidden");
+                return;
+            } else {
+                btn.classList.remove("sm-fully-hidden");
+            }
+
+            if (state.docked) {
+                btn.classList.add("sm-docked-edge");
+                const edgeX = state.side === "left" ? 2 : (vw - 10);
+                btn.style.setProperty("left", `${edgeX}px`, "important");
+            } else {
+                btn.classList.remove("sm-docked-edge");
+                state.left = Math.max(8, Math.min(vw - 46, state.left));
+                btn.style.setProperty("left", `${state.left}px`, "important");
+            }
+        }
+
+        applyFabPosition();
+        topWin.addEventListener("resize", applyFabPosition);
+
+        // 4. 阻断主代码在 btn 上绑定的旧死板 onclick，改由智能拖拽判别器接管！
+        btn.onclick = null;
+
+        let isDown = false;
+        let hasMoved = false;
+        let startX = 0, startY = 0;
+        let origLeft = 0, origTop = 0;
+
+        function onPointerDown(clientX, clientY, target) {
+            if (target && target.classList?.contains("sm-fab-hide-dot")) return;
+            isDown = true;
+            hasMoved = false;
+            startX = clientX;
+            startY = clientY;
+            const rect = btn.getBoundingClientRect();
+            origLeft = rect.left;
+            origTop = rect.top;
+            btn.classList.add("dragging");
+        }
+
+        function onPointerMove(clientX, clientY) {
+            if (!isDown) return;
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+            if (Math.hypot(dx, dy) > 6) {
+                hasMoved = true;
+                if (state.docked) {
+                    state.docked = false;
+                    btn.classList.remove("sm-docked-edge");
+                }
+                const vw = topWin.innerWidth || 390;
+                const vh = topWin.innerHeight || 800;
+                state.left = Math.max(4, Math.min(vw - 42, origLeft + dx));
+                state.top = Math.max(12, Math.min(vh - 50, origTop + dy));
+                btn.style.setProperty("left", `${state.left}px`, "important");
+                btn.style.setProperty("top", `${state.top}px`, "important");
+            }
+        }
+
+        function onPointerUp() {
+            if (!isDown) return;
+            isDown = false;
+            btn.classList.remove("dragging");
+
+            if (hasMoved) {
+                const vw = topWin.innerWidth || 390;
+                // 如果直接拖到了最左边或最右边边缘 (<12px)，自动进入贴边隐身细条状态！
+                if (state.left <= 10) {
+                    state.side = "left";
+                    state.docked = true;
+                } else if (state.left >= vw - 48) {
+                    state.side = "right";
+                    state.docked = true;
+                } else {
+                    state.side = state.left < vw / 2 ? "left" : "right";
+                }
+                saveFabState(state);
+                applyFabPosition();
+            }
+        }
+
+        // 鼠标拖拽支持
+        btn.addEventListener("mousedown", (e) => {
+            if (e.button !== 0) return;
+            onPointerDown(e.clientX, e.clientY, e.target);
+        });
+        topDoc.addEventListener("mousemove", (e) => onPointerMove(e.clientX, e.clientY));
+        topDoc.addEventListener("mouseup", () => onPointerUp());
+
+        // 手机触摸丝滑拖拽支持
+        btn.addEventListener("touchstart", (e) => {
+            const t = e.touches[0];
+            if (t) onPointerDown(t.clientX, t.clientY, e.target);
+        }, { passive: true });
+        topDoc.addEventListener("touchmove", (e) => {
+            if (!isDown) return;
+            const t = e.touches[0];
+            if (t) onPointerMove(t.clientX, t.clientY);
+        }, { passive: true });
+        topDoc.addEventListener("touchend", () => onPointerUp());
+
+        // 5. 点击右上角「−」微触点：一键缩成贴边隐身细条！
+        btn.querySelector(".sm-fab-hide-dot")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const vw = topWin.innerWidth || 390;
+            state.side = state.left < vw / 2 ? "left" : "right";
+            state.docked = true;
+            saveFabState(state);
+            applyFabPosition();
+        }, true);
+
+        // 6. 拦截捕获级 click：如果是拖拽松手或点隐身细条展开，绝不误触打开弹窗！
+        topDoc.addEventListener("click", (e) => {
+            const t = e.target;
+            if (!t || !t.closest) return;
+            if (t.closest(".sm-fab-hide-dot")) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                return;
+            }
+            if (t.closest("#seoul-mini-theater-btn")) {
+                // 如果刚刚是在拖动位置，阻止打开弹窗！
+                if (hasMoved) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    hasMoved = false;
+                    return;
+                }
+                // 如果当前处于「贴边隐身细条」状态，点第一下先弹出恢复成圆球！
+                if (state.docked) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    state.docked = false;
+                    const vw = topWin.innerWidth || 390;
+                    state.left = state.side === "left" ? 14 : (vw - 52);
+                    saveFabState(state);
+                    applyFabPosition();
+                    return;
+                }
+            }
+        }, true);
+
+        // 7. 在酒馆「扩展面板」里增加【👁️ 隐藏/显示悬浮球 & 重置位置】快捷按钮
+        setTimeout(() => {
+            const extContent = topDoc.querySelector("#seoul-ext-settings-panel .inline-drawer-content");
+            if (extContent && !topDoc.getElementById("sm-fab-toggle-hide-btn")) {
+                const ctrlRow = topDoc.createElement("div");
+                ctrlRow.style.cssText = "display:flex;gap:6px;margin-top:6px;";
+                ctrlRow.innerHTML = `
+                    <div id="sm-fab-toggle-hide-btn" class="menu_button" style="flex:1;text-align:center;padding:6px 0;font-size:11px;cursor:pointer;">
+                        ${state.hidden ? "👁️ 恢复显示悬浮球" : "🙈 彻底隐藏悬浮球"}
+                    </div>
+                    <div id="sm-fab-reset-pos-btn" class="menu_button" style="flex:1;text-align:center;padding:6px 0;font-size:11px;cursor:pointer;">
+                        🔄 重置悬浮球位置
+                    </div>
+                `;
+                extContent.appendChild(ctrlRow);
+
+                topDoc.getElementById("sm-fab-toggle-hide-btn").onclick = (ev) => {
+                    state.hidden = !state.hidden;
+                    state.docked = false;
+                    saveFabState(state);
+                    applyFabPosition();
+                    ev.target.textContent = state.hidden ? "👁️ 恢复显示悬浮球" : "🙈 彻底隐藏悬浮球";
+                };
+                topDoc.getElementById("sm-fab-reset-pos-btn").onclick = () => {
+                    state = { left: (topWin.innerWidth || 390) - 52, top: (topWin.innerHeight || 800) - 130, docked: false, side: "right", hidden: false };
+                    saveFabState(state);
+                    applyFabPosition();
+                    const hBtn = topDoc.getElementById("sm-fab-toggle-hide-btn");
+                    if (hBtn) hBtn.textContent = "🙈 彻底隐藏悬浮球";
+                };
+            }
+        }, 600);
+    }
+
+    mountDraggableMistFab();
+})();
