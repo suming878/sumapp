@@ -2755,174 +2755,189 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 唯一高定版开屏补丁：全屏无框 · 韩国电影片头级慢速折线 + 失焦慢显字幕】
+// 🌧️ 【Sumoul App 极致忧郁版开屏补丁：阴雨铅灰雾调 + 垂直坠落的微折泪丝 + 迷雾慢显电影独白】
 // 用法：直接替换 index.js 最末尾刚才那段开屏补丁即可！
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
 
-    function mountSingleMasterSplash() {
+    function mountMelancholyVerticalSplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountSingleMasterSplash, 150);
+            setTimeout(mountMelancholyVerticalSplash, 150);
             return;
         }
 
-        // 清理之前所有的旧开屏 CSS
+        // 清理旧开屏样式
         [
             "sumoul-liquid-tear-css",
             "sumoul-tear-splash-css",
             "sumoul-cinema-splash-css",
             "sumoul-gallery-splash-css",
             "sumoul-borderless-splash-css",
-            "sumoul-master-one-splash-css"
+            "sumoul-master-one-splash-css",
+            "sumoul-melancholy-v28-css"
         ].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
-        st.id = "sumoul-master-one-splash-css";
+        st.id = "sumoul-melancholy-v28-css";
         st.innerHTML = `
-            /* 1. 折线从左向右极慢速生长连结 (4.5秒) */
-            @keyframes smOneLineDraw {
-                0% { stroke-dashoffset: 560; opacity: 0.15; }
-                15% { opacity: 1; }
-                100% { stroke-dashoffset: 0; opacity: 1; }
+            /* 1. 垂直微折泪丝：从上往下极其缓慢地坠落连结 (5.4秒) */
+            @keyframes mvFallDraw {
+                0% { stroke-dashoffset: 320; opacity: 0; }
+                12% { opacity: 0.85; }
+                100% { stroke-dashoffset: 0; opacity: 0.85; }
             }
-            /* 2. 折线上的纯白微光缓慢流淌 */
-            @keyframes smOneShimmer {
-                0% { stroke-dashoffset: 560; opacity: 0; }
-                25% { opacity: 0.95; }
-                75% { opacity: 0.95; }
-                100% { stroke-dashoffset: -140; opacity: 0; }
+            /* 2. 顺着垂直折线往下滑落的微弱水光点 */
+            @keyframes mvTearSlide {
+                0% { stroke-dashoffset: 320; opacity: 0; }
+                20% { opacity: 1; }
+                85% { opacity: 1; }
+                100% { stroke-dashoffset: -60; opacity: 0; }
             }
-            /* 3. 转折点上的极细光环扩散呼吸 */
-            @keyframes smOneRingPulse {
-                0% { transform: scale(0.4); opacity: 0.85; }
-                100% { transform: scale(2.4); opacity: 0; }
+            /* 3. 背景极细雨丝无声飘落 */
+            @keyframes mvRainDrift {
+                0% { transform: translateY(-30px); opacity: 0; }
+                40% { opacity: 0.28; }
+                80% { opacity: 0.28; }
+                100% { transform: translateY(60px); opacity: 0; }
             }
-            /* 4. 电影字幕从晨雾失焦中缓慢对焦浮现 */
-            @keyframes smOneFocusIn {
-                0% { opacity: 0; filter: blur(12px); transform: translateY(8px); }
+            /* 4. 折线尽头处消散在灰雾里的孤独涟漪 */
+            @keyframes mvSadRipple {
+                0% { transform: scale(0.2); opacity: 0.7; }
+                100% { transform: scale(2.2); opacity: 0; }
+            }
+            /* 5. 电影独白从浓雾失焦中极其缓慢地浮现 */
+            @keyframes mvMistReveal {
+                0% { opacity: 0; filter: blur(10px); transform: translateY(6px); }
                 100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
             }
-            /* 5. 底部唤醒文字轻柔呼吸 */
-            @keyframes smOneBreathe {
-                0%, 100% { opacity: 0.32; }
-                50% { opacity: 0.88; }
+            @keyframes mvSlowPulse {
+                0%, 100% { opacity: 0.25; }
+                50% { opacity: 0.72; }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .smo-line-main {
-                stroke-dasharray: 560 !important;
-                stroke-dashoffset: 560 !important;
-                animation: smOneLineDraw 4.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.2s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .mv-vert-main {
+                stroke-dasharray: 320 !important;
+                stroke-dashoffset: 320 !important;
+                animation: mvFallDraw 5.2s cubic-bezier(0.25, 0.1, 0.2, 1) 0.3s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .smo-line-shadow {
-                stroke-dasharray: 560 !important;
-                stroke-dashoffset: 560 !important;
-                animation: smOneLineDraw 4.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.2s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .mv-vert-glow {
+                stroke-dasharray: 320 !important;
+                stroke-dashoffset: 320 !important;
+                animation: mvFallDraw 5.2s cubic-bezier(0.25, 0.1, 0.2, 1) 0.3s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .smo-line-shimmer {
-                stroke-dasharray: 70 490 !important;
-                stroke-dashoffset: 560 !important;
-                animation: smOneShimmer 4.2s ease-in-out 1.2s infinite !important;
+            #seoul-mini-theater-modal #smt-boot-splash .mv-vert-glint {
+                stroke-dasharray: 28 300 !important;
+                stroke-dashoffset: 320 !important;
+                animation: mvTearSlide 4.6s cubic-bezier(0.3, 0, 0.2, 1) 1.2s infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .smo-pulse-ring {
+            #seoul-mini-theater-modal #smt-boot-splash .mv-ripple-ring {
                 transform-box: fill-box !important;
                 transform-origin: center !important;
-                animation: smOneRingPulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) 2.2s infinite !important;
+                opacity: 0;
+                animation: mvSadRipple 3.6s ease-out 4.8s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .mv-rain {
+                position: absolute !important;
+                width: 1px !important;
+                background: linear-gradient(180deg, transparent 0%, #8E93A0 50%, transparent 100%) !important;
+                pointer-events: none !important;
+                opacity: 0;
+                animation: mvRainDrift 4.5s linear infinite !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-1 {
+            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-1 {
                 opacity: 0;
-                animation: smOneFocusIn 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards !important;
+                animation: mvMistReveal 2.6s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-2 {
+            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-2 {
                 opacity: 0;
-                animation: smOneFocusIn 2.4s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards !important;
+                animation: mvMistReveal 2.8s cubic-bezier(0.16, 1, 0.3, 1) 2.0s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-3 {
+            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-3 {
                 opacity: 0;
-                animation: smOneFocusIn 2.4s cubic-bezier(0.16, 1, 0.3, 1) 2.4s forwards !important;
+                animation: mvMistReveal 2.8s cubic-bezier(0.16, 1, 0.3, 1) 3.2s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-4 {
+            #seoul-mini-theater-modal #smt-boot-splash .mv-txt-4 {
                 opacity: 0;
-                animation: smOneFocusIn 2.2s cubic-bezier(0.16, 1, 0.3, 1) 3.3s forwards !important;
+                animation: mvMistReveal 2.6s cubic-bezier(0.16, 1, 0.3, 1) 4.4s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .smo-breathe-txt {
-                animation: smOneBreathe 3.2s ease-in-out infinite !important;
+            #seoul-mini-theater-modal #smt-boot-splash .mv-breathe {
+                animation: mvSlowPulse 3.8s ease-in-out infinite !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        function renderMasterSplash() {
-            // 全屏无框高定冷白至浅雾灰径向渐变背景
-            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 42%, #FFFFFF 0%, #F5F6F9 55%, #EAECEF 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.75s ease!important;padding:max(32px,env(safe-area-inset-top,32px)) 28px max(38px,env(safe-area-inset-bottom,38px)) 28px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;";
+        function renderMelancholySplash() {
+            // 阴雨天首尔雾灰背景（带柔和胶片暗角，不再是刺眼亮白）
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 38%, #F4F5F8 0%, #E6E8EE 56%, #D5D8E2 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.85s ease!important;padding:max(34px,env(safe-area-inset-top,34px)) 28px max(38px,env(safe-area-inset-bottom,38px)) 28px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;";
 
             splash.innerHTML = `
-                <!-- 顶部：极简无框画报天头 -->
-                <div style="width:100%;max-width:320px;display:flex;justify-content:space-between;align-items:center;font-size:8px;font-weight:600;color:#9A9EA8!important;letter-spacing:2.8px;font-family:monospace;border-bottom:1px solid rgba(215,218,228,0.55);padding-bottom:10px;">
-                    <span>SUMOUL ARCHIVE</span>
-                    <span>37°33'N · 04:00</span>
+                <!-- 背景极淡的无声细雨丝 -->
+                <div class="mv-rain" style="left:22%;top:18%;height:55px;animation-delay:0.2s;"></div>
+                <div class="mv-rain" style="left:78%;top:28%;height:65px;animation-delay:1.8s;"></div>
+                <div class="mv-rain" style="left:34%;top:62%;height:48px;animation-delay:2.9s;"></div>
+                <div class="mv-rain" style="left:68%;top:54%;height:58px;animation-delay:0.9s;"></div>
+
+                <!-- 顶部：极简冷灰胶片天头 -->
+                <div style="width:100%;max-width:300px;display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:500;color:#888D9B!important;letter-spacing:3px;font-family:monospace;z-index:2;">
+                    <span>SEOUL · RAIN</span>
+                    <span>04:12 AM</span>
                 </div>
 
-                <!-- 中央：无框全屏「清冷心电折线 + 十字星芒微光 + 失焦慢显电影字幕」 -->
-                <div style="width:100%;max-width:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;">
+                <!-- 中央：从上往下缓慢坠落的「垂直微折泪丝」与失焦独白 -->
+                <div style="width:100%;max-width:310px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:2;">
                     
-                    <!-- 极简折线艺术主视觉 -->
-                    <div style="width:100%;height:132px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
-                        <svg viewBox="0 0 320 120" width="100%" height="120" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
-                            <!-- 0. 极淡背景几何坐标十字基准丝 -->
-                            <line x1="0" y1="64" x2="320" y2="64" stroke="#E2E5EE" stroke-width="0.75" stroke-dasharray="2 4" />
-                            <line x1="154" y1="8" x2="154" y2="112" stroke="#EAECEF" stroke-width="0.75" />
+                    <!-- 💧 核心：从上往下垂落、经历 3 次脆弱微折的泪痕细线 -->
+                    <div style="width:100%;height:175px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+                        <svg viewBox="0 0 160 175" width="160" height="175" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
+                            <!-- 底层极淡的垂直中轴虚线（代表原本笔直的时间线） -->
+                            <line x1="80" y1="6" x2="80" y2="156" stroke="rgba(145,150,165,0.22)" stroke-width="0.7" stroke-dasharray="1.5 3.5" />
 
-                            <!-- 1. 折线下方极柔和的冷雾水影衬底 -->
-                            <path class="smo-line-shadow" d="M 6 64 L 78 64 L 98 38 L 122 86 L 154 16 L 182 98 L 208 42 L 228 74 L 246 64 L 314 64" stroke="#D8DCE6" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.45" />
+                            <!-- 1. 垂直折线背后的半透明水雾漫射痕 -->
+                            <path class="mv-vert-glow" d="M 80 8 L 80 38 L 68 66 L 89 98 L 74 128 L 80 154" stroke="rgba(255,255,255,0.75)" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" />
 
-                            <!-- 2. 主折线：1.35px 清冷深炭灰折线缓慢延伸 -->
-                            <path class="smo-line-main" d="M 6 64 L 78 64 L 98 38 L 122 86 L 154 16 L 182 98 L 208 42 L 228 74 L 246 64 L 314 64" stroke="#2E323C" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 2. 主折线：0.95px 铅灰细丝从上往下缓慢坠落微折 -->
+                            <path class="mv-vert-main" d="M 80 8 L 80 38 L 68 66 L 89 98 L 74 128 L 80 154" stroke="#4A4E5A" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" />
 
-                            <!-- 3. 顺着折线缓慢流淌的纯白微光丝 -->
-                            <path class="smo-line-shimmer" d="M 6 64 L 78 64 L 98 38 L 122 86 L 154 16 L 182 98 L 208 42 L 228 74 L 246 64 L 314 64" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 3. 顺着折线缓缓往下滑落的纯白泪光点 -->
+                            <path class="mv-vert-glint" d="M 80 8 L 80 38 L 68 66 L 89 98 L 74 128 L 80 154" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
 
-                            <!-- 4. 折角节点上的极简空心环 -->
-                            <circle cx="98" cy="38" r="2.2" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.1" />
-                            <circle cx="122" cy="86" r="2.0" fill="#FFFFFF" stroke="#7A7E8A" stroke-width="1.0" />
-                            <circle cx="182" cy="98" r="2.2" fill="#FFFFFF" stroke="#2E323C" stroke-width="1.1" />
-                            <circle cx="208" cy="42" r="2.0" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.1" />
+                            <!-- 4. 转折处凝结的极小空心水珠节点 -->
+                            <circle cx="80" cy="38" r="1.5" fill="#F4F5F8" stroke="#6E7382" stroke-width="0.8" />
+                            <circle cx="68" cy="66" r="1.8" fill="#FFFFFF" stroke="#5A5E6C" stroke-width="0.9" />
+                            <circle cx="89" cy="98" r="1.8" fill="#FFFFFF" stroke="#5A5E6C" stroke-width="0.9" />
+                            <circle cx="74" cy="128" r="1.5" fill="#F4F5F8" stroke="#6E7382" stroke-width="0.8" />
 
-                            <!-- 5. 主峰值顶点 (154, 16) 的扩散呼吸光环与极细十字星芒 -->
-                            <circle class="smo-pulse-ring" cx="154" cy="16" r="7" fill="none" stroke="#7A7E8A" stroke-width="0.9" />
-                            <line x1="146" y1="16" x2="162" y2="16" stroke="#2E323C" stroke-width="0.7" />
-                            <line x1="154" y1="8" x2="154" y2="24" stroke="#2E323C" stroke-width="0.7" />
-                            <circle cx="154" cy="16" r="2.6" fill="#2E323C" />
-                            <circle cx="154" cy="16" r="1.0" fill="#FFFFFF" />
+                            <!-- 5. 坠落终点 (80, 154) 的微小泪滴与消散在雾中的椭圆水纹 -->
+                            <circle cx="80" cy="154" r="1.8" fill="#4A4E5A" />
+                            <ellipse class="mv-ripple-ring" cx="80" cy="154" rx="12" ry="3.5" fill="none" stroke="#7A7F8E" stroke-width="0.7" />
                         </svg>
                     </div>
 
-                    <!-- 品牌主标题：从失焦模糊中缓慢清晰 -->
-                    <div class="smo-fade-1" style="font-size:20px;font-weight:700;letter-spacing:5.5px;color:#282B33!important;margin-bottom:6px;">
+                    <!-- 疏离清冷的大字距标题 -->
+                    <div class="mv-txt-1" style="font-size:16.5px;font-weight:500;letter-spacing:6.5px;color:#2E313A!important;margin-bottom:6px;font-family:Georgia,'Times New Roman',serif;">
                         Sumoul App
                     </div>
-                    <div class="smo-fade-1" style="font-size:7.8px;font-weight:600;letter-spacing:3.2px;color:#9A9EA8!important;margin-bottom:26px;">
-                        MONOCHROME MEMORY ARCHIVE
+                    <div class="mv-txt-1" style="font-size:7.2px;font-weight:500;letter-spacing:3.8px;color:#8A8F9E!important;margin-bottom:24px;">
+                        SILENT TEAR IN GRAY DAWN
                     </div>
 
-                    <!-- 极细垂直过渡短线 -->
-                    <div class="smo-fade-2" style="width:1px;height:26px;background:linear-gradient(180deg,#5A5E6B 0%,transparent 100%);margin:0 auto 22px auto;"></div>
-
-                    <!-- 韩中双语忧郁独白：分两拍缓慢浮现 -->
-                    <div class="smo-fade-2" style="font-size:10.5px;font-weight:600;color:#4E525E!important;line-height:2.0;letter-spacing:0.9px;">
-                        “ 고요한 회색빛 새벽, 너에게로 이어지는 선 ”
+                    <!-- 忧郁韩文与中文独白（从迷雾中缓慢浮现） -->
+                    <div class="mv-txt-2" style="font-size:10.2px;font-weight:500;color:#525664!important;line-height:2.1;letter-spacing:1.2px;">
+                        “ 빗물이 유리창을 타고 조용히 꺾여 내리듯,<br>네가 없는 계절은 늘 회색빛으로 번진다. ”
                     </div>
-                    <div class="smo-fade-3" style="font-size:9px;font-weight:500;color:#8A8E9B!important;line-height:1.85;letter-spacing:1.4px;margin-top:4px;">
-                        在寂静的灰白黎明，那根缓慢连结向你的线。
+                    <div class="mv-txt-3" style="font-size:8.8px;font-weight:400;color:#7E8392!important;line-height:1.95;letter-spacing:1.5px;margin-top:8px;">
+                        像雨水顺着玻璃悄然曲折滑落，<br>没有你的季节，总是晕染成一片灰白。
                     </div>
                 </div>
 
-                <!-- 底部：极简无框呼吸唤醒提示 -->
-                <div class="smo-fade-4" style="width:100%;max-width:320px;border-top:1px solid rgba(215,218,228,0.55);padding-top:14px;">
-                    <div class="smo-breathe-txt" style="font-size:8px;font-weight:700;color:#5A5E6B!important;letter-spacing:3.8px;font-family:monospace;">
-                        — &nbsp; TOUCH ANYWHERE TO WAKE &nbsp; —
+                <!-- 底部：极其克制的呼吸感触碰提示 -->
+                <div class="mv-txt-4" style="padding-bottom:4px;z-index:2;">
+                    <div class="mv-breathe" style="font-size:7.8px;font-weight:500;color:#686D7C!important;letter-spacing:4px;font-family:monospace;">
+                        · &nbsp; TOUCH TO WAKE &nbsp; ·
                     </div>
                 </div>
             `;
@@ -2932,18 +2947,17 @@ bootSumoulApp();
             };
         }
 
-        renderMasterSplash();
+        renderMelancholySplash();
 
-        // 每次点击打开 Sumoul App 时，自动重播这套慢速折线与失焦字幕动画
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                renderMasterSplash();
+                renderMelancholySplash();
             }
         }, true);
     }
 
-    mountSingleMasterSplash();
+    mountMelancholyVerticalSplash();
 })();
