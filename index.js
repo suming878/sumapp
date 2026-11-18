@@ -2755,7 +2755,7 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// ❄️ 【Sumoul App 清冷银白 · 四幕式电影级开屏补丁（1、2、4幕100%原封不动，第3幕升级：同款精致六角雪花化修长圣十字 † + 底部滴水涟漪 + 精致小字宿命制作）】
+// ❄️ 【Sumoul App 清冷银白 · 四幕式电影级开屏补丁（第1、2、3幕100%未动，第4幕终幕升级为「冰雾渐隐折线 + 霜银清冷文字」）】
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
@@ -2933,16 +2933,14 @@ bootSumoulApp();
             }
 
             /* ══════════════════════════════════════════════════════
-               💧【高定审美版 · 动画 ③：4.08s ~ 6.58s 精致六角雪花飘过 ➔ 化作修长圣十字(†) + 底部滴水涟漪 + 精致小字宿命制作】
+               【动画 ③：4.08s ~ 6.58s 精致六角雪花飘过 ➔ 修长圣十字(†) + 底部滴水涟漪 + 精致小字宿命制作（100%原封不动）】
                ══════════════════════════════════════════════════════ */
-            /* 1. 同款精致六角冰晶雪花从斜上方轻盈旋转掠过交汇点 (0, -24px) */
             @keyframes faElegantSnowPass {
                 0%   { transform: translate(-64px, -68px) rotate(-110deg) scale(0.35); opacity: 0; filter: blur(4px); }
                 32%  { opacity: 0.95; filter: blur(0px); }
                 74%  { transform: translate(0px, -24px) rotate(15deg) scale(0.82); opacity: 1; filter: blur(0px); }
                 100% { transform: translate(8px, -18px) rotate(55deg) scale(0.1); opacity: 0; filter: blur(4px); }
             }
-            /* 2. 雪花融化瞬间 (4.54s)：舒展开黄金比例修长圣十字 († 上短下长) */
             @keyframes faLatinCrossV {
                 0%   { height: 0px; opacity: 0; }
                 22%  { height: 186px; opacity: 0.95; }
@@ -2955,14 +2953,12 @@ bootSumoulApp();
                 78%  { width: 134px; opacity: 0.9; }
                 100% { width: 0px; opacity: 0; }
             }
-            /* 3. 十字交汇处的纤长菱形冰晶核与四端露珠呼吸浮现 */
             @keyframes faCrossDiamondCore {
                 0%   { transform: scale(0.2); opacity: 0; }
                 24%  { transform: scale(1); opacity: 1; }
                 76%  { transform: scale(1.04); opacity: 0.92; }
                 100% { transform: scale(0.2); opacity: 0; }
             }
-            /* 4. 水光顺着十字竖轴往下流淌至最底端，凝成水滴垂直坠落！(4.85s ~ 5.50s) */
             @keyframes faCrossBottomDrip {
                 0%   { transform: translateY(-28px) scale(0.4); opacity: 0; }
                 25%  { transform: translateY(0px) scale(1); opacity: 1; }
@@ -2970,7 +2966,6 @@ bootSumoulApp();
                 88%  { transform: translateY(34px) scale(0.65); opacity: 0.95; }
                 100% { transform: translateY(38px) scale(0.2); opacity: 0; }
             }
-            /* 5. 水滴落在十字架最底部水面 (5.38s)，激起两圈清透银白椭圆涟漪！ */
             @keyframes faCrossDripRippleA {
                 0%   { transform: scale(0.1); opacity: 0; }
                 20%  { opacity: 0.9; }
@@ -2981,7 +2976,6 @@ bootSumoulApp();
                 25%  { opacity: 0.6; }
                 100% { transform: scale(2.8); opacity: 0; }
             }
-            /* 6. 缩小精修后的「宿命制作」克制浮现 */
             @keyframes faRefinedDestinyText {
                 0%   { opacity: 0; filter: blur(8px); transform: translateY(5px); }
                 26%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
@@ -2994,13 +2988,11 @@ bootSumoulApp();
                 display: flex !important; align-items: center !important; justify-content: center !important;
                 pointer-events: none !important; z-index: 14 !important;
             }
-            /* 掠过十字交汇点的同款精致六角雪花 */
             #seoul-mini-theater-modal #smt-boot-splash .fa-passing-snow {
                 position: absolute !important; width: 58px !important; height: 58px !important;
                 opacity: 0 !important;
                 animation: faElegantSnowPass 0.68s cubic-bezier(0.25, 0.1, 0.25, 1) 4.06s forwards !important;
             }
-            /* 修长圣十字竖轴（纯白柔光包裹浅银细芯） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-v {
                 position: absolute !important; width: 1.2px !important; height: 0px;
                 margin-top: -10px !important;
@@ -3009,7 +3001,6 @@ bootSumoulApp();
                 opacity: 0 !important;
                 animation: faLatinCrossV 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.54s forwards !important;
             }
-            /* 修长圣十字横轴（位于中心偏上 24px 黄金比例处，形成修长 † 圣十字！） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-h {
                 position: absolute !important; height: 1.2px !important; width: 0px;
                 margin-top: -48px !important;
@@ -3018,21 +3009,18 @@ bootSumoulApp();
                 opacity: 0 !important;
                 animation: faLatinCrossH 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.54s forwards !important;
             }
-            /* 十字交汇心精致冰晶菱形与挂壁小水珠（让十字不再单调素净，又极其清冷！） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-jewel {
                 position: absolute !important; width: 140px !important; height: 200px !important;
                 margin-top: -10px !important;
                 opacity: 0 !important;
                 animation: faCrossDiamondCore 2.0s cubic-bezier(0.16, 1, 0.3, 1) 4.56s forwards !important;
             }
-            /* 十字最底端凝结并垂直滴落的那颗晶莹水滴 */
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-bead {
                 position: absolute !important; width: 6px !important; height: 9px !important;
                 margin-top: 82px !important;
                 opacity: 0 !important;
                 animation: faCrossBottomDrip 0.72s cubic-bezier(0.4, 0, 0.85, 1) 4.82s forwards !important;
             }
-            /* 十字最底端滴水处荡开的双层清透椭圆水波涟漪 */
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring1,
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 {
                 position: absolute !important; width: 42px !important; height: 14px !important;
@@ -3050,8 +3038,6 @@ bootSumoulApp();
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 {
                 animation: faCrossDripRippleB 1.55s cubic-bezier(0.16, 1, 0.3, 1) 5.54s forwards !important;
             }
-
-            /* 缩小精修后的清冷「宿命制作」署名（位于底部滴水涟漪下方） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-destiny-pure {
                 position: absolute !important; z-index: 16 !important;
                 margin-top: 168px !important;
@@ -3061,16 +3047,16 @@ bootSumoulApp();
             }
 
             /* ══════════════════════════════════════════════════════
-               【动画 ④：6.55s 起 清冷银白雨痕折线 + 露珠渐线 + 深雾灰粗体主视觉（100%原封不动）】
+               ❄️【清冷冰雾升级版 · 动画 ④：6.55s 起 渐隐冰丝折线 + 四芒冰晶渐线 + 霜银雾感文字】
                ══════════════════════════════════════════════════════ */
             @keyframes faAct4In {
-                0%   { opacity: 0; filter: blur(10px); transform: translateY(7px); }
+                0%   { opacity: 0; filter: blur(12px); transform: translateY(6px); }
                 100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
             }
             @keyframes faTraceDraw {
                 0%   { stroke-dashoffset: 280; opacity: 0; }
-                15%  { opacity: 1; }
-                100% { stroke-dashoffset: 0; opacity: 1; }
+                15%  { opacity: 0.92; }
+                100% { stroke-dashoffset: 0; opacity: 0.92; }
             }
             @keyframes faGlintFlow {
                 0%   { stroke-dashoffset: 280; opacity: 0; }
@@ -3080,8 +3066,8 @@ bootSumoulApp();
             }
             @keyframes faSilverGradLine {
                 0%   { width: 0%; opacity: 0; }
-                30%  { opacity: 1; }
-                100% { width: 100%; opacity: 1; }
+                30%  { opacity: 0.9; }
+                100% { width: 82%; opacity: 0.9; }
             }
             @keyframes faRainSnowFall {
                 0%   { transform: translateY(-30px); opacity: 0; }
@@ -3090,12 +3076,17 @@ bootSumoulApp();
                 100% { transform: translateY(145px); opacity: 0; }
             }
             @keyframes faEndRipple {
-                0%   { transform: scale(0.2); opacity: 0.8; }
-                100% { transform: scale(2.3); opacity: 0; }
+                0%   { transform: scale(0.2); opacity: 0.85; }
+                100% { transform: scale(2.4); opacity: 0; }
+            }
+            /* 微雪冰尘在折线旁轻轻呼吸浮动 */
+            @keyframes faIceMoteFloat {
+                0%, 100% { transform: translateY(0px) scale(0.9); opacity: 0.35; }
+                50%      { transform: translateY(-7px) scale(1.25); opacity: 0.95; }
             }
             @keyframes faSoftBreathe {
-                0%, 100% { opacity: 0.35; }
-                50%      { opacity: 0.88; }
+                0%, 100% { opacity: 0.28; }
+                50%      { opacity: 0.78; }
             }
 
             #seoul-mini-theater-modal #smt-boot-splash .fa-bg-rain {
@@ -3112,46 +3103,57 @@ bootSumoulApp();
                 animation: faRainSnowFall 5.0s ease-in-out infinite !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-head  { opacity: 0; animation: faAct4In 1.6s ease 6.50s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-stage { opacity: 0; animation: faAct4In 1.5s ease 6.55s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-head  { opacity: 0; animation: faAct4In 1.8s ease 6.50s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-stage { opacity: 0; animation: faAct4In 1.8s ease 6.55s forwards !important; }
             #seoul-mini-theater-modal #smt-boot-splash .fa-main-path {
                 stroke-dasharray: 280 !important; stroke-dashoffset: 280 !important;
-                animation: faTraceDraw 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) 6.60s forwards !important;
+                animation: faTraceDraw 2.7s cubic-bezier(0.22, 0.61, 0.36, 1) 6.60s forwards !important;
             }
             #seoul-mini-theater-modal #smt-boot-splash .fa-main-glint {
-                stroke-dasharray: 26 254 !important; stroke-dashoffset: 280 !important;
-                animation: faGlintFlow 3.4s ease-in-out 7.1s infinite !important;
+                stroke-dasharray: 28 252 !important; stroke-dashoffset: 280 !important;
+                animation: faGlintFlow 3.6s ease-in-out 7.1s infinite !important;
             }
             #seoul-mini-theater-modal #smt-boot-splash .fa-end-rip {
                 transform-box: fill-box !important; transform-origin: center !important;
-                opacity: 0; animation: faEndRipple 3.4s ease-out 7.5s infinite !important;
+                opacity: 0; animation: faEndRipple 3.6s ease-out 7.4s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-end-rip-2 {
+                transform-box: fill-box !important; transform-origin: center !important;
+                opacity: 0; animation: faEndRipple 3.6s ease-out 8.6s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-ice-mote {
+                transform-box: fill-box !important; transform-origin: center !important;
+                animation: faIceMoteFloat 3.8s ease-in-out infinite !important;
             }
 
+            /* 清冷极细冰丝渐线（带纯白光晕，中央嵌一颗微缩菱形冰晶） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-grad-line {
-                position: relative !important; height: 1px !important; width: 0%;
-                margin: 14px auto 16px auto !important;
-                background: linear-gradient(90deg, transparent 0%, #CCCCCC 22%, #7A7A7A 50%, #CCCCCC 78%, transparent 100%) !important;
+                position: relative !important; height: 0.9px !important; width: 0%;
+                margin: 16px auto 18px auto !important;
+                background: linear-gradient(90deg, transparent 0%, #D8D8D8 25%, #9E9E9E 50%, #D8D8D8 75%, transparent 100%) !important;
+                box-shadow: 0 0 8px #FFFFFF !important;
                 opacity: 0;
-                animation: faSilverGradLine 2.0s cubic-bezier(0.16, 1, 0.3, 1) 6.80s forwards !important;
+                animation: faSilverGradLine 2.2s cubic-bezier(0.16, 1, 0.3, 1) 6.80s forwards !important;
             }
             #seoul-mini-theater-modal #smt-boot-splash .fa-grad-line::after {
                 content: "" !important; position: absolute !important; left: 50% !important; top: -2.2px !important;
                 margin-left: -2.5px !important; width: 5px !important; height: 5px !important;
-                border-radius: 50% !important; background: #FFFFFF !important; border: 1px solid #888888 !important;
-                box-shadow: 0 0 6px #FFFFFF !important;
+                background: #FFFFFF !important; border: 0.8px solid #9A9A9A !important;
+                transform: rotate(45deg) !important;
+                box-shadow: 0 0 8px #FFFFFF !important;
             }
             #seoul-mini-theater-modal #smt-boot-splash .fa-grad-sub {
-                height: 0.8px !important; width: 0%; margin: 14px auto 0 auto !important;
-                background: linear-gradient(90deg, transparent 0%, #D8D8D8 30%, #9A9A9A 50%, #D8D8D8 70%, transparent 100%) !important;
+                height: 0.7px !important; width: 0%; margin: 16px auto 0 auto !important;
+                background: linear-gradient(90deg, transparent 0%, #E2E2E2 32%, #B5B5B5 50%, #E2E2E2 68%, transparent 100%) !important;
                 opacity: 0;
-                animation: faSilverGradLine 2.2s cubic-bezier(0.16, 1, 0.3, 1) 7.45s forwards !important;
+                animation: faSilverGradLine 2.4s cubic-bezier(0.16, 1, 0.3, 1) 7.45s forwards !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-title { opacity: 0; animation: faAct4In 1.8s cubic-bezier(0.16,1,0.3,1) 6.70s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-kr    { opacity: 0; animation: faAct4In 1.9s cubic-bezier(0.16,1,0.3,1) 7.10s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-cn    { opacity: 0; animation: faAct4In 1.9s cubic-bezier(0.16,1,0.3,1) 7.45s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-foot  { opacity: 0; animation: faAct4In 1.8s cubic-bezier(0.16,1,0.3,1) 7.80s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-breathe { animation: faSoftBreathe 3.2s ease-in-out infinite !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-title { opacity: 0; animation: faAct4In 2.0s cubic-bezier(0.16,1,0.3,1) 6.70s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-kr    { opacity: 0; animation: faAct4In 2.1s cubic-bezier(0.16,1,0.3,1) 7.10s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-cn    { opacity: 0; animation: faAct4In 2.1s cubic-bezier(0.16,1,0.3,1) 7.45s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-foot  { opacity: 0; animation: faAct4In 2.0s cubic-bezier(0.16,1,0.3,1) 7.80s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-breathe { animation: faSoftBreathe 3.6s ease-in-out infinite !important; }
         `;
         topDoc.head.appendChild(st);
 
@@ -3207,10 +3209,9 @@ bootSumoulApp();
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     💧【高定审美版 · 动画 ③：同款精致六角雪花飘过 ➔ 化作修长圣十字(†) + 底部凝结滴水涟漪 + 精致小字宿命制作】
+                     【动画 ③：同款精致六角雪花飘过 ➔ 化作修长圣十字(†) + 底部凝结滴水涟漪 + 精致小字宿命制作（100%未动）】
                      ══════════════════════════════════════════════════ -->
                 <div class="fa-act3-cross">
-                    <!-- 1. 与第2幕完全同款的精致分叉六角冰晶雪花从斜上方轻盈旋转掠过 -->
                     <svg class="fa-passing-snow" viewBox="0 0 100 100" fill="none">
                         <g stroke="#8E8E8E" stroke-width="1.15" stroke-linecap="round">
                             <line x1="50" y1="12" x2="50" y2="88" />
@@ -3224,36 +3225,27 @@ bootSumoulApp();
                         <circle cx="50" cy="50" r="3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
                     </svg>
 
-                    <!-- 2. 黄金比例修长圣十字 († 上短下长，清冷修长) -->
                     <div class="fa-cross-v"></div>
                     <div class="fa-cross-h"></div>
 
-                    <!-- 3. 圣十字交汇处的精致冰晶菱形核与挂壁小水珠（恰到好处的清冷精致度） -->
                     <svg class="fa-cross-jewel" viewBox="0 0 140 200" fill="none">
-                        <!-- 交汇点(70, 76)外围极淡的冰晶菱形光晕 -->
                         <polygon points="70,60 82,76 70,92 58,76" fill="rgba(255,255,255,0.65)" stroke="#FFFFFF" stroke-width="1.2" />
-                        <!-- 交汇核心纤长四芒冰晶 -->
                         <path d="M 70 54 Q 70 76 92 76 Q 70 76 70 98 Q 70 76 48 76 Q 70 76 70 54 Z" fill="#FFFFFF" stroke="#8A8A8A" stroke-width="0.85" stroke-linejoin="round" />
                         <circle cx="70" cy="76" r="2.0" fill="#7A7A7A" />
-                        <!-- 十字横轴与竖轴上凝结的 4 颗微小纯白挂壁露珠 -->
                         <circle cx="70" cy="36" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
                         <circle cx="38" cy="76" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
                         <circle cx="102" cy="76" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
                         <circle cx="70" cy="126" r="1.7" fill="#FFFFFF" stroke="#8E8E8E" stroke-width="0.85" />
-                        <!-- 最底端尖角处欲滴落的微露珠 -->
                         <circle cx="70" cy="186" r="1.8" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
                     </svg>
 
-                    <!-- 4. 从十字架最底部尖角处凝结并垂直坠落的那滴晶莹水珠！ -->
                     <svg class="fa-cross-drip-bead" viewBox="0 0 12 18" fill="none">
                         <path d="M 6 1 C 6 1 1.5 8.5 1.5 12 C 1.5 14.8 3.5 16.8 6 16.8 C 8.5 16.8 10.5 14.8 10.5 12 C 10.5 8.5 6 1 6 1 Z" fill="#FFFFFF" stroke="#828282" stroke-width="1.1" />
                     </svg>
 
-                    <!-- 5. 水滴落在底部激起的两圈清透银白水波涟漪 -->
                     <div class="fa-cross-drip-ring1"></div>
                     <div class="fa-cross-drip-ring2"></div>
 
-                    <!-- 6. 缩小精修后的高冷小字号「宿命制作」（克制留白，绝不喧宾夺主！） -->
                     <div class="fa-destiny-pure">
                         <div style="font-size:11.5px;font-weight:700;color:#555555!important;letter-spacing:11px;text-indent:11px;">
                             宿命制作
@@ -3265,63 +3257,99 @@ bootSumoulApp();
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     【动画 ④：清冷银白雨痕折线 + 露珠渐线 + 高级深雾灰粗体文字（100%未动）】
+                     ❄️【清冷冰雾升级版 · 动画 ④：渐隐冰丝微折雨线 + 四芒冰晶渐线 + 霜银雾感文字】
                      ══════════════════════════════════════════════════ -->
-                <div class="fa-a4-head" style="width:100%;max-width:310px;display:flex;justify-content:space-between;align-items:center;font-size:7.8px;font-weight:700;color:#949494!important;letter-spacing:2.8px;z-index:5;">
+                <div class="fa-a4-head" style="width:100%;max-width:300px;display:flex;justify-content:space-between;align-items:center;font-size:7.2px;font-weight:600;color:#A8A8A8!important;letter-spacing:3.5px;font-family:monospace;z-index:5;">
                     <span>SUMOUL · 宿命制作</span>
                     <span>04:00 AM</span>
                 </div>
 
-                <div style="width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:5;">
+                <div style="width:100%;max-width:316px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:5;">
                     
-                    <div class="fa-a4-stage" style="width:100%;height:154px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
-                        <svg viewBox="0 0 220 154" width="220" height="154" fill="none" style="overflow:visible!important;">
-                            <line x1="42" y1="68" x2="178" y2="68" stroke="#E4E4E4" stroke-width="0.8" stroke-dasharray="2 4" />
-                            <line x1="110" y1="6" x2="110" y2="140" stroke="#E8E8E8" stroke-width="0.8" stroke-dasharray="2 4" />
+                    <!-- 主视觉：清冷冰雾柔光折线 + 圣十字残影 + 悬浮微雪冰尘 + 双层呼吸水纹 -->
+                    <div class="fa-a4-stage" style="width:100%;height:158px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+                        <svg viewBox="0 0 220 158" width="220" height="158" fill="none" style="overflow:visible!important;">
+                            <defs>
+                                <!-- 折线上下两端自然融于白雾的清冷银白渐变 -->
+                                <linearGradient id="faColdTraceGrad" x1="110" y1="6" x2="110" y2="140" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.1" />
+                                    <stop offset="22%" stop-color="#B8B8B8" stop-opacity="0.75" />
+                                    <stop offset="65%" stop-color="#8A8A8A" stop-opacity="0.9" />
+                                    <stop offset="100%" stop-color="#B0B0B0" stop-opacity="0.85" />
+                                </linearGradient>
+                                <!-- 冰雾高斯柔焦滤镜 -->
+                                <filter id="faIceMistBlur" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="3.2" result="blur" />
+                                </filter>
+                            </defs>
 
-                            <line x1="54" y1="16" x2="54" y2="48" stroke="#D0D0D0" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="10 5" />
-                            <circle cx="54" cy="52" r="1.4" fill="#FFFFFF" stroke="#A8A8A8" stroke-width="0.8" />
-                            <line x1="166" y1="26" x2="166" y2="62" stroke="#D0D0D0" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="12 5" />
-                            <circle cx="166" cy="66" r="1.4" fill="#FFFFFF" stroke="#A8A8A8" stroke-width="0.8" />
+                            <!-- 刚刚第3幕圣十字留下的极淡微光残影 -->
+                            <line x1="68" y1="46" x2="152" y2="46" stroke="#EAEAEA" stroke-width="0.7" />
+                            <line x1="110" y1="6" x2="110" y2="142" stroke="#ECECEC" stroke-width="0.7" stroke-dasharray="1.5 3.5" />
 
-                            <path class="fa-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path class="fa-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#7A7A7A" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" />
-                            <path class="fa-main-glint" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 折线两侧静静呼吸浮动的微雪冰尘与细雨丝 -->
+                            <g class="fa-ice-mote">
+                                <line x1="58" y1="20" x2="58" y2="46" stroke="#DCDCDC" stroke-width="0.8" stroke-linecap="round" />
+                                <circle cx="58" cy="50" r="1.4" fill="#FFFFFF" stroke="#B8B8B8" stroke-width="0.7" />
+                            </g>
+                            <g class="fa-ice-mote" style="animation-delay:1.6s;">
+                                <line x1="162" y1="32" x2="162" y2="60" stroke="#DCDCDC" stroke-width="0.8" stroke-linecap="round" />
+                                <circle cx="162" cy="64" r="1.4" fill="#FFFFFF" stroke="#B8B8B8" stroke-width="0.7" />
+                            </g>
+                            <circle class="fa-ice-mote" cx="76" cy="96" r="1.2" fill="#FFFFFF" stroke="#CCCCCC" stroke-width="0.6" style="animation-delay:0.8s;" />
+                            <circle class="fa-ice-mote" cx="146" cy="18" r="1.3" fill="#FFFFFF" stroke="#CCCCCC" stroke-width="0.6" style="animation-delay:2.3s;" />
 
-                            <circle cx="110" cy="36" r="1.8" fill="#FFFFFF" stroke="#8C8C8C" stroke-width="0.9" />
-                            <circle cx="96" cy="60" r="2.1" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
-                            <circle cx="122" cy="88" r="2.1" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
-                            <circle cx="102" cy="114" r="1.9" fill="#FFFFFF" stroke="#8C8C8C" stroke-width="0.9" />
+                            <!-- 1. 折线底层：宽 7px 的纯白冰雾柔焦光晕（让折线像浸在冷雾里一样通透！） -->
+                            <path class="fa-main-path" d="M 110 8 L 110 38 L 99 62 L 119 90 L 103 116 L 110 138" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" filter="url(#faIceMistBlur)" />
 
-                            <path d="M 110 133 C 110 133 107.6 137.2 107.6 139 C 107.6 140.4 108.7 141.5 110 141.5 C 111.3 141.5 112.4 140.4 112.4 139 C 112.4 137.2 110 133 110 133 Z" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="0.95" />
-                            <ellipse class="fa-end-rip" cx="110" cy="143" rx="15" ry="3.8" fill="none" stroke="#9E9E9E" stroke-width="0.8" />
-                            <ellipse cx="110" cy="143" rx="9" ry="2.2" fill="none" stroke="#FFFFFF" stroke-width="1.1" />
+                            <!-- 2. 主冰丝折线：0.95px 纤长清冷浅银灰（收窄折角，更加修长孤寂） -->
+                            <path class="fa-main-path" d="M 110 8 L 110 38 L 99 62 L 119 90 L 103 116 L 110 138" stroke="url(#faColdTraceGrad)" stroke-width="0.95" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 3. 顺着折线缓缓往下淌的纯白冰晶流光 -->
+                            <path class="fa-main-glint" d="M 110 8 L 110 38 L 99 62 L 119 90 L 103 116 L 110 138" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 4. 折角处凝结的微小纯白冰露与纤细四芒冰星 -->
+                            <circle cx="110" cy="38" r="1.5" fill="#FFFFFF" stroke="#A6A6A6" stroke-width="0.8" />
+                            <!-- 第一个折角的小四芒冰星 -->
+                            <path d="M 99 57 L 100.2 60.8 L 104 62 L 100.2 63.2 L 99 67 L 97.8 63.2 L 94 62 L 97.8 60.8 Z" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="0.6" />
+                            <circle cx="119" cy="90" r="1.7" fill="#FFFFFF" stroke="#969696" stroke-width="0.85" />
+                            <circle cx="103" cy="116" r="1.5" fill="#FFFFFF" stroke="#A6A6A6" stroke-width="0.8" />
+
+                            <!-- 5. 折线尽头垂落的晶莹纯白小冰滴与双层呼吸涟漪 -->
+                            <path d="M 110 135 C 110 135 107.8 139 107.8 140.8 C 107.8 142.1 108.8 143.2 110 143.2 C 111.2 143.2 112.2 142.1 112.2 140.8 C 112.2 139 110 135 110 135 Z" fill="#FFFFFF" stroke="#909090" stroke-width="0.85" />
+                            <ellipse class="fa-end-rip" cx="110" cy="145" rx="16" ry="3.8" fill="none" stroke="#B0B0B0" stroke-width="0.75" />
+                            <ellipse class="fa-end-rip-2" cx="110" cy="145" rx="16" ry="3.8" fill="none" stroke="#FFFFFF" stroke-width="1.3" />
+                            <ellipse cx="110" cy="145" rx="8" ry="1.8" fill="none" stroke="#FFFFFF" stroke-width="1.0" />
                         </svg>
                     </div>
 
-                    <div class="fa-t-title" style="font-size:20px;font-weight:800;letter-spacing:5px;color:#424242!important;">
+                    <!-- 清冷霜银灰标题（提亮色号为 #5E5E5E + 纯白冰雾发光背影，去掉沉闷感！） -->
+                    <div class="fa-t-title" style="font-size:18.5px;font-weight:700;letter-spacing:6.5px;text-indent:6.5px;color:#5E5E5E!important;text-shadow:0 0 16px #FFFFFF, 0 0 8px #FFFFFF!important;">
                         Sumoul App
                     </div>
-                    <div class="fa-t-title" style="font-size:8px;font-weight:700;letter-spacing:3.5px;color:#999999!important;margin-top:4px;">
+                    <div class="fa-t-title" style="font-size:7px;font-weight:600;letter-spacing:4.2px;text-indent:4.2px;color:#A6A6A6!important;margin-top:5px;">
                         RAIN &amp; SNOW · 宿命制作
                     </div>
 
+                    <!-- 第一道冰晶渐线（中央嵌一颗微缩菱形纯白冰晶） -->
                     <div class="fa-grad-line"></div>
 
-                    <div class="fa-t-kr" style="font-size:10.8px;font-weight:700;color:#555555!important;line-height:2.0;letter-spacing:0.9px;">
+                    <!-- 清冷疏离的霜银双语独白（色号 #6E6E6E / #969696 + 纯白雾光衬底） -->
+                    <div class="fa-t-kr" style="font-size:10.2px;font-weight:600;color:#6E6E6E!important;line-height:2.1;letter-spacing:1.2px;text-shadow:0 0 12px #FFFFFF!important;">
                         “ 두 방울의 눈비가 마주쳐 십자로 교차하던 밤,<br>하얀 안개 속에 우리의 계절이 내린다. ”
                     </div>
-                    <div class="fa-t-cn" style="font-size:9.4px;font-weight:600;color:#828282!important;line-height:1.9;letter-spacing:1.3px;margin-top:6px;">
+                    <div class="fa-t-cn" style="font-size:8.8px;font-weight:500;color:#969696!important;line-height:1.95;letter-spacing:1.6px;margin-top:6px;text-shadow:0 0 10px #FFFFFF!important;">
                         两滴雨雪相遇、交错成十字的夜里，<br>白雾深处，正落下属于我们的季节。
                     </div>
 
+                    <!-- 第二道浅银雾丝副渐线 -->
                     <div class="fa-grad-sub"></div>
                 </div>
 
-                <!-- 底部：清冷呼吸唤醒提示 -->
+                <!-- 底部：清冷极简呼吸唤醒提示 -->
                 <div class="fa-t-foot" style="padding-bottom:4px;z-index:5;">
-                    <div class="fa-breathe" style="font-size:8px;font-weight:700;color:#6E6E6E!important;letter-spacing:3.8px;">
-                        — &nbsp; TOUCH TO WAKE · 触碰唤醒 &nbsp; —
+                    <div class="fa-breathe" style="font-size:7.5px;font-weight:600;color:#888888!important;letter-spacing:4.2px;font-family:monospace;">
+                        · &nbsp; TOUCH TO WAKE &nbsp; ·
                     </div>
                 </div>
             `;
@@ -3345,6 +3373,7 @@ bootSumoulApp();
 
     mountFourActColdSilverSplash();
 })();
+
 
 // ==========================================================================
 // 🤍 【Sumoul App 悬浮球高定重塑补丁：白雾磨砂星芒圆球 + 自由拖拽移动 + 贴边隐身/彻底隐藏】
