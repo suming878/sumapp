@@ -5561,50 +5561,30 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// 🌿 【Sumoul App 个人主页新增第5应用：有情树 · 기억의 나무 (Memory Tree) 写实植物标本馆级补丁】
-// 功能：1.主页自动挂载「有情树」入口 2.写实多枝干摇曳大树UI+微光孢子+四时形态切换 3.每片叶子承载一段记忆与TA的叶背批注
-// 用法：直接粘贴在 index.js 最末尾最后一行后面！
+// 🌿 【Sumoul App 有情树 · 기억의 나무 (Memory Tree) 全屏写实左树右白 · 无上限情绪深浅叶片终极版】
+// 特点：1.100%占据全屏(左侧苍劲真树斜伸、右侧空灵留白) 2.Canvas真树分形树皮肌理与物理风场摇曳 3.无上限叶片+开心度决定颜色深浅
+// 用法：直接替换 index.js 最末尾刚才那段有情树补丁即可！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    // 极细 1.5px 线性矢量图标 (零彩色 Emoji)
-    const treeSvg = (p, sz = 16, c = "currentColor", sw = "1.6") =>
+    const svgIco = (p, sz = 14, c = "currentColor", sw = "1.6") =>
         `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
     const MT_ICO = {
-        appIcon: treeSvg(`<path d="M12 22v-7l-2-2"/><path d="M17 8v.8A6 6 0 0 1 13.8 20v0H10v0A6.5 6.5 0 0 1 7 8h0a5 5 0 0 1 10 0Z"/><path d="m14 14-2 2"/>`, 22, "#3A3A40", "1.5"),
-        leaf: treeSvg(`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`, 13),
-        drop: treeSvg(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`, 13),
-        spark: treeSvg(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
-        plus: treeSvg(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
-        season: treeSvg(`<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/>`, 13),
-        trash: treeSvg(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 12, "#9A6868"),
-        book: treeSvg(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`, 13)
-    };
-
-    // 18 个树冠枝头黄金挂叶坐标（x, y 对应 360x380 画布上的真实枝桠末端，angle 为自然垂落倾角）
-    const BRANCH_SLOTS = [
-        { x: 180, y: 58,  ang: -8 },  { x: 132, y: 74,  ang: -28 }, { x: 228, y: 72,  ang: 24 },
-        { x: 92,  y: 106, ang: -42 }, { x: 162, y: 98,  ang: -14 }, { x: 204, y: 96,  ang: 16 },
-        { x: 268, y: 104, ang: 38 },  { x: 68,  y: 146, ang: -52 }, { x: 118, y: 136, ang: -25 },
-        { x: 180, y: 130, ang: 4 },   { x: 242, y: 134, ang: 28 },  { x: 292, y: 144, ang: 48 },
-        { x: 84,  y: 182, ang: -36 }, { x: 144, y: 168, ang: -18 }, { x: 216, y: 166, ang: 20 },
-        { x: 276, y: 180, ang: 35 },  { x: 114, y: 204, ang: -22 }, { x: 246, y: 202, ang: 25 }
-    ];
-
-    // 四时树叶配色主题（清冷韩系低饱和色调）
-    const SEASON_THEMES = {
-        frost:  { name: "霜白初雪", bg1: "#FFFFFF", bg2: "#F3F4F8", leafFill: "#FFFFFF", leafStroke: "#6E707A", activeFill: "#2C2C34", activeStroke: "#2C2C34", vein: "#9A9CA6" },
-        spring: { name: "雾翠春芽", bg1: "#FFFFFF", bg2: "#F2F6F4", leafFill: "#E8F0EC", leafStroke: "#5C7468", activeFill: "#3B5247", activeStroke: "#2C3E35", vein: "#7E968A" },
-        summer: { name: "清透夏荫", bg1: "#FFFFFF", bg2: "#F0F4F6", leafFill: "#DCE8EB", leafStroke: "#4E6870", activeFill: "#344950", activeStroke: "#26383E", vein: "#6E8890" },
-        autumn: { name: "浅金秋叶", bg1: "#FFFFFF", bg2: "#F7F4F0", leafFill: "#F2EAE1", leafStroke: "#847260", activeFill: "#524438", activeStroke: "#3E3228", vein: "#A2907E" }
+        appIcon: svgIco(`<path d="M12 22v-7l-2-2"/><path d="M17 8v.8A6 6 0 0 1 13.8 20v0H10v0A6.5 6.5 0 0 1 7 8h0a5 5 0 0 1 10 0Z"/><path d="m14 14-2 2"/>`, 22, "#3A3A40", "1.5"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2C32", "1.9"),
+        plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
+        spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
+        leaf: svgIco(`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`, 13),
+        list: svgIco(`<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>`, 13),
+        trash: svgIco(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 12, "#9A6868"),
+        close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 13)
     };
 
     function getCtx() {
         let userName = "ME", charName = "PARTNER", scope = "PARTNER";
-        let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
         let charDesc = "", recentChat = "";
         try {
             const st = topWin.SillyTavern?.getContext?.();
@@ -5614,7 +5594,6 @@ bootSumoulApp();
                     const c = st.characters[st.characterId];
                     charName = c.name || st.name2 || charName;
                     scope = c.avatar || c.name || String(st.characterId);
-                    if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
                     charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
                 } else if (st.name2) { charName = st.name2; scope = st.name2; }
                 if (Array.isArray(st.chat) && st.chat.length) {
@@ -5627,54 +5606,58 @@ bootSumoulApp();
             const wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || "{}");
             if (wCfg.myNick) userName = wCfg.myNick;
             if (wCfg.remark) charName = wCfg.remark;
-            if (wCfg.myAva) userAvatar = wCfg.myAva;
-            if (wCfg.charAva) charAvatar = wCfg.charAva;
         } catch (e) {}
-        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat };
+        return { userName, charName, safeScope, charDesc, recentChat };
     }
 
-    function getTreeStorageKey() { return `sumoul_v16_memtree__${getCtx().safeScope}`; }
+    function getTreeKey() { return `sumoul_v16_real_tree__${getCtx().safeScope}`; }
 
     function createDefaultTree(charName, userName) {
         return {
-            level: 3,
-            dewCount: 12,
-            season: "frost",
-            activeLeafId: 101,
+            activeId: 101,
             leaves: [
                 {
                     id: 101,
-                    title: "初遇的微雨夜",
-                    date: "MEMORY · 01",
+                    title: "初雪揣进口袋的指尖",
+                    date: "12.04",
                     author: charName,
-                    isCore: true,
-                    content: `和 ${userName} 第一次在首尔街角停下脚步的那晚，连空气里潮湿的冷雾都变得有了温度。`,
-                    whisper: `“ 其实那天在你转身之前，我就已经偷偷看了你很久。”`
+                    joy: 96, // 开心程度 0~100 (越高越清透浅白发光，越低越深邃炭灰)
+                    content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`,
+                    whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”`
                 },
                 {
                     id: 102,
-                    title: "只属于我们的暗号",
-                    date: "MEMORY · 02",
+                    title: "凌晨三点的秒回",
+                    date: "11.28",
                     author: userName,
-                    isCore: false,
-                    content: `半夜睡不着发消息给 ${charName}，无论多晚总是能收到秒回的温热回应。`,
-                    whisper: `“ 手机永远为你调成振动放在枕边，怕漏掉你的任何一句话。”`
+                    joy: 88,
+                    content: `半夜醒来随手发了一句睡不着，没想到不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`,
+                    whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”`
                 },
                 {
                     id: 103,
-                    title: "并肩走过的初雪",
-                    date: "MEMORY · 03",
+                    title: "微雨夜的沉默对视",
+                    date: "11.15",
                     author: charName,
-                    isCore: true,
-                    content: `把 ${userName} 冰凉的指尖揣进我大衣口袋里的瞬间，想让这条路永远走不到尽头。`,
-                    whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”`
+                    joy: 62,
+                    content: `屋檐下躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的呼吸。`,
+                    whisper: `“ 那天其实忍得很辛苦，才没有当场把你按进怀里。”`
+                },
+                {
+                    id: 104,
+                    title: "短暂分别时的酸涩",
+                    date: "11.02",
+                    author: charName,
+                    joy: 28,
+                    content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`,
+                    whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”`
                 }
             ]
         };
     }
 
-    function loadTreeData() {
-        const c = getCtx(), k = getTreeStorageKey();
+    function loadTree() {
+        const c = getCtx(), k = getTreeKey();
         try {
             const raw = localStorage.getItem(k);
             if (!raw) {
@@ -5683,13 +5666,26 @@ bootSumoulApp();
                 return init;
             }
             return Object.assign(createDefaultTree(c.charName, c.userName), JSON.parse(raw));
-        } catch (e) {
-            return createDefaultTree(c.charName, c.userName);
-        }
+        } catch (e) { return createDefaultTree(c.charName, c.userName); }
     }
+    function saveTree(d) { try { localStorage.setItem(getTreeKey(), JSON.stringify(d)); } catch (e) {} }
 
-    function saveTreeData(d) {
-        try { localStorage.setItem(getTreeStorageKey(), JSON.stringify(d)); } catch (e) {}
+    // 🎨 根据开心程度 (joy: 0~100) 计算叶片的真实深浅色阶与光泽！
+    function getLeafColorByJoy(joy = 80) {
+        const j = Math.max(0, Math.min(100, Number(joy) || 80));
+        if (j >= 85) {
+            // 极度开心/心动 (85~100%)：发光纯白霜叶 + 银白叶脉
+            return { fill: "rgba(255, 255, 255, 0.96)", stroke: "#8A8C96", vein: "#B8BAC4", glow: "rgba(255,255,255,0.9)", label: `极开心 ${j}% · 霜白叶` };
+        } else if (j >= 65) {
+            // 愉悦温暖 (65~84%)：清透浅雾银叶
+            return { fill: "rgba(232, 234, 240, 0.94)", stroke: "#767882", vein: "#A0A3AE", glow: "rgba(230,234,242,0.6)", label: `愉悦 ${j}% · 雾银叶` };
+        } else if (j >= 40) {
+            // 平静微涩 (40~64%)：沉静烟灰叶
+            return { fill: "rgba(176, 180, 190, 0.92)", stroke: "#585A64", vein: "#828590", glow: "rgba(180,184,194,0.3)", label: `平静 ${j}% · 烟灰叶` };
+        } else {
+            // 低落/酸涩/思念 (0~39%)：深邃炭墨叶
+            return { fill: "rgba(68, 70, 80, 0.94)", stroke: "#282A32", vein: "#9A9CA8", glow: "rgba(68,70,80,0.25)", label: `思念 ${j}% · 炭墨叶` };
+        }
     }
 
     async function askTreeAI(sys, usr) {
@@ -5711,582 +5707,473 @@ bootSumoulApp();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    function mountMemoryTreeApp() {
+    // 确定性随机数生成器（保证每次重绘树干形态稳定不乱跳）
+    function mulberry32(seed) {
+        return function () {
+            let t = (seed += 0x6d2b79f5);
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+
+    function mountFullScreenRealTree() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        const fsBody = modal?.querySelector(".smt-fs-body");
-        if (!modal || !homePage || !fsBody) {
-            setTimeout(mountMemoryTreeApp, 200);
-            return;
-        }
+        if (!modal || !homePage) { setTimeout(mountFullScreenRealTree, 200); return; }
 
-        // 1. 注入「有情树」写实植物馆高定 CSS 样式
+        // 清理旧版卡片树
+        topDoc.getElementById("smt-page-memory_tree")?.remove();
         topDoc.getElementById("sumoul-memory-tree-css")?.remove();
+
         const st = topDoc.createElement("style");
         st.id = "sumoul-memory-tree-css";
         st.innerHTML = `
-            @keyframes mtLeafSway {
-                0%, 100% { transform: rotate(0deg) scale(1); }
-                50%      { transform: rotate(5.5deg) scale(1.04); }
+            #seoul-mini-theater-modal #smt-real-tree-overlay {
+                position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
+                background: radial-gradient(circle at 75% 28%, #FFFFFF 0%, #F7F8FA 55%, #ECEEF2 100%) !important;
+                display: none; flex-direction: column !important; overflow: hidden !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
-            @keyframes mtSporeRise {
-                0%   { transform: translateY(15px) scale(0.6); opacity: 0; }
-                40%  { opacity: 0.75; }
-                100% { transform: translateY(-45px) scale(1.1); opacity: 0; }
+            #seoul-mini-theater-modal #smt-real-tree-overlay.open { display: flex !important; }
+            #seoul-mini-theater-modal #mt-real-canvas {
+                position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+                display: block !important; cursor: pointer !important; z-index: 1 !important;
             }
-            @keyframes mtRootRipple {
-                0%   { transform: scale(0.6); opacity: 0.8; }
-                100% { transform: scale(1.7); opacity: 0; }
+            #seoul-mini-theater-modal .mt-glass-pill {
+                display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
+                height: 28px !important; padding: 0 11px !important; border-radius: 999px !important;
+                background: rgba(255, 255, 255, 0.82) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important;
+                border: 1px solid rgba(226, 228, 236, 0.9) !important; font-size: 9.2px !important; font-weight: 700 !important;
+                color: #2C2C34 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 20, 30, 0.04) !important;
             }
-            @keyframes mtCardSlideIn {
-                from { opacity: 0; transform: translateY(8px); }
-                to   { opacity: 1; transform: translateY(0); }
+            #seoul-mini-theater-modal .mt-glass-pill.dark {
+                background: rgba(44, 44, 52, 0.92) !important; border-color: #2C2C34 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
             }
-
-            /* 严格防串页：默认隐藏，仅当带 .active 时才显示 */
-            #seoul-mini-theater-modal #smt-page-memory_tree {
-                display: none !important;
-                flex-direction: column !important;
-                flex: 1 !important;
-                min-height: 0 !important;
-                overflow-y: auto !important;
-                padding: 2px 2px 24px 2px !important;
-                gap: 10px !important;
-                background: #FFFFFF !important;
-            }
-            #seoul-mini-theater-modal #smt-page-memory_tree.active {
-                display: flex !important;
-            }
-
-            /* 有情树全景植物画布舱 */
-            #seoul-mini-theater-modal .mt-canvas-shell {
-                position: relative !important;
-                width: 100% !important;
-                height: 360px !important;
-                border-radius: 22px !important;
-                border: 1px solid #EAEAF2 !important;
-                overflow: hidden !important;
-                flex-shrink: 0 !important;
-                box-shadow: inset 0 0 40px rgba(255,255,255,0.9), 0 6px 24px rgba(20,20,30,0.03) !important;
-                transition: background 0.5s ease !important;
-            }
-
-            /* 树冠上的叶片交互节点 */
-            #seoul-mini-theater-modal .mt-leaf-node {
-                cursor: pointer !important;
-                transform-box: fill-box !important;
-                transform-origin: bottom center !important;
-                animation: mtLeafSway 4.2s ease-in-out infinite !important;
-                transition: filter 0.25s ease !important;
-            }
-            #seoul-mini-theater-modal .mt-leaf-node:hover {
-                filter: drop-shadow(0 0 8px rgba(44,44,52,0.35)) !important;
-            }
-            #seoul-mini-theater-modal .mt-leaf-node.active-leaf {
-                filter: drop-shadow(0 4px 10px rgba(44,44,52,0.4)) !important;
-            }
-            #seoul-mini-theater-modal .mt-spore {
-                transform-box: fill-box !important;
-                transform-origin: center !important;
-                animation: mtSporeRise 5.5s ease-in-out infinite !important;
-                pointer-events: none !important;
-            }
-            #seoul-mini-theater-modal .mt-root-rip {
-                transform-box: fill-box !important;
-                transform-origin: center !important;
-                animation: mtRootRipple 4s ease-out infinite !important;
-            }
-
-            /* 叶片记忆标本详情卡 */
-            #seoul-mini-theater-modal .mt-specimen-card {
-                background: #FFFFFF !important;
-                border: 1px solid #E6E6EE !important;
-                border-radius: 18px !important;
-                padding: 15px 16px !important;
-                box-shadow: 0 6px 20px rgba(20,20,30,0.03) !important;
-                animation: mtCardSlideIn 0.3s ease forwards !important;
-                flex-shrink: 0 !important;
-            }
-            #seoul-mini-theater-modal .mt-whisper-box {
-                margin-top: 10px !important;
-                padding: 10px 12px !important;
-                background: #F8F8FA !important;
-                border-left: 2.5px solid #3A3A42 !important;
-                border-radius: 0 10px 10px 0 !important;
-                font-size: 10.5px !important;
-                font-weight: 600 !important;
-                color: #3A3A42 !important;
-                line-height: 1.6 !important;
+            #seoul-mini-theater-modal .mt-float-card {
+                background: rgba(255, 255, 255, 0.86) !important; backdrop-filter: blur(18px) !important; -webkit-backdrop-filter: blur(18px) !important;
+                border: 1px solid rgba(230, 232, 240, 0.95) !important; border-radius: 18px !important;
+                padding: 14px 15px !important; box-shadow: 0 12px 34px rgba(20, 20, 35, 0.07) !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        // 2. 在个人主页 (#smt-page-home) 的应用扩展坞里挂载第 5 个图标：【有情树】
+        // 在个人主页挂载「有情树」入口图标
         const homeDockGrid = homePage.querySelector(".ab-dock-grid");
-        if (homeDockGrid && !topDoc.getElementById("smt-home-open-memtree")) {
+        if (homeDockGrid) {
+            topDoc.getElementById("smt-home-open-memtree")?.remove();
             const treeBtn = topDoc.createElement("div");
             treeBtn.className = "ab-app-item";
             treeBtn.id = "smt-home-open-memtree";
-            treeBtn.innerHTML = `
-                <div class="ab-app-squircle">${MT_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">3叶</span></div>
-                <div class="ab-app-title">有情树</div>
-                <div class="ab-app-kr">기억의 나무 · TREE</div>
-            `;
+            treeBtn.innerHTML = `<div class="ab-app-squircle">${MT_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadTree().leaves.length}叶</span></div><div class="ab-app-title">有情树</div><div class="ab-app-kr">기억의 나무</div>`;
             homeDockGrid.appendChild(treeBtn);
         }
 
-        // 3. 创建独立的 `#smt-page-memory_tree` 全屏页面
-        topDoc.getElementById("smt-page-memory_tree")?.remove();
-        const treePage = topDoc.createElement("div");
-        treePage.id = "smt-page-memory_tree";
-        treePage.className = "smt-page";
-        treePage.innerHTML = `
-            <!-- 顶部写实有情树全景画布舱 -->
-            <div class="mt-canvas-shell" id="mt-stage-shell">
-                <!-- 画布顶部悬浮状态栏 -->
-                <div style="position:absolute;top:12px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;z-index:6;pointer-events:none;">
-                    <div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(10px);border:1px solid #E6E6EE;border-radius:99px;padding:4px 11px;display:inline-flex;align-items:center;gap:6px;pointer-events:auto;">
-                        ${MT_ICO.leaf}
-                        <span style="font-size:9px;font-weight:800;color:#2C2C32;" id="mt-top-stat">LV.3 古木 · 3片记忆叶</span>
-                    </div>
-                    <div style="display:flex;gap:5px;pointer-events:auto;">
-                        <span class="smt-pill-btn" id="mt-season-btn" style="height:24px!important;background:rgba(255,255,255,0.9)!important;">
-                            ${MT_ICO.season}<span id="mt-season-txt">霜白初雪</span>
-                        </span>
-                        <span class="smt-pill-btn dark" id="mt-water-btn" style="height:24px!important;">
-                            ${MT_ICO.drop}<span>晨露浇灌</span>
-                        </span>
-                    </div>
-                </div>
+        // 创建 100% 占据全屏的有情树画布层
+        topDoc.getElementById("smt-real-tree-overlay")?.remove();
+        const overlay = topDoc.createElement("div");
+        overlay.id = "smt-real-tree-overlay";
+        overlay.innerHTML = `
+            <!-- 全屏写实植物分形 Canvas 画布（左树右白） -->
+            <canvas id="mt-real-canvas"></canvas>
 
-                <!-- 中央写实古木与摇曳记忆叶片 SVG 舞台 -->
-                <svg id="mt-tree-svg" viewBox="0 0 360 360" width="100%" height="100%" fill="none" style="display:block;">
-                    <defs>
-                        <!-- 树干立体木纹渐变 -->
-                        <linearGradient id="mtTrunkGrad" x1="150" y1="150" x2="210" y2="330" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#6E6E78" />
-                            <stop offset="45%" stop-color="#484852" />
-                            <stop offset="100%" stop-color="#2C2C34" />
-                        </linearGradient>
-                        <!-- 树冠背景柔光雾晕 -->
-                        <radialGradient id="mtCanopyGlow" cx="50%" cy="40%" r="48%">
-                            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
-                            <stop offset="60%" stop-color="#F2F2F7" stop-opacity="0.55" />
-                            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
-                        </radialGradient>
-                        <!-- 叶片立体光泽渐变 -->
-                        <linearGradient id="mtLeaf sheen" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
-                            <stop offset="100%" stop-color="#E4E4EE" stop-opacity="0.85" />
-                        </linearGradient>
-                    </defs>
-
-                    <!-- 1. 远景树冠呼吸雾光与精细几何年轮星轨 -->
-                    <circle cx="180" cy="142" r="128" fill="url(#mtCanopyGlow)" />
-                    <circle cx="180" cy="142" r="102" stroke="#EAEAF0" stroke-width="0.7" stroke-dasharray="2 4" />
-                    <circle cx="180" cy="142" r="72" stroke="#EFEFF5" stroke-width="0.6" />
-
-                    <!-- 2. 树根底部水面涟漪与坡地微光 -->
-                    <ellipse cx="180" cy="326" rx="96" ry="11" fill="#F2F2F7" />
-                    <ellipse class="mt-root-rip" cx="180" cy="326" rx="54" ry="6.5" stroke="#D5D5E0" stroke-width="0.9" fill="none" />
-                    <ellipse cx="180" cy="326" rx="34" ry="4" stroke="#FFFFFF" stroke-width="1.2" fill="none" />
-                    <path d="M 88 326 Q 180 316 272 326" stroke="#C8C8D4" stroke-width="1.1" stroke-linecap="round" fill="none" />
-
-                    <!-- 3. 写实苍劲主树干与盘根细节 (Organic Bezier Trunk) -->
-                    <path d="M 152 326 C 166 312, 171 278, 172 224 C 172 192, 160 168, 134 146 C 154 156, 170 176, 177 196 C 179 162, 178 128, 180 86 C 183 128, 182 160, 184 190 C 194 168, 212 150, 234 138 C 208 160, 191 184, 189 222 C 190 276, 195 310, 209 326 C 194 322, 186 320, 180 324 C 174 320, 166 322, 152 326 Z" fill="url(#mtTrunkGrad)" />
-                    <!-- 树干高光纹理丝 -->
-                    <path d="M 176 318 C 177 276, 177 232, 179 160" stroke="rgba(255,255,255,0.35)" stroke-width="1.1" stroke-linecap="round" />
-
-                    <!-- 4. 多层级写实伸展枝桠网络 (Realistic Layered Branches) -->
-                    <g stroke="#484852" stroke-linecap="round" fill="none">
-                        <!-- 左侧主枝与二级细枝 -->
-                        <path d="M 174 212 C 146 196, 112 184, 84 182" stroke-width="3.2" />
-                        <path d="M 128 190 C 104 176, 84 160, 68 146" stroke-width="2.1" />
-                        <path d="M 148 198 C 134 202, 124 204, 114 204" stroke-width="1.6" />
-
-                        <path d="M 176 182 C 148 158, 122 132, 92 106" stroke-width="2.8" />
-                        <path d="M 144 154 C 134 146, 126 140, 118 136" stroke-width="1.8" />
-                        <path d="M 156 166 C 150 168, 146 168, 144 168" stroke-width="1.5" />
-
-                        <path d="M 179 148 C 162 122, 148 96, 132 74" stroke-width="2.3" />
-                        <path d="M 164 122 C 163 110, 162 102, 162 98" stroke-width="1.6" />
-
-                        <!-- 中央顶冠枝 -->
-                        <path d="M 180 120 C 180 96, 180 76, 180 58" stroke-width="2.0" />
-
-                        <!-- 右侧主枝与二级细枝 -->
-                        <path d="M 186 208 C 216 194, 248 182, 276 180" stroke-width="3.2" />
-                        <path d="M 232 188 C 256 174, 276 158, 292 144" stroke-width="2.1" />
-                        <path d="M 214 196 C 228 200, 238 202, 246 202" stroke-width="1.6" />
-
-                        <path d="M 183 176 C 212 152, 238 128, 268 104" stroke-width="2.8" />
-                        <path d="M 218 150 C 228 142, 236 138, 242 134" stroke-width="1.8" />
-                        <path d="M 204 162 C 210 164, 214 166, 216 166" stroke-width="1.5" />
-
-                        <path d="M 181 144 C 198 118, 212 94, 228 72" stroke-width="2.3" />
-                        <path d="M 196 118 C 200 108, 202 100, 204 96" stroke-width="1.6" />
-                    </g>
-
-                    <!-- 5. 空中漂浮的微光记忆孢子 -->
-                    <circle class="mt-spore" cx="86" cy="230" r="1.8" fill="#FFFFFF" stroke="#9A9AA5" stroke-width="0.7" style="animation-delay:0s;" />
-                    <circle class="mt-spore" cx="274" cy="220" r="2.0" fill="#FFFFFF" stroke="#9A9AA5" stroke-width="0.7" style="animation-delay:1.8s;" />
-                    <circle class="mt-spore" cx="136" cy="255" r="1.5" fill="#FFFFFF" stroke="#9A9AA5" stroke-width="0.7" style="animation-delay:3.2s;" />
-                    <circle class="mt-spore" cx="228" cy="250" r="1.6" fill="#FFFFFF" stroke="#9A9AA5" stroke-width="0.7" style="animation-delay:0.9s;" />
-
-                    <!-- 6. 动态生长的记忆叶片层 (由 JS 实时渲染挂载在枝头) -->
-                    <g id="mt-leaves-layer"></g>
-                </svg>
-
-                <!-- 画布底部操作浮岛：挂新叶 / 自动汲取聊天结叶 / 让TA挂叶 -->
-                <div style="position:absolute;bottom:10px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;gap:6px;z-index:6;">
-                    <span class="smt-pill-btn" id="mt-btn-user-hang" style="flex:1;height:28px!important;background:rgba(255,255,255,0.92)!important;border-radius:10px!important;">
-                        ${MT_ICO.plus}<span>我挂记忆叶</span>
-                    </span>
-                    <span class="smt-pill-btn" id="mt-btn-ai-hang" style="flex:1;height:28px!important;background:rgba(255,255,255,0.92)!important;border-radius:10px!important;">
-                        ${MT_ICO.leaf}<span>让TA挂叶</span>
-                    </span>
-                    <span class="smt-pill-btn dark" id="mt-btn-auto-absorb" style="flex:1.25;height:28px!important;border-radius:10px!important;">
-                        ${MT_ICO.spark}<span>汲取聊天结叶</span>
-                    </span>
+            <!-- 顶部极简悬浮导航 -->
+            <div style="position:relative;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:max(18px,env(safe-area-inset-top,18px)) 16px 0 16px;pointer-events:none;">
+                <span class="mt-glass-pill" id="mt-close-btn" style="pointer-events:auto;">${MT_ICO.back}<span>返回主页</span></span>
+                <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
+                    <span class="mt-glass-pill" id="mt-count-pill" style="pointer-events:none;">${MT_ICO.leaf}<span id="mt-count-txt">4 片记忆叶</span></span>
+                    <span class="mt-glass-pill" id="mt-list-btn">${MT_ICO.list}<span>叶册</span></span>
                 </div>
             </div>
 
-            <!-- 手写挂新叶输入抽屉（默认收起） -->
-            <div id="mt-add-drawer" class="mt-specimen-card" style="display:none;">
-                <div style="font-size:10px;font-weight:800;color:#2C2C32;margin-bottom:8px;">새 기억의 잎 · 亲手挂上一片新记忆叶 (挂上后 TA 会在叶背写下批注)</div>
-                <input type="text" id="mt-inp-title" placeholder="给这片记忆叶子起个名字 (如：第一次一起看海)..." style="width:100%;height:30px;background:#F8F8FA;border:1px solid #E6E6EE;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#2C2C32;box-sizing:border-box;outline:none;margin-bottom:6px;" />
-                <textarea id="mt-inp-content" placeholder="写下你想封存在这片树叶里的记忆瞬间..." style="width:100%;height:54px;background:#F8F8FA;border:1px solid #E6E6EE;border-radius:9px;padding:7px 10px;font-size:10px;font-weight:600;color:#2C2C32;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
-                <div style="display:flex;justify-content:flex-end;gap:6px;">
-                    <span class="smt-pill-btn" id="mt-add-cancel">取消</span>
-                    <span class="smt-pill-btn dark" id="mt-add-submit">挂上枝头并让TA批注</span>
+            <!-- 右侧留白处极简情绪色阶图例（竖排小字，极致韩系呼吸感） -->
+            <div style="position:absolute;top:76px;right:18px;z-index:4;text-align:right;pointer-events:none;">
+                <div style="font-size:15px;font-weight:800;color:#2C2C34;letter-spacing:3px;">有情树</div>
+                <div style="font-size:7.5px;font-weight:700;color:#9A9AA5;letter-spacing:2px;margin-top:2px;">MEMORY TREE · 无上限叶</div>
+                <div style="display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:rgba(255,255,255,0.7);padding:3px 8px;border-radius:99px;border:1px solid #EAEAF0;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:#FFFFFF;border:1px solid #8A8C96;"></span>
+                    <span style="font-size:7px;color:#7A7A85;">开心浅白</span>
+                    <span style="width:14px;height:1px;background:linear-gradient(90deg,#DDD,#444);"></span>
+                    <span style="width:7px;height:7px;border-radius:50%;background:#444650;"></span>
+                    <span style="font-size:7px;color:#7A7A85;">低落深炭</span>
                 </div>
             </div>
 
-            <!-- 当前点选叶片的「植物标本记忆卡 (Memory Specimen Card)」 -->
-            <div id="mt-specimen-detail"></div>
+            <!-- 底部：右侧留白区悬浮记忆详情卡 + 极简操作条 -->
+            <div style="position:relative;z-index:6;margin-top:auto;padding:0 16px max(22px,env(safe-area-inset-bottom,22px)) 16px;display:flex;flex-direction:column;gap:9px;pointer-events:none;">
+                <!-- 选中叶片的回忆标本浮卡 -->
+                <div id="mt-leaf-card-wrap" style="pointer-events:auto;"></div>
 
-            <!-- 底部：全部记忆叶片编年史索引 -->
-            <div class="mt-specimen-card" style="padding:13px 15px!important;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid #F2F2F7;">
-                    <span style="font-size:9.8px;font-weight:800;color:#2C2C32;display:inline-flex;align-items:center;gap:6px;">
-                        ${MT_ICO.book}<span>HERBARIUM ARCHIVE · 树叶记忆标本册</span>
-                    </span>
-                    <span style="font-size:8px;font-weight:700;color:#9A9AA5;">点击树上叶片或下方条目查看</span>
+                <!-- 手写挂新叶弹窗抽屉（带 0~100% 开心度滑杆） -->
+                <div id="mt-add-modal" class="mt-float-card" style="display:none;pointer-events:auto;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <span style="font-size:10px;font-weight:800;color:#2C2C34;">挂上一片新记忆叶（无上限）</span>
+                        <span id="mt-add-close" style="cursor:pointer;color:#8E8E98;">${MT_ICO.close}</span>
+                    </div>
+                    <input type="text" id="mt-new-title" placeholder="回忆标题 (如：雨夜撑伞的街角)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E4E4EE;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#2C2C34;box-sizing:border-box;outline:none;margin-bottom:6px;" />
+                    <textarea id="mt-new-content" placeholder="写下你想封存在树叶里的真实回忆..." style="width:100%;height:50px;background:#FFFFFF;border:1px solid #E4E4EE;border-radius:9px;padding:7px 10px;font-size:10px;color:#2C2C34;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
+                        <span style="font-size:9px;font-weight:700;color:#55555E;">此刻开心程度：</span>
+                        <input type="range" id="mt-new-joy" min="5" max="100" value="88" style="flex:1;accent-color:#2C2C34;" />
+                        <span id="mt-new-joy-lbl" style="font-size:8.5px;font-weight:800;color:#2C2C34;min-width:86px;text-align:right;">极开心 88% · 霜白</span>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;gap:6px;">
+                        <span class="mt-glass-pill dark" id="mt-add-submit" style="height:28px!important;">挂上枝头并让TA批注</span>
+                    </div>
                 </div>
-                <div id="mt-archive-list" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;"></div>
+
+                <!-- 全部记忆叶名录抽屉（适合几十上百片叶子时检索） -->
+                <div id="mt-all-list-modal" class="mt-float-card" style="display:none;max-height:240px;overflow-y:auto;pointer-events:auto;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #EFEFF5;">
+                        <span style="font-size:10px;font-weight:800;color:#2C2C34;">全部记忆叶索引（点击定位查看）</span>
+                        <span id="mt-list-close" style="cursor:pointer;color:#8E8E98;">${MT_ICO.close}</span>
+                    </div>
+                    <div id="mt-all-list-body" style="display:flex;flex-direction:column;gap:5px;"></div>
+                </div>
+
+                <!-- 底部操作浮岛 -->
+                <div style="display:flex;justify-content:flex-end;gap:6px;pointer-events:auto;">
+                    <span class="mt-glass-pill" id="mt-btn-add">${MT_ICO.plus}<span>挂记忆叶</span></span>
+                    <span class="mt-glass-pill" id="mt-btn-ai-leaf">${MT_ICO.leaf}<span>让TA挂叶</span></span>
+                    <span class="mt-glass-pill dark" id="mt-btn-absorb">${MT_ICO.spark}<span>汲取聊天结叶</span></span>
+                </div>
             </div>
         `;
-        fsBody.appendChild(treePage);
+        modal.appendChild(overlay);
 
-        // 4. 渲染写实有情树叶片与标本卡
-        function renderMemoryTree() {
-            const c = getCtx();
-            const data = loadTreeData();
-            const th = SEASON_THEMES[data.season || "frost"] || SEASON_THEMES.frost;
+        // ── Canvas 写实植物分形渲染与物理摇曳引擎 ──
+        const canvas = topDoc.getElementById("mt-real-canvas");
+        const ctx2d = canvas.getContext("2d");
+        let animId = null, W = 390, H = 780;
+        let renderedLeavesHitbox = []; // 存储当前帧每片叶子的屏幕坐标，供点击精确命中！
 
-            // 更新主页角标
+        // 预先生成漂浮微光尘埃
+        const spores = Array.from({ length: 18 }, (_, i) => ({
+            rx: 0.2 + ((i * 37) % 75) / 100,
+            ry: 0.1 + ((i * 53) % 75) / 100,
+            r: 0.9 + (i % 3) * 0.55,
+            speed: 0.00018 + (i % 4) * 0.00008,
+            phase: i * 1.1
+        }));
+
+        function resizeCanvas() {
+            const rect = overlay.getBoundingClientRect();
+            W = rect.width || topWin.innerWidth || 390;
+            H = rect.height || topWin.innerHeight || 780;
+            const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        // 递归绘制真实自然弯曲枝干并收集枝梢锚点
+        function drawRealBranch(x, y, len, angle, width, depth, maxDepth, rng, windTime, anchors) {
+            const sway = Math.sin(windTime * 1.15 + depth * 0.75 + x * 0.01) * (0.006 * (maxDepth - depth + 1));
+            const curAng = angle + sway;
+            const ctrlAng = curAng + (rng() - 0.5) * 0.24;
+            const endX = x + Math.cos(curAng) * len;
+            const endY = y + Math.sin(curAng) * len;
+            const cx = x + Math.cos(ctrlAng) * (len * 0.52);
+            const cy = y + Math.sin(ctrlAng) * (len * 0.52);
+
+            // 主枝干木质暗部
+            ctx2d.beginPath();
+            ctx2d.moveTo(x, y);
+            ctx2d.quadraticCurveTo(cx, cy, endX, endY);
+            const shade = Math.min(135, 36 + (maxDepth - depth) * 14);
+            ctx2d.strokeStyle = `rgb(${shade}, ${shade + 2}, ${shade + 8})`;
+            ctx2d.lineWidth = Math.max(0.8, width);
+            ctx2d.lineCap = "round";
+            ctx2d.stroke();
+
+            // 粗枝干表面增加一层写实受光木纹高光丝
+            if (width > 3.2) {
+                ctx2d.beginPath();
+                ctx2d.moveTo(x + width * 0.22, y);
+                ctx2d.quadraticCurveTo(cx + width * 0.16, cy, endX + width * 0.12, endY);
+                ctx2d.strokeStyle = "rgba(255, 255, 255, 0.28)";
+                ctx2d.lineWidth = Math.max(0.7, width * 0.18);
+                ctx2d.stroke();
+            }
+
+            // 收集二级以上细枝梢作为记忆叶生长锚点
+            if (depth <= maxDepth - 2) {
+                anchors.push({ x: endX, y: endY, ang: curAng, depth });
+            }
+            if (depth <= 1) return;
+
+            const subCount = depth > 4 ? 2 : (rng() > 0.35 ? 2 : 3);
+            for (let i = 0; i < subCount; i++) {
+                // 让枝条优雅地朝向右上方舒展，形成左树右白的高定构图！
+                const spread = subCount === 2 ? (i === 0 ? -0.34 : 0.32) : (i - 1) * 0.36;
+                const biasRight = endX < W * 0.52 ? 0.11 : -0.05;
+                const nextAng = curAng + spread + biasRight + (rng() - 0.5) * 0.16;
+                const nextLen = len * (0.68 + rng() * 0.14);
+                const nextW = width * (0.64 + rng() * 0.08);
+                drawRealBranch(endX, endY, nextLen, nextAng, nextW, depth - 1, maxDepth, rng, windTime, anchors);
+            }
+        }
+
+        // 绘制单片写实植物叶片（带真实叶尖、叶脉、光泽与选中高亮光晕）
+        function drawSingleLeaf(lx, ly, ang, size, style, isSelected) {
+            ctx2d.save();
+            ctx2d.translate(lx, ly);
+            ctx2d.rotate(ang);
+
+            if (isSelected) {
+                ctx2d.shadowColor = "rgba(44, 44, 52, 0.32)";
+                ctx2d.shadowBlur = 12;
+            } else {
+                ctx2d.shadowColor = style.glow;
+                ctx2d.shadowBlur = 6;
+            }
+
+            // 叶片轮廓
+            ctx2d.beginPath();
+            ctx2d.moveTo(0, 0);
+            ctx2d.bezierCurveTo(-size * 0.58, -size * 0.32, -size * 0.52, -size * 0.95, 0, -size * 1.38);
+            ctx2d.bezierCurveTo(size * 0.52, -size * 0.95, size * 0.58, -size * 0.32, 0, 0);
+            ctx2d.closePath();
+            ctx2d.fillStyle = style.fill;
+            ctx2d.fill();
+            ctx2d.lineWidth = isSelected ? 1.5 : 0.9;
+            ctx2d.strokeStyle = isSelected ? "#1E1E24" : style.stroke;
+            ctx2d.stroke();
+
+            // 清除阴影画精细主叶脉与侧叶脉
+            ctx2d.shadowBlur = 0;
+            ctx2d.beginPath();
+            ctx2d.moveTo(0, -1);
+            ctx2d.lineTo(0, -size * 1.15);
+            ctx2d.moveTo(0, -size * 0.38); ctx2d.lineTo(-size * 0.24, -size * 0.58);
+            ctx2d.moveTo(0, -size * 0.62); ctx2d.lineTo(size * 0.24, -size * 0.82);
+            ctx2d.moveTo(0, -size * 0.85); ctx2d.lineTo(-size * 0.18, -size * 1.0);
+            ctx2d.strokeStyle = style.vein;
+            ctx2d.lineWidth = 0.65;
+            ctx2d.stroke();
+
+            // 若当前选中，在叶尖绘一颗清冷微光星点
+            if (isSelected) {
+                ctx2d.beginPath();
+                ctx2d.arc(0, -size * 1.42, 2.6, 0, Math.PI * 2);
+                ctx2d.fillStyle = "#2C2C34";
+                ctx2d.fill();
+            }
+            ctx2d.restore();
+        }
+
+        function renderFrame(ts) {
+            if (!overlay.classList.contains("open")) { animId = null; return; }
+            const windTime = ts * 0.001;
+            ctx2d.clearRect(0, 0, W, H);
+
+            // 1. 树根处淡雅雾面地平线
+            const rootX = W * 0.08, rootY = H * 1.01;
+            const grd = ctx2d.createRadialGradient(rootX + 40, H * 0.96, 10, rootX + 40, H * 0.96, W * 0.55);
+            grd.addColorStop(0, "rgba(210, 212, 222, 0.32)");
+            grd.addColorStop(1, "rgba(255, 255, 255, 0)");
+            ctx2d.fillStyle = grd;
+            ctx2d.fillRect(0, H * 0.82, W, H * 0.2);
+
+            // 2. 绘制左侧拔地而起的写实分形古木（斜逸向右上，右侧自然留白）
+            const anchors = [];
+            const rng = mulberry32(20260520);
+            const trunkLen = Math.min(W, H) * 0.36;
+            drawRealBranch(rootX, rootY, trunkLen, -Math.PI * 0.39, 26, 6, 6, rng, windTime, anchors);
+
+            // 补充一根从左侧低位横斜向中间舒展的写实侧枝
+            drawRealBranch(rootX + 26, rootY - trunkLen * 0.56, trunkLen * 0.52, -Math.PI * 0.18, 12, 4, 4, mulberry32(8848), windTime, anchors);
+
+            // 3. 在分形枝梢上挂载【无上限】的记忆叶片（颜色深浅严格由 joy 开心度决定！）
+            const treeData = loadTree();
+            const leaves = treeData.leaves || [];
+            renderedLeavesHitbox = [];
+
+            if (anchors.length > 0) {
+                leaves.forEach((leaf, idx) => {
+                    // 无上限映射：当叶子超过枝梢数时，使用黄金角微偏移环绕自然生长成繁茂树冠！
+                    const base = anchors[(idx * 7 + 3) % anchors.length];
+                    const ringLayer = Math.floor(idx / anchors.length);
+                    const goldenAng = idx * 2.39996;
+                    const offsetDist = ringLayer === 0 ? 0 : (10 + ringLayer * 9);
+                    const lx = base.x + Math.cos(goldenAng) * offsetDist;
+                    const ly = base.y + Math.sin(goldenAng) * offsetDist;
+
+                    const leafSway = Math.sin(windTime * 1.8 + idx * 0.9) * 0.11;
+                    const ang = base.ang + Math.PI * 0.5 + ((idx % 5) - 2) * 0.24 + leafSway;
+                    const isSelected = Number(leaf.id) === Number(treeData.activeId);
+                    const sz = isSelected ? 19 : (13.5 + (idx % 4) * 1.4);
+                    const style = getLeafColorByJoy(leaf.joy);
+
+                    drawSingleLeaf(lx, ly, ang, sz, style, isSelected);
+                    renderedLeavesHitbox.push({ id: leaf.id, x: lx, y: ly - sz * 0.55, r: 22 });
+                });
+            }
+
+            // 4. 绘制右侧留白区缓缓飘浮的银白孢子微光
+            spores.forEach((sp) => {
+                const py = ((sp.ry - windTime * sp.speed) % 1 + 1) % 1;
+                const px = sp.rx + Math.sin(windTime * 0.8 + sp.phase) * 0.025;
+                ctx2d.beginPath();
+                ctx2d.arc(px * W, py * H, sp.r, 0, Math.PI * 2);
+                ctx2d.fillStyle = "rgba(180, 184, 196, 0.45)";
+                ctx2d.fill();
+            });
+
+            animId = requestAnimationFrame(renderFrame);
+        }
+
+        // ── 渲染底部浮卡与全部记忆叶索引 ──
+        function renderTreeUI() {
+            const c = getCtx(), data = loadTree();
             const homeBadge = topDoc.getElementById("mt-home-badge");
             if (homeBadge) homeBadge.textContent = `${data.leaves.length}叶`;
+            topDoc.getElementById("mt-count-txt").textContent = `${data.leaves.length} 片记忆叶`;
 
-            // 更新画布底色与顶部状态
-            const shell = topDoc.getElementById("mt-stage-shell");
-            if (shell) shell.style.background = `linear-gradient(180deg, ${th.bg1} 0%, ${th.bg2} 100%)`;
-            topDoc.getElementById("mt-top-stat").textContent = `LV.${data.level || 1} 有情木 · ${data.leaves.length}片记忆叶 · 晨露 ${data.dewCount || 0}`;
-            topDoc.getElementById("mt-season-txt").textContent = th.name;
-
-            // 渲染枝头上的写实叶片（带叶柄、饱满叶身与叶脉）
-            const leavesLayer = topDoc.getElementById("mt-leaves-layer");
-            const visibleLeaves = data.leaves.slice(0, BRANCH_SLOTS.length);
-            if (!data.activeLeafId && visibleLeaves[0]) data.activeLeafId = visibleLeaves[0].id;
-
-            leavesLayer.innerHTML = visibleLeaves.map((leaf, idx) => {
-                const slot = BRANCH_SLOTS[idx % BRANCH_SLOTS.length];
-                const isSelected = Number(leaf.id) === Number(data.activeLeafId);
-                const fillCol = isSelected ? th.activeFill : th.leafFill;
-                const strokeCol = isSelected ? th.activeStroke : th.leafStroke;
-                const veinCol = isSelected ? "#FFFFFF" : th.vein;
-                const textCol = isSelected ? "#FFFFFF" : "#3A3A42";
-                const delay = ((idx * 0.37) % 3.2).toFixed(2);
-
-                return `
-                    <g class="mt-leaf-node ${isSelected ? "active-leaf" : ""}" data-leafid="${leaf.id}" style="animation-delay:${delay}s;">
-                        <g transform="translate(${slot.x}, ${slot.y}) rotate(${slot.ang})">
-                            <!-- 写实银杏/水滴形植物叶片 + 中央主叶脉 + 侧叶脉 -->
-                            <path d="M 0 0 C -13 -9, -15 -26, 0 -36 C 15 -26, 13 -9, 0 0 Z" fill="${fillCol}" stroke="${strokeCol}" stroke-width="${isSelected ? "1.5" : "1.15"}" />
-                            <path d="M 0 -1 L 0 -29" stroke="${veinCol}" stroke-width="0.85" stroke-linecap="round" opacity="0.85" />
-                            <path d="M 0 -10 L -5 -15 M 0 -16 L 5 -21 M 0 -21 L -4 -25" stroke="${veinCol}" stroke-width="0.65" stroke-linecap="round" opacity="0.7" />
-                            <!-- 叶片底端凝结的微露珠 -->
-                            <circle cx="0" cy="-36" r="${isSelected ? "2.4" : "1.5"}" fill="#FFFFFF" stroke="${strokeCol}" stroke-width="0.8" />
-                        </g>
-                        <!-- 叶片旁悬浮的微缩标题签 -->
-                        <g transform="translate(${slot.x}, ${slot.y + 8})">
-                            <rect x="-32" y="-6" width="64" height="13" rx="6.5" fill="${isSelected ? "#2C2C34" : "rgba(255,255,255,0.88)"}" stroke="${strokeCol}" stroke-width="0.7" />
-                            <text x="0" y="3" text-anchor="middle" fill="${textCol}" font-size="6.8" font-weight="700" font-family="-apple-system,sans-serif">${leaf.title.slice(0, 6)}</text>
-                        </g>
-                    </g>
-                `;
-            }).join("");
-
-            leavesLayer.querySelectorAll("[data-leafid]").forEach((node) => {
-                node.onclick = () => {
-                    const lid = Number(node.getAttribute("data-leafid"));
-                    const d = loadTreeData();
-                    d.activeLeafId = lid;
-                    saveTreeData(d);
-                    renderMemoryTree();
-                };
-            });
-
-            // 渲染当前选中叶片的植物标本详情卡
-            const detailBox = topDoc.getElementById("mt-specimen-detail");
-            const curLeaf = data.leaves.find((x) => Number(x.id) === Number(data.activeLeafId)) || data.leaves[0];
-            if (!curLeaf) {
-                detailBox.innerHTML = `<div class="mt-specimen-card" style="text-align:center;color:#9A9AA5;font-size:10px;padding:24px;">树上还没有记忆叶片 · 点击上方「汲取聊天结叶」或「我挂记忆叶」吧</div>`;
+            const cur = data.leaves.find((x) => Number(x.id) === Number(data.activeId));
+            const wrap = topDoc.getElementById("mt-leaf-card-wrap");
+            if (!cur) {
+                wrap.innerHTML = "";
             } else {
-                detailBox.innerHTML = `
-                    <div class="mt-specimen-card">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                            <div style="display:flex;align-items:center;gap:6px;">
-                                <span style="background:#2C2C34;color:#FFFFFF;font-size:7.8px;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:0.6px;">LEAF SPECIMEN</span>
-                                <span style="font-size:12px;font-weight:800;color:#2C2C32;">${curLeaf.title.replace(/</g, "&lt;")}</span>
+                const stInfo = getLeafColorByJoy(cur.joy);
+                wrap.innerHTML = `
+                    <div class="mt-float-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+                                <span style="width:9px;height:9px;border-radius:50%;background:${stInfo.fill};border:1.2px solid ${stInfo.stroke};flex-shrink:0;"></span>
+                                <span style="font-size:11.5px;font-weight:800;color:#2C2C34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span>
                             </div>
-                            <div style="display:flex;align-items:center;gap:8px;">
-                                <span style="font-size:8px;font-weight:700;color:#8E8E98;">挂叶人: ${curLeaf.author} · ${curLeaf.date}</span>
-                                <span id="mt-del-cur-leaf" data-delid="${curLeaf.id}" style="cursor:pointer;display:inline-flex;align-items:center;" title="摘除这片叶子">${MT_ICO.trash}</span>
+                            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                <span style="font-size:7.8px;font-weight:700;color:#6E6E78;background:#F4F4F8;padding:2px 7px;border-radius:99px;">${stInfo.label}</span>
+                                <span id="mt-del-leaf" style="cursor:pointer;display:inline-flex;">${MT_ICO.trash}</span>
+                                <span id="mt-hide-card" style="cursor:pointer;color:#8E8E98;display:inline-flex;">${MT_ICO.close}</span>
                             </div>
                         </div>
-                        <div style="font-size:11px;font-weight:600;color:#3A3A40;line-height:1.7;padding:4px 2px;">
-                            ${curLeaf.content.replace(/</g, "&lt;")}
+                        <div style="font-size:8px;color:#9A9AA5;font-weight:700;margin-bottom:5px;">${cur.author} · ${cur.date}</div>
+                        <div style="font-size:10.8px;font-weight:600;color:#3A3A42;line-height:1.65;">${cur.content.replace(/</g, "&lt;")}</div>
+                        <div style="margin-top:8px;padding:8px 10px;background:rgba(246,246,250,0.85);border-left:2px solid #3A3A42;border-radius:0 8px 8px 0;font-size:10px;font-weight:600;color:#3A3A42;line-height:1.55;">
+                            <span style="font-size:7.8px;color:#8E8E98;display:block;margin-bottom:2px;">${c.charName} 的叶背批注</span>
+                            ${(cur.whisper || "“ 这片叶子我替你收好了。”").replace(/</g, "&lt;")}
                         </div>
-                        <div class="mt-whisper-box">
-                            <div style="font-size:8px;font-weight:800;color:#8E8E98;margin-bottom:3px;letter-spacing:0.5px;">LEAF BACK WHISPER · ${c.charName} 写在叶背的批注</div>
-                            <div>${(curLeaf.whisper || `“ 这段记忆我也替你好好收在树冠最高处了。”`).replace(/</g, "&lt;")}</div>
-                        </div>
-                    </div>
-                `;
-                topDoc.getElementById("mt-del-cur-leaf").onclick = () => {
-                    if (!confirm(`确定从有情树上摘除「${curLeaf.title}」这片记忆叶吗？`)) return;
-                    const d = loadTreeData();
-                    d.leaves = d.leaves.filter((x) => Number(x.id) !== Number(curLeaf.id));
-                    d.activeLeafId = d.leaves[0]?.id || 0;
-                    saveTreeData(d);
-                    renderMemoryTree();
+                    </div>`;
+                topDoc.getElementById("mt-hide-card").onclick = () => { const d = loadTree(); d.activeId = 0; saveTree(d); renderTreeUI(); };
+                topDoc.getElementById("mt-del-leaf").onclick = () => {
+                    if (!confirm(`确定摘除「${cur.title}」这片记忆叶吗？`)) return;
+                    const d = loadTree(); d.leaves = d.leaves.filter((x) => Number(x.id) !== Number(cur.id)); d.activeId = d.leaves[0]?.id || 0; saveTree(d); renderTreeUI();
                 };
             }
 
-            // 渲染底部标本目录列表
-            const archEl = topDoc.getElementById("mt-archive-list");
-            archEl.innerHTML = data.leaves.map((lf, i) => {
-                const isAct = curLeaf && Number(lf.id) === Number(curLeaf.id);
+            // 渲染全部记忆叶索引列表
+            const listBody = topDoc.getElementById("mt-all-list-body");
+            listBody.innerHTML = data.leaves.map((lf, i) => {
+                const stInfo = getLeafColorByJoy(lf.joy);
                 return `
-                    <div data-pickleaf="${lf.id}" style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;border-radius:11px;border:1px solid ${isAct ? "#2C2C34" : "#EFEFF5"};background:${isAct ? "#F8F8FA" : "#FFFFFF"};cursor:pointer;">
-                        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
-                            <span style="font-size:8px;font-weight:800;color:#8E8E98;font-family:monospace;">#${String(i + 1).padStart(2, "0")}</span>
-                            <span style="font-size:10.2px;font-weight:800;color:#2C2C32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lf.title.replace(/</g, "&lt;")}</span>
+                    <div data-pickid="${lf.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(lf.id) === Number(data.activeId) ? "#2C2C34" : "#EFEFF5"};background:#FFFFFF;cursor:pointer;">
+                        <div style="display:flex;align-items:center;gap:7px;min-width:0;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:${stInfo.fill};border:1px solid ${stInfo.stroke};flex-shrink:0;"></span>
+                            <span style="font-size:10px;font-weight:800;color:#2C2C34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lf.title.replace(/</g, "&lt;")}</span>
                         </div>
-                        <span style="font-size:8px;font-weight:700;color:#8E8E98;flex-shrink:0;margin-left:8px;">${lf.author} · ${lf.date}</span>
-                    </div>
-                `;
+                        <span style="font-size:8px;color:#8E8E98;flex-shrink:0;margin-left:8px;">开心${lf.joy ?? 80}% · ${lf.date}</span>
+                    </div>`;
             }).join("");
-
-            archEl.querySelectorAll("[data-pickleaf]").forEach((row) => {
-                row.onclick = () => {
-                    const d = loadTreeData();
-                    d.activeLeafId = Number(row.getAttribute("data-pickleaf"));
-                    saveTreeData(d);
-                    renderMemoryTree();
-                };
+            listBody.querySelectorAll("[data-pickid]").forEach((row) => row.onclick = () => {
+                const d = loadTree(); d.activeId = Number(row.getAttribute("data-pickid")); saveTree(d);
+                topDoc.getElementById("mt-all-list-modal").style.display = "none";
+                renderTreeUI();
             });
         }
 
-        // 5. 绑定四大互动按钮事件
-        // ① 切换四时树叶形态
-        topDoc.getElementById("mt-season-btn").onclick = () => {
-            const keys = ["frost", "spring", "summer", "autumn"];
-            const d = loadTreeData();
-            const nextIdx = (keys.indexOf(d.season || "frost") + 1) % keys.length;
-            d.season = keys[nextIdx];
-            saveTreeData(d);
-            renderMemoryTree();
-        };
-
-        // ② 晨露浇灌升级
-        topDoc.getElementById("mt-water-btn").onclick = () => {
-            const d = loadTreeData();
-            d.dewCount = (d.dewCount || 0) + 1;
-            if (d.dewCount % 5 === 0) d.level = (d.level || 1) + 1;
-            saveTreeData(d);
-            renderMemoryTree();
-        };
-
-        // ③ 我亲手挂记忆叶（挂上后 AI 自动在叶背写下批注）
-        const addDrawer = topDoc.getElementById("mt-add-drawer");
-        topDoc.getElementById("mt-btn-user-hang").onclick = () => {
-            addDrawer.style.display = addDrawer.style.display === "none" ? "block" : "none";
-        };
-        topDoc.getElementById("mt-add-cancel").onclick = () => { addDrawer.style.display = "none"; };
-        topDoc.getElementById("mt-add-submit").onclick = async (e) => {
-            const tInp = topDoc.getElementById("mt-inp-title");
-            const cInp = topDoc.getElementById("mt-inp-content");
-            const title = tInp.value.trim() || "独家记忆";
-            const content = cInp.value.trim();
-            if (!content) return alert("请先写下这片叶子里的记忆内容！");
-
-            const c = getCtx();
-            const dt = new Date();
-            const dateStr = `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`;
-            const newId = Date.now();
-            const d = loadTreeData();
-
-            d.leaves.unshift({
-                id: newId,
-                title,
-                date: dateStr,
-                author: c.userName,
-                content,
-                whisper: `（${c.charName} 正在这片叶子背面写下批注...）`
-            });
-            d.activeLeafId = newId;
-            d.dewCount = (d.dewCount || 0) + 1;
-            saveTreeData(d);
-            tInp.value = ""; cInp.value = "";
-            addDrawer.style.display = "none";
-            renderMemoryTree();
-
-            try {
-                const whisper = await askTreeAI(
-                    `你是${c.charName}。人设：${c.charDesc.slice(0, 1000)}`,
-                    `${c.userName}在你们共同培育的「有情树」上挂了一片记忆树叶，标题是《${title}》，内容是：“${content}”。请你以${c.charName}的身份，在这片树叶背面写下一句深情、占有欲或宠溺的私密批注心声（45字以内，不要引号外的多余解释）：`
-                );
-                const latest = loadTreeData();
-                const target = latest.leaves.find((x) => x.id === newId);
-                if (target) {
-                    target.whisper = `“ ${whisper.replace(/^[“"]|[”"]$/g, "").trim()} ”`;
-                    saveTreeData(latest);
-                    renderMemoryTree();
-                }
-            } catch (err) {}
-        };
-
-        // ④ 让 TA 主动挂一片记忆叶
-        topDoc.getElementById("mt-btn-ai-hang").onclick = async (e) => {
-            const btn = e.currentTarget, orig = btn.innerHTML;
-            btn.textContent = "正在结叶...";
-            const c = getCtx();
-            try {
-                const raw = await askTreeAI(
-                    `你是${c.charName}。人设：${c.charDesc.slice(0, 1000)}\n近期剧情：${c.recentChat}`,
-                    `请你在你和${c.userName}共同培育的「有情树 (Memory Tree)」上亲手挂上一片新的记忆树叶，记录一个你最心动或最难忘的瞬间。严格只输出JSON格式：{"title":"6字以内的唯美记忆标题","content":"55字以内以第一人称描述这段与${c.userName}有关的记忆画面","whisper":"你在叶子背面偷偷写给${c.userName}的一句私密情话或心声(35字以内)"}`
-                );
-                const m = raw.match(/\{[\s\S]*\}/);
-                if (m) {
-                    const obj = JSON.parse(m[0]);
-                    const dt = new Date(), dateStr = `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`;
-                    const d = loadTreeData(), newId = Date.now();
-                    d.leaves.unshift({
-                        id: newId,
-                        title: obj.title || "心动的瞬间",
-                        date: dateStr,
-                        author: c.charName,
-                        content: obj.content || "",
-                        whisper: `“ ${(obj.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”`
-                    });
-                    d.activeLeafId = newId;
-                    d.level = (d.level || 1) + 1;
-                    saveTreeData(d);
-                    renderMemoryTree();
-                }
-            } catch (err) {
-                alert(err.message);
-            } finally {
-                btn.innerHTML = orig;
+        // 点击画布上的任意叶片精确命中查看！
+        canvas.onclick = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left, py = e.clientY - rect.top;
+            let best = null, minDist = 30;
+            for (let i = renderedLeavesHitbox.length - 1; i >= 0; i--) {
+                const hb = renderedLeavesHitbox[i];
+                const dist = Math.hypot(px - hb.x, py - hb.y);
+                if (dist < minDist) { minDist = dist; best = hb; }
+            }
+            if (best) {
+                const d = loadTree(); d.activeId = best.id; saveTree(d); renderTreeUI();
             }
         };
 
-        // ⑤ 自动汲取微信/主线最新聊天记录凝结成记忆叶！
-        topDoc.getElementById("mt-btn-auto-absorb").onclick = async (e) => {
-            const btn = e.currentTarget, orig = btn.innerHTML;
-            btn.textContent = "汲取记忆中...";
-            const c = getCtx();
-            let wxHistory = "";
-            try {
-                const wxList = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${c.safeScope}`) || "[]");
-                wxHistory = wxList.slice(-15).map((m) => `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n");
-            } catch (err) {}
-
-            const sourceText = [wxHistory, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常点滴`;
-            try {
-                const raw = await askTreeAI(
-                    `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`,
-                    `请根据以下你和${c.userName}最近的聊天记录，提炼出最值得铭记的一个温情或心动细节，凝结成「有情树」上的一片新叶子。\n【聊天记录】：\n${sourceText.slice(-1200)}\n请严格只输出JSON格式：{"title":"6字以内的记忆叶标题","content":"55字以内浓缩这段共同记忆的画面","whisper":"你作为${c.charName}在这片叶子背面写下的内心独白批注(35字以内)"}`
-                );
-                const m = raw.match(/\{[\s\S]*\}/);
-                if (m) {
-                    const obj = JSON.parse(m[0]);
-                    const dt = new Date(), dateStr = `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`;
-                    const d = loadTreeData(), newId = Date.now();
-                    d.leaves.unshift({
-                        id: newId,
-                        title: obj.title || "聊天记忆结晶",
-                        date: dateStr,
-                        author: `${c.userName} & ${c.charName}`,
-                        content: obj.content || "",
-                        whisper: `“ ${(obj.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”`
-                    });
-                    d.activeLeafId = newId;
-                    d.dewCount = (d.dewCount || 0) + 2;
-                    saveTreeData(d);
-                    renderMemoryTree();
-                }
-            } catch (err) {
-                alert(err.message);
-            } finally {
-                btn.innerHTML = orig;
-            }
-        };
-
-        // 6. 严密的路由跳转与防串页清场控制
-        function closeMemoryTreePage() {
-            treePage.classList.remove("active");
+        // 绑定打开/关闭与 3 大结叶交互
+        function openTreeOverlay() {
+            overlay.classList.add("open");
+            resizeCanvas();
+            renderTreeUI();
+            if (!animId) animId = requestAnimationFrame(renderFrame);
+        }
+        function closeTreeOverlay() {
+            overlay.classList.remove("open");
+            if (animId) { cancelAnimationFrame(animId); animId = null; }
         }
 
-        function openMemoryTreePage() {
-            renderMemoryTree();
-            topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
-            treePage.classList.add("active");
-            topDoc.getElementById("smt-back-text").textContent = "이전 · 返回主页";
-            topDoc.getElementById("smt-top-title").textContent = "MEMORY TREE · 기억의 나무";
-            topDoc.getElementById("smt-top-sub").textContent = "Botanical Memory Archive · 有情树";
-        }
+        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openTreeOverlay(); });
+        topDoc.getElementById("mt-close-btn").onclick = () => closeTreeOverlay();
+        topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resizeCanvas(); });
 
-        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => {
-            e.stopPropagation();
-            openMemoryTreePage();
-        });
+        const addModal = topDoc.getElementById("mt-add-modal"), listModal = topDoc.getElementById("mt-all-list-modal");
+        topDoc.getElementById("mt-btn-add").onclick = () => { listModal.style.display = "none"; addModal.style.display = addModal.style.display === "none" ? "block" : "none"; };
+        topDoc.getElementById("mt-add-close").onclick = () => { addModal.style.display = "none"; };
+        topDoc.getElementById("mt-list-btn").onclick = () => { addModal.style.display = "none"; listModal.style.display = listModal.style.display === "none" ? "block" : "none"; renderTreeUI(); };
+        topDoc.getElementById("mt-list-close").onclick = () => { listModal.style.display = "none"; };
 
-        // 切换到任何底部主栏或其他子应用时，自动关闭有情树页面（100% 绝不串页！）
-        modal.querySelectorAll(".smt-tab-item").forEach((tab) => {
-            tab.addEventListener("click", () => closeMemoryTreePage(), true);
-        });
-        homePage.querySelectorAll(".ab-app-item:not(#smt-home-open-memtree)").forEach((item) => {
-            item.addEventListener("click", () => closeMemoryTreePage(), true);
-        });
-        ["smt-wx-cfg-btn", "smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
-            topDoc.getElementById(id)?.addEventListener("click", () => closeMemoryTreePage(), true);
-        });
+        const joySlider = topDoc.getElementById("mt-new-joy"), joyLbl = topDoc.getElementById("mt-new-joy-lbl");
+        joySlider.oninput = () => { joyLbl.textContent = getLeafColorByJoy(joySlider.value).label; };
 
-        // 顶栏返回键：从有情树返回个人主页
-        topDoc.getElementById("smt-header-back-btn").addEventListener("click", (e) => {
-            if (treePage.classList.contains("active")) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-                closeMemoryTreePage();
-                topDoc.querySelector('.smt-tab-item[data-page="home"]')?.click();
-            }
-        }, true);
+        // ① 手写挂新叶
+        topDoc.getElementById("mt-add-submit").onclick = async () => {
+            const title = topDoc.getElementById("mt-new-title").value.trim() || "独家回忆";
+            const content = topDoc.getElementById("mt-new-content").value.trim();
+            if (!content) return alert("请写下你想封存的回忆内容！");
+            const joy = Number(joySlider.value) || 85, c = getCtx(), dt = new Date(), newId = Date.now();
+            const d = loadTree();
+            d.leaves.unshift({ id: newId, title, date: `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`, author: c.userName, joy, content, whisper: `（${c.charName} 正在叶背写下批注...）` });
+            d.activeId = newId; saveTree(d);
+            topDoc.getElementById("mt-new-title").value = ""; topDoc.getElementById("mt-new-content").value = "";
+            addModal.style.display = "none"; renderTreeUI();
+            try {
+                const w = await askTreeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `${c.userName}在有情树上挂了一片记忆叶《${title}》（开心度${joy}%）：“${content}”。请在叶背写一句深情批注(40字内)：`);
+                const latest = loadTree(), t = latest.leaves.find((x) => x.id === newId);
+                if (t) { t.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveTree(latest); renderTreeUI(); }
+            } catch (e) {}
+        };
 
-        renderMemoryTree();
+        // ② 让 TA 挂叶（AI 自动评估开心度决定叶子颜色深浅！）
+        topDoc.getElementById("mt-btn-ai-leaf").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "结叶中...";
+            const c = getCtx();
+            try {
+                const raw = await askTreeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`, `请在有情树上挂一片你的独家回忆叶，并根据这段回忆的情绪打分(joy: 10~100，越开心越高，越酸涩思念越低)。严格只输出JSON：{"title":"8字内标题","joy":85,"content":"50字内回忆描写","whisper":"35字内叶背情话"}`);
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) {
+                    const o = JSON.parse(m[0]), dt = new Date(), d = loadTree(), nid = Date.now();
+                    d.leaves.unshift({ id: nid, title: o.title || "心动瞬间", date: `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`, author: c.charName, joy: Number(o.joy) || 85, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    d.activeId = nid; saveTree(d); renderTreeUI();
+                }
+            } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+        };
+
+        // ③ 自动汲取聊天记录结叶
+        topDoc.getElementById("mt-btn-absorb").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "汲取中...";
+            const c = getCtx();
+            let wx = "";
+            try { wx = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${c.safeScope}`) || "[]").slice(-14).map((m) => `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n"); } catch (err) {}
+            const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常`;
+            try {
+                const raw = await askTreeAI(`你是${c.charName}。`, `根据以下近期聊天提炼一段最值得铭记的回忆结成有情树叶片，并给出情绪开心度(joy: 10~100)。\n${src.slice(-1100)}\n严格只输出JSON：{"title":"8字内标题","joy":90,"content":"50字内回忆浓缩","whisper":"35字内叶背批注"}`);
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) {
+                    const o = JSON.parse(m[0]), dt = new Date(), d = loadTree(), nid = Date.now();
+                    d.leaves.unshift({ id: nid, title: o.title || "聊天记忆", date: `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`, author: `${c.userName} & ${c.charName}`, joy: Number(o.joy) || 88, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    d.activeId = nid; saveTree(d); renderTreeUI();
+                }
+            } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+        };
     }
 
-    mountMemoryTreeApp();
+    mountFullScreenRealTree();
 })();
