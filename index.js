@@ -2755,17 +2755,17 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// 🌧️❄️ 【Sumoul App 雨雪宿命三幕开屏补丁：1.三滴雨涟漪 ➔ 2.两滴雨雪相撞化作十字交错(宿命制作) ➔ 3.漫天雨雪与水滴渐线粗体主视觉】
-// 用法：直接替换 index.js 最末尾刚才那段开屏补丁即可！
+// ❄️ 【Sumoul App 极致清冷银白版开屏补丁：零黑色墨汁感！纯白浅银细雨 + 双雨微光十字交错(无框宿命制作) + 清冷雨雪渐线】
+// 用法：直接替换 index.js 倒数第二个开屏补丁（保留最后面的悬浮球补丁）！
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
 
-    function mountRainSnowDestinySplash() {
+    function mountPureColdSilverSplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountRainSnowDestinySplash, 150);
+            setTimeout(mountPureColdSilverSplash, 150);
             return;
         }
 
@@ -2781,445 +2781,453 @@ bootSumoulApp();
             "sumoul-whitemist-v29-css",
             "sumoul-blink-rain-v31-css",
             "sumoul-destiny-v32-css",
-            "sumoul-rainsnow-v33-css"
+            "sumoul-rainsnow-v33-css",
+            "sumoul-coldsilver-v34-css"
         ].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
-        st.id = "sumoul-rainsnow-v33-css";
+        st.id = "sumoul-coldsilver-v34-css";
         st.innerHTML = `
             /* ══════════════════════════════════════════════════════
-               【第一幕：0.0s ~ 2.7s 眨眼苏醒 + 3滴错落雨滴涟漪】
+               【第一幕：0.0s ~ 2.7s 轻柔眨眼 + 3滴半透明银白细雨涟漪】
                ══════════════════════════════════════════════════════ */
-            @keyframes rsLidTop {
+            @keyframes csLidTop {
                 0%   { transform: translateY(0%); }
-                22%  { transform: translateY(-76%); }
-                36%  { transform: translateY(-14%); }
-                62%  { transform: translateY(-100%); }
+                24%  { transform: translateY(-78%); }
+                38%  { transform: translateY(-18%); }
+                65%  { transform: translateY(-100%); }
                 100% { transform: translateY(-100%); }
             }
-            @keyframes rsLidBot {
+            @keyframes csLidBot {
                 0%   { transform: translateY(0%); }
-                22%  { transform: translateY(76%); }
-                36%  { transform: translateY(14%); }
-                62%  { transform: translateY(100%); }
+                24%  { transform: translateY(78%); }
+                38%  { transform: translateY(18%); }
+                65%  { transform: translateY(100%); }
                 100% { transform: translateY(100%); }
             }
-            @keyframes rsDropFall {
-                0%   { transform: translateY(-60px) scaleY(1.4); opacity: 0; }
-                35%  { opacity: 0.95; }
-                78%  { transform: translateY(0px) scaleY(0.35); opacity: 1; }
+            /* 清透银白雨丝落下（绝不发黑！） */
+            @keyframes csSilverDrop {
+                0%   { transform: translateY(-55px) scaleY(1.2); opacity: 0; }
+                40%  { opacity: 0.85; }
+                80%  { transform: translateY(0px) scaleY(0.3); opacity: 0.9; }
                 100% { transform: translateY(2px) scaleY(0.1); opacity: 0; }
             }
-            @keyframes rsHitDot {
+            @keyframes csSilverDot {
                 0%   { transform: scale(0); opacity: 0; }
-                30%  { transform: scale(1.4); opacity: 1; }
-                100% { transform: scale(0.4); opacity: 0; }
+                35%  { transform: scale(1.2); opacity: 0.9; }
+                100% { transform: scale(0.3); opacity: 0; }
             }
-            @keyframes rsRingA {
-                0%   { transform: scale(0.08); opacity: 0; }
-                18%  { opacity: 0.9; }
-                100% { transform: scale(2.0); opacity: 0; }
+            @keyframes csSilverRingA {
+                0%   { transform: scale(0.1); opacity: 0; }
+                20%  { opacity: 0.85; }
+                100% { transform: scale(2.1); opacity: 0; }
             }
-            @keyframes rsRingB {
-                0%   { transform: scale(0.08); opacity: 0; }
-                22%  { opacity: 0.65; }
-                100% { transform: scale(2.8); opacity: 0; }
-            }
-
-            #seoul-mini-theater-modal #smt-boot-splash .rs-lid-top {
-                position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 54% !important;
-                background: linear-gradient(180deg, #D8D8D8 0%, #E8E8E8 80%, rgba(232,232,232,0) 100%) !important;
-                z-index: 25 !important; pointer-events: none !important;
-                animation: rsLidTop 1.85s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-lid-bot {
-                position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 54% !important;
-                background: linear-gradient(0deg, #D8D8D8 0%, #E8E8E8 80%, rgba(232,232,232,0) 100%) !important;
-                z-index: 25 !important; pointer-events: none !important;
-                animation: rsLidBot 1.85s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            @keyframes csSilverRingB {
+                0%   { transform: scale(0.1); opacity: 0; }
+                25%  { opacity: 0.55; }
+                100% { transform: scale(2.9); opacity: 0; }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .rs-rain-spot {
-                position: absolute !important; width: 96px !important; height: 96px !important;
-                margin-left: -48px !important; margin-top: -48px !important;
+            #seoul-mini-theater-modal #smt-boot-splash .cs-lid-top {
+                position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 52% !important;
+                background: linear-gradient(180deg, #E8E8E8 0%, #F2F2F2 78%, rgba(242,242,242,0) 100%) !important;
+                z-index: 25 !important; pointer-events: none !important;
+                animation: csLidTop 1.9s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-lid-bot {
+                position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 52% !important;
+                background: linear-gradient(0deg, #E8E8E8 0%, #F2F2F2 78%, rgba(242,242,242,0) 100%) !important;
+                z-index: 25 !important; pointer-events: none !important;
+                animation: csLidBot 1.9s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .cs-rain-spot {
+                position: absolute !important; width: 90px !important; height: 90px !important;
+                margin-left: -45px !important; margin-top: -45px !important;
                 pointer-events: none !important; z-index: 8 !important;
                 display: flex !important; align-items: center !important; justify-content: center !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-drop {
-                position: absolute !important; bottom: 48px !important; left: 50% !important;
-                width: 1.5px !important; height: 42px !important; margin-left: -0.75px !important;
+            /* 半透明纯白+浅银雨丝 */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-drop {
+                position: absolute !important; bottom: 45px !important; left: 50% !important;
+                width: 1.1px !important; height: 38px !important; margin-left: -0.55px !important;
                 border-radius: 99px !important;
-                background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #777777 60%, #262626 100%) !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #B0B0B0 55%, #FFFFFF 100%) !important;
+                box-shadow: 0 0 6px #FFFFFF !important;
                 opacity: 0 !important; transform-origin: bottom center !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-dot {
-                position: absolute !important; width: 5px !important; height: 5px !important;
-                border-radius: 50% !important; background: #2E2E2E !important;
+            #seoul-mini-theater-modal #smt-boot-splash .cs-dot {
+                position: absolute !important; width: 4px !important; height: 4px !important;
+                border-radius: 50% !important; background: #FFFFFF !important;
+                border: 0.8px solid #A0A0A0 !important;
                 box-shadow: 0 0 8px #FFFFFF !important; opacity: 0 !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-ring-1,
-            #seoul-mini-theater-modal #smt-boot-splash .rs-ring-2 {
-                position: absolute !important; width: 52px !important; height: 24px !important;
-                border-radius: 50% !important; border: 1.3px solid #555555 !important;
-                box-shadow: 0 0 10px rgba(255,255,255,0.95) !important; opacity: 0 !important;
+            /* 纯白高光 + 极浅银灰水纹圈 */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-ring-1,
+            #seoul-mini-theater-modal #smt-boot-splash .cs-ring-2 {
+                position: absolute !important; width: 48px !important; height: 20px !important;
+                border-radius: 50% !important; border: 1px solid #A8A8A8 !important;
+                box-shadow: 0 0 8px #FFFFFF, inset 0 0 6px #FFFFFF !important; opacity: 0 !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-ring-2 { border: 0.9px solid #888888 !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-ring-2 { border: 0.7px solid #C2C2C2 !important; }
 
             /* 第1滴：左上 (0.55s) */
-            #seoul-mini-theater-modal #smt-boot-splash .spot-a .rs-drop   { animation: rsDropFall 0.48s cubic-bezier(0.4,0,1,1) 0.55s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-a .rs-dot    { animation: rsHitDot 0.6s ease-out 0.95s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-a .rs-ring-1 { animation: rsRingA 1.5s cubic-bezier(0.16,1,0.3,1) 0.97s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-a .rs-ring-2 { animation: rsRingB 1.8s cubic-bezier(0.16,1,0.3,1) 1.12s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-1 .cs-drop   { animation: csSilverDrop 0.5s cubic-bezier(0.4,0,1,1) 0.55s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-1 .cs-dot    { animation: csSilverDot 0.6s ease-out 0.96s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-1 .cs-ring-1 { animation: csSilverRingA 1.6s cubic-bezier(0.16,1,0.3,1) 0.98s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-1 .cs-ring-2 { animation: csSilverRingB 1.9s cubic-bezier(0.16,1,0.3,1) 1.14s forwards !important; }
 
             /* 第2滴：右下 (1.35s) */
-            #seoul-mini-theater-modal #smt-boot-splash .spot-b .rs-drop   { animation: rsDropFall 0.48s cubic-bezier(0.4,0,1,1) 1.35s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-b .rs-dot    { animation: rsHitDot 0.6s ease-out 1.75s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-b .rs-ring-1 { animation: rsRingA 1.5s cubic-bezier(0.16,1,0.3,1) 1.77s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-b .rs-ring-2 { animation: rsRingB 1.8s cubic-bezier(0.16,1,0.3,1) 1.92s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-2 .cs-drop   { animation: csSilverDrop 0.5s cubic-bezier(0.4,0,1,1) 1.35s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-2 .cs-dot    { animation: csSilverDot 0.6s ease-out 1.76s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-2 .cs-ring-1 { animation: csSilverRingA 1.6s cubic-bezier(0.16,1,0.3,1) 1.78s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-2 .cs-ring-2 { animation: csSilverRingB 1.9s cubic-bezier(0.16,1,0.3,1) 1.94s forwards !important; }
 
-            /* 第3滴：正中偏上 (2.10s) */
-            #seoul-mini-theater-modal #smt-boot-splash .spot-c .rs-drop   { height: 48px !important; animation: rsDropFall 0.5s cubic-bezier(0.4,0,1,1) 2.10s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-c .rs-dot    { animation: rsHitDot 0.65s ease-out 2.50s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-c .rs-ring-1 { width: 62px !important; height: 28px !important; animation: rsRingA 1.7s cubic-bezier(0.16,1,0.3,1) 2.52s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .spot-c .rs-ring-2 { width: 62px !important; height: 28px !important; animation: rsRingB 2.0s cubic-bezier(0.16,1,0.3,1) 2.68s forwards !important; }
+            /* 第3滴：正中 (2.10s) */
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-3 .cs-drop   { height: 44px !important; animation: csSilverDrop 0.5s cubic-bezier(0.4,0,1,1) 2.10s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-3 .cs-dot    { animation: csSilverDot 0.65s ease-out 2.52s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-3 .cs-ring-1 { width: 58px !important; height: 24px !important; animation: csSilverRingA 1.8s cubic-bezier(0.16,1,0.3,1) 2.54s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .c-spot-3 .cs-ring-2 { width: 58px !important; height: 24px !important; animation: csSilverRingB 2.1s cubic-bezier(0.16,1,0.3,1) 2.70s forwards !important; }
 
             /* ══════════════════════════════════════════════════════
-               【第二幕：2.65s ~ 5.4s 两滴雨雪奔赴相撞 ➔ 交错成十字 + 宿命制作】
+               【第二幕：2.65s ~ 5.3s 两点清冷银白雨滴滑入相撞 ➔ 极细微光十字 + 无框「宿命制作」】
                ══════════════════════════════════════════════════════ */
-            /* 第一滴雨（垂直方向）：从上方拖着水尾滑入中心 (0,0) */
-            @keyframes rsCollideDropV {
-                0%   { transform: translateY(-130px) scaleY(1.3); opacity: 0; }
+            /* 垂直滑落的第一点银白雨珠 */
+            @keyframes csGlideV {
+                0%   { transform: translateY(-95px); opacity: 0; }
                 30%  { opacity: 1; }
-                100% { transform: translateY(0px) scaleY(1); opacity: 1; }
+                90%  { transform: translateY(0px); opacity: 1; }
+                100% { transform: translateY(0px) scale(0); opacity: 0; }
             }
-            /* 第二滴雨（水平方向）：从左侧拖着水尾滑入中心 (0,0) 与第一滴相撞！ */
-            @keyframes rsCollideDropH {
-                0%   { transform: translateX(-130px) scaleX(1.3); opacity: 0; }
+            /* 水平滑入的第二点银白雨珠 */
+            @keyframes csGlideH {
+                0%   { transform: translateX(-95px); opacity: 0; }
                 30%  { opacity: 1; }
-                100% { transform: translateX(0px) scaleX(1); opacity: 1; }
+                90%  { transform: translateX(0px); opacity: 1; }
+                100% { transform: translateX(0px) scale(0); opacity: 0; }
             }
-            /* 相撞瞬间 (3.22s)：交错延展成修长的水光十字线 (十) */
-            @keyframes rsWaterCrossV {
-                0%   { transform: scaleY(0.05); opacity: 0; }
-                20%  { transform: scaleY(1); opacity: 1; }
-                76%  { transform: scaleY(1); opacity: 0.95; }
-                100% { transform: scaleY(0.2); opacity: 0; }
+            /* 两点相撞后：化作极细、清冷的银白微光十字丝（无粗黑感！） */
+            @keyframes csThinCrossV {
+                0%   { height: 0px; opacity: 0; }
+                22%  { height: 230px; opacity: 0.95; }
+                76%  { height: 240px; opacity: 0.85; }
+                100% { height: 0px; opacity: 0; }
             }
-            @keyframes rsWaterCrossH {
-                0%   { transform: scaleX(0.05); opacity: 0; }
-                20%  { transform: scaleX(1); opacity: 1; }
-                76%  { transform: scaleX(1); opacity: 0.95; }
-                100% { transform: scaleX(0.2); opacity: 0; }
+            @keyframes csThinCrossH {
+                0%   { width: 0px; opacity: 0; }
+                22%  { width: 230px; opacity: 0.95; }
+                76%  { width: 240px; opacity: 0.85; }
+                100% { width: 0px; opacity: 0; }
             }
-            /* 相撞中心溅开的雨滴涟漪与雪花微晶 */
-            @keyframes rsImpactSplash {
-                0%   { transform: scale(0.1); opacity: 0; }
-                22%  { transform: scale(1); opacity: 1; }
-                78%  { transform: scale(1.15); opacity: 0.85; }
+            /* 十字交汇中心的纯白柔和呼吸水晕 */
+            @keyframes csCenterBloom {
+                0%   { transform: scale(0.2); opacity: 0; }
+                25%  { transform: scale(1); opacity: 1; }
+                75%  { transform: scale(1.12); opacity: 0.85; }
                 100% { transform: scale(1.5); opacity: 0; }
             }
-            /* 宿命制作 粗体署名印记浮现与消散 */
-            @keyframes rsDestinyBadge {
-                0%   { opacity: 0; filter: blur(10px); transform: translateY(6px) scale(0.94); }
-                24%  { opacity: 1; filter: blur(0px); transform: translateY(0px) scale(1); }
-                76%  { opacity: 1; filter: blur(0px); transform: translateY(0px) scale(1); }
-                100% { opacity: 0; filter: blur(8px); transform: translateY(-4px) scale(1.04); }
-            }
-            /* 第二幕整体容器在 5.45s 平滑退场 */
-            @keyframes rsAct2Exit {
-                0%, 82% { opacity: 1; }
-                100%    { opacity: 0; }
+            /* 无框清冷「宿命制作」文字从白雾中浮现 -> 消散 */
+            @keyframes csPureTextFloat {
+                0%   { opacity: 0; filter: blur(10px); letter-spacing: 14px; transform: translateY(5px); }
+                26%  { opacity: 1; filter: blur(0px); letter-spacing: 9px; transform: translateY(0px); }
+                74%  { opacity: 1; filter: blur(0px); letter-spacing: 9px; transform: translateY(0px); }
+                100% { opacity: 0; filter: blur(10px); letter-spacing: 13px; transform: translateY(-4px); }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .rs-act2-stage {
+            #seoul-mini-theater-modal #smt-boot-splash .cs-act2-wrap {
                 position: absolute !important; inset: 0 !important;
                 display: flex !important; align-items: center !important; justify-content: center !important;
                 pointer-events: none !important; z-index: 14 !important;
-                animation: rsAct2Exit 2.85s ease 2.65s forwards !important;
             }
-            /* 奔赴相撞的垂直雨滴 */
-            #seoul-mini-theater-modal #smt-boot-splash .rs-incoming-v {
-                position: absolute !important; width: 2.2px !important; height: 54px !important;
-                background: linear-gradient(180deg, transparent 0%, #888888 50%, #222222 100%) !important;
-                border-radius: 99px !important; opacity: 0 !important;
-                animation: rsCollideDropV 0.58s cubic-bezier(0.35, 0, 0.9, 1) 2.65s forwards !important;
+            /* 两颗滑入相撞的清透雨珠（带细白雾尾） */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-bead-v {
+                position: absolute !important; width: 1.2px !important; height: 36px !important;
+                background: linear-gradient(180deg, transparent 0%, #B8B8B8 50%, #FFFFFF 100%) !important;
+                opacity: 0 !important;
+                animation: csGlideV 0.62s cubic-bezier(0.35, 0, 0.85, 1) 2.62s forwards !important;
             }
-            /* 奔赴相撞的水平雨滴 */
-            #seoul-mini-theater-modal #smt-boot-splash .rs-incoming-h {
-                position: absolute !important; height: 2.2px !important; width: 54px !important;
-                background: linear-gradient(90deg, transparent 0%, #888888 50%, #222222 100%) !important;
-                border-radius: 99px !important; opacity: 0 !important;
-                animation: rsCollideDropH 0.58s cubic-bezier(0.35, 0, 0.9, 1) 2.65s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .cs-bead-v::after {
+                content: "" !important; position: absolute !important; bottom: -2px !important; left: -2px !important;
+                width: 5px !important; height: 5px !important; border-radius: 50% !important;
+                background: #FFFFFF !important; border: 1px solid #999999 !important; box-shadow: 0 0 8px #FFFFFF !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-bead-h {
+                position: absolute !important; height: 1.2px !important; width: 36px !important;
+                background: linear-gradient(90deg, transparent 0%, #B8B8B8 50%, #FFFFFF 100%) !important;
+                opacity: 0 !important;
+                animation: csGlideH 0.62s cubic-bezier(0.35, 0, 0.85, 1) 2.62s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-bead-h::after {
+                content: "" !important; position: absolute !important; right: -2px !important; top: -2px !important;
+                width: 5px !important; height: 5px !important; border-radius: 50% !important;
+                background: #FFFFFF !important; border: 1px solid #999999 !important; box-shadow: 0 0 8px #FFFFFF !important;
             }
 
-            /* 相撞后交错展开的「雨雪水光十字」 */
-            #seoul-mini-theater-modal #smt-boot-splash .rs-cross-water-v {
-                position: absolute !important; width: 2px !important; height: 280px !important;
-                background: linear-gradient(180deg, transparent 0%, #999999 18%, #1F1F1F 50%, #999999 82%, transparent 100%) !important;
-                box-shadow: 0 0 14px #FFFFFF, 0 0 4px rgba(0,0,0,0.15) !important;
+            /* 相撞后延展开的 1px 极细银白十字水丝（零死黑！） */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-cross-v {
+                position: absolute !important; width: 1px !important; height: 0px;
+                background: linear-gradient(180deg, transparent 0%, #C8C8C8 20%, #787878 50%, #C8C8C8 80%, transparent 100%) !important;
+                box-shadow: 0 0 10px #FFFFFF, 0 0 4px #FFFFFF !important;
                 opacity: 0 !important;
-                animation: rsWaterCrossV 2.2s cubic-bezier(0.16, 1, 0.3, 1) 3.20s forwards !important;
+                animation: csThinCrossV 2.15s cubic-bezier(0.16, 1, 0.3, 1) 3.18s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-cross-water-h {
-                position: absolute !important; height: 2px !important; width: 280px !important;
-                background: linear-gradient(90deg, transparent 0%, #999999 18%, #1F1F1F 50%, #999999 82%, transparent 100%) !important;
-                box-shadow: 0 0 14px #FFFFFF, 0 0 4px rgba(0,0,0,0.15) !important;
+            #seoul-mini-theater-modal #smt-boot-splash .cs-cross-h {
+                position: absolute !important; height: 1px !important; width: 0px;
+                background: linear-gradient(90deg, transparent 0%, #C8C8C8 20%, #787878 50%, #C8C8C8 80%, transparent 100%) !important;
+                box-shadow: 0 0 10px #FFFFFF, 0 0 4px #FFFFFF !important;
                 opacity: 0 !important;
-                animation: rsWaterCrossH 2.2s cubic-bezier(0.16, 1, 0.3, 1) 3.20s forwards !important;
+                animation: csThinCrossH 2.15s cubic-bezier(0.16, 1, 0.3, 1) 3.18s forwards !important;
             }
-            /* 相撞中心溅开的水珠与雪晶 */
-            #seoul-mini-theater-modal #smt-boot-splash .rs-impact-svg {
-                position: absolute !important; width: 220px !important; height: 220px !important;
+            /* 十字中心清冷微光涟漪与挂壁小露珠 */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-cross-bloom {
+                position: absolute !important; width: 160px !important; height: 160px !important;
                 opacity: 0 !important;
-                animation: rsImpactSplash 2.2s cubic-bezier(0.16, 1, 0.3, 1) 3.20s forwards !important;
+                animation: csCenterBloom 2.15s cubic-bezier(0.16, 1, 0.3, 1) 3.18s forwards !important;
             }
-            /* 十字下方的「宿命制作」粗体署名 */
-            #seoul-mini-theater-modal #smt-boot-splash .rs-destiny-card {
+            /* 无边框、直接悬浮在白雾与十字光晕中的「宿命制作」 */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-destiny-pure {
                 position: relative !important; z-index: 16 !important;
-                margin-top: 86px !important;
-                background: rgba(255, 255, 255, 0.90) !important;
-                backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
-                padding: 9px 22px !important; border-radius: 999px !important;
-                border: 1px solid rgba(210,210,210,0.85) !important;
-                box-shadow: 0 8px 28px rgba(0,0,0,0.06), 0 0 18px #FFFFFF !important;
+                margin-top: 66px !important;
+                text-shadow: 0 0 16px #FFFFFF, 0 0 8px #FFFFFF, 0 2px 10px rgba(255,255,255,0.95) !important;
                 opacity: 0 !important;
-                animation: rsDestinyBadge 2.18s cubic-bezier(0.16, 1, 0.3, 1) 3.22s forwards !important;
+                animation: csPureTextFloat 2.15s cubic-bezier(0.16, 1, 0.3, 1) 3.20s forwards !important;
             }
 
             /* ══════════════════════════════════════════════════════
-               【第三幕：5.3s 起 漫天细雨微雪 + 雨滴渐线 + 饱满粗体主视觉】
+               【第三幕：5.25s 起 清冷细雨垂落折线 + 银白渐线 + 高级深雾灰粗体】
                ══════════════════════════════════════════════════════ */
-            @keyframes rsAct3Reveal {
-                0%   { opacity: 0; filter: blur(10px); transform: translateY(8px); }
+            @keyframes csAct3In {
+                0%   { opacity: 0; filter: blur(10px); transform: translateY(7px); }
                 100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
             }
-            @keyframes rsRainLineGrow {
-                0%   { stroke-dashoffset: 300; opacity: 0; }
+            @keyframes csTraceDraw {
+                0%   { stroke-dashoffset: 280; opacity: 0; }
                 15%  { opacity: 1; }
                 100% { stroke-dashoffset: 0; opacity: 1; }
             }
-            @keyframes rsRainDropSlide {
-                0%   { stroke-dashoffset: 300; opacity: 0; }
+            @keyframes csGlintFlow {
+                0%   { stroke-dashoffset: 280; opacity: 0; }
                 25%  { opacity: 1; }
                 80%  { opacity: 1; }
-                100% { stroke-dashoffset: -60; opacity: 0; }
+                100% { stroke-dashoffset: -50; opacity: 0; }
             }
-            /* 渐线舒展动画 */
-            @keyframes rsGradExpand {
+            @keyframes csSilverGradLine {
                 0%   { width: 0%; opacity: 0; }
                 30%  { opacity: 1; }
                 100% { width: 100%; opacity: 1; }
             }
-            /* 背景持续飘落的细雨与微雪絮 */
-            @keyframes rsSnowRainDrift {
-                0%   { transform: translateY(-30px) translateX(4px); opacity: 0; }
-                30%  { opacity: 0.55; }
-                75%  { opacity: 0.55; }
-                100% { transform: translateY(150px) translateX(-6px); opacity: 0; }
+            @keyframes csRainSnowFall {
+                0%   { transform: translateY(-30px); opacity: 0; }
+                35%  { opacity: 0.65; }
+                75%  { opacity: 0.65; }
+                100% { transform: translateY(145px); opacity: 0; }
             }
-            @keyframes rsBreatheTxt {
+            @keyframes csEndRipple {
+                0%   { transform: scale(0.2); opacity: 0.8; }
+                100% { transform: scale(2.3); opacity: 0; }
+            }
+            @keyframes csSoftBreathe {
                 0%, 100% { opacity: 0.35; }
-                50%      { opacity: 0.92; }
+                50%      { opacity: 0.85; }
             }
 
-            /* 全屏背景持续飘落的细雨丝与微雪点 */
-            #seoul-mini-theater-modal #smt-boot-splash .rs-bg-rain {
-                position: absolute !important; width: 1.2px !important;
-                background: linear-gradient(180deg, transparent 0%, #888888 55%, #444444 100%) !important;
+            /* 全场清透银白雨丝与雪絮（零黑感！） */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-bg-rain {
+                position: absolute !important; width: 1px !important;
+                background: linear-gradient(180deg, transparent 0%, #BDBDBD 55%, #FFFFFF 100%) !important;
                 pointer-events: none !important; opacity: 0; z-index: 2 !important;
-                animation: rsSnowRainDrift 3.8s linear infinite !important;
+                animation: csRainSnowFall 3.6s linear infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-bg-snow {
+            #seoul-mini-theater-modal #smt-boot-splash .cs-bg-snow {
                 position: absolute !important; border-radius: 50% !important;
-                background: #FFFFFF !important; border: 1px solid #999999 !important;
+                background: #FFFFFF !important; border: 0.8px solid #CCCCCC !important;
                 box-shadow: 0 0 6px #FFFFFF !important;
                 pointer-events: none !important; opacity: 0; z-index: 2 !important;
-                animation: rsSnowRainDrift 5.2s ease-in-out infinite !important;
+                animation: csRainSnowFall 5.0s ease-in-out infinite !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .rs-a3-head { opacity: 0; animation: rsAct3Reveal 1.6s ease 5.25s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-a3-stage { opacity: 0; animation: rsAct3Reveal 1.5s ease 5.30s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-main-path {
-                stroke-dasharray: 300 !important; stroke-dashoffset: 300 !important;
-                animation: rsRainLineGrow 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) 5.35s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .cs-a3-head  { opacity: 0; animation: csAct3In 1.6s ease 5.20s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-a3-stage { opacity: 0; animation: csAct3In 1.5s ease 5.25s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-main-path {
+                stroke-dasharray: 280 !important; stroke-dashoffset: 280 !important;
+                animation: csTraceDraw 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) 5.30s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-main-glint {
-                stroke-dasharray: 28 272 !important; stroke-dashoffset: 300 !important;
-                animation: rsRainDropSlide 3.4s ease-in-out 5.9s infinite !important;
+            #seoul-mini-theater-modal #smt-boot-splash .cs-main-glint {
+                stroke-dasharray: 26 254 !important; stroke-dashoffset: 280 !important;
+                animation: csGlintFlow 3.4s ease-in-out 5.8s infinite !important;
             }
-            /* 带挂壁小雨珠的水平渐线 */
-            #seoul-mini-theater-modal #smt-boot-splash .rs-grad-bar {
-                position: relative !important; height: 1.5px !important; width: 0%;
-                margin: 12px auto 16px auto !important;
-                background: linear-gradient(90deg, transparent 0%, #888888 22%, #1F1F1F 50%, #888888 78%, transparent 100%) !important;
-                opacity: 0;
-                animation: rsGradExpand 2.0s cubic-bezier(0.16, 1, 0.3, 1) 5.55s forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-grad-bar::after {
-                content: "" !important; position: absolute !important; left: 50% !important; top: -2.5px !important;
-                margin-left: -3px !important; width: 6px !important; height: 6px !important;
-                border-radius: 50% !important; background: #FFFFFF !important; border: 1.4px solid #262626 !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-grad-bar-sub {
-                height: 1px !important; width: 0%; margin: 14px auto 0 auto !important;
-                background: linear-gradient(90deg, transparent 0%, #B0B0B0 30%, #4A4A4A 50%, #B0B0B0 70%, transparent 100%) !important;
-                opacity: 0;
-                animation: rsGradExpand 2.2s cubic-bezier(0.16, 1, 0.3, 1) 6.20s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .cs-end-rip {
+                transform-box: fill-box !important; transform-origin: center !important;
+                opacity: 0; animation: csEndRipple 3.4s ease-out 6.2s infinite !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .rs-t-title { opacity: 0; animation: rsAct3Reveal 1.8s cubic-bezier(0.16,1,0.3,1) 5.45s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-t-kr    { opacity: 0; animation: rsAct3Reveal 1.9s cubic-bezier(0.16,1,0.3,1) 5.85s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-t-cn    { opacity: 0; animation: rsAct3Reveal 1.9s cubic-bezier(0.16,1,0.3,1) 6.20s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-t-foot  { opacity: 0; animation: rsAct3Reveal 1.8s cubic-bezier(0.16,1,0.3,1) 6.60s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .rs-breathe { animation: rsBreatheTxt 3.0s ease-in-out infinite !important; }
+            /* 清冷银灰水平渐线（中央嵌一颗纯白小露珠） */
+            #seoul-mini-theater-modal #smt-boot-splash .cs-grad-line {
+                position: relative !important; height: 1px !important; width: 0%;
+                margin: 14px auto 16px auto !important;
+                background: linear-gradient(90deg, transparent 0%, #CCCCCC 22%, #7A7A7A 50%, #CCCCCC 78%, transparent 100%) !important;
+                opacity: 0;
+                animation: csSilverGradLine 2.0s cubic-bezier(0.16, 1, 0.3, 1) 5.50s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-grad-line::after {
+                content: "" !important; position: absolute !important; left: 50% !important; top: -2.2px !important;
+                margin-left: -2.5px !important; width: 5px !important; height: 5px !important;
+                border-radius: 50% !important; background: #FFFFFF !important; border: 1px solid #888888 !important;
+                box-shadow: 0 0 6px #FFFFFF !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-grad-sub {
+                height: 0.8px !important; width: 0%; margin: 14px auto 0 auto !important;
+                background: linear-gradient(90deg, transparent 0%, #D8D8D8 30%, #9A9A9A 50%, #D8D8D8 70%, transparent 100%) !important;
+                opacity: 0;
+                animation: csSilverGradLine 2.2s cubic-bezier(0.16, 1, 0.3, 1) 6.15s forwards !important;
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .cs-t-title { opacity: 0; animation: csAct3In 1.8s cubic-bezier(0.16,1,0.3,1) 5.40s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-t-kr    { opacity: 0; animation: csAct3In 1.9s cubic-bezier(0.16,1,0.3,1) 5.80s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-t-cn    { opacity: 0; animation: csAct3In 1.9s cubic-bezier(0.16,1,0.3,1) 6.15s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-t-foot  { opacity: 0; animation: csAct3In 1.8s cubic-bezier(0.16,1,0.3,1) 6.55s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .cs-breathe { animation: csSoftBreathe 3.2s ease-in-out infinite !important; }
         `;
         topDoc.head.appendChild(st);
 
-        function playRainSnowSplash() {
-            // 纯正零蓝调白雾灰底色 (#FFFFFF -> #F3F3F3 -> #E5E5E5)
-            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 42%, #FFFFFF 0%, #F3F3F3 55%, #E5E5E5 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.75s ease!important;padding:max(32px,env(safe-area-inset-top,32px)) 24px max(36px,env(safe-area-inset-bottom,36px)) 24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','PingFang SC','Microsoft YaHei',sans-serif!important;";
+        function playColdSilverSplash() {
+            // 通透清冷的纯白雾至浅银灰背景 (#FFFFFF -> #F6F6F6 -> #ECECEC)
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 42%, #FFFFFF 0%, #F6F6F6 56%, #ECECEC 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.75s ease!important;padding:max(32px,env(safe-area-inset-top,32px)) 24px max(36px,env(safe-area-inset-bottom,36px)) 24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','PingFang SC','Microsoft YaHei',sans-serif!important;";
 
             splash.innerHTML = `
-                <!-- 🌨️ 全场背景持续飘落的细雨丝与微雪点 -->
-                <div class="rs-bg-rain" style="left:16%;top:12%;height:46px;animation-delay:0.4s;"></div>
-                <div class="rs-bg-rain" style="left:82%;top:18%;height:54px;animation-delay:1.6s;"></div>
-                <div class="rs-bg-rain" style="left:28%;top:48%;height:42px;animation-delay:2.8s;"></div>
-                <div class="rs-bg-rain" style="left:72%;top:52%;height:50px;animation-delay:0.9s;"></div>
-                <div class="rs-bg-snow" style="left:22%;top:22%;width:4px;height:4px;animation-delay:0.2s;"></div>
-                <div class="rs-bg-snow" style="left:78%;top:32%;width:3.5px;height:3.5px;animation-delay:1.8s;"></div>
-                <div class="rs-bg-snow" style="left:35%;top:64%;width:4.5px;height:4.5px;animation-delay:3.1s;"></div>
-                <div class="rs-bg-snow" style="left:66%;top:26%;width:3px;height:3px;animation-delay:2.3s;"></div>
+                <!-- ❄️ 全场背景无声飘落的半透明银白雨丝与雪点 -->
+                <div class="cs-bg-rain" style="left:16%;top:10%;height:46px;animation-delay:0.3s;"></div>
+                <div class="cs-bg-rain" style="left:83%;top:16%;height:52px;animation-delay:1.5s;"></div>
+                <div class="cs-bg-rain" style="left:26%;top:46%;height:42px;animation-delay:2.6s;"></div>
+                <div class="cs-bg-rain" style="left:74%;top:50%;height:48px;animation-delay:0.8s;"></div>
+                <div class="cs-bg-snow" style="left:21%;top:22%;width:4px;height:4px;animation-delay:0.2s;"></div>
+                <div class="cs-bg-snow" style="left:79%;top:30%;width:3.5px;height:3.5px;animation-delay:1.7s;"></div>
+                <div class="cs-bg-snow" style="left:34%;top:62%;width:4px;height:4px;animation-delay:2.9s;"></div>
+                <div class="cs-bg-snow" style="left:67%;top:25%;width:3.5px;height:3.5px;animation-delay:2.1s;"></div>
 
                 <!-- ══════════════════════════════════════════════════
-                     【第一幕：眨眼苏醒 + 3滴不同位置落下的雨滴与水纹】
+                     【第一幕：眨眼苏醒 + 3滴清透银白雨丝涟漪】
                      ══════════════════════════════════════════════════ -->
-                <div class="rs-lid-top"></div>
-                <div class="rs-lid-bot"></div>
+                <div class="cs-lid-top"></div>
+                <div class="cs-lid-bot"></div>
 
-                <div class="rs-rain-spot spot-a" style="left:26%;top:30%;">
-                    <div class="rs-drop"></div><div class="rs-dot"></div><div class="rs-ring-1"></div><div class="rs-ring-2"></div>
+                <div class="cs-rain-spot c-spot-1" style="left:26%;top:30%;">
+                    <div class="cs-drop"></div><div class="cs-dot"></div><div class="cs-ring-1"></div><div class="cs-ring-2"></div>
                 </div>
-                <div class="rs-rain-spot spot-b" style="left:74%;top:58%;">
-                    <div class="rs-drop"></div><div class="rs-dot"></div><div class="rs-ring-1"></div><div class="rs-ring-2"></div>
+                <div class="cs-rain-spot c-spot-2" style="left:74%;top:58%;">
+                    <div class="cs-drop"></div><div class="cs-dot"></div><div class="cs-ring-1"></div><div class="cs-ring-2"></div>
                 </div>
-                <div class="rs-rain-spot spot-c" style="left:50%;top:42%;">
-                    <div class="rs-drop"></div><div class="rs-dot"></div><div class="rs-ring-1"></div><div class="rs-ring-2"></div>
+                <div class="cs-rain-spot c-spot-3" style="left:50%;top:42%;">
+                    <div class="cs-drop"></div><div class="cs-dot"></div><div class="cs-ring-1"></div><div class="cs-ring-2"></div>
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     【第二幕：两滴雨雪奔赴相撞 ➔ 交错成水光十字 + 宿命制作】
+                     【第二幕：两颗银白雨珠滑入相撞 ➔ 极细微光十字 + 无框「宿命制作」】
                      ══════════════════════════════════════════════════ -->
-                <div class="rs-act2-stage">
-                    <!-- 正在奔向中心相撞的两滴雨线 (一纵一横) -->
-                    <div class="rs-incoming-v"></div>
-                    <div class="rs-incoming-h"></div>
+                <div class="cs-act2-wrap">
+                    <!-- 两点清透雨珠滑入中心 -->
+                    <div class="cs-bead-v"></div>
+                    <div class="cs-bead-h"></div>
 
-                    <!-- 两滴雨相撞后瞬间交错展开的「雨雪水光十字」 -->
-                    <div class="rs-cross-water-v"></div>
-                    <div class="rs-cross-water-h"></div>
+                    <!-- 相撞化作 1px 极细银白微光十字丝 -->
+                    <div class="cs-cross-v"></div>
+                    <div class="cs-cross-h"></div>
 
-                    <!-- 相撞中心溅开的雨滴水圈、挂壁水珠与六角雪晶 -->
-                    <svg class="rs-impact-svg" viewBox="0 0 220 220" fill="none">
-                        <!-- 相撞中心水波涟漪 -->
-                        <circle cx="110" cy="110" r="24" stroke="#333333" stroke-width="1.2" opacity="0.8" />
-                        <circle cx="110" cy="110" r="44" stroke="#888888" stroke-width="0.8" stroke-dasharray="3 4" opacity="0.6" />
-                        <!-- 十字水光轴线上凝结的四颗相撞雨珠 -->
-                        <circle cx="110" cy="72" r="2.8" fill="#FFFFFF" stroke="#222222" stroke-width="1.3" />
-                        <circle cx="110" cy="148" r="2.8" fill="#FFFFFF" stroke="#222222" stroke-width="1.3" />
-                        <circle cx="72" cy="110" r="2.8" fill="#FFFFFF" stroke="#222222" stroke-width="1.3" />
-                        <circle cx="148" cy="110" r="2.8" fill="#FFFFFF" stroke="#222222" stroke-width="1.3" />
-                        <!-- 四角飞溅出的微小雪晶星点 -->
-                        <circle cx="88" cy="88" r="1.6" fill="#555555" />
-                        <circle cx="132" cy="88" r="1.6" fill="#555555" />
-                        <circle cx="88" cy="132" r="1.6" fill="#555555" />
-                        <circle cx="132" cy="132" r="1.6" fill="#555555" />
-                        <!-- 十字交汇核心冰晶 -->
-                        <path d="M110 100 L112.5 107.5 L120 110 L112.5 112.5 L110 120 L107.5 112.5 L100 110 L107.5 107.5 Z" fill="#222222" />
-                        <circle cx="110" cy="110" r="2" fill="#FFFFFF" />
+                    <!-- 十字中心扩散的纯白柔光水圈与四颗凝露（极简空灵） -->
+                    <svg class="cs-cross-bloom" viewBox="0 0 160 160" fill="none">
+                        <circle cx="80" cy="80" r="22" stroke="#FFFFFF" stroke-width="1.6" opacity="0.9" />
+                        <circle cx="80" cy="80" r="38" stroke="#BCBCBC" stroke-width="0.7" stroke-dasharray="2 4" />
+                        <!-- 十字轴上的 4 颗微小纯白水珠 -->
+                        <circle cx="80" cy="48" r="2" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="0.9" />
+                        <circle cx="80" cy="112" r="2" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="0.9" />
+                        <circle cx="48" cy="80" r="2" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="0.9" />
+                        <circle cx="112" cy="80" r="2" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="0.9" />
+                        <!-- 中心纯白星芒 -->
+                        <circle cx="80" cy="80" r="3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
                     </svg>
 
-                    <!-- 宿命制作 署名印记 -->
-                    <div class="rs-destiny-card">
-                        <div style="font-size:15px;font-weight:900;color:#1F1F1F!important;letter-spacing:8px;text-indent:8px;">
+                    <!-- 无边框、直接浮现在白雾光晕里的清冷粗体署名 -->
+                    <div class="cs-destiny-pure">
+                        <div style="font-size:15px;font-weight:800;color:#484848!important;letter-spacing:9px;text-indent:9px;">
                             宿命制作
                         </div>
-                        <div style="font-size:7.5px;font-weight:800;color:#777777!important;letter-spacing:2.5px;margin-top:2px;">
+                        <div style="font-size:7px;font-weight:700;color:#9A9A9A!important;letter-spacing:3.5px;margin-top:4px;">
                             RAIN &amp; SNOW · DESTINY
                         </div>
                     </div>
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     【第三幕：雨雪余韵舞台 + 雨珠渐线 + 饱满粗体主视觉】
+                     【第三幕：清冷银白雨痕折线 + 露珠渐线 + 高级深雾灰粗体文字】
                      ══════════════════════════════════════════════════ -->
-                <div class="rs-a3-head" style="width:100%;max-width:310px;display:flex;justify-content:space-between;align-items:center;font-size:8px;font-weight:800;color:#777777!important;letter-spacing:2.5px;z-index:5;">
+                <div class="cs-a3-head" style="width:100%;max-width:310px;display:flex;justify-content:space-between;align-items:center;font-size:7.8px;font-weight:700;color:#949494!important;letter-spacing:2.8px;z-index:5;">
                     <span>SUMOUL · 宿命制作</span>
-                    <span>RAIN &amp; SNOW</span>
+                    <span>04:00 AM</span>
                 </div>
 
                 <div style="width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:5;">
                     
-                    <!-- 第三幕主视觉：雨丝交错余韵 + 垂落雨滴折线 + 底部双层雨波纹 -->
-                    <div class="rs-a3-stage" style="width:100%;height:156px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
-                        <svg viewBox="0 0 220 156" width="220" height="156" fill="none" style="overflow:visible!important;">
-                            <!-- 两侧正在落下的细雨丝与微雪晶 -->
-                            <line x1="48" y1="14" x2="48" y2="52" stroke="#B5B5B5" stroke-width="1" stroke-linecap="round" stroke-dasharray="12 6" />
-                            <circle cx="48" cy="56" r="1.5" fill="#777777" />
-                            <line x1="172" y1="28" x2="172" y2="70" stroke="#B5B5B5" stroke-width="1" stroke-linecap="round" stroke-dasharray="14 6" />
-                            <circle cx="172" cy="74" r="1.5" fill="#777777" />
+                    <!-- 第三幕主视觉：清冷浅银雨丝折线 + 纯白流光 + 双层银白水纹 -->
+                    <div class="cs-a3-stage" style="width:100%;height:154px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
+                        <svg viewBox="0 0 220 154" width="220" height="154" fill="none" style="overflow:visible!important;">
+                            <!-- 极淡的十字水痕余韵虚线 -->
+                            <line x1="42" y1="68" x2="178" y2="68" stroke="#E4E4E4" stroke-width="0.8" stroke-dasharray="2 4" />
+                            <line x1="110" y1="6" x2="110" y2="140" stroke="#E8E8E8" stroke-width="0.8" stroke-dasharray="2 4" />
 
-                            <!-- 刚刚两滴雨相撞留下的极淡十字水痕余韵 -->
-                            <line x1="36" y1="68" x2="184" y2="68" stroke="#DCDCDC" stroke-width="1" stroke-dasharray="2 4" />
-                            <line x1="110" y1="6" x2="110" y2="142" stroke="#E2E2E2" stroke-width="1" stroke-dasharray="2 4" />
+                            <!-- 两侧飘落的细银雨丝 -->
+                            <line x1="54" y1="16" x2="54" y2="48" stroke="#D0D0D0" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="10 5" />
+                            <circle cx="54" cy="52" r="1.4" fill="#FFFFFF" stroke="#A8A8A8" stroke-width="0.8" />
+                            <line x1="166" y1="26" x2="166" y2="62" stroke="#D0D0D0" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="12 5" />
+                            <circle cx="166" cy="66" r="1.4" fill="#FFFFFF" stroke="#A8A8A8" stroke-width="0.8" />
 
-                            <!-- 主雨痕折线背后的纯白水雾光晕 -->
-                            <path class="rs-main-path" d="M 110 10 L 110 36 L 95 60 L 123 88 L 101 114 L 110 138" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 折线背后的纯白柔雾光晕 -->
+                            <path class="cs-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
 
-                            <!-- 主雨痕折线 (1.6px 饱满炭黑灰) -->
-                            <path class="rs-main-path" d="M 110 10 L 110 36 L 95 60 L 123 88 L 101 114 L 110 138" stroke="#242424" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            <!-- 主雨痕折线：1.15px 清冷银灰细丝（绝不发黑！） -->
+                            <path class="cs-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#7A7A7A" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" />
 
                             <!-- 顺着折线滑落的纯白雨珠流光 -->
-                            <path class="rs-main-glint" d="M 110 10 L 110 36 L 95 60 L 123 88 L 101 114 L 110 138" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" />
+                            <path class="cs-main-glint" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
 
-                            <!-- 折角上凝结的雨雪水珠 -->
-                            <circle cx="110" cy="36" r="2.0" fill="#FFFFFF" stroke="#242424" stroke-width="1.2" />
-                            <circle cx="95" cy="60" r="2.3" fill="#FFFFFF" stroke="#242424" stroke-width="1.3" />
-                            <circle cx="123" cy="88" r="2.4" fill="#242424" />
-                            <circle cx="101" cy="114" r="2.2" fill="#FFFFFF" stroke="#242424" stroke-width="1.3" />
+                            <!-- 折角上凝结的纯白半透明露珠 -->
+                            <circle cx="110" cy="36" r="1.8" fill="#FFFFFF" stroke="#8C8C8C" stroke-width="0.9" />
+                            <circle cx="96" cy="60" r="2.1" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
+                            <circle cx="122" cy="88" r="2.1" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
+                            <circle cx="102" cy="114" r="1.9" fill="#FFFFFF" stroke="#8C8C8C" stroke-width="0.9" />
 
-                            <!-- 折线尽头滴落的雨滴与水面双层涟漪 -->
-                            <path d="M 110 135 C 110 135 107.2 139.8 107.2 141.8 C 107.2 143.5 108.5 144.8 110 144.8 C 111.5 144.8 112.8 143.5 112.8 141.8 C 112.8 139.8 110 135 110 135 Z" fill="#242424" />
-                            <ellipse cx="110" cy="146" rx="16" ry="4.2" fill="none" stroke="#888888" stroke-width="0.9" />
-                            <ellipse cx="110" cy="146" rx="26" ry="6.5" fill="none" stroke="#CCCCCC" stroke-width="0.7" stroke-dasharray="3 3" />
+                            <!-- 折线尽头凝结的纯白水滴与清透银白水纹 -->
+                            <path d="M 110 133 C 110 133 107.6 137.2 107.6 139 C 107.6 140.4 108.7 141.5 110 141.5 C 111.3 141.5 112.4 140.4 112.4 139 C 112.4 137.2 110 133 110 133 Z" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="0.95" />
+                            <ellipse class="cs-end-rip" cx="110" cy="143" rx="15" ry="3.8" fill="none" stroke="#9E9E9E" stroke-width="0.8" />
+                            <ellipse cx="110" cy="143" rx="9" ry="2.2" fill="none" stroke="#FFFFFF" stroke-width="1.1" />
                         </svg>
                     </div>
 
-                    <!-- 饱满重粗体主标题 -->
-                    <div class="rs-t-title" style="font-size:21px;font-weight:900;letter-spacing:4.5px;color:#1F1F1F!important;">
+                    <!-- 清冷深雾灰粗体主标题（#424242 温润高级，告别刺眼纯黑） -->
+                    <div class="cs-t-title" style="font-size:20px;font-weight:800;letter-spacing:5px;color:#424242!important;">
                         Sumoul App
                     </div>
-                    <div class="rs-t-title" style="font-size:8.5px;font-weight:800;letter-spacing:3px;color:#777777!important;margin-top:4px;">
+                    <div class="cs-t-title" style="font-size:8px;font-weight:700;letter-spacing:3.5px;color:#999999!important;margin-top:4px;">
                         RAIN &amp; SNOW · 宿命制作
                     </div>
 
-                    <!-- 第一道雨珠渐线（中央镶嵌一颗小水珠，向两侧渐隐拉开） -->
-                    <div class="rs-grad-bar"></div>
+                    <!-- 第一道清冷银白露珠渐线 -->
+                    <div class="cs-grad-line"></div>
 
-                    <!-- 饱满粗体韩中双语独白（呼应两滴雨雪相撞交错） -->
-                    <div class="rs-t-kr" style="font-size:11.2px;font-weight:800;color:#2C2C2C!important;line-height:1.95;letter-spacing:0.8px;">
+                    <!-- 清冷粗体韩中双语独白 -->
+                    <div class="cs-t-kr" style="font-size:10.8px;font-weight:700;color:#555555!important;line-height:2.0;letter-spacing:0.9px;">
                         “ 두 방울의 눈비가 마주쳐 십자로 교차하던 밤,<br>하얀 안개 속에 우리의 계절이 내린다. ”
                     </div>
-                    <div class="rs-t-cn" style="font-size:9.8px;font-weight:700;color:#666666!important;line-height:1.85;letter-spacing:1.2px;margin-top:6px;">
+                    <div class="cs-t-cn" style="font-size:9.4px;font-weight:600;color:#828282!important;line-height:1.9;letter-spacing:1.3px;margin-top:6px;">
                         两滴雨雪相遇、交错成十字的夜里，<br>白雾深处，正落下属于我们的季节。
                     </div>
 
-                    <!-- 第二道副渐线 -->
-                    <div class="rs-grad-bar-sub"></div>
+                    <!-- 第二道浅银副渐线 -->
+                    <div class="cs-grad-sub"></div>
                 </div>
 
-                <!-- 底部：粗体呼吸唤醒提示 -->
-                <div class="rs-t-foot" style="padding-bottom:4px;z-index:5;">
-                    <div class="rs-breathe" style="font-size:8.5px;font-weight:800;color:#3A3A3A!important;letter-spacing:3.5px;">
+                <!-- 底部：清冷呼吸唤醒提示 -->
+                <div class="cs-t-foot" style="padding-bottom:4px;z-index:5;">
+                    <div class="cs-breathe" style="font-size:8px;font-weight:700;color:#6E6E6E!important;letter-spacing:3.8px;">
                         — &nbsp; TOUCH TO WAKE · 触碰唤醒 &nbsp; —
                     </div>
                 </div>
@@ -3230,20 +3238,21 @@ bootSumoulApp();
             };
         }
 
-        playRainSnowSplash();
+        playColdSilverSplash();
 
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                playRainSnowSplash();
+                playColdSilverSplash();
             }
         }, true);
     }
 
-    mountRainSnowDestinySplash();
+    mountPureColdSilverSplash();
 })();
+
 
 // ==========================================================================
 // 🤍 【Sumoul App 悬浮球高定重塑补丁：白雾磨砂星芒圆球 + 自由拖拽移动 + 贴边隐身/彻底隐藏】
