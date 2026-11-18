@@ -2754,3 +2754,184 @@ bootSumoulApp();
 
     mountMomentsAndFullCoupleApp();
 })();
+// ==========================================================================
+// 💧 【Sumoul App 专属开屏补丁：泪痕折线 · 缓慢连结 (Tear-Trace Polyline) + 点击才进入】
+// 用法：直接粘贴在 index.js 最末尾最后一行后面！绝不影响任何其他模块！
+// ==========================================================================
+(function () {
+    const topDoc = (window.parent || window).document;
+
+    function mountTearLineSplash() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        const splash = topDoc.getElementById("smt-boot-splash");
+        if (!modal || !splash) {
+            setTimeout(mountTearLineSplash, 200);
+            return;
+        }
+
+        // 1. 注入「泪痕折线缓慢连结 + 泪滴凝结涟漪」专属 CSS 动画
+        topDoc.getElementById("sumoul-tear-splash-css")?.remove();
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-tear-splash-css";
+        st.innerHTML = `
+            /* 泪痕折线从无到有缓慢连结动画 (3.2秒) */
+            @keyframes tearLineDraw {
+                0% { stroke-dashoffset: 320; opacity: 0.2; }
+                15% { opacity: 1; }
+                100% { stroke-dashoffset: 0; opacity: 1; }
+            }
+            /* 折线背景虚影轨迹渐显 */
+            @keyframes tearGhostFade {
+                0% { opacity: 0; }
+                100% { opacity: 0.28; }
+            }
+            /* 转折节点上的微小水珠依次亮起 */
+            @keyframes tearNodePop {
+                0% { transform: scale(0); opacity: 0; }
+                70% { transform: scale(1.25); opacity: 0.9; }
+                100% { transform: scale(1); opacity: 0.75; }
+            }
+            /* 终点泪滴凝结并轻微欲坠 */
+            @keyframes tearDropForm {
+                0% { transform: translateY(-6px) scale(0.2); opacity: 0; }
+                60% { transform: translateY(1px) scale(1.06); opacity: 1; }
+                100% { transform: translateY(0px) scale(1); opacity: 1; }
+            }
+            @keyframes tearDropFloat {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(3.5px); }
+            }
+            /* 泪滴下方的水波涟漪扩散 */
+            @keyframes tearRippleOut {
+                0% { r: 2px; opacity: 0.75; stroke-width: 1.2px; }
+                100% { r: 16px; opacity: 0; stroke-width: 0.3px; }
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .tear-main-path {
+                stroke-dasharray: 320 !important;
+                stroke-dashoffset: 320 !important;
+                animation: tearLineDraw 3.2s cubic-bezier(0.35, 0, 0.2, 1) forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .tear-ghost-path {
+                stroke-dasharray: 2 3.5 !important;
+                opacity: 0 !important;
+                animation: tearGhostFade 2s ease 0.4s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .t-node {
+                transform-box: fill-box !important;
+                transform-origin: center !important;
+                opacity: 0 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .t-node.n1 { animation: tearNodePop 0.6s ease 0.25s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .t-node.n2 { animation: tearNodePop 0.6s ease 0.85s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .t-node.n3 { animation: tearNodePop 0.6s ease 1.45s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .t-node.n4 { animation: tearNodePop 0.6s ease 2.05s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .t-node.n5 { animation: tearNodePop 0.6s ease 2.60s forwards !important; }
+
+            #seoul-mini-theater-modal #smt-boot-splash .tear-final-drop {
+                transform-box: fill-box !important;
+                transform-origin: center top !important;
+                opacity: 0 !important;
+                animation: tearDropForm 0.85s cubic-bezier(0.22, 1, 0.36, 1) 2.85s forwards, tearDropFloat 2.8s ease-in-out 3.7s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .tear-ripple-1 {
+                opacity: 0 !important;
+                animation: tearRippleOut 2.6s ease-out 3.1s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .tear-ripple-2 {
+                opacity: 0 !important;
+                animation: tearRippleOut 2.6s ease-out 3.9s infinite !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        // 2. 构建「泪痕折线缓慢连结」白灰忧郁开屏结构
+        function renderTearSplashDOM() {
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFFFFF 0%,#F5F5F8 58%,#ECECF0 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity 0.65s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important;";
+
+            splash.innerHTML = `
+                <div style="border:1px solid #E2E2EA!important;border-radius:6px!important;padding:34px 26px 28px 26px!important;background:rgba(255,255,255,0.84)!important;max-width:286px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 12px 32px rgba(30,30,40,0.03)!important;">
+                    <!-- 顶部极细档案编号 -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;color:#9A9AA5!important;letter-spacing:2px;font-family:monospace;border-bottom:1px solid #EFEFF4!important;padding-bottom:8px;margin-bottom:18px;">
+                        <span>SUMOUL APP</span>
+                        <span>TEAR TRACE · 04:00</span>
+                    </div>
+
+                    <!-- 💧 核心舞台：缓慢连结的泪痕折线与末端凝结泪滴 SVG -->
+                    <div style="width:100%;height:112px;display:flex;align-items:center;justify-content:center;margin:4px 0 14px 0;">
+                        <svg viewBox="0 0 220 108" width="210" height="104" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
+                            <defs>
+                                <!-- 泪水光泽渐变 -->
+                                <linearGradient id="tearLineGrad" x1="28" y1="12" x2="184" y2="82" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#C8C8D2" />
+                                    <stop offset="55%" stop-color="#7A7A85" />
+                                    <stop offset="100%" stop-color="#3A3A40" />
+                                </linearGradient>
+                                <linearGradient id="tearDropGrad" x1="184" y1="68" x2="184" y2="92" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#FFFFFF" />
+                                    <stop offset="45%" stop-color="#D8D8E2" />
+                                    <stop offset="100%" stop-color="#55555E" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- 底层极细虚线轨迹（代表干涸的旧泪痕） -->
+                            <polyline class="tear-ghost-path" points="28,16 66,44 102,24 142,60 166,46 184,70" fill="none" stroke="#B0B0BA" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 主泪水折线：一折一折缓慢延伸连结 -->
+                            <polyline class="tear-main-path" points="28,16 66,44 102,24 142,60 166,46 184,70" fill="none" stroke="url(#tearLineGrad)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 折线转折点上凝结的 5 颗微小泪珠（随折线经过依次亮起） -->
+                            <circle class="t-node n1" cx="28" cy="16" r="2.2" fill="#FFFFFF" stroke="#8E8E98" stroke-width="1.2" />
+                            <circle class="t-node n2" cx="66" cy="44" r="2.5" fill="#FFFFFF" stroke="#7A7A85" stroke-width="1.2" />
+                            <circle class="t-node n3" cx="102" cy="24" r="2.2" fill="#FFFFFF" stroke="#7A7A85" stroke-width="1.2" />
+                            <circle class="t-node n4" cx="142" cy="60" r="2.8" fill="#FFFFFF" stroke="#55555E" stroke-width="1.3" />
+                            <circle class="t-node n5" cx="166" cy="46" r="2.2" fill="#FFFFFF" stroke="#484852" stroke-width="1.2" />
+
+                            <!-- 终点处扩散的泪水涟漪 -->
+                            <circle class="tear-ripple-1" cx="184" cy="90" r="3" fill="none" stroke="#8E8E98" />
+                            <circle class="tear-ripple-2" cx="184" cy="90" r="3" fill="none" stroke="#A0A0AA" />
+
+                            <!-- 折线尽头缓慢凝结成形、欲落未落的立体泪滴 -->
+                            <g class="tear-final-drop">
+                                <path d="M184 69 C184 69 176.5 79.5 176.5 84.5 C176.5 88.8 179.8 92 184 92 C188.2 92 191.5 88.8 191.5 84.5 C191.5 79.5 184 69 184 69 Z" fill="url(#tearDropGrad)" stroke="#3A3A40" stroke-width="1.25" stroke-linejoin="round" />
+                                <!-- 泪滴内部的高光月牙反光 -->
+                                <path d="M180.5 82.5 C180 84.5 181 87 182.8 88" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" />
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- 标题与忧郁韩文诗句 -->
+                    <div style="font-size:14.5px;font-weight:700;letter-spacing:3px;color:#2C2C32!important;margin-bottom:7px;">눈물의 궤적 · 泪之轨迹</div>
+                    <div style="font-size:9.5px;color:#6E6E77!important;line-height:1.85;letter-spacing:0.4px;margin-bottom:20px;">
+                        “ 천천히 이어지는 회색빛 눈물의 선,<br>그 끝에서 다시 너를 만난다. ”<br>
+                        <span style="font-size:8.2px;color:#9A9AA5!important;display:block;margin-top:4px;">缓慢连结的灰白泪线，在尽头处与你重逢。</span>
+                    </div>
+
+                    <!-- 底部点击进入胶囊 -->
+                    <div style="display:inline-block;padding:6px 20px;background:#F4F4F8!important;border:1px solid #E2E2EA!important;border-radius:999px;font-size:8px;color:#484852!important;letter-spacing:2px;font-weight:700;">
+                        TOUCH TO CONNECT · 触碰连结
+                    </div>
+                </div>
+                <div style="font-size:7.5px;color:#A5A5B0!important;letter-spacing:1.8px;margin-top:16px;">SUMOUL APP · MONOCHROME TEAR ARCHIVE</div>
+            `;
+
+            splash.onclick = () => {
+                splash.classList.add("fade-out");
+            };
+        }
+
+        renderTearSplashDOM();
+
+        // 3. 每次重新点击打开 Sumoul App 时，自动重置并重新播放一次「泪痕折线缓慢连结」动画
+        topDoc.addEventListener("click", (e) => {
+            const t = e.target;
+            if (!t || !t.closest) return;
+            if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
+                splash.classList.remove("fade-out");
+                renderTearSplashDOM();
+            }
+        }, true);
+    }
+
+    mountTearLineSplash();
+})();
