@@ -3413,284 +3413,285 @@ bootSumoulApp();
 
     forceMountV25();
 })();// ==========================================================================
-// 💧 【Sumoul App 真·无边框光学折射透明露珠与微水珠串折线开屏补丁】
-// 彻底摒弃卡通尖头水滴与黑边框！采用真实物理表面张力「透明凝露 + 焦散月牙白光 + 断续微水珠串」
+// 🤍 【Sumoul App 4合1 韩国高定白灰开屏画廊补丁（支持开屏直接点击切换 4 种极简忧郁样式并自动记忆）】
+// 样式1：寂静心电折线(PULSE) | 样式2：双环引力交叠(ECLIPSE) | 样式3：凌晨黑胶声波(VINYL) | 样式4：失焦电影片头(MIST)
+// 用法：直接替换 index.js 最末尾刚才那段开屏补丁即可！
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
+    const K_SPLASH_STYLE = "sumoul_v26_splash_style";
 
-    function mountPureDewTearSplash() {
+    function mountFourStyleGallerySplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountPureDewTearSplash, 150);
+            setTimeout(mountFourStyleGallerySplash, 150);
             return;
         }
 
-        ["sumoul-liquid-tear-css", "sumoul-tear-splash-css", "sumoul-cinema-splash-css"].forEach((id) => topDoc.getElementById(id)?.remove());
+        ["sumoul-liquid-tear-css", "sumoul-tear-splash-css", "sumoul-cinema-splash-css", "sumoul-gallery-splash-css"].forEach((id) => topDoc.getElementById(id)?.remove());
 
-        let animId = null;
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-gallery-splash-css";
+        st.innerHTML = `
+            /* ── 通用：文字从迷雾模糊中极慢速浮现 ── */
+            @keyframes sgBlurIn {
+                0% { opacity: 0; filter: blur(8px); transform: translateY(6px); }
+                100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-t1 { opacity: 0; animation: sgBlurIn 1.8s cubic-bezier(0.22,1,0.36,1) 0.4s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-t2 { opacity: 0; animation: sgBlurIn 2.0s cubic-bezier(0.22,1,0.36,1) 1.2s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-t3 { opacity: 0; animation: sgBlurIn 2.0s cubic-bezier(0.22,1,0.36,1) 2.0s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-t4 { opacity: 0; animation: sgBlurIn 1.8s cubic-bezier(0.22,1,0.36,1) 2.8s forwards !important; }
 
-        function playDewSplash() {
-            if (animId) cancelAnimationFrame(animId);
+            /* ── 样式 1：PULSE 寂静心电折线缓慢连结与游走高光 ── */
+            @keyframes sgPulseDraw {
+                0% { stroke-dashoffset: 380; opacity: 0.2; }
+                100% { stroke-dashoffset: 0; opacity: 1; }
+            }
+            @keyframes sgPulseDot {
+                0%, 100% { transform: scale(1); opacity: 0.9; }
+                50% { transform: scale(1.6); opacity: 0.35; }
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-ecg-line {
+                stroke-dasharray: 380 !important;
+                stroke-dashoffset: 380 !important;
+                animation: sgPulseDraw 3.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-ecg-dot {
+                transform-box: fill-box !important;
+                transform-origin: center !important;
+                animation: sgPulseDot 2.4s ease-in-out infinite !important;
+            }
 
-            // 清冷高级的雾面灰白玻璃底色（让纯白高光与透明水珠自然凸显）
-            splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(165deg,#F6F7FA 0%,#ECEEF4 50%,#E2E5EE 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity 0.7s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;";
+            /* ── 样式 2：ECLIPSE 双环引力缓慢靠近交叠 ── */
+            @keyframes sgRingLeft {
+                0% { transform: translateX(-28px); opacity: 0; }
+                100% { transform: translateX(0px); opacity: 1; }
+            }
+            @keyframes sgRingRight {
+                0% { transform: translateX(28px); opacity: 0; }
+                100% { transform: translateX(0px); opacity: 1; }
+            }
+            @keyframes sgRingBreathe {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.04); }
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-ring-l {
+                animation: sgRingLeft 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-ring-r {
+                animation: sgRingRight 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+            }
+
+            /* ── 样式 3：VINYL 凌晨电台极细声波呼吸起伏 ── */
+            @keyframes sgWaveBar {
+                0%, 100% { transform: scaleY(0.25); opacity: 0.35; }
+                50% { transform: scaleY(1); opacity: 0.95; }
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-wbar {
+                transform-box: fill-box !important;
+                transform-origin: center !important;
+                animation: sgWaveBar 2.2s ease-in-out infinite !important;
+            }
+
+            /* ── 样式 4：MIST 韩国文艺片重度失焦缓慢对焦 ── */
+            @keyframes sgCinemaFocus {
+                0% { opacity: 0; filter: blur(14px); letter-spacing: 8px; }
+                45% { opacity: 0.65; filter: blur(5px); }
+                100% { opacity: 1; filter: blur(0px); letter-spacing: 3.5px; }
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-focus-hero {
+                opacity: 0;
+                animation: sgCinemaFocus 3.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards !important;
+            }
+
+            /* 顶部样式切换微胶囊 */
+            #seoul-mini-theater-modal #smt-boot-splash .sg-style-switcher {
+                display: inline-flex !important;
+                gap: 5px !important;
+                background: #F4F5F8 !important;
+                border: 1px solid #E4E6EE !important;
+                border-radius: 999px !important;
+                padding: 3px 5px !important;
+                z-index: 20 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-sw-btn {
+                padding: 3px 9px !important;
+                border-radius: 999px !important;
+                font-size: 8px !important;
+                font-weight: 700 !important;
+                color: #7A7E8A !important;
+                cursor: pointer !important;
+                transition: all 0.2s ease !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .sg-sw-btn.active {
+                background: #3A3D46 !important;
+                color: #FFFFFF !important;
+                -webkit-text-fill-color: #FFFFFF !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        function getCurStyle() {
+            return localStorage.getItem(K_SPLASH_STYLE) || "pulse";
+        }
+
+        function renderSplashByStyle() {
+            const cur = getCurStyle();
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFFFFF 0%,#F6F7FA 55%,#ECEEF3 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.65s ease!important;padding:max(22px,env(safe-area-inset-top,22px)) 24px max(30px,env(safe-area-inset-bottom,30px)) 24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;";
+
+            let stageHtml = "";
+
+            if (cur === "pulse") {
+                // 样式 1：寂静心电折线 (PULSE)
+                stageHtml = `
+                    <div style="width:100%;max-width:290px;padding:34px 22px 28px 22px;background:rgba(255,255,255,0.86);border:1px solid #E4E6EE;border-radius:16px;box-shadow:0 14px 36px rgba(30,35,45,0.03);">
+                        <div style="display:flex;justify-content:space-between;font-size:7.5px;font-weight:700;color:#9A9EA8;letter-spacing:2px;font-family:monospace;border-bottom:1px solid #F0F1F6;padding-bottom:8px;margin-bottom:22px;">
+                            <span>SUMOUL APP</span><span>FREQUENCY · 04:00</span>
+                        </div>
+                        <div style="height:105px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                            <svg viewBox="0 0 240 90" width="236" height="88" fill="none">
+                                <!-- 极淡坐标基准线 -->
+                                <line x1="12" y1="48" x2="228" y2="48" stroke="#EAECEF" stroke-width="1" stroke-dasharray="2 3" />
+                                <!-- 缓慢延伸的清冷心电折线 -->
+                                <path class="sg-ecg-line" d="M 14 48 L 62 48 L 76 26 L 92 68 L 112 14 L 130 76 L 146 34 L 160 56 L 172 48 L 226 48" stroke="#3A3D46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <!-- 折线顶点上的微光锚点 -->
+                                <circle cx="76" cy="26" r="2" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.2" />
+                                <circle cx="112" cy="14" r="2.8" fill="#3A3D46" class="sg-ecg-dot" />
+                                <circle cx="130" cy="76" r="2.2" fill="#FFFFFF" stroke="#3A3D46" stroke-width="1.2" />
+                                <circle cx="146" cy="34" r="2" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.2" />
+                                <circle cx="226" cy="48" r="2.5" fill="#3A3D46" />
+                            </svg>
+                        </div>
+                        <div class="sg-t1" style="font-size:15px;font-weight:800;letter-spacing:3.2px;color:#2C2E35;margin-bottom:8px;">Sumoul App</div>
+                        <div class="sg-t2" style="font-size:9.8px;font-weight:600;color:#686C78;line-height:1.85;">“ 고요한 새벽, 너에게로 이어지는 파동 ”</div>
+                        <div class="sg-t3" style="font-size:8.6px;font-weight:500;color:#9498A4;margin-top:4px;margin-bottom:22px;">寂静黎明，缓慢延伸向你的心跳折线。</div>
+                        <div class="sg-t4"><span style="display:inline-block;padding:7px 24px;background:#3A3D46;color:#FFF;-webkit-text-fill-color:#FFF;border-radius:999px;font-size:8px;font-weight:700;letter-spacing:2px;">TOUCH TO ENTER · 触碰进入</span></div>
+                    </div>
+                `;
+            } else if (cur === "eclipse") {
+                // 样式 2：Tamburins 极简双环引力交叠 (ECLIPSE)
+                stageHtml = `
+                    <div style="width:100%;max-width:290px;padding:34px 22px 28px 22px;background:rgba(255,255,255,0.86);border:1px solid #E4E6EE;border-radius:16px;box-shadow:0 14px 36px rgba(30,35,45,0.03);">
+                        <div style="display:flex;justify-content:space-between;font-size:7.5px;font-weight:700;color:#9A9EA8;letter-spacing:2px;font-family:monospace;border-bottom:1px solid #F0F1F6;padding-bottom:8px;margin-bottom:22px;">
+                            <span>SUMOUL APP</span><span>ECLIPSE · GRAVITY</span>
+                        </div>
+                        <div style="height:105px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                            <svg viewBox="0 0 220 100" width="216" height="98" fill="none">
+                                <line x1="20" y1="50" x2="200" y2="50" stroke="#ECEEF4" stroke-width="1" />
+                                <g class="sg-ring-l">
+                                    <circle cx="92" cy="50" r="34" fill="rgba(225,228,238,0.28)" stroke="#484C56" stroke-width="1.2" />
+                                    <circle cx="58" cy="50" r="2.2" fill="#484C56" />
+                                </g>
+                                <g class="sg-ring-r">
+                                    <circle cx="128" cy="50" r="34" fill="rgba(205,210,222,0.25)" stroke="#3A3D46" stroke-width="1.2" stroke-dasharray="3 2.5" />
+                                    <circle cx="162" cy="50" r="2.2" fill="#3A3D46" />
+                                </g>
+                                <!-- 双环交汇核心点 -->
+                                <circle cx="110" cy="50" r="3" fill="#2C2E35" class="sg-ecg-dot" />
+                            </svg>
+                        </div>
+                        <div class="sg-t1" style="font-size:15px;font-weight:800;letter-spacing:3.2px;color:#2C2E35;margin-bottom:8px;">Sumoul App</div>
+                        <div class="sg-t2" style="font-size:9.8px;font-weight:600;color:#686C78;line-height:1.85;">“ 두 개의 궤도가 겹쳐지는 회색의 순간 ”</div>
+                        <div class="sg-t3" style="font-size:8.6px;font-weight:500;color:#9498A4;margin-top:4px;margin-bottom:22px;">当两道孤立的轨迹缓慢靠近，在灰白中交叠合一。</div>
+                        <div class="sg-t4"><span style="display:inline-block;padding:7px 24px;background:#3A3D46;color:#FFF;-webkit-text-fill-color:#FFF;border-radius:999px;font-size:8px;font-weight:700;letter-spacing:2px;">TOUCH TO ENTER · 触碰进入</span></div>
+                    </div>
+                `;
+            } else if (cur === "vinyl") {
+                // 样式 3：首尔凌晨电台黑胶声波 (VINYL)
+                const bars = [16, 28, 42, 22, 54, 36, 64, 46, 26, 58, 38, 20, 44, 30, 16];
+                stageHtml = `
+                    <div style="width:100%;max-width:290px;padding:34px 22px 28px 22px;background:rgba(255,255,255,0.86);border:1px solid #E4E6EE;border-radius:16px;box-shadow:0 14px 36px rgba(30,35,45,0.03);">
+                        <div style="display:flex;justify-content:space-between;font-size:7.5px;font-weight:700;color:#9A9EA8;letter-spacing:2px;font-family:monospace;border-bottom:1px solid #F0F1F6;padding-bottom:8px;margin-bottom:22px;">
+                            <span>FM 94.5 · SEOUL</span><span>04:12 AM</span>
+                        </div>
+                        <div style="height:105px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                            <svg viewBox="0 0 220 84" width="216" height="84" fill="none">
+                                ${bars.map((h, i) => {
+                                    const x = 32 + i * 11;
+                                    const y = 42 - h / 2;
+                                    return `<rect class="sg-wbar" x="${x}" y="${y}" width="2.2" height="${h}" rx="1.1" fill="#3A3D46" style="animation-delay:${(i * 0.14).toFixed(2)}s;" />`;
+                                }).join("")}
+                            </svg>
+                        </div>
+                        <div class="sg-t1" style="font-size:15px;font-weight:800;letter-spacing:3.2px;color:#2C2E35;margin-bottom:8px;">Sumoul App</div>
+                        <div class="sg-t2" style="font-size:9.8px;font-weight:600;color:#686C78;line-height:1.85;">“ 잠들지 못한 밤, 주파수를 맞추는 시간 ”</div>
+                        <div class="sg-t3" style="font-size:8.6px;font-weight:500;color:#9498A4;margin-top:4px;margin-bottom:22px;">在失眠的灰白雨夜，缓慢校准属于你的声音频率。</div>
+                        <div class="sg-t4"><span style="display:inline-block;padding:7px 24px;background:#3A3D46;color:#FFF;-webkit-text-fill-color:#FFF;border-radius:999px;font-size:8px;font-weight:700;letter-spacing:2px;">TOUCH TO ENTER · 触碰进入</span></div>
+                    </div>
+                `;
+            } else {
+                // 样式 4：韩国独立电影失焦缓慢对焦片头 (MIST)
+                stageHtml = `
+                    <div style="width:100%;max-width:296px;padding:42px 24px 34px 24px;background:rgba(255,255,255,0.82);border:1px solid #E4E6EE;border-radius:6px;position:relative;">
+                        <div style="position:absolute;top:10px;left:12px;font-size:12px;color:#B0B4C0;">⌜</div>
+                        <div style="position:absolute;top:10px;right:12px;font-size:12px;color:#B0B4C0;">⌝</div>
+                        <div style="position:absolute;bottom:10px;left:12px;font-size:12px;color:#B0B4C0;">⌞</div>
+                        <div style="position:absolute;bottom:10px;right:12px;font-size:12px;color:#B0B4C0;">⌟</div>
+
+                        <div style="font-size:7.5px;font-weight:700;color:#9A9EA8;letter-spacing:2.5px;font-family:monospace;margin-bottom:28px;">SCENE 01 · MONOCHROME DAWN</div>
+
+                        <div class="sg-focus-hero" style="font-size:21px;font-weight:700;color:#2C2E35;margin-bottom:10px;">회색빛 기억</div>
+                        <div class="sg-t1" style="font-size:10px;font-weight:700;letter-spacing:3px;color:#7A7E8A;margin-bottom:26px;">SUMOUL ARCHIVE</div>
+
+                        <div style="width:36px;height:1px;background:#D0D4E0;margin:0 auto 24px auto;"></div>
+
+                        <div class="sg-t2" style="font-size:9.8px;font-weight:600;color:#5A5E6B;line-height:1.9;">“ 안개 너머로 천천히 선명해지는 너의 윤곽 ”</div>
+                        <div class="sg-t3" style="font-size:8.6px;font-weight:500;color:#9498A4;margin-top:5px;margin-bottom:26px;">穿过灰白晨雾，你的轮廓在镜头里缓慢清晰。</div>
+
+                        <div class="sg-t4"><span style="display:inline-block;padding:6px 22px;background:#F4F5F8;border:1px solid #DCDFE8;border-radius:999px;font-size:8px;color:#3A3D46;font-weight:700;letter-spacing:2px;">TOUCH TO FOCUS · 触碰进入</span></div>
+                    </div>
+                `;
+            }
 
             splash.innerHTML = `
-                <div style="border:1px solid rgba(255,255,255,0.88)!important;border-radius:20px!important;padding:32px 24px 28px 24px!important;background:linear-gradient(160deg,rgba(255,255,255,0.58) 0%,rgba(242,244,250,0.38) 100%)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;max-width:292px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 20px 48px rgba(45,52,68,0.06), inset 0 1px 2px #FFFFFF!important;">
-                    <!-- 顶部极淡档案栏 -->
-                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:700;color:#8E94A2!important;letter-spacing:2px;font-family:monospace;border-bottom:1px solid rgba(255,255,255,0.65)!important;padding-bottom:8px;margin-bottom:14px;">
-                        <span>SUMOUL APP</span>
-                        <span id="dew-pct-txt">TEAR TRACE · 0%</span>
-                    </div>
+                <!-- 顶部：4款高定开屏样式实时切换器（点击小胶囊可随时换样式，不触发关闭！） -->
+                <div class="sg-style-switcher" id="sg-top-switcher" title="点击切换你喜欢的开屏样式">
+                    <span class="sg-sw-btn ${cur === "pulse" ? "active" : ""}" data-sgstyle="pulse">01.心电折线</span>
+                    <span class="sg-sw-btn ${cur === "eclipse" ? "active" : ""}" data-sgstyle="eclipse">02.双环交叠</span>
+                    <span class="sg-sw-btn ${cur === "vinyl" ? "active" : ""}" data-sgstyle="vinyl">03.凌晨声波</span>
+                    <span class="sg-sw-btn ${cur === "mist" ? "active" : ""}" data-sgstyle="mist">04.失焦电影</span>
+                </div>
 
-                    <!-- 💧 透明凝露与微水珠串折线画布 -->
-                    <div style="width:100%;height:136px;display:flex;align-items:center;justify-content:center;margin:2px 0 12px 0;">
-                        <canvas id="sumoul-dew-canvas" style="width:244px!important;height:132px!important;display:block!important;"></canvas>
-                    </div>
+                <!-- 中央主视觉舞台 -->
+                <div id="sg-main-stage" style="width:100%;display:flex;justify-content:center;my:auto;">
+                    ${stageHtml}
+                </div>
 
-                    <!-- 随泪痕进度柔和慢显并永久驻留的文字 -->
-                    <div id="dew-txt-1" style="opacity:0;transform:translateY(5px);transition:opacity 1.4s ease, transform 1.4s ease;font-size:14.5px;font-weight:700;letter-spacing:3.2px;color:#323640!important;margin-bottom:8px;">
-                        눈물의 궤적 · 泪之轨迹
-                    </div>
-
-                    <div style="min-height:50px;margin-bottom:18px;">
-                        <div id="dew-txt-2" style="opacity:0;transform:translateY(5px);transition:opacity 1.5s ease, transform 1.5s ease;font-size:9.8px;font-weight:600;color:#646A78!important;line-height:1.85;letter-spacing:0.4px;">
-                            “ 유리창에 맺혀 천천히 이어지는 투명한 물기 ”
-                        </div>
-                        <div id="dew-txt-3" style="opacity:0;transform:translateY(5px);transition:opacity 1.5s ease, transform 1.5s ease;font-size:8.6px;font-weight:500;color:#8C92A0!important;line-height:1.8;letter-spacing:0.5px;margin-top:4px;">
-                            凝结在玻璃上缓慢延伸的透明水痕，将记忆静静连结。
-                        </div>
-                    </div>
-
-                    <div id="dew-txt-4" style="opacity:0;transform:translateY(4px);transition:opacity 1.4s ease, transform 1.4s ease;">
-                        <div style="display:inline-block;padding:7px 24px;background:rgba(255,255,255,0.85)!important;border:1px solid #FFFFFF!important;border-radius:999px;font-size:8px;color:#424652!important;letter-spacing:2.2px;font-weight:700;box-shadow:0 4px 14px rgba(45,52,68,0.06)!important;">
-                            TOUCH TO ENTER · 触碰进入
-                        </div>
-                    </div>
+                <!-- 底部铭牌 -->
+                <div style="font-size:7.5px;font-weight:600;color:#A0A4B0;letter-spacing:2px;">
+                    SUMOUL APP · CLICK SCREEN TO ENTER
                 </div>
             `;
 
-            splash.onclick = () => {
-                if (animId) cancelAnimationFrame(animId);
+            // 点击顶部切换器：直接切换开屏样式并保存记忆（阻止冒泡，不关闭开屏）
+            splash.querySelectorAll("[data-sgstyle]").forEach((btn) => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    localStorage.setItem(K_SPLASH_STYLE, btn.getAttribute("data-sgstyle"));
+                    renderSplashByStyle();
+                };
+            });
+
+            // 点击屏幕其余区域：丝滑淡出进入系统
+            splash.onclick = (e) => {
+                if (e.target.closest("#sg-top-switcher")) return;
                 splash.classList.add("fade-out");
             };
-
-            const canvas = topDoc.getElementById("sumoul-dew-canvas");
-            const pctTxt = topDoc.getElementById("dew-pct-txt");
-            if (!canvas) return;
-
-            const dpr = window.devicePixelRatio || 2;
-            const W = 244, H = 132;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            const ctx = canvas.getContext("2d");
-            ctx.scale(dpr, dpr);
-
-            // 折线顶点
-            const pts = [
-                { x: 26, y: 20 },
-                { x: 70, y: 56 },
-                { x: 114, y: 26 },
-                { x: 158, y: 72 },
-                { x: 192, y: 48 },
-                { x: 214, y: 86 },
-                { x: 214, y: 112 } // 末端顺着玻璃垂直滑落的一小段水迹
-            ];
-
-            const segs = [];
-            let totalLen = 0;
-            for (let i = 0; i < pts.length - 1; i++) {
-                const len = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
-                segs.push({ p1: pts[i], p2: pts[i + 1], len, start: totalLen });
-                totalLen += len;
-            }
-
-            // 预先在折线路径上生成一串「真实表面张力留下的细碎微水珠 (Micro-droplets)」坐标
-            const microBeads = [];
-            for (let d = 4; d < totalLen - 4; ) {
-                // 不规则间距与大小，模拟真实泪水滑过玻璃后收缩留下的大大小小挂壁水珠
-                const stepDist = 6.5 + Math.sin(d * 0.7) * 3.2;
-                d += stepDist;
-                for (let i = 0; i < segs.length; i++) {
-                    const sg = segs[i];
-                    if (d >= sg.start && d <= sg.start + sg.len) {
-                        const t = (d - sg.start) / sg.len;
-                        const bx = sg.p1.x + (sg.p2.x - sg.p1.x) * t;
-                        const by = sg.p1.y + (sg.p2.y - sg.p1.y) * t;
-                        const r = 1.1 + Math.abs(Math.cos(d * 1.3)) * 1.9;
-                        microBeads.push({ dist: d, x: bx, y: by, r, rx: r * 1.08, ry: r * 0.94 });
-                        break;
-                    }
-                }
-            }
-
-            /**
-             * 💧 核心光学函数：绘制一颗「无黑框 · 100% 透明玻璃折射水珠 (Realistic Glass Dewdrop)」
-             * 原理：真实水珠没有深色外框！上半部因为折射背景略微偏冷灰透明，下半部聚焦光线形成一道明亮的纯白焦散弧（Caustics），左上角有一颗锐利的纯白反光点。
-             */
-            function drawRealisticDew(x, y, rx, ry, alpha = 1) {
-                if (alpha <= 0.02 || rx <= 0.3) return;
-                ctx.save();
-
-                // 1. 水珠右下方极其柔和的半透明透光投影
-                ctx.beginPath();
-                ctx.ellipse(x + rx * 0.18, y + ry * 0.38, rx * 0.95, ry * 0.85, 0, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(135, 145, 165, ${0.18 * alpha})`;
-                ctx.fill();
-
-                // 2. 水珠内部光学折射渐变（上暗透明 ➔ 下亮纯白焦散聚光，零黑框！）
-                const g = ctx.createLinearGradient(x - rx * 0.3, y - ry, x + rx * 0.3, y + ry);
-                g.addColorStop(0, `rgba(175, 184, 200, ${0.42 * alpha})`);
-                g.addColorStop(0.45, `rgba(225, 230, 240, ${0.25 * alpha})`);
-                g.addColorStop(0.82, `rgba(255, 255, 255, ${0.78 * alpha})`);
-                g.addColorStop(1, `rgba(255, 255, 255, ${0.95 * alpha})`);
-
-                ctx.beginPath();
-                ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
-                ctx.fillStyle = g;
-                ctx.fill();
-
-                // 3. 水珠底缘的「新月形焦散亮弧（Caustic Crescent）」——让水珠瞬间产生透明凸透镜立体感！
-                ctx.beginPath();
-                ctx.ellipse(x, y, rx * 0.88, ry * 0.85, 0, 0.12 * Math.PI, 0.88 * Math.PI);
-                ctx.strokeStyle = `rgba(255, 255, 255, ${0.92 * alpha})`;
-                ctx.lineWidth = Math.max(0.7, ry * 0.24);
-                ctx.lineCap = "round";
-                ctx.stroke();
-
-                // 4. 水珠左上角最晶莹的「纯白镜面高光点（Specular Dot）」
-                ctx.beginPath();
-                ctx.ellipse(x - rx * 0.32, y - ry * 0.32, Math.max(0.65, rx * 0.25), Math.max(0.5, ry * 0.18), -0.4, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.99 * alpha})`;
-                ctx.fill();
-
-                ctx.restore();
-            }
-
-            const t1 = topDoc.getElementById("dew-txt-1");
-            const t2 = topDoc.getElementById("dew-txt-2");
-            const t3 = topDoc.getElementById("dew-txt-3");
-            const t4 = topDoc.getElementById("dew-txt-4");
-
-            const DURATION = 5200; // 5.2秒缓慢滑落
-            const startT = performance.now();
-
-            function render(now) {
-                if (!topDoc.getElementById("sumoul-dew-canvas")) return;
-                const elapsed = now - startT;
-                const rawP = Math.min(1, elapsed / DURATION);
-
-                // 每个折角轻微停顿凝结的物理缓动
-                const n = segs.length;
-                const scaled = rawP * n;
-                const sIdx = Math.min(n - 1, Math.floor(scaled));
-                const localT = scaled - sIdx;
-                const smoothLocal = localT < 0.5 ? 2 * localT * localT : 1 - Math.pow(-2 * localT + 2, 2) / 2;
-
-                let curDist = 0;
-                for (let i = 0; i < sIdx; i++) curDist += segs[i].len;
-                curDist += segs[sIdx].len * smoothLocal;
-
-                if (pctTxt) {
-                    pctTxt.textContent = rawP >= 1 ? "TEAR TRACE · 100%" : `TEAR TRACE · ${Math.round(rawP * 100)}%`;
-                }
-
-                // 文字随进度慢慢浮现并永久保留
-                if (rawP > 0.12 && t1 && t1.style.opacity !== "1") { t1.style.opacity = "1"; t1.style.transform = "translateY(0px)"; }
-                if (rawP > 0.36 && t2 && t2.style.opacity !== "1") { t2.style.opacity = "1"; t2.style.transform = "translateY(0px)"; }
-                if (rawP > 0.62 && t3 && t3.style.opacity !== "1") { t3.style.opacity = "1"; t3.style.transform = "translateY(0px)"; }
-                if (rawP > 0.88 && t4 && t4.style.opacity !== "1") { t4.style.opacity = "1"; t4.style.transform = "translateY(0px)"; }
-
-                ctx.clearRect(0, 0, W, H);
-
-                // 计算当前已划过的折线路径顶点
-                const activePts = [pts[0]];
-                let headX = pts[0].x, headY = pts[0].y;
-                for (let i = 0; i < segs.length; i++) {
-                    const sg = segs[i];
-                    if (curDist >= sg.start + sg.len) {
-                        activePts.push(sg.p2);
-                        headX = sg.p2.x; headY = sg.p2.y;
-                    } else if (curDist > sg.start) {
-                        const r = (curDist - sg.start) / sg.len;
-                        headX = sg.p1.x + (sg.p2.x - sg.p1.x) * r;
-                        headY = sg.p1.y + (sg.p2.y - sg.p1.y) * r;
-                        activePts.push({ x: headX, y: headY });
-                        break;
-                    } else {
-                        break;
-                    }
-                }
-
-                // 1. 绘制玻璃上留下的「无边框透明浸润水痕折线」
-                if (activePts.length > 1) {
-                    // 水痕底层微弱透光阴影线
-                    ctx.save();
-                    ctx.beginPath();
-                    activePts.forEach((p, k) => k === 0 ? ctx.moveTo(p.x + 0.6, p.y + 1.2) : ctx.lineTo(p.x + 0.6, p.y + 1.2));
-                    ctx.strokeStyle = "rgba(150, 160, 180, 0.22)";
-                    ctx.lineWidth = 3.2;
-                    ctx.lineCap = "round";
-                    ctx.lineJoin = "round";
-                    ctx.stroke();
-                    ctx.restore();
-
-                    // 水痕本体：半透明纯白反光细水丝
-                    ctx.save();
-                    ctx.beginPath();
-                    activePts.forEach((p, k) => k === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-                    ctx.strokeStyle = "rgba(255, 255, 255, 0.88)";
-                    ctx.lineWidth = 1.6;
-                    ctx.lineCap = "round";
-                    ctx.lineJoin = "round";
-                    ctx.stroke();
-                    ctx.restore();
-                }
-
-                // 2. 绘制折线划过之后，因表面张力留在轨迹上的「断续透明微水珠串」
-                for (let i = 0; i < microBeads.length; i++) {
-                    const mb = microBeads[i];
-                    if (curDist >= mb.dist) {
-                        const fade = Math.min(1, (curDist - mb.dist) / 10);
-                        drawRealisticDew(mb.x, mb.y, mb.rx, mb.ry, fade * 0.92);
-                    }
-                }
-
-                // 3. 绘制 6 个折角转折点上凝结的饱满透明大露珠
-                let acc = 0;
-                for (let i = 0; i < pts.length - 1; i++) {
-                    if (i > 0) acc += segs[i - 1].len;
-                    if (curDist >= acc) {
-                        const p = pts[i];
-                        const grow = Math.min(1, (curDist - acc + 4) / 14);
-                        const baseR = (i === 1 || i === 3 || i === 5) ? 4.5 : 3.4;
-                        drawRealisticDew(p.x, p.y, baseR * 1.05 * grow, baseR * 0.95 * grow, grow);
-                    }
-                }
-
-                // 4. 绘制正在最前端缓慢滑落的「主透明泪滴（带自然水体张力微颤）」
-                const breathe = 1 + Math.sin(now * 0.006) * 0.05;
-                drawRealisticDew(headX, headY, 5.4 * breathe, 5.8 / breathe, 1);
-
-                animId = requestAnimationFrame(render);
-            }
-
-            animId = requestAnimationFrame(render);
         }
 
-        playDewSplash();
+        renderSplashByStyle();
 
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                playDewSplash();
+                renderSplashByStyle();
             }
         }, true);
     }
 
-    mountPureDewTearSplash();
+    mountFourStyleGallerySplash();
 })();
