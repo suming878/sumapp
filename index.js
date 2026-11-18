@@ -4098,15 +4098,38 @@ bootSumoulApp();
     mountPrivateServerV46();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 微信沉浸式真·全屏 + 顶栏功能全部收纳至右上角设置 + 世界书自动读取补丁】
-// 功能：1.隐藏微信顶栏杂乱按钮，聊天流全屏铺满 2.右上角直达设置 3.记忆开关/总结/CSS美化/清空/世界书全部集成在设置页
-// 用法：直接粘贴在 index.js 最末尾最后一行后面（若刚才粘过世界书补丁，直接用这段替换它即可）！
+// 🤍 【Sumoul App 微信沉浸全屏 + 韩系高定纯白磨砂「聊天设置中心」+ 世界书自动读取终极美学版】
+// 特点：0彩色Emoji！全套 1.5px 极细冷灰线性SVG图标 + iOS丝滑拨杆开关 + 韩系Bento磨砂卡片！
+// 用法：直接替换 index.js 最末尾刚才那段世界书/全屏补丁即可！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    // 获取当前角色安全存档后缀
+    // ── 1. 全套高定 1.5px 极细冷灰 SVG 线性矢量图标库（零彩色 Emoji！） ──
+    const svgLine = (path, sz = 16, color = "#3A3A40", sw = "1.6") =>
+        `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${path}</svg>`;
+
+    const LUX_ICO = {
+        sliders: svgLine(`<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>`, 14, "#3A3A40", "1.7"),
+        back: svgLine(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2C32", "1.9"),
+        sync: svgLine(`<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>`, 16, "#3A3A40"),
+        clock: svgLine(`<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>`, 16, "#3A3A40"),
+        summary: svgLine(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/>`, 16, "#3A3A40"),
+        palette: svgLine(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`, 16, "#3A3A40"),
+        book: svgLine(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`, 16, "#3A3A40"),
+        upload: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>`, 13, "#FFFFFF", "1.8"),
+        sparkle: svgLine(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13, "#3A3A40", "1.6"),
+        user: svgLine(`<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`, 15, "#3A3A40"),
+        camera: svgLine(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 13, "#55555E"),
+        trash: svgLine(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 14, "#9A6868"),
+        shield: svgLine(`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, 14, "#55555E"),
+        plus: svgLine(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13, "#3A3A40", "1.8"),
+        check: svgLine(`<polyline points="20 6 9 17 4 12"/>`, 13, "#FFFFFF", "2"),
+        linkHeart: svgLine(`<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`, 14, "#8E8E98", "1.6")
+    };
+
+    // ── 2. 世界书底层存储与解析引擎 ──
     function getCharScope() {
         let scope = "";
         try {
@@ -4115,11 +4138,8 @@ bootSumoulApp();
                 if (st.characterId !== undefined && st.characters?.[st.characterId]) {
                     const c = st.characters[st.characterId];
                     scope = c.avatar || c.name || String(st.characterId);
-                } else if (st.groupId) {
-                    scope = "group_" + String(st.groupId);
-                } else if (st.name2) {
-                    scope = st.name2;
-                }
+                } else if (st.groupId) scope = "group_" + String(st.groupId);
+                else if (st.name2) scope = st.name2;
             }
         } catch (e) {}
         if (!scope) {
@@ -4130,25 +4150,17 @@ bootSumoulApp();
         return String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
     }
 
-    function getWiStorageKey() {
-        return `sumoul_v16_worldinfo__${getCharScope()}`;
-    }
+    function getWiStorageKey() { return `sumoul_v16_worldinfo__${getCharScope()}`; }
 
     function loadWorldInfo() {
         const def = { enabled: true, mode: "smart", entries: [] };
-        try {
-            return Object.assign(def, JSON.parse(localStorage.getItem(getWiStorageKey()) || "{}"));
-        } catch (e) {
-            return def;
-        }
+        try { return Object.assign(def, JSON.parse(localStorage.getItem(getWiStorageKey()) || "{}")); } catch (e) { return def; }
     }
-
     function saveWorldInfo(data) {
         try { localStorage.setItem(getWiStorageKey(), JSON.stringify(data)); } catch (e) {}
     }
 
-    // 解析 .json / .txt 世界书
-    function parseWorldBookJson(rawText, fileName = "导入世界书") {
+    function parseWorldBookJson(rawText, fileName = "WorldBook") {
         const extracted = [];
         try {
             const obj = JSON.parse(rawText);
@@ -4221,7 +4233,7 @@ bootSumoulApp();
                     const keys = (Array.isArray(item.key) ? item.key : []).map(String).filter(Boolean);
                     found.push({
                         id: Date.now() + 500 + idx,
-                        title: String(item.comment || keys[0] || `酒馆世界书 #${idx + 1}`),
+                        title: String(item.comment || keys[0] || `世界书 #${idx + 1}`),
                         keys, content, enabled: !item.disable,
                         constant: Boolean(item.constant) || keys.length === 0
                     });
@@ -4247,7 +4259,7 @@ bootSumoulApp();
             }
         });
         if (matched.length === 0) return "";
-        return `\n\n【📚 角色必须严格遵守的世界书 (World Info / Lorebook) 核心设定】：\n${matched.join("\n")}\n（请在回复中自然融入并严格遵守以上世界书设定与人物关系！）`;
+        return `\n\n【角色必须严格遵守的世界书 (World Info / Lorebook) 核心设定】：\n${matched.join("\n")}\n（请在回复中自然融入并严格遵守以上世界书设定与人物关系！）`;
     }
 
     function hookFetchForWorldInfo() {
@@ -4263,7 +4275,7 @@ bootSumoulApp();
                     if (bodyObj && Array.isArray(bodyObj.messages) && bodyObj.messages.length > 0) {
                         const allMsgText = bodyObj.messages.map((m) => m.content || "").join("\n");
                         const wiBlock = buildActiveWorldInfoPrompt(allMsgText);
-                        if (wiBlock && !allMsgText.includes("【📚 角色必须严格遵守的世界书")) {
+                        if (wiBlock && !allMsgText.includes("【角色必须严格遵守的世界书")) {
                             const sysMsg = bodyObj.messages.find((m) => m.role === "system") || bodyObj.messages[0];
                             if (sysMsg) {
                                 sysMsg.content = `${sysMsg.content}${wiBlock}`;
@@ -4277,28 +4289,28 @@ bootSumoulApp();
         };
     }
 
-    function mountFullScreenWeChatAndUnifiedSettings() {
+    // ── 3. 构建韩系高定纯白磨砂设置页 & 微信全屏视图 ──
+    function mountLuxuryKoreanSettings() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const talkPage = topDoc.getElementById("smt-page-talk");
         const wxSetPage = topDoc.getElementById("smt-page-wx_settings");
         const topBadge = topDoc.getElementById("smt-top-badge");
         if (!modal || !talkPage || !wxSetPage || !topBadge) {
-            setTimeout(mountFullScreenWeChatAndUnifiedSettings, 200);
+            setTimeout(mountLuxuryKoreanSettings, 200);
             return;
         }
 
         hookFetchForWorldInfo();
 
-        // 1. 注入【微信真·全屏化 CSS】：隐藏原本拥挤的 .smt-wx-top-bar，让聊天窗口无边框铺满全屏！
+        // 注入韩系高定设置页 & 微信全屏 CSS
         topDoc.getElementById("sumoul-wx-fullscreen-css")?.remove();
-        const fsStyle = topDoc.createElement("style");
-        fsStyle.id = "sumoul-wx-fullscreen-css";
-        fsStyle.innerHTML = `
-            /* 隐藏原本占地方的微信二层顶栏，所有功能已收纳进右上角设置 */
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-wx-fullscreen-css";
+        st.innerHTML = `
+            /* ── 1. 微信聊天页真·全屏沉浸化 ── */
             #seoul-mini-theater-modal #smt-page-talk .smt-wx-top-bar {
                 display: none !important;
             }
-            /* 当处于微信聊天页时，释放外层边距，实现沉浸式全屏聊天视图 */
             #seoul-mini-theater-modal .smt-fs-body:has(#smt-page-talk.active) {
                 padding: 0 !important;
                 max-width: 100% !important;
@@ -4314,7 +4326,6 @@ bootSumoulApp();
                 padding: 14px 14px 10px 14px !important;
                 flex: 1 !important;
             }
-            /* 底部快捷栏与输入栏贴合全屏底部 */
             #seoul-mini-theater-modal #smt-page-talk .smt-wx-quick {
                 padding: 6px 12px 6px 12px !important;
                 background: #FFFFFF !important;
@@ -4329,23 +4340,144 @@ bootSumoulApp();
             #seoul-mini-theater-modal #smt-wx-emoji-drawer {
                 margin: 0 10px 6px 10px !important;
             }
-        `;
-        topDoc.head.appendChild(fsStyle);
 
-        // 2. 改造主顶栏右上角按钮 (#smt-top-badge)：变成高定「··· 设置」按钮，直达微信设置中心！
-        topBadge.innerHTML = `
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#3A3A40" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">
-                <circle cx="12" cy="12" r="1.3" fill="#3A3A40"/>
-                <circle cx="19" cy="12" r="1.3" fill="#3A3A40"/>
-                <circle cx="5" cy="12" r="1.3" fill="#3A3A40"/>
-            </svg>
-            <span style="margin-left:2px;">设置</span>
+            /* ── 2. 韩系高定聊天设置页 (#smt-page-wx_settings) 专属美学样式 ── */
+            #seoul-mini-theater-modal #smt-page-wx_settings {
+                background: #F6F6F9 !important;
+                margin: -10px -14px !important;
+                padding: 12px 14px 28px 14px !important;
+            }
+            #seoul-mini-theater-modal .lux-card {
+                background: #FFFFFF !important;
+                border: 1px solid #ECECF2 !important;
+                border-radius: 20px !important;
+                padding: 15px !important;
+                margin-bottom: 11px !important;
+                box-shadow: 0 4px 18px rgba(20, 20, 30, 0.025) !important;
+                flex-shrink: 0 !important;
+            }
+            #seoul-mini-theater-modal .lux-card-head {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                margin-bottom: 12px !important;
+            }
+            #seoul-mini-theater-modal .lux-card-title {
+                display: flex !important;
+                align-items: center !important;
+                gap: 7px !important;
+                font-size: 10.5px !important;
+                font-weight: 800 !important;
+                color: #2C2C32 !important;
+                letter-spacing: 0.4px !important;
+            }
+            #seoul-mini-theater-modal .lux-ico-box {
+                width: 30px !important;
+                height: 30px !important;
+                border-radius: 10px !important;
+                background: #F6F6F9 !important;
+                border: 1px solid #EAEAF0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* 韩系 iOS 丝滑胶囊拨杆开关 (Toggle Switch) */
+            #seoul-mini-theater-modal .lux-switch {
+                position: relative !important;
+                width: 38px !important;
+                height: 21px !important;
+                border-radius: 999px !important;
+                background: #E2E2EA !important;
+                cursor: pointer !important;
+                transition: background 0.25s ease !important;
+                flex-shrink: 0 !important;
+            }
+            #seoul-mini-theater-modal .lux-switch::after {
+                content: "" !important;
+                position: absolute !important;
+                top: 2.5px !important;
+                left: 2.5px !important;
+                width: 16px !important;
+                height: 16px !important;
+                border-radius: 50% !important;
+                background: #FFFFFF !important;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12) !important;
+                transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
+            }
+            #seoul-mini-theater-modal .lux-switch.on {
+                background: #3A3A42 !important;
+            }
+            #seoul-mini-theater-modal .lux-switch.on::after {
+                transform: translateX(17px) !important;
+            }
+
+            /* 2x2 高定快捷控制网格 */
+            #seoul-mini-theater-modal .lux-bento-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 8px !important;
+            }
+            #seoul-mini-theater-modal .lux-bento-item {
+                background: #F9F9FB !important;
+                border: 1px solid #ECECF2 !important;
+                border-radius: 15px !important;
+                padding: 11px 12px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                cursor: pointer !important;
+                transition: all 0.18s ease !important;
+            }
+            #seoul-mini-theater-modal .lux-bento-item:active {
+                transform: scale(0.98) !important;
+                background: #F2F2F6 !important;
+            }
+            #seoul-mini-theater-modal .lux-bento-item.active-tab {
+                background: #FFFFFF !important;
+                border-color: #3A3A42 !important;
+                box-shadow: 0 4px 12px rgba(40, 40, 50, 0.06) !important;
+            }
+
+            /* 干净细腻的无感输入行 */
+            #seoul-mini-theater-modal .lux-field-row {
+                display: flex !important;
+                align-items: center !important;
+                background: #F8F8FA !important;
+                border: 1px solid #ECECF2 !important;
+                border-radius: 11px !important;
+                padding: 0 11px !important;
+                height: 32px !important;
+                margin-bottom: 6px !important;
+            }
+            #seoul-mini-theater-modal .lux-field-lbl {
+                font-size: 9px !important;
+                font-weight: 700 !important;
+                color: #8E8E98 !important;
+                width: 54px !important;
+                flex-shrink: 0 !important;
+                text-align: left !important;
+            }
+            #seoul-mini-theater-modal .lux-field-inp {
+                flex: 1 !important;
+                border: none !important;
+                background: transparent !important;
+                font-size: 10.5px !important;
+                font-weight: 600 !important;
+                color: #2C2C32 !important;
+                outline: none !important;
+                min-width: 0 !important;
+            }
         `;
-        topBadge.title = "打开聊天设置 / 记忆总结 / CSS美化 / 世界书 / 管理后台";
+        topDoc.head.appendChild(st);
+
+        // 改造主顶栏右上角按钮：高定极细三道滑杆线性图标 + 「设置」
+        topBadge.innerHTML = `${LUX_ICO.sliders}<span style="margin-left:3px;font-weight:700;letter-spacing:0.5px;">设置</span>`;
+        topBadge.style.cssText = "display:inline-flex!important;align-items:center!important;gap:3px!important;height:26px!important;padding:0 10px!important;background:#F8F8FA!important;border:1px solid #E6E6EE!important;border-radius:999px!important;font-size:9px!important;color:#3A3A40!important;cursor:pointer!important;z-index:2!important;";
         topBadge.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            // 如果已经在设置页，点一下就返回微信聊天；否则打开微信设置页！
             if (wxSetPage.classList.contains("active")) {
                 topDoc.getElementById("smt-wxset-back-chat")?.click();
             } else {
@@ -4353,252 +4485,512 @@ bootSumoulApp();
             }
         };
 
-        // 3. 把原本散落在微信顶栏的【记忆开关、区间总结、CSS美化、清空聊天、管理员入口】+【世界书】全部搬进设置页 (#smt-page-wx_settings)！
-        const scrollArea = wxSetPage.children[1];
+        // ── 把原本主代码里的旧 input 元素暂存起来（保持原有 ID 不变，直接嵌入新高级卡片中，100% 兼容主代码保存逻辑！） ──
         const cssDrawer = topDoc.getElementById("smt-wx-css-drawer");
         const sumDrawer = topDoc.getElementById("smt-wx-sum-drawer");
 
-        if (scrollArea && !topDoc.getElementById("smt-wxset-all-in-one-hub")) {
-            const hubCard = topDoc.createElement("div");
-            hubCard.id = "smt-wxset-all-in-one-hub";
-            hubCard.className = "smt-prof-card";
-            hubCard.style.cssText = "border:1.5px solid #3A3A40!important;background:#F8F8FA!important;";
-            hubCard.innerHTML = `
-                <div class="smt-sec-title" style="margin-bottom:9px!important;">
-                    <span>🎛️ WECHAT CONTROL HUB · 微信顶栏功能总控台</span>
-                    <span class="smt-pill-btn" id="smt-hub-admin-btn" style="height:21px!important;font-size:8px!important;">👑 管理员/锁屏</span>
+        const elBackChat = topDoc.getElementById("smt-wxset-back-chat");
+        const elTimePill = topDoc.getElementById("smt-wxset-time-pill");
+        const elTimeTitle = topDoc.getElementById("smt-wxset-time-title");
+        const elTimeToggle = topDoc.getElementById("smt-wxset-time-toggle");
+        const elClockBig = topDoc.getElementById("smt-wxset-clock-big");
+
+        const elMyAvaFile = topDoc.getElementById("smt-cfg-myava-file");
+        const elMyAvaPrev = topDoc.getElementById("smt-cfg-myava-preview");
+        const elMyNick = topDoc.getElementById("smt-cfg-mynick");
+        const elMyBio = topDoc.getElementById("smt-cfg-mybio");
+        const elMyAvaUrl = topDoc.getElementById("smt-cfg-myava");
+
+        const elCharAvaFile = topDoc.getElementById("smt-cfg-charava-file");
+        const elCharAvaPrev = topDoc.getElementById("smt-cfg-charava-preview");
+        const elRemark = topDoc.getElementById("smt-cfg-remark");
+        const elCharBio = topDoc.getElementById("smt-cfg-charbio");
+        const elCharAvaUrl = topDoc.getElementById("smt-cfg-charava");
+        const elAvaSize = topDoc.getElementById("smt-cfg-avasize");
+
+        const elBgNote = topDoc.getElementById("smt-cfg-bgnote");
+        const elResetBtn = topDoc.getElementById("smt-cfg-reset-btn");
+        const elSaveBtn = topDoc.getElementById("smt-cfg-save-btn");
+
+        if (!elMyNick || topDoc.getElementById("lux-wxset-root")) return;
+
+        // 赋予旧 input 高定无边框样式
+        [elMyNick, elMyBio, elMyAvaUrl, elRemark, elCharBio, elCharAvaUrl, elAvaSize].forEach((inp) => {
+            if (inp) inp.className = "lux-field-inp";
+        });
+
+        // 隐藏主代码原本用于兼容的旧节点外壳，重新装配进全新高定布局
+        const hiddenCompatBox = topDoc.createElement("div");
+        hiddenCompatBox.style.cssText = "display:none!important;";
+        if (elTimeTitle) hiddenCompatBox.appendChild(elTimeTitle);
+        if (elTimeToggle) hiddenCompatBox.appendChild(elTimeToggle);
+        if (elClockBig) hiddenCompatBox.appendChild(elClockBig);
+
+        // 重绘整个 #smt-page-wx_settings 为韩系高定纯白磨砂界面
+        wxSetPage.innerHTML = `
+            <div id="lux-wxset-root" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+                <!-- 顶部极简导航条 -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 12px 2px;flex-shrink:0;">
+                    <div id="lux-back-slot"></div>
+                    <div id="lux-time-slot"></div>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
-                    <span class="smt-pill-btn dark" id="smt-hub-sync-btn" style="height:28px!important;width:100%!important;">记忆: ON</span>
-                    <span class="smt-pill-btn" id="smt-hub-sum-btn" style="height:28px!important;width:100%!important;">📝 记忆总结</span>
-                    <span class="smt-pill-btn" id="smt-hub-css-btn" style="height:28px!important;width:100%!important;">🎨 CSS美化</span>
-                    <span class="smt-pill-btn" id="smt-hub-clear-btn" style="height:28px!important;width:100%!important;color:#9A6868!important;">🗑️ 清空聊天</span>
+
+                <!-- 滚动主内容区 -->
+                <div style="flex:1;min-height:0;overflow-y:auto;padding-right:2px;">
+
+                    <!-- 🤍 卡片 1：高定双人连结头像与人设名片 (COUPLE PROFILE) -->
+                    <div class="lux-card">
+                        <div class="lux-card-head">
+                            <div class="lux-card-title">
+                                <div class="lux-ico-box">${LUX_ICO.user}</div>
+                                <div>
+                                    <div>PROFILE &amp; AVATAR · 双人名片设置</div>
+                                    <div style="font-size:8px;font-weight:600;color:#9A9AA5;margin-top:1px;">点击上方圆形头像可直接从相册更换图片</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 双人对称头像展示台 -->
+                        <div style="display:grid;grid-template-columns:1fr 36px 1fr;align-items:center;text-align:center;background:#F9F9FB;border:1px solid #EFEFF5;border-radius:16px;padding:14px 10px;margin-bottom:12px;">
+                            <div style="display:flex;flex-direction:column;align-items:center;">
+                                <label style="position:relative;cursor:pointer;display:inline-block;" title="点击更换我的头像">
+                                    <div id="lux-myava-img-slot"></div>
+                                    <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);">${LUX_ICO.camera}</span>
+                                    <div id="lux-myava-file-slot" style="display:none;"></div>
+                                </label>
+                                <span style="font-size:8.5px;font-weight:800;color:#55555E;margin-top:6px;letter-spacing:0.5px;">MY PROFILE · 我</span>
+                            </div>
+
+                            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0.65;">
+                                ${LUX_ICO.linkHeart}
+                                <div style="width:20px;height:1px;background:#DCDCE6;margin-top:4px;"></div>
+                            </div>
+
+                            <div style="display:flex;flex-direction:column;align-items:center;">
+                                <label style="position:relative;cursor:pointer;display:inline-block;" title="点击更换TA的头像">
+                                    <div id="lux-charava-img-slot"></div>
+                                    <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);">${LUX_ICO.camera}</span>
+                                    <div id="lux-charava-file-slot" style="display:none;"></div>
+                                </label>
+                                <span style="font-size:8.5px;font-weight:800;color:#55555E;margin-top:6px;letter-spacing:0.5px;">PARTNER · 对方</span>
+                            </div>
+                        </div>
+
+                        <!-- 我的信息表单 -->
+                        <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin:0 0 5px 4px;letter-spacing:0.5px;">01 / 我的微信资料</div>
+                        <div class="lux-field-row"><span class="lux-field-lbl">我的昵称</span><div id="lux-mynick-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="lux-field-row"><span class="lux-field-lbl">状态签名</span><div id="lux-mybio-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="lux-field-row" style="margin-bottom:12px!important;"><span class="lux-field-lbl">头像链接</span><div id="lux-myavaurl-slot" style="flex:1;display:flex;"></div></div>
+
+                        <!-- 对方信息表单 -->
+                        <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin:0 0 5px 4px;letter-spacing:0.5px;">02 / 对方备注与头像尺寸</div>
+                        <div class="lux-field-row"><span class="lux-field-lbl">专属备注</span><div id="lux-remark-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="lux-field-row"><span class="lux-field-lbl">顶栏签名</span><div id="lux-charbio-slot" style="flex:1;display:flex;"></div></div>
+                        <div style="display:grid;grid-template-columns:1fr 105px;gap:6px;">
+                            <div class="lux-field-row" style="margin-bottom:0!important;"><span class="lux-field-lbl">TA头像URL</span><div id="lux-charavaurl-slot" style="flex:1;display:flex;"></div></div>
+                            <div class="lux-field-row" style="margin-bottom:0!important;padding:0 8px!important;"><span class="lux-field-lbl" style="width:42px!important;">尺寸px</span><div id="lux-avasize-slot" style="flex:1;display:flex;"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- 🤍 卡片 2：韩系 2x2 智能控制中心 (记忆同步 / 真实时间 / 区间总结 / 气泡CSS) -->
+                    <div class="lux-card">
+                        <div class="lux-card-head">
+                            <div class="lux-card-title">
+                                <div class="lux-ico-box">${LUX_ICO.sparkle}</div>
+                                <div>
+                                    <div>CHAT STUDIO · 聊天控制与美化工作台</div>
+                                    <div style="font-size:8px;font-weight:600;color:#9A9AA5;margin-top:1px;">原微信顶栏功能已全部收纳至此</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lux-bento-grid">
+                            <!-- 拨杆 1：主线记忆互通 -->
+                            <div class="lux-bento-item" id="lux-card-sync">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.sync}</div>
+                                    <div style="text-align:left;">
+                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">主线记忆互通</div>
+                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;" id="lux-sync-sub">同步至酒馆上下文</div>
+                                    </div>
+                                </div>
+                                <div class="lux-switch" id="lux-sw-sync"></div>
+                            </div>
+
+                            <!-- 拨杆 2：真实时间感知 -->
+                            <div class="lux-bento-item" id="lux-card-time">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.clock}</div>
+                                    <div style="text-align:left;">
+                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">真实时间感知</div>
+                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;" id="lux-time-sub">感知现实昼夜时间</div>
+                                    </div>
+                                </div>
+                                <div class="lux-switch on" id="lux-sw-time"></div>
+                            </div>
+
+                            <!-- 抽屉触发 3：区间记忆总结 -->
+                            <div class="lux-bento-item" id="lux-card-sum">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.summary}</div>
+                                    <div style="text-align:left;">
+                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">微信区间总结</div>
+                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;">提炼记忆并注入主线</div>
+                                    </div>
+                                </div>
+                                <span style="font-size:10px;color:#8E8E98;font-weight:700;">▾</span>
+                            </div>
+
+                            <!-- 抽屉触发 4：气泡与尾巴 CSS 美化 -->
+                            <div class="lux-bento-item" id="lux-card-css">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.palette}</div>
+                                    <div style="text-align:left;">
+                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">气泡 CSS 美化</div>
+                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;">自定义气泡与小尾巴</div>
+                                    </div>
+                                </div>
+                                <span style="font-size:10px;color:#8E8E98;font-weight:700;">▾</span>
+                            </div>
+                        </div>
+
+                        <!-- 总结与CSS展开插槽 -->
+                        <div id="lux-drawers-holder" style="margin-top:8px;"></div>
+                    </div>
+
+                    <!-- 🤍 卡片 3：高定世界书挂载与角色自动读取 (WORLD INFO ARCHIVE) -->
+                    <div class="lux-card">
+                        <div class="lux-card-head" style="margin-bottom:8px!important;">
+                            <div class="lux-card-title">
+                                <div class="lux-ico-box">${LUX_ICO.book}</div>
+                                <div>
+                                    <div>WORLD INFO · 世界书导入与角色自动读取</div>
+                                    <div style="font-size:8px;font-weight:600;color:#9A9AA5;margin-top:1px;">微信私聊与全应用互动时自动读取世界观</div>
+                                </div>
+                            </div>
+                            <div class="lux-switch on" id="lux-sw-wi" title="开启/关闭角色自动读取世界书"></div>
+                        </div>
+
+                        <!-- 极简高定操作按钮排 -->
+                        <div style="display:flex;gap:6px;margin-bottom:9px;">
+                            <label class="smt-pill-btn dark" style="flex:1.15;height:28px!important;cursor:pointer;border-radius:10px!important;">
+                                ${LUX_ICO.upload}<span>导入世界书 (.json/.txt)</span>
+                                <input type="file" id="smt-wi-file-inp" accept=".json,.txt,.world" multiple style="display:none;" />
+                            </label>
+                            <span class="smt-pill-btn" id="smt-wi-sync-st-btn" style="flex:1;height:28px!important;border-radius:10px!important;">
+                                ${LUX_ICO.sync}<span>读取酒馆世界书</span>
+                            </span>
+                            <span class="smt-pill-btn" id="smt-wi-open-add-drawer" style="height:28px!important;padding:0 10px!important;border-radius:10px!important;" title="手动新增单条设定">
+                                ${LUX_ICO.plus}<span>新增</span>
+                            </span>
+                        </div>
+
+                        <!-- 默认折叠的「手动新增世界书条目」精致抽屉 -->
+                        <div id="smt-wi-add-drawer" style="display:none;background:#F9F9FB;border:1px solid #EAEAF0;border-radius:13px;padding:10px;margin-bottom:9px;">
+                            <div style="display:flex;gap:6px;margin-bottom:6px;">
+                                <input type="text" id="smt-wi-new-title" class="smt-wx-input" style="width:38%!important;flex:none!important;height:26px!important;font-size:9.5px!important;border-radius:8px!important;" placeholder="设定标题 (如:同居规则)" />
+                                <input type="text" id="smt-wi-new-keys" class="smt-wx-input" style="flex:1!important;height:26px!important;font-size:9.5px!important;border-radius:8px!important;" placeholder="触发词逗号隔开 (留空则常驻生效)" />
+                            </div>
+                            <textarea id="smt-wi-new-content" style="width:100%;height:48px;background:#FFFFFF;border:1px solid #E6E6EC;border-radius:9px;padding:6px 8px;font-size:9.8px;color:#3A3A40;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;" placeholder="写下该条世界书的具体设定内容..."></textarea>
+                            <div style="display:flex;justify-content:flex-end;gap:5px;">
+                                <span class="smt-pill-btn" id="smt-wi-cancel-add" style="height:24px!important;">收起</span>
+                                <span class="smt-pill-btn dark" id="smt-wi-add-btn" style="height:24px!important;">✓ 存入世界书</span>
+                            </div>
+                        </div>
+
+                        <!-- 世界书状态栏 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0 2px;margin-bottom:6px;">
+                            <span style="font-size:8.5px;font-weight:800;color:#7A7A85;" id="smt-wi-count-txt">已挂载设定 (0)</span>
+                            <div style="display:flex;gap:10px;align-items:center;">
+                                <span id="smt-wi-mode-btn" style="font-size:8px;font-weight:700;color:#55555E;cursor:pointer;background:#F4F4F8;padding:2px 7px;border-radius:99px;">模式: 常驻+词触发</span>
+                                <span id="smt-wi-clear-btn" style="font-size:8px;font-weight:700;color:#9A6868;cursor:pointer;">清空</span>
+                            </div>
+                        </div>
+
+                        <!-- 条目列表 -->
+                        <div id="smt-wi-entries-list" style="max-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+
+                        <!-- 补充私聊背景小字条 -->
+                        <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #ECECF2;">
+                            <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:5px;">EXTRA NOTE · 当前微信私聊补充背景设定</div>
+                            <div id="lux-bgnote-slot"></div>
+                        </div>
+                    </div>
+
+                    <!-- 🤍 卡片 4：底部快捷管理栏 (清空记录 / 恢复默认 / 管理员后台) -->
+                    <div class="lux-card" style="padding:12px 15px!important;margin-bottom:6px!important;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;">
+                            <span class="smt-pill-btn" id="lux-clear-wx-btn" style="flex:1;height:28px!important;border-radius:10px!important;color:#9A6868!important;border-color:#F0E0E0!important;background:#FFF9F9!important;">
+                                ${LUX_ICO.trash}<span>清空当前聊天记录</span>
+                            </span>
+                            <span class="smt-pill-btn" id="lux-open-admin-btn" style="flex:1;height:28px!important;border-radius:10px!important;">
+                                ${LUX_ICO.shield}<span>管理员 / 锁屏后台</span>
+                            </span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <div id="lux-reset-slot" style="flex:0.8;display:flex;"></div>
+                            <div id="lux-save-slot" style="flex:1.4;display:flex;"></div>
+                        </div>
+                    </div>
+
                 </div>
-                <div id="smt-hub-drawers-slot" style="margin-top:8px;"></div>
-            `;
-            scrollArea.prepend(hubCard);
+            </div>
+        `;
+        wxSetPage.appendChild(hiddenCompatBox);
 
-            // 把原本在聊天页里的「区间总结抽屉」和「CSS美化抽屉」无缝移入设置页的总控台内部！
-            const slot = topDoc.getElementById("smt-hub-drawers-slot");
-            if (sumDrawer && slot) {
-                sumDrawer.style.marginBottom = "8px";
-                slot.appendChild(sumDrawer);
+        // ── 将原有 DOM 节点精准挂载进高定插槽中 ──
+        if (elBackChat) {
+            elBackChat.style.cssText = "height:28px!important;padding:0 12px!important;background:#FFFFFF!important;border:1px solid #E6E6EE!important;border-radius:999px!important;font-size:9.5px!important;font-weight:800!important;color:#2C2C32!important;";
+            topDoc.getElementById("lux-back-slot").appendChild(elBackChat);
+        }
+        if (elTimePill) {
+            elTimePill.style.cssText = "height:26px!important;padding:0 10px!important;background:#FFFFFF!important;border:1px solid #ECECF2!important;border-radius:999px!important;font-size:8.5px!important;font-weight:700!important;color:#6E6E77!important;";
+            topDoc.getElementById("lux-time-slot").appendChild(elTimePill);
+        }
+
+        if (elMyAvaPrev) {
+            elMyAvaPrev.style.cssText = "width:58px!important;height:58px!important;border-radius:50%!important;object-fit:cover!important;border:2.5px solid #FFFFFF!important;box-shadow:0 4px 12px rgba(20,20,30,0.08)!important;display:block!important;";
+            topDoc.getElementById("lux-myava-img-slot").appendChild(elMyAvaPrev);
+        }
+        if (elMyAvaFile) topDoc.getElementById("lux-myava-file-slot").appendChild(elMyAvaFile);
+
+        if (elCharAvaPrev) {
+            elCharAvaPrev.style.cssText = "width:58px!important;height:58px!important;border-radius:50%!important;object-fit:cover!important;border:2.5px solid #FFFFFF!important;box-shadow:0 4px 12px rgba(20,20,30,0.08)!important;display:block!important;";
+            topDoc.getElementById("lux-charava-img-slot").appendChild(elCharAvaPrev);
+        }
+        if (elCharAvaFile) topDoc.getElementById("lux-charava-file-slot").appendChild(elCharAvaFile);
+
+        if (elMyNick) topDoc.getElementById("lux-mynick-slot").appendChild(elMyNick);
+        if (elMyBio) topDoc.getElementById("lux-mybio-slot").appendChild(elMyBio);
+        if (elMyAvaUrl) topDoc.getElementById("lux-myavaurl-slot").appendChild(elMyAvaUrl);
+
+        if (elRemark) topDoc.getElementById("lux-remark-slot").appendChild(elRemark);
+        if (elCharBio) topDoc.getElementById("lux-charbio-slot").appendChild(elCharBio);
+        if (elCharAvaUrl) topDoc.getElementById("lux-charavaurl-slot").appendChild(elCharAvaUrl);
+        if (elAvaSize) topDoc.getElementById("lux-avasize-slot").appendChild(elAvaSize);
+
+        if (elBgNote) {
+            elBgNote.style.cssText = "width:100%!important;height:46px!important;background:#F8F8FA!important;border:1px solid #ECECF2!important;border-radius:11px!important;padding:7px 9px!important;font-size:9.8px!important;color:#3A3A40!important;box-sizing:border-box!important;resize:none!important;outline:none!important;";
+            topDoc.getElementById("lux-bgnote-slot").appendChild(elBgNote);
+        }
+
+        if (elResetBtn) {
+            elResetBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:9.5px!important;font-weight:700!important;";
+            topDoc.getElementById("lux-reset-slot").appendChild(elResetBtn);
+        }
+        if (elSaveBtn) {
+            elSaveBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:10px!important;font-weight:800!important;background:#2C2C34!important;border-color:#2C2C34!important;";
+            elSaveBtn.innerHTML = `${LUX_ICO.check}<span>保存设置并返回聊天</span>`;
+            topDoc.getElementById("lux-save-slot").appendChild(elSaveBtn);
+        }
+
+        const drawersHolder = topDoc.getElementById("lux-drawers-holder");
+        if (sumDrawer && drawersHolder) {
+            sumDrawer.style.cssText = "display:none;background:#F9F9FB!important;border:1px solid #EAEAF0!important;border-radius:14px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
+            drawersHolder.appendChild(sumDrawer);
+        }
+        if (cssDrawer && drawersHolder) {
+            cssDrawer.style.cssText = "display:none;background:#F9F9FB!important;border:1px solid #EAEAF0!important;border-radius:14px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
+            drawersHolder.appendChild(cssDrawer);
+        }
+
+        // ── 绑定 2x2 高定控制中心交互 ──
+        function refreshToggleStates() {
+            const isSync = localStorage.getItem("sumoul_v16_sync") === "true";
+            const swSync = topDoc.getElementById("lux-sw-sync");
+            const subSync = topDoc.getElementById("lux-sync-sub");
+            if (swSync) swSync.classList.toggle("on", isSync);
+            if (subSync) subSync.textContent = isSync ? "已开启 · 实时同步记忆" : "已关闭 · 独立私密聊天";
+
+            const isTimeOn = elTimeToggle ? elTimeToggle.classList.contains("dark") : true;
+            const swTime = topDoc.getElementById("lux-sw-time");
+            const subTime = topDoc.getElementById("lux-time-sub");
+            if (swTime) swTime.classList.toggle("on", isTimeOn);
+            if (subTime) subTime.textContent = isTimeOn ? "已开启 · 实时感知昼夜" : "已关闭时间感知";
+        }
+
+        topDoc.getElementById("lux-card-sync").onclick = () => {
+            topDoc.getElementById("smt-sync-toggle")?.click();
+            refreshToggleStates();
+        };
+        topDoc.getElementById("lux-card-time").onclick = () => {
+            elTimeToggle?.click();
+            setTimeout(refreshToggleStates, 20);
+        };
+        topDoc.getElementById("lux-card-sum").onclick = (e) => {
+            const card = e.currentTarget;
+            const show = sumDrawer.style.display !== "block";
+            sumDrawer.style.display = show ? "block" : "none";
+            card.classList.toggle("active-tab", show);
+            if (cssDrawer) cssDrawer.style.display = "none";
+            topDoc.getElementById("lux-card-css")?.classList.remove("active-tab");
+        };
+        topDoc.getElementById("lux-card-css").onclick = (e) => {
+            const card = e.currentTarget;
+            const show = cssDrawer.style.display !== "block";
+            cssDrawer.style.display = show ? "block" : "none";
+            card.classList.toggle("active-tab", show);
+            if (sumDrawer) sumDrawer.style.display = "none";
+            topDoc.getElementById("lux-card-sum")?.classList.remove("active-tab");
+            const ta = topDoc.getElementById("smt-wx-css-textarea");
+            if (ta && !ta.value) topDoc.getElementById("smt-wx-css-btn")?.click();
+        };
+
+        topDoc.getElementById("lux-clear-wx-btn").onclick = () => {
+            if (confirm("确定要清空与当前角色的微信聊天记录吗？")) {
+                topDoc.getElementById("smt-wx-clear")?.click();
+                elBackChat?.click();
             }
-            if (cssDrawer && slot) {
-                cssDrawer.style.marginBottom = "0px";
-                slot.appendChild(cssDrawer);
+        };
+        topDoc.getElementById("lux-open-admin-btn").onclick = () => {
+            topDoc.getElementById("smt-api-open-admin")?.click();
+        };
+
+        const cssUpload = topDoc.getElementById("smt-wx-css-upload");
+        if (cssUpload) {
+            cssUpload.onchange = async (ev) => {
+                const f = ev.target.files?.[0];
+                if (!f) return;
+                const txt = await f.text();
+                const ta = topDoc.getElementById("smt-wx-css-textarea");
+                if (ta) ta.value = txt;
+            };
+        }
+
+        // ── 绑定高定世界书管理交互 ──
+        function renderLuxuryWiList() {
+            const wi = loadWorldInfo();
+            const swWi = topDoc.getElementById("lux-sw-wi");
+            const modeBtn = topDoc.getElementById("smt-wi-mode-btn");
+            const countTxt = topDoc.getElementById("smt-wi-count-txt");
+            const listEl = topDoc.getElementById("smt-wi-entries-list");
+
+            if (swWi) swWi.classList.toggle("on", wi.enabled);
+            if (modeBtn) modeBtn.textContent = wi.mode === "all" ? "模式: 全部强注" : "模式: 常驻+词触发";
+
+            const enabledCnt = (wi.entries || []).filter((x) => x.enabled).length;
+            if (countTxt) countTxt.textContent = `ACTIVE LORE · 已启用 ${enabledCnt} / 共 ${wi.entries.length} 条设定`;
+
+            if (!wi.entries || wi.entries.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center;padding:16px 12px;background:#F9F9FB;border:1px dashed #E2E2EA;border-radius:12px;font-size:9px;font-weight:600;color:#9A9AA5;">尚未挂载世界书 · 点击上方导入 .json 或读取酒馆设定</div>`;
+                return;
             }
 
-            // 同步记忆开关状态显示
-            function syncHubMemoryBtn() {
-                const isSync = localStorage.getItem("sumoul_v16_sync") === "true";
-                const b = topDoc.getElementById("smt-hub-sync-btn");
-                if (b) {
-                    b.className = `smt-pill-btn ${isSync ? "dark" : ""}`;
-                    b.textContent = `🔄 记忆: ${isSync ? "ON" : "OFF"}`;
-                }
-            }
-            syncHubMemoryBtn();
+            listEl.innerHTML = wi.entries.map((item, idx) => {
+                const isConst = wi.mode === "all" || item.constant || !item.keys?.length;
+                const tagHtml = isConst
+                    ? `<span style="background:#3A3A42;color:#FFF;padding:1.5px 6px;border-radius:99px;font-size:7.5px;font-weight:700;">常驻生效</span>`
+                    : `<span style="background:#EFEFF5;color:#55555E;padding:1.5px 6px;border-radius:99px;font-size:7.5px;font-weight:700;">触发词: ${item.keys.slice(0, 3).join(",")}</span>`;
 
-            topDoc.getElementById("smt-hub-sync-btn").onclick = () => {
-                topDoc.getElementById("smt-sync-toggle")?.click();
-                syncHubMemoryBtn();
-            };
-            topDoc.getElementById("smt-hub-sum-btn").onclick = () => {
-                if (sumDrawer) {
-                    const show = sumDrawer.style.display !== "block";
-                    sumDrawer.style.display = show ? "block" : "none";
-                    if (cssDrawer) cssDrawer.style.display = "none";
-                }
-            };
-            topDoc.getElementById("smt-hub-css-btn").onclick = () => {
-                if (cssDrawer) {
-                    const show = cssDrawer.style.display !== "block";
-                    cssDrawer.style.display = show ? "block" : "none";
-                    if (sumDrawer) sumDrawer.style.display = "none";
-                    const ta = topDoc.getElementById("smt-wx-css-textarea");
-                    if (ta && !ta.value) topDoc.getElementById("smt-wx-css-btn")?.click();
-                }
-            };
-            topDoc.getElementById("smt-hub-clear-btn").onclick = () => {
-                if (confirm("确定要清空与当前角色的微信聊天记录吗？")) {
-                    topDoc.getElementById("smt-wx-clear")?.click();
-                    topDoc.getElementById("smt-wxset-back-chat")?.click();
-                }
-            };
-            topDoc.getElementById("smt-hub-admin-btn").onclick = () => {
-                topDoc.getElementById("smt-api-open-admin")?.click();
-            };
+                return `
+                    <div style="background:#F9F9FB;border:1px solid ${item.enabled ? "#E2E2EC" : "#F2F2F6"};border-radius:12px;padding:8px 10px;opacity:${item.enabled ? "1" : "0.5"};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <label style="display:flex;align-items:center;gap:6px;font-size:9.8px;font-weight:800;color:#2C2C32;cursor:pointer;">
+                                <input type="checkbox" data-witoggle="${idx}" ${item.enabled ? "checked" : ""} style="accent-color:#3A3A42;" />
+                                <span>${item.title.replace(/</g, "&lt;")}</span>
+                                ${tagHtml}
+                            </label>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <span data-wiconst="${idx}" style="font-size:8px;font-weight:700;color:#7A7A85;cursor:pointer;">${item.constant ? "切为词触发" : "切为常驻"}</span>
+                                <span data-widel="${idx}" style="font-size:9.5px;color:#9A6868;cursor:pointer;font-weight:700;">✕</span>
+                            </div>
+                        </div>
+                        <div style="font-size:8.8px;color:#6E6E77;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-left:18px;">
+                            ${item.content.replace(/</g, "&lt;")}
+                        </div>
+                    </div>`;
+            }).join("");
 
-            // 支持上传本地 .css 美化文件
-            const cssUpload = topDoc.getElementById("smt-wx-css-upload");
-            if (cssUpload) {
-                cssUpload.onchange = async (ev) => {
-                    const f = ev.target.files?.[0];
-                    if (!f) return;
-                    const txt = await f.text();
-                    const ta = topDoc.getElementById("smt-wx-css-textarea");
-                    if (ta) ta.value = txt;
-                };
-            }
-
-            topDoc.getElementById("smt-wx-cfg-btn")?.addEventListener("click", () => {
-                setTimeout(syncHubMemoryBtn, 30);
+            listEl.querySelectorAll("[data-witoggle]").forEach((cb) => cb.onchange = (e) => {
+                const i = Number(cb.getAttribute("data-witoggle")), d = loadWorldInfo();
+                if (d.entries[i]) { d.entries[i].enabled = e.target.checked; saveWorldInfo(d); renderLuxuryWiList(); }
+            });
+            listEl.querySelectorAll("[data-wiconst]").forEach((btn) => btn.onclick = () => {
+                const i = Number(btn.getAttribute("data-wiconst")), d = loadWorldInfo();
+                if (d.entries[i]) { d.entries[i].constant = !d.entries[i].constant; saveWorldInfo(d); renderLuxuryWiList(); }
+            });
+            listEl.querySelectorAll("[data-widel]").forEach((btn) => btn.onclick = () => {
+                const i = Number(btn.getAttribute("data-widel")), d = loadWorldInfo();
+                d.entries.splice(i, 1); saveWorldInfo(d); renderLuxuryWiList();
             });
         }
 
-        // 4. 在设置页挂载【📚 世界书 (World Info) 导入与角色自动读取】卡片
-        const bgNoteInput = topDoc.getElementById("smt-cfg-bgnote");
-        const lastCard = bgNoteInput?.closest(".smt-prof-card");
-        if (lastCard && !topDoc.getElementById("smt-wi-manager-card")) {
-            const wiCard = topDoc.createElement("div");
-            wiCard.id = "smt-wi-manager-card";
-            wiCard.className = "smt-prof-card";
-            wiCard.innerHTML = `
-                <div class="smt-sec-title" style="margin-bottom:8px!important;">
-                    <span style="display:inline-flex;align-items:center;gap:5px;">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#484852" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        <span>WORLD INFO · 世界书导入与角色自动读取</span>
-                    </span>
-                    <span class="smt-pill-btn dark" id="smt-wi-toggle-btn">已开启读取</span>
-                </div>
-                <div style="font-size:8.5px;color:#7A7A85;line-height:1.5;margin-bottom:8px;">
-                    💡 导入世界书后，TA 在<b>微信聊天、发动态、情侣空间、查手机</b>时会实时读取下方的世界观与专属设定！
-                </div>
-                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
-                    <label class="smt-pill-btn dark" style="cursor:pointer;flex:1;height:26px!important;">
-                        <span>📁 导入世界书 (.json/.txt)</span>
-                        <input type="file" id="smt-wi-file-inp" accept=".json,.txt,.world" multiple style="display:none;" />
-                    </label>
-                    <span class="smt-pill-btn" id="smt-wi-sync-st-btn" style="flex:1;height:26px!important;">🔄 读取酒馆当前世界书</span>
-                    <span class="smt-pill-btn" id="smt-wi-mode-btn" style="height:26px!important;">模式: 智能触发</span>
-                </div>
-                <div style="background:#FFFFFF;border:1px solid #EAEAF0;border-radius:11px;padding:8px 9px;margin-bottom:8px;">
-                    <div style="display:flex;gap:5px;margin-bottom:5px;">
-                        <input type="text" id="smt-wi-new-title" class="smt-wx-input" style="width:38%!important;flex:none!important;height:24px!important;font-size:9.5px!important;" placeholder="条目名 (如:世界观设定)" />
-                        <input type="text" id="smt-wi-new-keys" class="smt-wx-input" style="flex:1!important;height:24px!important;font-size:9.5px!important;" placeholder="触发词逗号隔开 (留空则常驻生效)" />
-                        <span class="smt-pill-btn dark" id="smt-wi-add-btn" style="height:24px!important;">＋添加条目</span>
-                    </div>
-                    <textarea id="smt-wi-new-content" style="width:100%;height:42px;background:#F8F8FA;border:1px solid #E6E6EC;border-radius:8px;padding:5px 7px;font-size:9.5px;color:#3A3A40;box-sizing:border-box;resize:none;outline:none;" placeholder="输入该条世界书的具体设定内容（角色在微信聊天时会自动读取）..."></textarea>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                    <span style="font-size:8.8px;font-weight:700;color:#484852;" id="smt-wi-count-txt">📚 当前已挂载条目 (0)</span>
-                    <span id="smt-wi-clear-btn" style="font-size:8.5px;color:#9A6868;cursor:pointer;font-weight:700;">清空全部</span>
-                </div>
-                <div id="smt-wi-entries-list" style="max-height:145px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
-            `;
-            lastCard.parentNode.insertBefore(wiCard, lastCard);
+        topDoc.getElementById("lux-sw-wi").onclick = () => {
+            const d = loadWorldInfo(); d.enabled = !d.enabled; saveWorldInfo(d); renderLuxuryWiList();
+        };
+        topDoc.getElementById("smt-wi-mode-btn").onclick = () => {
+            const d = loadWorldInfo(); d.mode = d.mode === "all" ? "smart" : "all"; saveWorldInfo(d); renderLuxuryWiList();
+        };
+        topDoc.getElementById("smt-wi-open-add-drawer").onclick = () => {
+            const dr = topDoc.getElementById("smt-wi-add-drawer");
+            dr.style.display = dr.style.display === "none" ? "block" : "none";
+        };
+        topDoc.getElementById("smt-wi-cancel-add").onclick = () => {
+            topDoc.getElementById("smt-wi-add-drawer").style.display = "none";
+        };
 
-            function renderWiPanel() {
-                const wi = loadWorldInfo();
-                const toggleBtn = topDoc.getElementById("smt-wi-toggle-btn");
-                const modeBtn = topDoc.getElementById("smt-wi-mode-btn");
-                const countTxt = topDoc.getElementById("smt-wi-count-txt");
-                const listEl = topDoc.getElementById("smt-wi-entries-list");
-
-                if (toggleBtn) {
-                    toggleBtn.className = `smt-pill-btn ${wi.enabled ? "dark" : ""}`;
-                    toggleBtn.textContent = wi.enabled ? "✓ 角色自动读取: ON" : "角色读取: OFF";
-                }
-                if (modeBtn) {
-                    modeBtn.textContent = wi.mode === "all" ? "模式: 全部强注" : "模式: 常驻+词触发";
-                }
-                const enabledCnt = (wi.entries || []).filter((x) => x.enabled).length;
-                if (countTxt) countTxt.textContent = `📚 已挂载世界书条目 (启用 ${enabledCnt} / 共 ${wi.entries.length} 条)`;
-
-                if (!wi.entries || wi.entries.length === 0) {
-                    listEl.innerHTML = `<div style="text-align:center;padding:12px;background:#FFF;border:1px dashed #E2E2EA;border-radius:9px;font-size:9px;color:#9A9AA5;">暂无世界书条目 · 点击上方「导入世界书」或「读取酒馆当前世界书」</div>`;
-                    return;
-                }
-
-                listEl.innerHTML = wi.entries.map((item, idx) => {
-                    const badgeTxt = (wi.mode === "all" || item.constant || !item.keys?.length)
-                        ? `<span style="background:#484852;color:#FFF;padding:1px 5px;border-radius:99px;font-size:7.5px;">⚡常驻</span>`
-                        : `<span style="background:#EAEAF0;color:#55555E;padding:1px 5px;border-radius:99px;font-size:7.5px;">🔍词:${item.keys.slice(0, 3).join(",")}</span>`;
-                    return `
-                        <div style="background:#FFFFFF;border:1px solid ${item.enabled ? "#DCDCE6" : "#F0F0F5"};border-radius:9px;padding:6px 9px;opacity:${item.enabled ? "1" : "0.55"};">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-                                <label style="display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;color:#2C2C32;cursor:pointer;">
-                                    <input type="checkbox" data-witoggle="${idx}" ${item.enabled ? "checked" : ""} />
-                                    <span>${item.title.replace(/</g, "&lt;")}</span>
-                                    ${badgeTxt}
-                                </label>
-                                <div style="display:flex;gap:6px;align-items:center;">
-                                    <span data-wiconst="${idx}" style="font-size:8px;color:#6E6E77;cursor:pointer;text-decoration:underline;">${item.constant ? "改词触发" : "设为常驻"}</span>
-                                    <span data-widel="${idx}" style="font-size:9px;color:#9A6868;cursor:pointer;font-weight:700;">✕</span>
-                                </div>
-                            </div>
-                            <div style="font-size:8.8px;color:#6E6E77;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-                                ${item.content.replace(/</g, "&lt;")}
-                            </div>
-                        </div>`;
-                }).join("");
-
-                listEl.querySelectorAll("[data-witoggle]").forEach((cb) => cb.onchange = (e) => {
-                    const i = Number(cb.getAttribute("data-witoggle")), d = loadWorldInfo();
-                    if (d.entries[i]) { d.entries[i].enabled = e.target.checked; saveWorldInfo(d); renderWiPanel(); }
-                });
-                listEl.querySelectorAll("[data-wiconst]").forEach((btn) => btn.onclick = () => {
-                    const i = Number(btn.getAttribute("data-wiconst")), d = loadWorldInfo();
-                    if (d.entries[i]) { d.entries[i].constant = !d.entries[i].constant; saveWorldInfo(d); renderWiPanel(); }
-                });
-                listEl.querySelectorAll("[data-widel]").forEach((btn) => btn.onclick = () => {
-                    const i = Number(btn.getAttribute("data-widel")), d = loadWorldInfo();
-                    d.entries.splice(i, 1); saveWorldInfo(d); renderWiPanel();
-                });
+        topDoc.getElementById("smt-wi-file-inp").onchange = async (e) => {
+            const files = Array.from(e.target.files || []);
+            if (!files.length) return;
+            const d = loadWorldInfo();
+            let totalAdded = 0;
+            for (const f of files) {
+                const text = await f.text();
+                parseWorldBookJson(text, f.name).forEach((item) => { d.entries.unshift(item); totalAdded++; });
             }
+            saveWorldInfo(d); e.target.value = ""; renderLuxuryWiList();
+            alert(`✓ 已导入 ${totalAdded} 条世界书设定！`);
+        };
 
-            topDoc.getElementById("smt-wi-toggle-btn").onclick = () => { const d = loadWorldInfo(); d.enabled = !d.enabled; saveWorldInfo(d); renderWiPanel(); };
-            topDoc.getElementById("smt-wi-mode-btn").onclick = () => { const d = loadWorldInfo(); d.mode = d.mode === "all" ? "smart" : "all"; saveWorldInfo(d); renderWiPanel(); };
-            topDoc.getElementById("smt-wi-file-inp").onchange = async (e) => {
-                const files = Array.from(e.target.files || []);
-                if (!files.length) return;
-                const d = loadWorldInfo();
-                let totalAdded = 0;
-                for (const f of files) {
-                    const text = await f.text();
-                    parseWorldBookJson(text, f.name).forEach((item) => { d.entries.unshift(item); totalAdded++; });
+        topDoc.getElementById("smt-wi-sync-st-btn").onclick = async (e) => {
+            const btn = e.currentTarget;
+            const origHtml = btn.innerHTML;
+            btn.textContent = "读取中...";
+            const found = await extractTavernActiveLore();
+            btn.innerHTML = origHtml;
+            if (!found.length) return alert("未检测到内嵌世界书，请直接点击左侧「导入世界书」上传 .json 文件！");
+            const d = loadWorldInfo();
+            let added = 0;
+            found.forEach((item) => {
+                if (!d.entries.some((x) => x.title === item.title && x.content === item.content)) {
+                    d.entries.unshift(item); added++;
                 }
-                saveWorldInfo(d); e.target.value = ""; renderWiPanel();
-                alert(`✓ 成功导入 ${totalAdded} 条世界书设定！`);
-            };
-            topDoc.getElementById("smt-wi-sync-st-btn").onclick = async (e) => {
-                e.target.textContent = "⏳ 读取中...";
-                const found = await extractTavernActiveLore();
-                e.target.textContent = "🔄 读取酒馆当前世界书";
-                if (!found.length) return alert("未检测到内嵌世界书，请直接点击左侧「📁 导入世界书」上传文件！");
-                const d = loadWorldInfo();
-                let added = 0;
-                found.forEach((item) => {
-                    if (!d.entries.some((x) => x.title === item.title && x.content === item.content)) {
-                        d.entries.unshift(item); added++;
-                    }
-                });
-                saveWorldInfo(d); renderWiPanel();
-                alert(`✓ 已同步导入 ${added} 条世界书设定！`);
-            };
-            topDoc.getElementById("smt-wi-add-btn").onclick = () => {
-                const titleInp = topDoc.getElementById("smt-wi-new-title");
-                const keysInp = topDoc.getElementById("smt-wi-new-keys");
-                const contInp = topDoc.getElementById("smt-wi-new-content");
-                const content = contInp.value.trim();
-                if (!content) return alert("请填写世界书条目的具体设定内容！");
-                const keys = keysInp.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean);
-                const title = titleInp.value.trim() || keys[0] || `自定义设定 #${loadWorldInfo().entries.length + 1}`;
-                const d = loadWorldInfo();
-                d.entries.unshift({ id: Date.now(), title, keys, content, enabled: true, constant: keys.length === 0 });
-                saveWorldInfo(d);
-                titleInp.value = ""; keysInp.value = ""; contInp.value = "";
-                renderWiPanel();
-            };
-            topDoc.getElementById("smt-wi-clear-btn").onclick = () => {
-                if (!confirm("确定清空当前角色的所有世界书条目吗？")) return;
-                const d = loadWorldInfo(); d.entries = []; saveWorldInfo(d); renderWiPanel();
-            };
-            topDoc.getElementById("smt-wx-cfg-btn")?.addEventListener("click", () => setTimeout(renderWiPanel, 40));
-            renderWiPanel();
-        }
+            });
+            saveWorldInfo(d); renderLuxuryWiList();
+            alert(`✓ 已同步导入 ${added} 条世界书设定！`);
+        };
+
+        topDoc.getElementById("smt-wi-add-btn").onclick = () => {
+            const titleInp = topDoc.getElementById("smt-wi-new-title");
+            const keysInp = topDoc.getElementById("smt-wi-new-keys");
+            const contInp = topDoc.getElementById("smt-wi-new-content");
+            const content = contInp.value.trim();
+            if (!content) return alert("请填写世界书条目的具体设定内容！");
+            const keys = keysInp.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean);
+            const title = titleInp.value.trim() || keys[0] || `自定义设定 #${loadWorldInfo().entries.length + 1}`;
+            const d = loadWorldInfo();
+            d.entries.unshift({ id: Date.now(), title, keys, content, enabled: true, constant: keys.length === 0 });
+            saveWorldInfo(d);
+            titleInp.value = ""; keysInp.value = ""; contInp.value = "";
+            topDoc.getElementById("smt-wi-add-drawer").style.display = "none";
+            renderLuxuryWiList();
+        };
+
+        topDoc.getElementById("smt-wi-clear-btn").onclick = () => {
+            if (!confirm("确定清空当前角色的所有世界书条目吗？")) return;
+            const d = loadWorldInfo(); d.entries = []; saveWorldInfo(d); renderLuxuryWiList();
+        };
+
+        topDoc.getElementById("smt-wx-cfg-btn")?.addEventListener("click", () => {
+            setTimeout(() => {
+                refreshToggleStates();
+                renderLuxuryWiList();
+            }, 30);
+        });
+
+        refreshToggleStates();
+        renderLuxuryWiList();
     }
 
-    mountFullScreenWeChatAndUnifiedSettings();
+    mountLuxuryKoreanSettings();
 })();
