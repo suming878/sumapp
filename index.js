@@ -3702,3 +3702,282 @@ bootSumoulApp();
 
     mountDraggableMistFab();
 })();
+// ==========================================================================
+// ☁️ 【Sumoul App 跨设备云端 QQ 授权申请 & 管理员后台实时同步补丁】
+// 彻底解决「别人提交QQ申请，自己管理员后台看不到」的本地缓存隔离问题！
+// 功能：1.跨手机云端实时同步申请列表 2.管理员后台一键云端批准/拉黑 3.自带绑死QQ号的专属算法激活码保底
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+
+    // 专属云端同步频道 ID（基于你的 Sumoul 宿命制作独立命名空间，全网跨设备互通）
+    const CLOUD_SYNC_KEY = "sumoul_destiny_qq_auth_v1";
+    const CLOUD_API_BASE = `https://kvdb.io/A8x9K2mPq7Vw3Lz5Rt8Yn/${CLOUD_SYNC_KEY}`;
+
+    // 绑定 QQ 号的专属哈希激活码算法（同一个 QQ 号算出的 6 位授权码全网唯一，发给别人用无效！）
+    function calcCodeForQQ(qq) {
+        const clean = String(qq || "").trim();
+        if (!clean) return "000000";
+        let hash = 202605;
+        for (let i = 0; i < clean.length; i++) {
+            hash = ((hash << 5) + hash) + clean.charCodeAt(i) * (i + 17);
+            hash = hash & 0x7fffffff;
+        }
+        return "SM" + String(hash % 900000 + 100000);
+    }
+
+    // 读取云端数据（带本地缓存降级保护）
+    async function fetchCloudAuthData() {
+        let localData = { pending: [], approved: [], blocked: [] };
+        try {
+            localData = Object.assign(localData, JSON.parse(localStorage.getItem("sumoul_cloud_bak") || "{}"));
+        } catch (e) {}
+
+        try {
+            const r = await fetch(`${CLOUD_API_BASE}?t=${Date.now()}`, { method: "GET" });
+            if (r.ok) {
+                const txt = await r.text();
+                if (txt && txt.trim().startsWith("{")) {
+                    const remote = JSON.parse(txt);
+                    const merged = {
+                        pending: Array.isArray(remote.pending) ? remote.pending : [],
+                        approved: Array.isArray(remote.approved) ? remote.approved : [],
+                        blocked: Array.isArray(remote.blocked) ? remote.blocked : []
+                    };
+                    localStorage.setItem("sumoul_cloud_bak", JSON.stringify(merged));
+                    return merged;
+                }
+            }
+        } catch (e) {}
+        return localData;
+    }
+
+    // 保存数据到云端（让所有人的手机和你的管理员后台实时同步）
+    async function pushCloudAuthData(data) {
+        localStorage.setItem("sumoul_cloud_bak", JSON.stringify(data));
+        try {
+            await fetch(CLOUD_API_BASE, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function mountCloudAdminSync() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
+        const adminPage = topDoc.getElementById("smt-page-admin");
+        if (!modal) {
+            setTimeout(mountCloudAdminSync, 250);
+            return;
+        }
+
+        // 1. 升级锁屏界面的「提交申请」与「验证解锁」按钮为云端互通版！
+        const qqInput = topDoc.getElementById("smt-lock-qq-input");
+        const codeInput = topDoc.getElementById("smt-lock-code-input");
+        const applyBtn = topDoc.getElementById("smt-lock-apply-btn");
+        const unlockBtn = topDoc.getElementById("smt-lock-unlock-btn");
+        const statusMsg = topDoc.getElementById("smt-lock-status-msg");
+
+        if (applyBtn && !applyBtn.getAttribute("data-cloud-bound")) {
+            applyBtn.setAttribute("data-cloud-bound", "1");
+            applyBtn.addEventListener("click", async (e) => {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                const qq = qqInput?.value?.trim();
+                if (!qq || !/^\d{5,12}$/.test(qq)) {
+                    if (statusMsg) statusMsg.textContent = "⚠️ 请输入正确的 5~12 位 QQ 号码！";
+                    return;
+                }
+                localStorage.setItem("sumoul_my_apply_qq", qq);
+                applyBtn.textContent = "⏳ 正在上传云端...";
+                if (statusMsg) statusMsg.textContent = "正在将你的 QQ 申请同步至管理员云端后台...";
+
+                const cloud = await fetchCloudAuthData();
+                if (cloud.blocked.includes(qq)) {
+                    applyBtn.textContent = "提交申请";
+                    if (statusMsg) statusMsg.textContent = "❌ 该 QQ 已被管理员限制访问。";
+                    return;
+                }
+                if (cloud.approved.includes(qq)) {
+                    applyBtn.textContent = "✓ 已获批";
+                    if (statusMsg) statusMsg.textContent = "🎉 管理员已批准你的 QQ！正在为你解锁进入...";
+                    localStorage.setItem("seoul_v15_unlocked_qq", qq);
+                    setTimeout(() => lockLayer?.classList.add("smt-unlocked-hide"), 600);
+                    return;
+                }
+
+                if (!cloud.pending.some((x) => x.qq === qq)) {
+                    const d = new Date();
+                    const timeStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                    cloud.pending.unshift({ qq, time: timeStr });
+                    await pushCloudAuthData(cloud);
+                }
+
+                applyBtn.textContent = "✓ 已送达云端";
+                if (statusMsg) {
+                    statusMsg.innerHTML = `✅ QQ【<b>${qq}</b>】已实时送达管理员云端后台！<br><span style="font-size:9px;color:#777;">管理员批准后点「验证进入」即可直接免密解锁，或输入专属码解锁。</span>`;
+                }
+            }, true);
+        }
+
+        if (unlockBtn && !unlockBtn.getAttribute("data-cloud-bound")) {
+            unlockBtn.setAttribute("data-cloud-bound", "1");
+            unlockBtn.addEventListener("click", async (e) => {
+                const qq = qqInput?.value?.trim() || localStorage.getItem("sumoul_my_apply_qq") || "";
+                const inpCode = codeInput?.value?.trim().toUpperCase() || "";
+
+                // ① 先检查是不是输入了绑定该 QQ 的专属算法激活码（SM开头）
+                if (qq && inpCode && inpCode === calcCodeForQQ(qq)) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    localStorage.setItem("seoul_v15_unlocked_qq", qq);
+                    if (statusMsg) statusMsg.textContent = "🎉 专属授权码验证通过！正在进入...";
+                    lockLayer?.classList.add("smt-unlocked-hide");
+                    return;
+                }
+
+                // ② 再联网检查管理员是不是已经在云端后台点过「批准」了（已批准则免输激活码直接进！）
+                if (qq) {
+                    unlockBtn.textContent = "⏳ 核验云端授权...";
+                    const cloud = await fetchCloudAuthData();
+                    unlockBtn.textContent = "验证进入";
+                    if (cloud.approved.includes(qq)) {
+                        e.stopImmediatePropagation();
+                        e.preventDefault();
+                        localStorage.setItem("seoul_v15_unlocked_qq", qq);
+                        if (statusMsg) statusMsg.textContent = "🎉 云端核验通过！管理员已批准你的申请！";
+                        lockLayer?.classList.add("smt-unlocked-hide");
+                        return;
+                    }
+                }
+                // 若都不是，放行给原本的万能密码校验逻辑
+            }, true);
+        }
+
+        // 2. 全面升级你的「管理员后台 (#smt-page-admin)」，注入云端实时同步面板与专属算码器！
+        if (adminPage && !topDoc.getElementById("smt-cloud-admin-box")) {
+            const cloudBox = topDoc.createElement("div");
+            cloudBox.id = "smt-cloud-admin-box";
+            cloudBox.className = "smt-section-box";
+            cloudBox.style.cssText = "border:1.5px solid #2C2C32!important;background:#F8F8FA!important;margin-bottom:12px!important;";
+            cloudBox.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-size:10.5px;font-weight:800;color:#2C2C32;">☁️ 全网跨设备云端 QQ 申请实时审批中心</span>
+                    <span class="smt-pill-btn dark" id="smt-cloud-refresh-btn" style="height:22px!important;font-size:8.5px!important;">↻ 立即同步云端申请</span>
+                </div>
+                <div style="font-size:9px;font-weight:600;color:#6E6E77;margin-bottom:10px;line-height:1.5;">
+                    💡 别人在他的手机上提交 QQ 申请后，会实时汇总到下方云端列表。你点<b>「云端批准」</b>后，对方点验证即可直接进入！
+                </div>
+
+                <!-- 专属激活码生成器（双保险） -->
+                <div style="background:#FFFFFF;border:1px solid #E4E4EC;border-radius:11px;padding:9px 10px;margin-bottom:10px;">
+                    <div style="font-size:8.5px;font-weight:800;color:#484852;margin-bottom:5px;">🔑 输入任意申请人 QQ ➔ 秒算他唯一绑定的专属激活码</div>
+                    <div style="display:flex;gap:5px;">
+                        <input type="text" id="smt-calc-qq-inp" class="smt-wx-input" style="height:26px!important;font-size:10px!important;" placeholder="输入对方的QQ号..." />
+                        <span class="smt-pill-btn dark" id="smt-calc-qq-btn" style="height:26px!important;white-space:nowrap;">生成专属码</span>
+                    </div>
+                    <div id="smt-calc-qq-res" style="font-size:10px;font-weight:800;color:#2C2C32;margin-top:6px;display:none;"></div>
+                </div>
+
+                <!-- 云端待审批列表 -->
+                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">📥 云端待审批 QQ 申请 (<span id="smt-cloud-pend-cnt">0</span>)</div>
+                <div id="smt-cloud-pend-list" style="max-height:150px;overflow-y:auto;margin-bottom:10px;"></div>
+
+                <!-- 云端已授权白名单 -->
+                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">✅ 云端已批准白名单 (<span id="smt-cloud-app-cnt">0</span>)</div>
+                <div id="smt-cloud-app-list" style="max-height:110px;overflow-y:auto;"></div>
+            `;
+            adminPage.prepend(cloudBox);
+
+            async function renderCloudAdminUI() {
+                const btn = topDoc.getElementById("smt-cloud-refresh-btn");
+                if (btn) btn.textContent = "⏳ 同步中...";
+                const cloud = await fetchCloudAuthData();
+                if (btn) btn.textContent = "↻ 立即同步云端申请";
+
+                topDoc.getElementById("smt-cloud-pend-cnt").textContent = cloud.pending.length;
+                topDoc.getElementById("smt-cloud-app-cnt").textContent = cloud.approved.length;
+
+                const pList = topDoc.getElementById("smt-cloud-pend-list");
+                if (!cloud.pending.length) {
+                    pList.innerHTML = `<div style="text-align:center;padding:12px;background:#FFF;border:1px solid #EFEFF4;border-radius:9px;font-size:9.5px;color:#9A9AA5;">暂无新的云端申请 · 点击右上角同步最新数据</div>`;
+                } else {
+                    pList.innerHTML = cloud.pending.map((item) => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EAEAF0;border-radius:9px;padding:7px 10px;margin-bottom:5px;">
+                            <div>
+                                <div style="font-size:10.5px;font-weight:800;color:#2C2C32;">QQ: ${item.qq}</div>
+                                <div style="font-size:8px;color:#8E8E98;">申请时间: ${item.time || "刚刚"} · 专属码: <b>${calcCodeForQQ(item.qq)}</b></div>
+                            </div>
+                            <div style="display:flex;gap:4px;">
+                                <span class="smt-pill-btn dark" data-cloudok="${item.qq}" style="height:22px!important;font-size:8.5px!important;">✓ 云端批准</span>
+                                <span class="smt-pill-btn" data-cloudno="${item.qq}" style="height:22px!important;font-size:8.5px!important;">拒绝</span>
+                            </div>
+                        </div>
+                    `).join("");
+                }
+
+                const aList = topDoc.getElementById("smt-cloud-app-list");
+                aList.innerHTML = cloud.approved.length
+                    ? cloud.approved.map((qq) => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;padding:5px 10px;margin-bottom:4px;font-size:9.5px;font-weight:700;">
+                            <span>✓ QQ: ${qq} <span style="color:#8E8E98;font-weight:600;">(码:${calcCodeForQQ(qq)})</span></span>
+                            <span data-cloudrev="${qq}" style="color:#8E8E98;cursor:pointer;font-size:8.5px;">移除授权</span>
+                        </div>
+                    `).join("")
+                    : `<div style="text-align:center;padding:8px;font-size:9px;color:#9A9AA5;">暂无已批准的 QQ</div>`;
+
+                pList.querySelectorAll("[data-cloudok]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-cloudok");
+                    b.textContent = "处理中...";
+                    const latest = await fetchCloudAuthData();
+                    latest.pending = latest.pending.filter((x) => x.qq !== qNum);
+                    if (!latest.approved.includes(qNum)) latest.approved.unshift(qNum);
+                    await pushCloudAuthData(latest);
+                    renderCloudAdminUI();
+                });
+
+                pList.querySelectorAll("[data-cloudno]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-cloudno");
+                    const latest = await fetchCloudAuthData();
+                    latest.pending = latest.pending.filter((x) => x.qq !== qNum);
+                    await pushCloudAuthData(latest);
+                    renderCloudAdminUI();
+                });
+
+                aList.querySelectorAll("[data-cloudrev]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-cloudrev");
+                    const latest = await fetchCloudAuthData();
+                    latest.approved = latest.approved.filter((x) => x !== qNum);
+                    await pushCloudAuthData(latest);
+                    renderCloudAdminUI();
+                });
+            }
+
+            topDoc.getElementById("smt-cloud-refresh-btn").onclick = () => renderCloudAdminUI();
+
+            topDoc.getElementById("smt-calc-qq-btn").onclick = () => {
+                const qVal = topDoc.getElementById("smt-calc-qq-inp").value.trim();
+                const resBox = topDoc.getElementById("smt-calc-qq-res");
+                if (!qVal) return;
+                const code = calcCodeForQQ(qVal);
+                resBox.style.display = "block";
+                resBox.innerHTML = `🎉 QQ【${qVal}】的唯一专属激活码为：<span style="background:#2C2C32;color:#FFF;padding:2px 8px;border-radius:6px;margin-left:4px;user-select:all;">${code}</span>`;
+            };
+
+            // 每次点进管理员后台时自动拉取最新云端申请
+            ["smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
+                topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(renderCloudAdminUI, 100));
+            });
+
+            renderCloudAdminUI();
+        }
+    }
+
+    mountCloudAdminSync();
+})();
