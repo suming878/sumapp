@@ -2755,299 +2755,195 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 全屏无框高定开屏补丁：彻底移除白色方框！100% 无界全屏留白 + 4款极简艺术动效】
+// 🤍 【Sumoul App 唯一高定版开屏补丁：全屏无框 · 韩国电影片头级慢速折线 + 失焦慢显字幕】
 // 用法：直接替换 index.js 最末尾刚才那段开屏补丁即可！
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
-    const K_SPLASH_STYLE = "sumoul_v27_borderless_style";
 
-    function mountBorderlessSplash() {
+    function mountSingleMasterSplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountBorderlessSplash, 150);
+            setTimeout(mountSingleMasterSplash, 150);
             return;
         }
 
-        ["sumoul-liquid-tear-css", "sumoul-tear-splash-css", "sumoul-cinema-splash-css", "sumoul-gallery-splash-css", "sumoul-borderless-splash-css"].forEach((id) => topDoc.getElementById(id)?.remove());
+        // 清理之前所有的旧开屏 CSS
+        [
+            "sumoul-liquid-tear-css",
+            "sumoul-tear-splash-css",
+            "sumoul-cinema-splash-css",
+            "sumoul-gallery-splash-css",
+            "sumoul-borderless-splash-css",
+            "sumoul-master-one-splash-css"
+        ].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
-        st.id = "sumoul-borderless-splash-css";
+        st.id = "sumoul-master-one-splash-css";
         st.innerHTML = `
-            /* ── 文字从迷雾模糊中极慢速浮现 ── */
-            @keyframes blFadeUp {
-                0% { opacity: 0; filter: blur(10px); transform: translateY(8px); }
-                100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
-            }
-            @keyframes blSoftBreathe {
-                0%, 100% { opacity: 0.35; }
-                50% { opacity: 0.85; }
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-t1 { opacity: 0; animation: blFadeUp 2.0s cubic-bezier(0.22,1,0.36,1) 0.3s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-t2 { opacity: 0; animation: blFadeUp 2.2s cubic-bezier(0.22,1,0.36,1) 1.1s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-t3 { opacity: 0; animation: blFadeUp 2.2s cubic-bezier(0.22,1,0.36,1) 1.9s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-t4 { opacity: 0; animation: blFadeUp 2.0s cubic-bezier(0.22,1,0.36,1) 2.7s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-breathe { animation: blSoftBreathe 3.2s ease-in-out infinite !important; }
-
-            /* ── 样式 1：PULSE 全屏无框极细心电折线缓慢延伸 ── */
-            @keyframes blLineDraw {
-                0% { stroke-dashoffset: 520; opacity: 0.1; }
+            /* 1. 折线从左向右极慢速生长连结 (4.5秒) */
+            @keyframes smOneLineDraw {
+                0% { stroke-dashoffset: 560; opacity: 0.15; }
                 15% { opacity: 1; }
                 100% { stroke-dashoffset: 0; opacity: 1; }
             }
-            @keyframes blNodePulse {
-                0%, 100% { transform: scale(1); opacity: 0.9; }
-                50% { transform: scale(1.8); opacity: 0.25; }
+            /* 2. 折线上的纯白微光缓慢流淌 */
+            @keyframes smOneShimmer {
+                0% { stroke-dashoffset: 560; opacity: 0; }
+                25% { opacity: 0.95; }
+                75% { opacity: 0.95; }
+                100% { stroke-dashoffset: -140; opacity: 0; }
             }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-pulse-path {
-                stroke-dasharray: 520 !important;
-                stroke-dashoffset: 520 !important;
-                animation: blLineDraw 4.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards !important;
+            /* 3. 转折点上的极细光环扩散呼吸 */
+            @keyframes smOneRingPulse {
+                0% { transform: scale(0.4); opacity: 0.85; }
+                100% { transform: scale(2.4); opacity: 0; }
             }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-pulse-dot {
+            /* 4. 电影字幕从晨雾失焦中缓慢对焦浮现 */
+            @keyframes smOneFocusIn {
+                0% { opacity: 0; filter: blur(12px); transform: translateY(8px); }
+                100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+            }
+            /* 5. 底部唤醒文字轻柔呼吸 */
+            @keyframes smOneBreathe {
+                0%, 100% { opacity: 0.32; }
+                50% { opacity: 0.88; }
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .smo-line-main {
+                stroke-dasharray: 560 !important;
+                stroke-dashoffset: 560 !important;
+                animation: smOneLineDraw 4.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.2s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .smo-line-shadow {
+                stroke-dasharray: 560 !important;
+                stroke-dashoffset: 560 !important;
+                animation: smOneLineDraw 4.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.2s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .smo-line-shimmer {
+                stroke-dasharray: 70 490 !important;
+                stroke-dashoffset: 560 !important;
+                animation: smOneShimmer 4.2s ease-in-out 1.2s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .smo-pulse-ring {
                 transform-box: fill-box !important;
                 transform-origin: center !important;
-                animation: blNodePulse 2.6s ease-in-out infinite !important;
+                animation: smOneRingPulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) 2.2s infinite !important;
             }
 
-            /* ── 样式 2：ECLIPSE 全屏无框双环缓慢交汇 ── */
-            @keyframes blOrbL {
-                0% { transform: translateX(-38px); opacity: 0; }
-                100% { transform: translateX(0px); opacity: 1; }
-            }
-            @keyframes blOrbR {
-                0% { transform: translateX(38px); opacity: 0; }
-                100% { transform: translateX(0px); opacity: 1; }
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-orb-l { animation: blOrbL 3.6s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-orb-r { animation: blOrbR 3.6s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
-
-            /* ── 样式 3：VINYL 全屏无框声波律动 ── */
-            @keyframes blWave {
-                0%, 100% { transform: scaleY(0.18); opacity: 0.25; }
-                50% { transform: scaleY(1); opacity: 0.9; }
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-wbar {
-                transform-box: fill-box !important;
-                transform-origin: center !important;
-                animation: blWave 2.4s ease-in-out infinite !important;
-            }
-
-            /* ── 样式 4：MIST 韩国电影片头大字失焦缓慢对焦 ── */
-            @keyframes blCinemaFocus {
-                0% { opacity: 0; filter: blur(18px); letter-spacing: 12px; transform: scale(1.04); }
-                50% { opacity: 0.7; filter: blur(6px); }
-                100% { opacity: 1; filter: blur(0px); letter-spacing: 5px; transform: scale(1); }
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-cinema-title {
+            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-1 {
                 opacity: 0;
-                animation: blCinemaFocus 4.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards !important;
+                animation: smOneFocusIn 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards !important;
             }
-
-            /* 顶部极简透明切换字（无任何底框！） */
-            #seoul-mini-theater-modal #smt-boot-splash .bl-top-nav {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 16px !important;
-                z-index: 25 !important;
-                padding: 4px 0 !important;
+            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-2 {
+                opacity: 0;
+                animation: smOneFocusIn 2.4s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-nav-item {
-                font-size: 8.5px !important;
-                font-weight: 600 !important;
-                letter-spacing: 1.5px !important;
-                color: #A0A4B0 !important;
-                cursor: pointer !important;
-                padding: 4px 2px !important;
-                border-bottom: 1.2px solid transparent !important;
-                transition: all 0.25s ease !important;
-                font-family: monospace !important;
+            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-3 {
+                opacity: 0;
+                animation: smOneFocusIn 2.4s cubic-bezier(0.16, 1, 0.3, 1) 2.4s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .bl-nav-item.active {
-                color: #2C2E35 !important;
-                font-weight: 800 !important;
-                border-bottom-color: #2C2E35 !important;
+            #seoul-mini-theater-modal #smt-boot-splash .smo-fade-4 {
+                opacity: 0;
+                animation: smOneFocusIn 2.2s cubic-bezier(0.16, 1, 0.3, 1) 3.3s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .smo-breathe-txt {
+                animation: smOneBreathe 3.2s ease-in-out infinite !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        function getCurStyle() {
-            return localStorage.getItem(K_SPLASH_STYLE) || "pulse";
-        }
-
-        function renderBorderlessSplash() {
-            const cur = getCurStyle();
-
-            // 全屏无框柔和灰白胶片背景（中心微亮，四周极淡冷雾灰暗角）
-            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 44%, #FFFFFF 0%, #F5F6F9 56%, #EAECEF 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.75s ease!important;padding:max(26px,env(safe-area-inset-top,26px)) 24px max(34px,env(safe-area-inset-bottom,34px)) 24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;";
-
-            let centerArtHtml = "";
-
-            if (cur === "pulse") {
-                // 样式 01：全屏无界 · 寂静心电折线 (PULSE)
-                centerArtHtml = `
-                    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;">
-                        <div class="bl-t1" style="font-size:8px;font-weight:700;color:#9A9EA8;letter-spacing:3.5px;font-family:monospace;margin-bottom:28px;">
-                            37°33'N 126°58'E · 04:00 AM
-                        </div>
-
-                        <!-- 横跨全屏的无框极细折线舞台 -->
-                        <div style="width:100%;height:125px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;">
-                            <svg viewBox="0 0 320 110" width="100%" height="110" fill="none" style="overflow:visible!important;">
-                                <!-- 背景极细十字坐标丝 -->
-                                <line x1="0" y1="58" x2="320" y2="58" stroke="#E4E6EE" stroke-width="0.8" stroke-dasharray="2 4" />
-                                <line x1="160" y1="6" x2="160" y2="104" stroke="#EAECEF" stroke-width="0.7" />
-
-                                <!-- 底层柔和漫射折线微影 -->
-                                <path class="bl-pulse-path" d="M 8 58 L 88 58 L 106 32 L 126 82 L 152 12 L 176 94 L 198 38 L 216 68 L 232 58 L 312 58" stroke="#D5D8E2" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.45" />
-
-                                <!-- 主折线：1.35px 清冷炭灰折线缓慢连结 -->
-                                <path class="bl-pulse-path" d="M 8 58 L 88 58 L 106 32 L 126 82 L 152 12 L 176 94 L 198 38 L 216 68 L 232 58 L 312 58" stroke="#323640" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
-
-                                <!-- 折角节点上的极简空心环与呼吸微光点 -->
-                                <circle cx="106" cy="32" r="2.2" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.1" />
-                                <circle cx="152" cy="12" r="5.5" fill="rgba(50,54,64,0.12)" class="bl-pulse-dot" />
-                                <circle cx="152" cy="12" r="2.4" fill="#323640" />
-                                <circle cx="176" cy="94" r="2.2" fill="#FFFFFF" stroke="#323640" stroke-width="1.1" />
-                                <circle cx="198" cy="38" r="2.0" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.1" />
-                            </svg>
-                        </div>
-
-                        <div class="bl-t1" style="font-size:18px;font-weight:700;letter-spacing:5px;color:#2C2E35;margin-bottom:14px;">Sumoul App</div>
-                        <div class="bl-t2" style="font-size:10.5px;font-weight:600;color:#5A5E6B;line-height:2.0;letter-spacing:0.8px;">“ 고요한 새벽, 너에게로 이어지는 파동 ”</div>
-                        <div class="bl-t3" style="font-size:9px;font-weight:500;color:#8E929E;letter-spacing:1.2px;margin-top:4px;">寂静黎明，缓慢延伸向你的心跳折线。</div>
-                    </div>
-                `;
-            } else if (cur === "eclipse") {
-                // 样式 02：全屏无界 · 双环引力交叠 (ECLIPSE)
-                centerArtHtml = `
-                    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;">
-                        <div class="bl-t1" style="font-size:8px;font-weight:700;color:#9A9EA8;letter-spacing:3.5px;font-family:monospace;margin-bottom:24px;">
-                            ORBITAL RESONANCE · 02
-                        </div>
-
-                        <div style="width:100%;height:135px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;">
-                            <svg viewBox="0 0 300 130" width="100%" height="130" fill="none" style="overflow:visible!important;">
-                                <line x1="10" y1="65" x2="290" y2="65" stroke="#E4E6EE" stroke-width="0.7" />
-                                <line x1="150" y1="8" x2="150" y2="122" stroke="#E4E6EE" stroke-width="0.7" stroke-dasharray="2 3" />
-
-                                <g class="bl-orb-l">
-                                    <circle cx="126" cy="65" r="46" fill="rgba(220,224,234,0.22)" stroke="#3A3D46" stroke-width="1.1" />
-                                    <circle cx="80" cy="65" r="2.2" fill="#3A3D46" />
-                                </g>
-                                <g class="bl-orb-r">
-                                    <circle cx="174" cy="65" r="46" fill="rgba(200,206,218,0.18)" stroke="#5A5E6B" stroke-width="1.1" stroke-dasharray="3 3" />
-                                    <circle cx="220" cy="65" r="2.2" fill="#FFFFFF" stroke="#3A3D46" stroke-width="1.2" />
-                                </g>
-                                <!-- 交集中心点 -->
-                                <circle cx="150" cy="65" r="6" fill="rgba(44,46,53,0.12)" class="bl-pulse-dot" />
-                                <circle cx="150" cy="65" r="2.5" fill="#2C2E35" />
-                            </svg>
-                        </div>
-
-                        <div class="bl-t1" style="font-size:18px;font-weight:700;letter-spacing:5px;color:#2C2E35;margin-bottom:14px;">Sumoul App</div>
-                        <div class="bl-t2" style="font-size:10.5px;font-weight:600;color:#5A5E6B;line-height:2.0;letter-spacing:0.8px;">“ 두 개의 궤도가 겹쳐지는 회색의 순간 ”</div>
-                        <div class="bl-t3" style="font-size:9px;font-weight:500;color:#8E929E;letter-spacing:1.2px;margin-top:4px;">当两道孤立的轨迹缓慢靠近，在灰白中交叠合一。</div>
-                    </div>
-                `;
-            } else if (cur === "vinyl") {
-                // 样式 03：全屏无界 · 凌晨电台声波 (VINYL)
-                const heights = [12, 22, 36, 18, 48, 30, 68, 44, 24, 76, 52, 84, 48, 62, 32, 54, 26, 40, 20, 28, 12];
-                centerArtHtml = `
-                    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;">
-                        <div class="bl-t1" style="font-size:8px;font-weight:700;color:#9A9EA8;letter-spacing:3.5px;font-family:monospace;margin-bottom:28px;">
-                            SILENT RADIO · FM 94.5
-                        </div>
-
-                        <div style="width:100%;height:125px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;">
-                            <svg viewBox="0 0 300 100" width="100%" height="100" fill="none">
-                                <line x1="16" y1="50" x2="284" y2="50" stroke="#EAECEF" stroke-width="0.7" />
-                                ${heights.map((h, i) => {
-                                    const x = 30 + i * 12;
-                                    const y = 50 - h / 2;
-                                    return `<rect class="bl-wbar" x="${x}" y="${y}" width="1.6" height="${h}" rx="0.8" fill="#323640" style="animation-delay:${(i * 0.11).toFixed(2)}s;" />`;
-                                }).join("")}
-                            </svg>
-                        </div>
-
-                        <div class="bl-t1" style="font-size:18px;font-weight:700;letter-spacing:5px;color:#2C2E35;margin-bottom:14px;">Sumoul App</div>
-                        <div class="bl-t2" style="font-size:10.5px;font-weight:600;color:#5A5E6B;line-height:2.0;letter-spacing:0.8px;">“ 잠들지 못한 밤, 주파수를 맞추는 시간 ”</div>
-                        <div class="bl-t3" style="font-size:9px;font-weight:500;color:#8E929E;letter-spacing:1.2px;margin-top:4px;">在失眠的灰白雨夜，缓慢校准属于你的声音频率。</div>
-                    </div>
-                `;
-            } else {
-                // 样式 04：全屏无界 · 韩国文艺片失焦对焦片头 (MIST)
-                centerArtHtml = `
-                    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;position:relative;padding:30px 0;">
-                        <div class="bl-t1" style="font-size:8px;font-weight:700;color:#9A9EA8;letter-spacing:4px;font-family:monospace;margin-bottom:36px;">
-                            SCENE 01 · MONOCHROME DAWN
-                        </div>
-
-                        <div class="bl-cinema-title" style="font-size:26px;font-weight:700;color:#2C2E35;margin-bottom:12px;">
-                            회색빛 기억
-                        </div>
-                        <div class="bl-t1" style="font-size:10.5px;font-weight:700;letter-spacing:4.5px;color:#7A7E8A;margin-bottom:34px;">
-                            SUMOUL APP
-                        </div>
-
-                        <!-- 极细垂直分割银丝 -->
-                        <div class="bl-t2" style="width:1px;height:36px;background:linear-gradient(180deg,#323640 0%,transparent 100%);margin:0 auto 28px auto;"></div>
-
-                        <div class="bl-t2" style="font-size:10.5px;font-weight:600;color:#5A5E6B;line-height:2.0;letter-spacing:0.8px;">“ 안개 너머로 천천히 선명해지는 너의 윤곽 ”</div>
-                        <div class="bl-t3" style="font-size:9px;font-weight:500;color:#8E929E;letter-spacing:1.2px;margin-top:5px;">穿过灰白晨雾，你的轮廓在镜头里缓慢清晰。</div>
-                    </div>
-                `;
-            }
+        function renderMasterSplash() {
+            // 全屏无框高定冷白至浅雾灰径向渐变背景
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 42%, #FFFFFF 0%, #F5F6F9 55%, #EAECEF 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.75s ease!important;padding:max(32px,env(safe-area-inset-top,32px)) 28px max(38px,env(safe-area-inset-bottom,38px)) 28px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;";
 
             splash.innerHTML = `
-                <!-- 顶部：无边框极简文字切换栏 -->
-                <div class="bl-top-nav" id="bl-style-nav" title="点击切换开屏样式">
-                    <span class="bl-nav-item ${cur === "pulse" ? "active" : ""}" data-blstyle="pulse">01.PULSE</span>
-                    <span class="bl-nav-item ${cur === "eclipse" ? "active" : ""}" data-blstyle="eclipse">02.ECLIPSE</span>
-                    <span class="bl-nav-item ${cur === "vinyl" ? "active" : ""}" data-blstyle="vinyl">03.VINYL</span>
-                    <span class="bl-nav-item ${cur === "mist" ? "active" : ""}" data-blstyle="mist">04.MIST</span>
+                <!-- 顶部：极简无框画报天头 -->
+                <div style="width:100%;max-width:320px;display:flex;justify-content:space-between;align-items:center;font-size:8px;font-weight:600;color:#9A9EA8!important;letter-spacing:2.8px;font-family:monospace;border-bottom:1px solid rgba(215,218,228,0.55);padding-bottom:10px;">
+                    <span>SUMOUL ARCHIVE</span>
+                    <span>37°33'N · 04:00</span>
                 </div>
 
-                <!-- 中央：无框全屏主视觉 -->
-                <div style="width:100%;display:flex;justify-content:center;align-items:center;flex:1;">
-                    ${centerArtHtml}
+                <!-- 中央：无框全屏「清冷心电折线 + 十字星芒微光 + 失焦慢显电影字幕」 -->
+                <div style="width:100%;max-width:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;">
+                    
+                    <!-- 极简折线艺术主视觉 -->
+                    <div style="width:100%;height:132px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+                        <svg viewBox="0 0 320 120" width="100%" height="120" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
+                            <!-- 0. 极淡背景几何坐标十字基准丝 -->
+                            <line x1="0" y1="64" x2="320" y2="64" stroke="#E2E5EE" stroke-width="0.75" stroke-dasharray="2 4" />
+                            <line x1="154" y1="8" x2="154" y2="112" stroke="#EAECEF" stroke-width="0.75" />
+
+                            <!-- 1. 折线下方极柔和的冷雾水影衬底 -->
+                            <path class="smo-line-shadow" d="M 6 64 L 78 64 L 98 38 L 122 86 L 154 16 L 182 98 L 208 42 L 228 74 L 246 64 L 314 64" stroke="#D8DCE6" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.45" />
+
+                            <!-- 2. 主折线：1.35px 清冷深炭灰折线缓慢延伸 -->
+                            <path class="smo-line-main" d="M 6 64 L 78 64 L 98 38 L 122 86 L 154 16 L 182 98 L 208 42 L 228 74 L 246 64 L 314 64" stroke="#2E323C" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 3. 顺着折线缓慢流淌的纯白微光丝 -->
+                            <path class="smo-line-shimmer" d="M 6 64 L 78 64 L 98 38 L 122 86 L 154 16 L 182 98 L 208 42 L 228 74 L 246 64 L 314 64" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+
+                            <!-- 4. 折角节点上的极简空心环 -->
+                            <circle cx="98" cy="38" r="2.2" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.1" />
+                            <circle cx="122" cy="86" r="2.0" fill="#FFFFFF" stroke="#7A7E8A" stroke-width="1.0" />
+                            <circle cx="182" cy="98" r="2.2" fill="#FFFFFF" stroke="#2E323C" stroke-width="1.1" />
+                            <circle cx="208" cy="42" r="2.0" fill="#FFFFFF" stroke="#5A5E6B" stroke-width="1.1" />
+
+                            <!-- 5. 主峰值顶点 (154, 16) 的扩散呼吸光环与极细十字星芒 -->
+                            <circle class="smo-pulse-ring" cx="154" cy="16" r="7" fill="none" stroke="#7A7E8A" stroke-width="0.9" />
+                            <line x1="146" y1="16" x2="162" y2="16" stroke="#2E323C" stroke-width="0.7" />
+                            <line x1="154" y1="8" x2="154" y2="24" stroke="#2E323C" stroke-width="0.7" />
+                            <circle cx="154" cy="16" r="2.6" fill="#2E323C" />
+                            <circle cx="154" cy="16" r="1.0" fill="#FFFFFF" />
+                        </svg>
+                    </div>
+
+                    <!-- 品牌主标题：从失焦模糊中缓慢清晰 -->
+                    <div class="smo-fade-1" style="font-size:20px;font-weight:700;letter-spacing:5.5px;color:#282B33!important;margin-bottom:6px;">
+                        Sumoul App
+                    </div>
+                    <div class="smo-fade-1" style="font-size:7.8px;font-weight:600;letter-spacing:3.2px;color:#9A9EA8!important;margin-bottom:26px;">
+                        MONOCHROME MEMORY ARCHIVE
+                    </div>
+
+                    <!-- 极细垂直过渡短线 -->
+                    <div class="smo-fade-2" style="width:1px;height:26px;background:linear-gradient(180deg,#5A5E6B 0%,transparent 100%);margin:0 auto 22px auto;"></div>
+
+                    <!-- 韩中双语忧郁独白：分两拍缓慢浮现 -->
+                    <div class="smo-fade-2" style="font-size:10.5px;font-weight:600;color:#4E525E!important;line-height:2.0;letter-spacing:0.9px;">
+                        “ 고요한 회색빛 새벽, 너에게로 이어지는 선 ”
+                    </div>
+                    <div class="smo-fade-3" style="font-size:9px;font-weight:500;color:#8A8E9B!important;line-height:1.85;letter-spacing:1.4px;margin-top:4px;">
+                        在寂静的灰白黎明，那根缓慢连结向你的线。
+                    </div>
                 </div>
 
-                <!-- 底部：无框呼吸感触碰提示 -->
-                <div class="bl-t4" style="padding-bottom:6px;">
-                    <div class="bl-breathe" style="font-size:8.5px;font-weight:700;color:#5A5E6B;letter-spacing:3.5px;font-family:monospace;">
-                        — &nbsp; TOUCH SCREEN TO WAKE &nbsp; —
+                <!-- 底部：极简无框呼吸唤醒提示 -->
+                <div class="smo-fade-4" style="width:100%;max-width:320px;border-top:1px solid rgba(215,218,228,0.55);padding-top:14px;">
+                    <div class="smo-breathe-txt" style="font-size:8px;font-weight:700;color:#5A5E6B!important;letter-spacing:3.8px;font-family:monospace;">
+                        — &nbsp; TOUCH ANYWHERE TO WAKE &nbsp; —
                     </div>
                 </div>
             `;
 
-            splash.querySelectorAll("[data-blstyle]").forEach((item) => {
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    localStorage.setItem(K_SPLASH_STYLE, item.getAttribute("data-blstyle"));
-                    renderBorderlessSplash();
-                };
-            });
-
-            splash.onclick = (e) => {
-                if (e.target.closest("#bl-style-nav")) return;
+            splash.onclick = () => {
                 splash.classList.add("fade-out");
             };
         }
 
-        renderBorderlessSplash();
+        renderMasterSplash();
 
+        // 每次点击打开 Sumoul App 时，自动重播这套慢速折线与失焦字幕动画
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                renderBorderlessSplash();
+                renderMasterSplash();
             }
         }, true);
     }
 
-    mountBorderlessSplash();
+    mountSingleMasterSplash();
 })();
