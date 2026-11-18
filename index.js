@@ -3414,230 +3414,365 @@ bootSumoulApp();
     forceMountV25();
 })();
 // ==========================================================================
-// 💧 【Sumoul App 液态水感折线开屏补丁：SVG گوگل级 Metaball 液态粘连滤镜 + 水珠顺折线动态流淌汇聚】
-// 用法：直接粘贴在 index.js 最末尾最后一行后面！自动覆盖旧开屏，100% 持续动态水感！
+// 💧 【Sumoul App 清透玻璃泪痕开屏补丁：Canvas 实时透明泪珠滑落折射 + 6.5秒极慢速连结 + 文字逐行雾化慢显】
+// 用法：直接粘贴在 index.js 最末尾（替换刚才那个液态开屏补丁即可）！
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
 
-    function mountLiquidTearSplash() {
+    function mountCrystalTearSplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountLiquidTearSplash, 180);
+            setTimeout(mountCrystalTearSplash, 180);
             return;
         }
 
-        // 1. 注入「液态水感流淌 + 水珠粘连滑落」专属 CSS 动画
+        // 1. 注入「文字从水雾模糊中极慢速逐行浮现」的 CSS 动画
         topDoc.getElementById("sumoul-liquid-tear-css")?.remove();
         const st = topDoc.createElement("style");
         st.id = "sumoul-liquid-tear-css";
         st.innerHTML = `
-            /* 主水流折线缓慢延伸铺开 */
-            @keyframes lqMainGrow {
-                0% { stroke-dashoffset: 380; opacity: 0.3; }
-                100% { stroke-dashoffset: 0; opacity: 0.95; }
+            /* 文字像水汽凝结一样：从模糊透明慢慢浮现清晰 */
+            @keyframes tearTextSlowReveal {
+                0% {
+                    opacity: 0;
+                    filter: blur(6px);
+                    transform: translateY(6px);
+                }
+                100% {
+                    opacity: 1;
+                    filter: blur(0px);
+                    transform: translateY(0px);
+                }
             }
-            /* 折线上的高光水滴脉冲：源源不断顺着折线往下流淌（无限循环动态！） */
-            @keyframes lqStreamFlow {
-                0% { stroke-dashoffset: 380; }
-                100% { stroke-dashoffset: 0; }
+            #seoul-mini-theater-modal #smt-boot-splash .t-slow-1 {
+                opacity: 0 !important;
+                animation: tearTextSlowReveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) 1.6s forwards !important;
             }
-            /* 第二层交错水珠流：营造真实不规则的泪水滑落感 */
-            @keyframes lqBeadsFlow {
-                0% { stroke-dashoffset: 420; }
-                100% { stroke-dashoffset: 0; }
+            #seoul-mini-theater-modal #smt-boot-splash .t-slow-2 {
+                opacity: 0 !important;
+                animation: tearTextSlowReveal 2.6s cubic-bezier(0.22, 1, 0.36, 1) 3.2s forwards !important;
             }
-            /* 节点水滴被水流充盈时的呼吸膨胀感 */
-            @keyframes lqNodeSwell {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.22); }
+            #seoul-mini-theater-modal #smt-boot-splash .t-slow-3 {
+                opacity: 0 !important;
+                animation: tearTextSlowReveal 2.6s cubic-bezier(0.22, 1, 0.36, 1) 4.6s forwards !important;
             }
-            /* 终点大泪滴汇聚晃动与水波荡漾 */
-            @keyframes lqDropWobble {
-                0%, 100% { transform: translateY(0px) scale(1, 1); }
-                40% { transform: translateY(3px) scale(0.95, 1.06); }
-                75% { transform: translateY(-1px) scale(1.03, 0.97); }
-            }
-            @keyframes lqWaveRing {
-                0% { r: 3px; opacity: 0.7; stroke-width: 1.5px; }
-                100% { r: 24px; opacity: 0; stroke-width: 0.2px; }
-            }
-
-            /* 底层水痕慢慢连结 */
-            #seoul-mini-theater-modal #smt-boot-splash .lq-base-track {
-                stroke-dasharray: 380 !important;
-                stroke-dashoffset: 380 !important;
-                animation: lqMainGrow 4.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards !important;
-            }
-            /* 持续在折线上流淌的液态高光水波流 */
-            #seoul-mini-theater-modal #smt-boot-splash .lq-water-stream {
-                stroke-dasharray: 22 46 !important;
-                stroke-dashoffset: 380 !important;
-                animation: lqStreamFlow 3.6s linear infinite !important;
-            }
-            /* 顺着折线滑落并与节点发生液态粘连的滚动水珠 */
-            #seoul-mini-theater-modal #smt-boot-splash .lq-rolling-beads {
-                stroke-dasharray: 2 58 !important;
-                stroke-dashoffset: 420 !important;
-                animation: lqBeadsFlow 4.0s linear infinite !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .lq-rolling-beads.delay {
-                stroke-dasharray: 1 74 !important;
-                animation: lqBeadsFlow 5.2s linear infinite !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .lq-node-drop {
-                transform-box: fill-box !important;
-                transform-origin: center !important;
-                animation: lqNodeSwell 3.2s ease-in-out infinite !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .lq-end-tear {
-                transform-box: fill-box !important;
-                transform-origin: center top !important;
-                animation: lqDropWobble 3.4s ease-in-out infinite !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .lq-rip-a {
-                animation: lqWaveRing 3.0s ease-out infinite !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .lq-rip-b {
-                animation: lqWaveRing 3.0s ease-out 1.5s infinite !important;
+            #seoul-mini-theater-modal #smt-boot-splash .t-slow-4 {
+                opacity: 0 !important;
+                animation: tearTextSlowReveal 2.2s cubic-bezier(0.22, 1, 0.36, 1) 6.0s forwards !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        let pctTimer = null;
+        let animReqId = null;
 
-        function buildLiquidSplash() {
-            clearInterval(pctTimer);
-            splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFFFFF 0%,#F3F4F8 55%,#EAEBF0 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity 0.65s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important;";
+        function playCrystalTearAnimation() {
+            if (animReqId) cancelAnimationFrame(animReqId);
+
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(180deg,#F9FAFC 0%,#EFF1F6 52%,#E5E8F0 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity 0.8s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important;";
 
             splash.innerHTML = `
-                <div style="border:1px solid rgba(215,215,225,0.85)!important;border-radius:18px!important;padding:32px 24px 26px 24px!important;background:rgba(255,255,255,0.82)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;max-width:292px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 16px 40px rgba(30,30,45,0.05), inset 0 1px 0 #FFFFFF!important;">
-                    <!-- 顶部液态连结状态栏 -->
-                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:700;color:#8E8E98!important;letter-spacing:1.8px;font-family:monospace;border-bottom:1px solid #EFEFF5!important;padding-bottom:8px;margin-bottom:14px;">
+                <div style="border:1px solid rgba(255,255,255,0.9)!important;border-radius:22px!important;padding:32px 24px 28px 24px!important;background:linear-gradient(165deg,rgba(255,255,255,0.72) 0%,rgba(244,246,250,0.52) 100%)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;max-width:296px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 20px 50px rgba(40,45,60,0.06), inset 0 1px 2px #FFFFFF!important;">
+                    <!-- 顶部极淡玻璃刻度 -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:700;color:#9A9EA8!important;letter-spacing:2px;font-family:monospace;border-bottom:1px solid rgba(220,224,232,0.6)!important;padding-bottom:8px;margin-bottom:14px;">
                         <span>SUMOUL APP</span>
-                        <span id="lq-pct-txt">LIQUID LINK · 0%</span>
+                        <span id="tear-progress-label">TEAR TRACE · 0%</span>
                     </div>
 
-                    <!-- 💧 核心舞台：带 SVG Gooey 液态粘连滤镜 + 水珠顺折线实时流淌汇聚 -->
-                    <div style="width:100%;height:130px;display:flex;align-items:center;justify-content:center;margin:2px 0 10px 0;position:relative;">
-                        <svg viewBox="0 0 240 126" width="232" height="122" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
-                            <defs>
-                                <!-- 🔥 液态水感核心：Gooey Metaball 粘连融合滤镜（让经过折线的水珠产生拉丝融球水感！） -->
-                                <filter id="liquidGooey" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feGaussianBlur in="SourceGraphic" stdDeviation="2.4" result="blur" />
-                                    <feColorMatrix in="blur" mode="matrix" values="
-                                        1 0 0 0 0
-                                        0 1 0 0 0
-                                        0 0 1 0 0
-                                        0 0 0 19 -7" result="goo" />
-                                    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-                                </filter>
-
-                                <!-- 水珠内部高光折射渐变 -->
-                                <linearGradient id="lqWaterGrad" x1="20" y1="10" x2="200" y2="95" gradientUnits="userSpaceOnUse">
-                                    <stop offset="0%" stop-color="#D0D2DC" />
-                                    <stop offset="50%" stop-color="#8A8C98" />
-                                    <stop offset="100%" stop-color="#3A3A42" />
-                                </linearGradient>
-                                <radialGradient id="lqBeadLight" cx="35%" cy="30%" r="70%">
-                                    <stop offset="0%" stop-color="#FFFFFF" />
-                                    <stop offset="55%" stop-color="#CFD1DC" />
-                                    <stop offset="100%" stop-color="#6E707C" />
-                                </radialGradient>
-                            </defs>
-
-                            <!-- 底层极细干涸折线预瞄轨 -->
-                            <polyline points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#E4E4EE" stroke-width="1.2" stroke-dasharray="2 4" stroke-linecap="round" stroke-linejoin="round" />
-
-                            <!-- 🌊 液态粘连层（应用 liquidGooey 滤镜：水珠滑过节点时自动粘连拉丝！） -->
-                            <g filter="url(#liquidGooey)">
-                                <!-- 1. 缓慢连结的主水痕折线 -->
-                                <polyline class="lq-base-track" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="url(#lqWaterGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
-
-                                <!-- 2. 在折线上持续流淌的水波段 -->
-                                <polyline class="lq-water-stream" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#9A9CA8" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" />
-
-                                <!-- 3. 顺着折线不断滑落并与转折点粘连融合的液态水珠群 -->
-                                <polyline class="lq-rolling-beads" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#484852" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" />
-                                <polyline class="lq-rolling-beads delay" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#7A7C88" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-
-                                <!-- 4. 折线 5 个转折节点上凝结的饱满水滴 -->
-                                <circle class="lq-node-drop" cx="26" cy="18" r="3.6" fill="url(#lqBeadLight)" />
-                                <circle class="lq-node-drop" cx="72" cy="52" r="4.4" fill="url(#lqBeadLight)" style="animation-delay:0.6s;" />
-                                <circle class="lq-node-drop" cx="114" cy="26" r="3.8" fill="url(#lqBeadLight)" style="animation-delay:1.2s;" />
-                                <circle class="lq-node-drop" cx="156" cy="68" r="4.8" fill="url(#lqBeadLight)" style="animation-delay:1.8s;" />
-                                <circle class="lq-node-drop" cx="186" cy="48" r="4.0" fill="url(#lqBeadLight)" style="animation-delay:2.4s;" />
-
-                                <!-- 5. 终点处不断汇入水流、欲坠未坠的立体大泪滴 -->
-                                <g class="lq-end-tear">
-                                    <path d="M204 76 C204 76 195 88.5 195 94.5 C195 99.6 199 103.5 204 103.5 C209 103.5 213 99.6 213 94.5 C213 88.5 204 76 204 76 Z" fill="url(#lqBeadLight)" stroke="#484852" stroke-width="1" />
-                                </g>
-                            </g>
-
-                            <!-- ✨ 叠加在液态层上方的纯白高光反光点（赋予水珠晶莹剔透的玻璃水感！） -->
-                            <polyline class="lq-water-stream" points="26,18 72,52 114,26 156,68 186,48 204,80" fill="none" stroke="#FFFFFF" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
-                            <circle cx="24.8" cy="16.8" r="1.1" fill="#FFFFFF" />
-                            <circle cx="70.5" cy="50.5" r="1.4" fill="#FFFFFF" />
-                            <circle cx="112.8" cy="24.8" r="1.2" fill="#FFFFFF" />
-                            <circle cx="154.5" cy="66.5" r="1.5" fill="#FFFFFF" />
-                            <circle cx="184.8" cy="46.8" r="1.2" fill="#FFFFFF" />
-                            <!-- 终点泪滴的弧形水光反光 -->
-                            <path d="M199.5 91.5 C199 94.2 200.2 97.2 202.5 98.4" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
-
-                            <!-- 终点下方的双层扩散水波涟漪 -->
-                            <circle class="lq-rip-a" cx="204" cy="104" r="3" fill="none" stroke="#8E8E98" />
-                            <circle class="lq-rip-b" cx="204" cy="104" r="3" fill="none" stroke="#A5A5B2" />
-                        </svg>
+                    <!-- 💧 高清 Canvas 玻璃水痕舞台：呈现真正的透明水滴折射、高光水脊与缓慢滑落折线 -->
+                    <div style="width:100%;height:136px;display:flex;align-items:center;justify-content:center;margin:2px 0 12px 0;position:relative;">
+                        <canvas id="sumoul-tear-canvas" style="width:246px!important;height:132px!important;display:block!important;"></canvas>
                     </div>
 
-                    <!-- 标题与水感连结文案 -->
-                    <div style="font-size:14.5px;font-weight:800;letter-spacing:2.5px;color:#2C2C32!important;margin-bottom:6px;">눈물의 결속 · 泪之连结</div>
-                    <div style="font-size:9.5px;font-weight:600;color:#6E6E77!important;line-height:1.85;letter-spacing:0.3px;margin-bottom:18px;">
-                        “ 흐르는 물방울이 선을 따라 이어지고,<br>우리의 기억이 하나로 스며든다. ”<br>
-                        <span style="font-size:8.2px;font-weight:500;color:#9A9AA5!important;display:block;margin-top:4px;">流淌的水珠顺着折线缓慢连结，将记忆浸润合一。</span>
+                    <!-- 逐行极慢速浮现的文字 -->
+                    <div class="t-slow-1" style="font-size:14.5px;font-weight:700;letter-spacing:3.2px;color:#3A3D46!important;margin-bottom:10px;">
+                        눈물의 궤적 · 泪之轨迹
                     </div>
 
-                    <!-- 底部带水波光泽的点击唤醒胶囊 -->
-                    <div id="lq-enter-pill" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 22px;background:linear-gradient(180deg,#FFFFFF 0%,#F2F3F7 100%)!important;border:1px solid #DCDCE6!important;border-radius:999px;font-size:8.5px;color:#3A3A40!important;letter-spacing:1.8px;font-weight:800;box-shadow:0 4px 12px rgba(30,30,45,0.06)!important;">
-                        <span>💧 TOUCH TO LINK · 触碰连结</span>
+                    <div style="min-height:54px;margin-bottom:18px;">
+                        <div class="t-slow-2" style="font-size:10px;font-weight:600;color:#6E7380!important;line-height:1.9;letter-spacing:0.5px;">
+                            “ 유리창을 타고 천천히 흐르는 투명한 눈물처럼 ”
+                        </div>
+                        <div class="t-slow-3" style="font-size:8.8px;font-weight:500;color:#9499A6!important;line-height:1.8;letter-spacing:0.6px;margin-top:4px;">
+                            如同顺着玻璃窗缓慢滑落的透明泪水，将记忆静静连结。
+                        </div>
+                    </div>
+
+                    <!-- 等泪线与文字全部慢显后才缓缓浮现的唤醒按钮 -->
+                    <div class="t-slow-4">
+                        <div style="display:inline-flex;align-items:center;justify-content:center;padding:7px 24px;background:rgba(255,255,255,0.85)!important;border:1px solid rgba(210,215,225,0.8)!important;border-radius:999px;font-size:8.2px;color:#484C56!important;letter-spacing:2.2px;font-weight:700;box-shadow:0 4px 14px rgba(40,45,60,0.05), inset 0 1px 1px #FFFFFF!important;">
+                            TOUCH TO WAKE · 触碰唤醒
+                        </div>
                     </div>
                 </div>
-                <div style="font-size:7.5px;font-weight:600;color:#A0A0AC!important;letter-spacing:1.8px;margin-top:16px;">SUMOUL APP · LIQUID TEAR CONNECTION</div>
+                <div class="t-slow-3" style="font-size:7.5px;font-weight:600;color:#A2A6B2!important;letter-spacing:2px;margin-top:16px;">
+                    SUMOUL APP · GLASS TEAR ARCHIVE
+                </div>
             `;
 
-            // 顶部连结进度从 0% 缓慢跳到 100%（配合 4.2 秒水流折线连结）
-            let curPct = 0;
-            const pctEl = topDoc.getElementById("lq-pct-txt");
-            pctTimer = setInterval(() => {
-                curPct += 4;
-                if (curPct >= 100) {
-                    curPct = 100;
-                    clearInterval(pctTimer);
-                    if (pctEl) pctEl.textContent = "LIQUID LINK · 100% CONNECTED";
-                } else {
-                    if (pctEl) pctEl.textContent = `LIQUID LINK · ${curPct}%`;
-                }
-            }, 150);
-
             splash.onclick = () => {
-                clearInterval(pctTimer);
+                if (animReqId) cancelAnimationFrame(animReqId);
                 splash.classList.add("fade-out");
             };
+
+            // 2. 启动 Canvas 透明玻璃水痕 + 领头泪珠极慢速滑落物理绘制
+            const canvas = topDoc.getElementById("sumoul-tear-canvas");
+            const pctLabel = topDoc.getElementById("tear-progress-label");
+            if (!canvas) return;
+
+            const dpr = window.devicePixelRatio || 2;
+            const W = 246, H = 132;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            const ctx = canvas.getContext("2d");
+            ctx.scale(dpr, dpr);
+
+            // 泪水滑落的 6 个折线转折点
+            const pts = [
+                { x: 28, y: 18 },
+                { x: 72, y: 54 },
+                { x: 112, y: 28 },
+                { x: 154, y: 72 },
+                { x: 186, y: 50 },
+                { x: 212, y: 92 }
+            ];
+
+            // 计算每段折线的长度
+            const segs = [];
+            let totalLen = 0;
+            for (let i = 0; i < pts.length - 1; i++) {
+                const dx = pts[i + 1].x - pts[i].x;
+                const dy = pts[i + 1].y - pts[i].y;
+                const len = Math.hypot(dx, dy);
+                segs.push({ p1: pts[i], p2: pts[i + 1], len, startDist: totalLen });
+                totalLen += len;
+            }
+
+            // 画出单颗「清透无色玻璃水珠」（底部微阴影 + 透明边缘 + 内部折射 + 左上角纯白月牙高光）
+            function drawGlassWaterDrop(x, y, r, alpha = 1, isTearShape = false) {
+                if (alpha <= 0.01 || r <= 0.2) return;
+                ctx.save();
+
+                // 1. 水珠底部的柔和投影（让透明水珠从白灰背景上浮凸出来）
+                ctx.shadowColor = `rgba(75, 85, 105, ${0.22 * alpha})`;
+                ctx.shadowBlur = r * 1.4;
+                ctx.shadowOffsetX = r * 0.25;
+                ctx.shadowOffsetY = r * 0.45;
+
+                // 2. 水珠本体渐变（上半部透明微暗，下半部折射透亮白光——这才是真水珠的光学原理！）
+                const grad = ctx.createRadialGradient(
+                    x - r * 0.25, y - r * 0.25, r * 0.05,
+                    x + r * 0.15, y + r * 0.25, r * 1.15
+                );
+                grad.addColorStop(0, `rgba(210, 218, 230, ${0.35 * alpha})`);
+                grad.addColorStop(0.55, `rgba(235, 240, 248, ${0.55 * alpha})`);
+                grad.addColorStop(0.88, `rgba(255, 255, 255, ${0.92 * alpha})`);
+                grad.addColorStop(1, `rgba(175, 185, 202, ${0.55 * alpha})`);
+
+                ctx.beginPath();
+                if (isTearShape) {
+                    // 欲滴落的悬挂水滴形状
+                    ctx.moveTo(x, y - r * 1.35);
+                    ctx.bezierCurveTo(x + r * 1.1, y - r * 0.2, x + r * 1.05, y + r, x, y + r);
+                    ctx.bezierCurveTo(x - r * 1.05, y + r, x - r * 1.1, y - r * 0.2, x, y - r * 1.35);
+                } else {
+                    ctx.arc(x, y, r, 0, Math.PI * 2);
+                }
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                // 清除阴影画内部高光
+                ctx.shadowColor = "transparent";
+
+                // 3. 玻璃水珠极细半透明轮廓线
+                ctx.lineWidth = 0.7;
+                ctx.strokeStyle = `rgba(165, 175, 192, ${0.42 * alpha})`;
+                ctx.stroke();
+
+                // 4. 水珠左上角最灵魂的「纯白晶莹高光点」与右下角「次级反光弧」
+                ctx.beginPath();
+                ctx.arc(x - r * 0.34, y - r * 0.32, Math.max(0.8, r * 0.26), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.98 * alpha})`;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(x, y, r * 0.72, 0.15 * Math.PI, 0.42 * Math.PI);
+                ctx.lineWidth = Math.max(0.7, r * 0.16);
+                ctx.lineCap = "round";
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.85 * alpha})`;
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
+            const DURATION = 6200; // 6.2秒极慢速划过
+            const startTime = performance.now();
+
+            // 带有节点停顿呼吸感的缓动函数（每经过一个转折点会轻微放慢凝结，再继续滑落）
+            function getTearDistance(elapsed) {
+                const rawP = Math.min(1, elapsed / DURATION);
+                // 整体柔和缓动 + 每个转折点微停顿波动
+                const n = segs.length;
+                const scaled = rawP * n;
+                const segIdx = Math.min(n - 1, Math.floor(scaled));
+                const localT = scaled - segIdx;
+                // S型平滑曲线让水珠在节点处慢下来凝结，在折线中段自然滑落
+                const smoothLocal = localT < 0.5
+                    ? 2 * localT * localT
+                    : 1 - Math.pow(-2 * localT + 2, 2) / 2;
+                let dist = 0;
+                for (let i = 0; i < segIdx; i++) dist += segs[i].len;
+                dist += segs[segIdx].len * smoothLocal;
+                return { dist, rawP };
+            }
+
+            function renderFrame(now) {
+                if (!topDoc.getElementById("sumoul-tear-canvas")) return;
+                const elapsed = now - startTime;
+                const { dist, rawP } = getTearDistance(elapsed);
+
+                if (pctLabel) {
+                    const pNum = Math.round(rawP * 100);
+                    pctLabel.textContent = pNum >= 100 ? "TEAR TRACE · CONNECTED" : `TEAR TRACE · ${pNum}%`;
+                }
+
+                ctx.clearRect(0, 0, W, H);
+
+                // 0. 底层极淡的干涸水迹虚线预瞄
+                ctx.save();
+                ctx.beginPath();
+                pts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+                ctx.strokeStyle = "rgba(180, 188, 202, 0.25)";
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 4]);
+                ctx.stroke();
+                ctx.restore();
+
+                // 计算当前已经划过的折线顶点与领头泪珠坐标
+                const activePts = [pts[0]];
+                let headX = pts[0].x, headY = pts[0].y;
+
+                for (let i = 0; i < segs.length; i++) {
+                    const sg = segs[i];
+                    if (dist >= sg.startDist + sg.len) {
+                        activePts.push(sg.p2);
+                        headX = sg.p2.x;
+                        headY = sg.p2.y;
+                    } else if (dist > sg.startDist) {
+                        const t = (dist - sg.startDist) / sg.len;
+                        headX = sg.p1.x + (sg.p2.x - sg.p1.x) * t;
+                        headY = sg.p1.y + (sg.p2.y - sg.p1.y) * t;
+                        activePts.push({ x: headX, y: headY });
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+
+                // 💧 绘制已经划过的「三层清透玻璃水痕折线」
+                if (activePts.length > 1) {
+                    // 第一层：水痕两侧的半透明浸润水晕 + 微弱底部水影
+                    ctx.save();
+                    ctx.beginPath();
+                    activePts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    ctx.lineWidth = 4.6;
+                    ctx.strokeStyle = "rgba(205, 214, 228, 0.34)";
+                    ctx.shadowColor = "rgba(80, 90, 110, 0.16)";
+                    ctx.shadowBlur = 4;
+                    ctx.shadowOffsetY = 2;
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // 第二层：水痕边缘的极细透明折射边
+                    ctx.save();
+                    ctx.beginPath();
+                    activePts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    ctx.lineWidth = 2.4;
+                    ctx.strokeStyle = "rgba(170, 180, 198, 0.42)";
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // 第三层（最关键的水感灵魂！）：水痕正脊上的 1.2px 纯白晶莹高光折射亮线
+                    ctx.save();
+                    ctx.beginPath();
+                    activePts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y - 0.5) : ctx.lineTo(p.x, p.y - 0.5));
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    ctx.lineWidth = 1.25;
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.96)";
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // 第四层：顺着已连结水痕缓慢滑落的细小晶莹水珠
+                    const flowOffset = (now * 0.022) % totalLen;
+                    for (let d = flowOffset; d < dist; d += 38) {
+                        for (let i = 0; i < segs.length; i++) {
+                            const sg = segs[i];
+                            if (d >= sg.startDist && d <= sg.startDist + sg.len) {
+                                const t = (d - sg.startDist) / sg.len;
+                                const bx = sg.p1.x + (sg.p2.x - sg.p1.x) * t;
+                                const by = sg.p1.y + (sg.p2.y - sg.p1.y) * t;
+                                drawGlassWaterDrop(bx, by, 2.1, 0.85, false);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // 💧 绘制每个转折节点上留下的「透明凝结露珠」
+                let acc = 0;
+                for (let i = 0; i < pts.length; i++) {
+                    if (i > 0) acc += segs[i - 1].len;
+                    if (dist >= acc - 1) {
+                        const age = Math.min(1, (dist - acc + 8) / 18);
+                        const pulse = 1 + 0.06 * Math.sin(now * 0.003 + i);
+                        const radius = (i === pts.length - 1 ? 6.2 : (i % 2 === 1 ? 4.4 : 3.6)) * pulse;
+                        const isLast = i === pts.length - 1;
+                        drawGlassWaterDrop(pts[i].x, isLast ? pts[i].y + 4 : pts[i].y, radius, age, isLast);
+                    }
+                }
+
+                // 💧 绘制正在折线最前端缓慢滑行的「领头透明泪珠」（带有轻微颤动水感）
+                if (rawP < 1) {
+                    const wobble = Math.sin(now * 0.012) * 0.4;
+                    drawGlassWaterDrop(headX, headY + wobble, 4.8, 1, false);
+                } else {
+                    // 连结完成后，终点悬挂的大泪滴下方泛起柔和的透明水波圈
+                    const ripT = ((now - startTime - DURATION) % 2600) / 2600;
+                    if (ripT >= 0) {
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.ellipse(pts[5].x, pts[5].y + 14, 3 + ripT * 18, 1.2 + ripT * 6, 0, 0, Math.PI * 2);
+                        ctx.strokeStyle = `rgba(160, 170, 188, ${(1 - ripT) * 0.55})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+
+                animReqId = requestAnimationFrame(renderFrame);
+            }
+
+            animReqId = requestAnimationFrame(renderFrame);
         }
 
-        buildLiquidSplash();
+        playCrystalTearAnimation();
 
-        // 每次点击打开 Sumoul App 时，重新触发液态水珠顺折线缓慢连结动画
+        // 每次点击打开 Sumoul App 时，重新从 0% 开始播放透明泪水划过与文字慢显动画
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                buildLiquidSplash();
+                playCrystalTearAnimation();
             }
         }, true);
     }
 
-    mountLiquidTearSplash();
+    mountCrystalTearSplash();
 })();
