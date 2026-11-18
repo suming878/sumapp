@@ -4098,49 +4098,57 @@ bootSumoulApp();
     mountPrivateServerV46();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 微信全屏 + 根除双边框纯白设置中心(10大模块) + 全屏语音通话UI + 真实天气 + 线上人设舱 + 世界书读取（完整终极版）】
+// 🤍 【Sumoul App 微信全屏 + 100%零Emoji纯白高定设置中心 + 高定清冷雾白语音通话舱 + 4通道酒馆世界书必成读取】
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
 
-    const svgLine = (p, sz = 15, c = "#3A3A40", sw = "1.5") =>
+    // ── 1. 全套高定 1.4px 极细冷灰 SVG 线性矢量图标库（彻底 0 Emoji！） ──
+    const svgLine = (p, sz = 14, c = "#3A3A40", sw = "1.5") =>
         `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
     const ICO = {
         sliders: svgLine(`<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>`, 14, "#3A3A40", "1.7"),
         user: svgLine(`<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`),
         camera: svgLine(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 11, "#3A3A40"),
-        phoneCall: svgLine(`<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>`, 14, "#3A3A40", "1.6"),
-        phoneOff: svgLine(`<path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="23" y1="1" x2="1" y2="23"/>`, 18, "#FFFFFF", "1.8"),
-        mic: svgLine(`<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>`, 16, "#3A3A40"),
-        speaker: svgLine(`<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`, 16, "#3A3A40"),
-        cloudSnow: svgLine(`<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="16" y1="16" x2="16.01" y2="16"/>`, 15),
-        mask: svgLine(`<path d="M2 12a5 5 0 0 0 5 5 8 8 0 0 1 5 2 8 8 0 0 1 5-2 5 5 0 0 0 5-5V7h-5a8 8 0 0 0-5 2 8 8 0 0 0-5-2H2Z"/>`, 15),
-        sync: svgLine(`<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>`),
-        clock: svgLine(`<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>`),
-        summary: svgLine(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/>`),
-        palette: svgLine(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`),
-        image: svgLine(`<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`),
-        book: svgLine(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`),
-        upload: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>`, 12, "#FFFFFF", "1.8"),
-        download: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>`, 13, "#3A3A40"),
-        plus: svgLine(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
-        trash: svgLine(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 13, "#9A6868"),
-        shield: svgLine(`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, 13),
-        check: svgLine(`<polyline points="20 6 9 17 4 12"/>`, 13, "#FFFFFF", "2"),
+        phoneCall: svgLine(`<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>`, 13, "currentColor", "1.6"),
+        phoneOff: svgLine(`<path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="23" y1="1" x2="1" y2="23"/>`, 18, "#FFFFFF", "1.6"),
+        mic: svgLine(`<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>`, 17, "currentColor", "1.5"),
+        speaker: svgLine(`<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`, 17, "currentColor", "1.5"),
+        snow: svgLine(`<line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/>`, 11, "currentColor", "1.6"),
+        rain: svgLine(`<path d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9"/><line x1="16" y1="14" x2="14" y2="20"/><line x1="12" y1="16" x2="10" y2="22"/><line x1="8" y1="14" x2="6" y2="20"/>`, 11, "currentColor", "1.6"),
+        sun: svgLine(`<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>`, 11, "currentColor", "1.6"),
+        cloudSnow: svgLine(`<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="16" y1="16" x2="16.01" y2="16"/>`, 14),
+        mask: svgLine(`<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>`, 14),
+        sync: svgLine(`<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>`, 13, "currentColor", "1.6"),
+        clock: svgLine(`<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>`, 14),
+        summary: svgLine(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/>`, 14),
+        palette: svgLine(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`, 14),
+        image: svgLine(`<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`, 14),
+        book: svgLine(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`, 14),
+        upload: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>`, 12, "currentColor", "1.7"),
+        download: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>`, 12, "currentColor", "1.7"),
+        plus: svgLine(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 12, "currentColor", "1.8"),
+        trash: svgLine(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 12, "#9A6868"),
+        shield: svgLine(`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, 12),
+        check: svgLine(`<polyline points="20 6 9 17 4 12"/>`, 12, "currentColor", "2"),
         heart: svgLine(`<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`, 13, "#9A9AA5"),
-        pin: svgLine(`<line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>`, 12, "#55555E")
+        pin: svgLine(`<line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>`, 12, "#55555E"),
+        spark: svgLine(`<path d="M12 2L14 10L22 12L14 14L12 22L10 14L2 12L10 10Z"/>`, 10, "currentColor", "1.6"),
+        send: svgLine(`<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>`, 13, "#FFFFFF", "1.7"),
+        close: svgLine(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 11, "currentColor", "1.8")
     };
 
     function getCharContext() {
         let userName = "ME", charName = "PARTNER", scope = "PARTNER";
-        let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg", charDesc = "";
+        let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg", charDesc = "", charObj = null;
         try {
             const st = topWin.SillyTavern?.getContext?.();
             if (st) {
                 userName = st.name1 || userName;
                 if (st.characterId !== undefined && st.characters?.[st.characterId]) {
                     const c = st.characters[st.characterId];
+                    charObj = c;
                     charName = c.name || st.name2 || charName;
                     scope = c.avatar || c.name || String(st.characterId);
                     if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
@@ -4149,7 +4157,7 @@ bootSumoulApp();
             }
         } catch (e) {}
         const safeScope = String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
-        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc };
+        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, charObj };
     }
 
     function getCharScope() { return getCharContext().safeScope; }
@@ -4256,26 +4264,79 @@ bootSumoulApp();
         return out;
     }
 
+    // 🔥 4 通道深度抓取酒馆世界书与当前角色设定（100% 必有反应、必出条目！）
     async function extractTavernLore() {
         const found = [];
         try {
             const st = topWin.SillyTavern?.getContext?.();
-            const cBook = st?.characters?.[st.characterId]?.data?.character_book || st?.characters?.[st.characterId]?.character_book;
+            const ctx = getCharContext();
+            const charObj = ctx.charObj || st?.characters?.[st?.characterId];
+
+            // 通道 1：读取角色卡 V2 内嵌的 character_book
+            const cBook = charObj?.data?.character_book || charObj?.character_book;
             if (cBook?.entries) {
                 Object.values(cBook.entries).forEach((it, i) => {
                     const content = String(it?.content || it?.entry || "").trim();
                     if (!content) return;
                     const keys = (Array.isArray(it.keys) ? it.keys : (Array.isArray(it.key) ? it.key : [])).map(String).filter(Boolean);
-                    found.push({ id: Date.now() + i, title: String(it.comment || it.name || keys[0] || `角色设定 #${i + 1}`), keys, content, enabled: it.enabled !== false && it.disable !== true, constant: Boolean(it.constant) || keys.length === 0 });
+                    found.push({ id: Date.now() + i, title: String(it.comment || it.name || keys[0] || `角色世界书 #${i + 1}`), keys, content, enabled: it.enabled !== false && it.disable !== true, constant: Boolean(it.constant) || keys.length === 0 });
                 });
             }
+
+            // 通道 2：尝试通过酒馆后端 API 读取当前角色绑定的外部世界书名称 (data.extensions.world) 及全局激活的世界书
+            const worldNames = new Set();
+            const charWorld = charObj?.data?.extensions?.world || charObj?.extensions?.world;
+            if (charWorld) worldNames.add(charWorld);
+
+            const wiSelect = topDoc.querySelector("#world_info");
+            if (wiSelect) {
+                Array.from(wiSelect.selectedOptions || []).forEach((opt) => {
+                    if (opt.text && opt.value) worldNames.add(opt.text.trim());
+                });
+            }
+
+            for (const wName of worldNames) {
+                try {
+                    const headers = { "Content-Type": "application/json" };
+                    if (typeof topWin.getRequestHeaders === "function") Object.assign(headers, topWin.getRequestHeaders());
+                    const r = await fetch("/api/worldinfo/get", { method: "POST", headers, body: JSON.stringify({ name: wName }) });
+                    if (r.ok) {
+                        const wData = await r.json();
+                        if (wData?.entries) {
+                            Object.values(wData.entries).forEach((it, idx) => {
+                                const content = String(it?.content || "").trim();
+                                if (!content) return;
+                                const keys = (Array.isArray(it.key) ? it.key : []).map(String).filter(Boolean);
+                                found.push({ id: Date.now() + 200 + idx, title: String(it.comment || keys[0] || `${wName} #${idx + 1}`), keys, content, enabled: !it.disable, constant: Boolean(it.constant) || keys.length === 0 });
+                            });
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 通道 3：扫描全局 window.world_info 对象
             if (topWin.world_info?.entries) {
                 Object.values(topWin.world_info.entries).forEach((it, i) => {
                     const content = String(it?.content || "").trim();
                     if (!content) return;
                     const keys = (Array.isArray(it.key) ? it.key : []).map(String).filter(Boolean);
-                    found.push({ id: Date.now() + 500 + i, title: String(it.comment || keys[0] || `世界书 #${i + 1}`), keys, content, enabled: !it.disable, constant: Boolean(it.constant) || keys.length === 0 });
+                    found.push({ id: Date.now() + 500 + i, title: String(it.comment || keys[0] || `全局世界书 #${i + 1}`), keys, content, enabled: !it.disable, constant: Boolean(it.constant) || keys.length === 0 });
                 });
+            }
+
+            // 通道 4（100% 保底提炼）：提取当前角色卡的核心设定、性格、世界背景与开场白作为常驻世界书条目！
+            if (charObj) {
+                if (charObj.description?.trim()) {
+                    found.push({ id: Date.now() + 801, title: `${ctx.charName} · 核心人设与背景`, keys: [ctx.charName], content: charObj.description.trim(), enabled: true, constant: true });
+                }
+                if (charObj.personality?.trim()) {
+                    found.push({ id: Date.now() + 802, title: `${ctx.charName} · 性格特征设定`, keys: [], content: charObj.personality.trim(), enabled: true, constant: true });
+                }
+                if (charObj.scenario?.trim()) {
+                    found.push({ id: Date.now() + 803, title: `${ctx.charName} · 剧情场景设定`, keys: [], content: charObj.scenario.trim(), enabled: true, constant: true });
+                }
+            } else if (ctx.charDesc?.trim()) {
+                found.push({ id: Date.now() + 804, title: `${ctx.charName} · 酒馆角色卡设定`, keys: [], content: ctx.charDesc.trim(), enabled: true, constant: true });
             }
         } catch (e) {}
         return found;
@@ -4315,8 +4376,8 @@ bootSumoulApp();
     }
 
     function hookFetch() {
-        if (window.__sumoul_wi_hook_v5) return;
-        window.__sumoul_wi_hook_v5 = true;
+        if (window.__sumoul_wi_hook_v6) return;
+        window.__sumoul_wi_hook_v6 = true;
         const orig = window.fetch.bind(window);
         window.fetch = async function (input, init) {
             try {
@@ -4337,9 +4398,9 @@ bootSumoulApp();
         };
     }
 
-    // 📞 全屏实时语音通话 UI 引擎
+    // ── 2. 高定重做：iOS 18 × Kakao 清冷雾白毛玻璃全屏语音通话舱 ──
     let callTimerInt = null, callSeconds = 0;
-    const fmtCallTime = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+    const fmtCallTime = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")} : ${String(s % 60).padStart(2, "0")}`;
 
     async function callVoiceAI(userSpoke = "") {
         const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
@@ -4348,7 +4409,7 @@ bootSumoulApp();
         if (!u || !k) throw new Error("请先在【API设置】填写独立 API 地址与 Key");
         const ctx = getCharContext();
         const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
-        const sysPrompt = `你是${ctx.charName}，正与${ctx.userName}进行微信实时语音通话（贴在耳边讲电话）。\n人设：${ctx.charDesc.slice(0, 1000)}${buildPromptInjection(userSpoke)}\n请严格只输出JSON格式：{"env":"电话那头的细微环境音或呼吸声(15字内)","voice":"你在电话里贴着TA耳边说的话(45字以内，有呼吸感与停顿)"}`;
+        const sysPrompt = `你是${ctx.charName}，正与${ctx.userName}进行深夜实时语音通话（贴在耳边讲电话）。\n人设：${ctx.charDesc.slice(0, 1000)}${buildPromptInjection(userSpoke)}\n请严格只输出JSON格式：{"env":"电话那头的细微环境音或呼吸声(14字内，如:窗外微雨声与贴近麦克风的呼吸)","voice":"你在电话里贴着TA耳边说的话(45字以内，富有苏感、呼吸停顿与口语亲昵感)"}`;
         const usrPrompt = userSpoke ? `${ctx.userName}在电话里对你说：“${userSpoke}”。请回应：` : `电话刚接通，请主动开口对${ctx.userName}说第一句话：`;
         const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: sysPrompt }, { role: "user", content: usrPrompt }] }) });
         const d = await r.json(), raw = d?.choices?.[0]?.message?.content?.trim() || "";
@@ -4368,71 +4429,138 @@ bootSumoulApp();
         topDoc.getElementById("smt-voice-call-overlay")?.remove();
         const callLayer = topDoc.createElement("div");
         callLayer.id = "smt-voice-call-overlay";
-        callLayer.style.cssText = "position:absolute!important;inset:0!important;z-index:2147483646!important;background:radial-gradient(circle at 50% 35%, #FFFFFF 0%, #F5F5F8 55%, #EAEAEF 100%)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;padding:max(36px,env(safe-area-inset-top,36px)) 24px max(38px,env(safe-area-inset-bottom,38px)) 24px!important;box-sizing:border-box!important;text-align:center!important;";
+        callLayer.style.cssText = "position:absolute!important;inset:0!important;z-index:2147483646!important;background:radial-gradient(circle at 50% 28%, #FFFFFF 0%, #F7F7FA 58%, #EFEFF4 100%)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;padding:max(28px,env(safe-area-inset-top,28px)) 22px max(30px,env(safe-area-inset-bottom,30px)) 22px!important;box-sizing:border-box!important;text-align:center!important;overflow:hidden!important;";
+
         callLayer.innerHTML = `
-            <div style="width:100%;display:flex;justify-content:space-between;align-items:center;font-size:8.5px;font-weight:700;color:#8E8E98;letter-spacing:1.5px;">
-                <span>VOICE CALL · 实时语音通话</span><span>${ex.weatherCity || "SEOUL"} · ${ex.weatherDesc || "微雾"}</span>
-            </div>
-            <div style="width:100%;max-width:310px;display:flex;flex-direction:column;align-items:center;my:auto;">
-                <div style="position:relative;width:106px;height:106px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <div class="vc-pulse-ring r1"></div><div class="vc-pulse-ring r2"></div>
-                    <img src="${charAva}" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:3px solid #FFFFFF;box-shadow:0 8px 24px rgba(30,30,40,0.12);position:relative;z-index:3;" />
+            <!-- 顶部清冷胶囊状态栏 -->
+            <div style="width:100%;max-width:340px;display:flex;justify-content:space-between;align-items:center;z-index:4;">
+                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.85);border:1px solid #EAEAF0;border-radius:999px;padding:4px 11px;font-size:8px;font-weight:700;color:#55555E;letter-spacing:1.2px;">
+                    <span style="width:5px;height:5px;border-radius:50%;background:#3A3A42;display:inline-block;animation:vcDotBlink 2s infinite;"></span>
+                    <span>VOICE CONNECTED</span>
                 </div>
-                <div style="font-size:17px;font-weight:800;color:#2C2C32;letter-spacing:1px;">${charName}</div>
-                <div id="vc-timer-txt" style="font-size:11px;font-weight:700;color:#7A7A85;font-family:monospace;letter-spacing:2px;margin:4px 0 16px 0;">拨号连接中...</div>
-                <div style="display:flex;align-items:center;justify-content:center;gap:4px;height:18px;margin-bottom:14px;">
-                    <span class="vc-wave-bar" style="animation-delay:0s;"></span><span class="vc-wave-bar" style="animation-delay:.2s;"></span><span class="vc-wave-bar" style="animation-delay:.4s;"></span><span class="vc-wave-bar" style="animation-delay:.1s;"></span><span class="vc-wave-bar" style="animation-delay:.3s;"></span>
-                </div>
-                <div style="width:100%;background:rgba(255,255,255,0.9);border:1px solid #E6E6EE;border-radius:18px;padding:15px 16px;box-shadow:0 6px 20px rgba(20,20,30,0.04);">
-                    <div id="vc-env-txt" style="font-size:8.5px;font-weight:700;color:#9A9AA5;margin-bottom:6px;">(( 正在接通听筒信号... ))</div>
-                    <div id="vc-voice-txt" style="font-size:12px;font-weight:700;color:#2C2C32;line-height:1.68;min-height:42px;">“ 喂……？ ”</div>
-                </div>
-                <div style="width:100%;display:flex;gap:6px;margin-top:12px;">
-                    <input type="text" id="vc-speak-inp" placeholder="在电话里对TA说点什么..." style="flex:1;height:34px!important;background:#FFFFFF!important;border:1px solid #E2E2EC!important;border-radius:999px!important;padding:0 14px!important;font-size:10.5px!important;color:#2C2C32!important;outline:none!important;" />
-                    <span class="smt-pill-btn dark" id="vc-speak-btn" style="height:34px!important;padding:0 14px!important;">回应TA</span>
+                <div style="font-size:8px;font-weight:700;color:#9A9AA5;letter-spacing:1px;">
+                    ${ex.weatherCity || "SEOUL"} · ${ex.weatherDesc || "微雾"}
                 </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:center;gap:28px;width:100%;">
-                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;"><div style="width:48px;height:48px;border-radius:50%;background:#FFFFFF;border:1px solid #E4E4EC;display:flex;align-items:center;justify-content:center;">${ICO.mic}</div><span style="font-size:8.5px;font-weight:700;color:#6E6E77;">麦克风</span></div>
-                <div id="vc-btn-hangup" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;"><div style="width:58px;height:58px;border-radius:50%;background:#3A3A42;border:1px solid #2C2C32;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(44,44,52,0.25);">${ICO.phoneOff}</div><span style="font-size:8.5px;font-weight:800;color:#2C2C32;">结束通话</span></div>
-                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;"><div style="width:48px;height:48px;border-radius:50%;background:#FFFFFF;border:1px solid #E4E4EC;display:flex;align-items:center;justify-content:center;">${ICO.speaker}</div><span style="font-size:8.5px;font-weight:700;color:#6E6E77;">免提外放</span></div>
+
+            <!-- 中央高定双环声波头像与无框感字幕舱 -->
+            <div style="width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;my:auto;z-index:4;">
+                
+                <!-- 极细同心银丝光环头像 -->
+                <div style="position:relative;width:136px;height:136px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+                    <svg viewBox="0 0 140 140" width="136" height="136" fill="none" style="position:absolute;inset:0;pointer-events:none;">
+                        <circle class="vc-svg-ring1" cx="70" cy="70" r="52" stroke="#DCDCE6" stroke-width="0.9" />
+                        <circle class="vc-svg-ring2" cx="70" cy="70" r="62" stroke="#E4E4EE" stroke-width="0.7" stroke-dasharray="3 4" />
+                    </svg>
+                    <div style="width:88px;height:88px;border-radius:50%;padding:3px;background:#FFFFFF;border:1px solid #EAEAF2;box-shadow:0 12px 32px rgba(30,30,45,0.08);position:relative;z-index:3;">
+                        <img src="${charAva}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;" />
+                    </div>
+                </div>
+
+                <!-- 角色名与纤细计时器 -->
+                <div style="font-size:18px;font-weight:800;color:#2C2C32;letter-spacing:1.5px;">${charName}</div>
+                <div id="vc-timer-txt" style="font-size:11px;font-weight:600;color:#8E8E98;font-family:monospace;letter-spacing:3px;margin:5px 0 16px 0;">00 : 00</div>
+
+                <!-- 清冷冰雾悬浮字幕舱 -->
+                <div style="width:100%;background:rgba(255,255,255,0.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid #EAEAF2;border-radius:22px;padding:18px 18px 16px 18px;box-shadow:0 10px 30px rgba(20,20,35,0.035);position:relative;">
+                    <!-- 顶部微距环境音标签 -->
+                    <div style="display:inline-flex;align-items:center;gap:5px;background:#FFFFFF;border:1px solid #EFEFF5;border-radius:99px;padding:2.5px 10px;font-size:8px;font-weight:700;color:#8E8E98;letter-spacing:0.5px;margin-bottom:12px;">
+                        <span id="vc-env-txt">正在接通听筒信号...</span>
+                    </div>
+
+                    <!-- 角色贴耳语音正文 -->
+                    <div id="vc-voice-txt" style="font-size:12.5px;font-weight:700;color:#2C2C32;line-height:1.75;letter-spacing:0.4px;min-height:44px;display:flex;align-items:center;justify-content:center;">
+                        “ 喂……听得到吗？ ”
+                    </div>
+
+                    <!-- 底部极细流线声波纹 -->
+                    <div style="margin-top:12px;padding-top:10px;border-top:1px solid #F4F4F8;display:flex;align-items:center;justify-content:center;gap:3px;height:12px;">
+                        <span class="vc-thin-wave" style="animation-delay:0.0s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.15s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.3s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.45s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.2s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.35s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.1s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.25s;"></span>
+                        <span class="vc-thin-wave" style="animation-delay:0.4s;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部：无框感对话输入条 + 高定三枚圆形通话控制键 -->
+            <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:18px;z-index:4;">
+                <div style="display:flex;align-items:center;background:#FFFFFF;border:1px solid #E6E6EE;border-radius:999px;padding:3px 4px 3px 14px;box-shadow:0 4px 14px rgba(0,0,0,0.025);">
+                    <input type="text" id="vc-speak-inp" placeholder="对着麦克风跟 TA 说句话..." style="flex:1;height:30px!important;border:0!important;outline:0!important;background:transparent!important;font-size:10.5px!important;font-weight:600!important;color:#2C2C32!important;" />
+                    <span id="vc-speak-btn" style="width:30px;height:30px;border-radius:50%;background:#2C2C34;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" title="发送语音回应">${ICO.send}</span>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-around;padding:0 12px;">
+                    <div id="vc-btn-mute" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                        <div class="vc-ctrl-circle">${ICO.mic}</div>
+                        <span style="font-size:8px;font-weight:700;color:#7A7A85;letter-spacing:0.5px;">静音</span>
+                    </div>
+
+                    <div id="vc-btn-hangup" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                        <div style="width:56px;height:56px;border-radius:50%;background:#2C2C34;border:1px solid #2C2C34;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(44,44,52,0.22);transition:transform 0.15s ease;">${ICO.phoneOff}</div>
+                        <span style="font-size:8px;font-weight:800;color:#2C2C32;letter-spacing:0.5px;">挂断</span>
+                    </div>
+
+                    <div id="vc-btn-speaker" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                        <div class="vc-ctrl-circle active-ctrl">${ICO.speaker}</div>
+                        <span style="font-size:8px;font-weight:700;color:#7A7A85;letter-spacing:0.5px;">免提</span>
+                    </div>
+                </div>
             </div>`;
         modal.appendChild(callLayer);
 
         callSeconds = 0;
         if (callTimerInt) clearInterval(callTimerInt);
-        callTimerInt = setInterval(() => { callSeconds++; const tEl = topDoc.getElementById("vc-timer-txt"); if (tEl) tEl.textContent = fmtCallTime(callSeconds); }, 1000);
+        callTimerInt = setInterval(() => {
+            callSeconds++;
+            const tEl = topDoc.getElementById("vc-timer-txt");
+            if (tEl) tEl.textContent = fmtCallTime(callSeconds);
+        }, 1000);
+
+        // 静音/免提按钮点选反馈
+        topDoc.getElementById("vc-btn-mute").onclick = (e) => e.currentTarget.querySelector(".vc-ctrl-circle")?.classList.toggle("active-ctrl");
+        topDoc.getElementById("vc-btn-speaker").onclick = (e) => e.currentTarget.querySelector(".vc-ctrl-circle")?.classList.toggle("active-ctrl");
 
         (async () => {
             try {
                 const res = await callVoiceAI("");
-                if (topDoc.getElementById("vc-env-txt")) topDoc.getElementById("vc-env-txt").textContent = `(( 听筒环境音：${res.env} ))`;
-                if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = res.voice;
-            } catch (err) { if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = `（${err.message}）`; }
+                if (topDoc.getElementById("vc-env-txt")) topDoc.getElementById("vc-env-txt").textContent = res.env;
+                if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = `“ ${res.voice.replace(/^[“"]|[”"]$/g, "")} ”`;
+            } catch (err) {
+                if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = `（${err.message}）`;
+            }
         })();
 
         const speakInp = topDoc.getElementById("vc-speak-inp"), speakBtn = topDoc.getElementById("vc-speak-btn");
         const handleSpeak = async () => {
             const txt = speakInp.value.trim(); if (!txt) return;
             speakInp.value = "";
-            if (topDoc.getElementById("vc-env-txt")) topDoc.getElementById("vc-env-txt").textContent = `(( 对方正在听你说：“${txt}”... ))`;
+            if (topDoc.getElementById("vc-env-txt")) topDoc.getElementById("vc-env-txt").textContent = `正在倾听你说：“${txt.slice(0, 14)}”...`;
             try {
                 const res = await callVoiceAI(txt);
-                if (topDoc.getElementById("vc-env-txt")) topDoc.getElementById("vc-env-txt").textContent = `(( 听筒环境音：${res.env} ))`;
-                if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = res.voice;
-            } catch (err) { if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = err.message; }
+                if (topDoc.getElementById("vc-env-txt")) topDoc.getElementById("vc-env-txt").textContent = res.env;
+                if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = `“ ${res.voice.replace(/^[“"]|[”"]$/g, "")} ”`;
+            } catch (err) {
+                if (topDoc.getElementById("vc-voice-txt")) topDoc.getElementById("vc-voice-txt").textContent = err.message;
+            }
         };
         speakBtn.onclick = handleSpeak;
         speakInp.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); handleSpeak(); } };
 
         topDoc.getElementById("vc-btn-hangup").onclick = () => {
             if (callTimerInt) clearInterval(callTimerInt);
-            const durStr = fmtCallTime(callSeconds || 1), lastVoice = topDoc.getElementById("vc-voice-txt")?.textContent || "";
+            const durStr = fmtCallTime(callSeconds || 1).replace(/\s+/g, "");
+            const lastVoice = topDoc.getElementById("vc-voice-txt")?.textContent || "";
             callLayer.remove();
             const chatKey = `sumoul_v16_wx__${ctx.safeScope}`;
             try {
                 const list = JSON.parse(localStorage.getItem(chatKey) || "[]"), d = new Date(), tStr = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                list.push({ role: "sys", text: `📞 语音通话已结束 · 通话时长 ${durStr}`, time: tStr });
+                list.push({ role: "sys", text: `语音通话已结束 · 时长 ${durStr}`, time: tStr });
                 if (lastVoice && !lastVoice.includes("API")) list.push({ role: "ai", text: `[语音通话] ${lastVoice}`, time: tStr });
                 localStorage.setItem(chatKey, JSON.stringify(list));
             } catch (e) {}
@@ -4441,9 +4569,9 @@ bootSumoulApp();
         };
     }
 
-    function mountUltimateSettingsV5() {
+    function mountUltimateSettingsV6() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal"), talkPage = topDoc.getElementById("smt-page-talk"), wxSetPage = topDoc.getElementById("smt-page-wx_settings"), topBadge = topDoc.getElementById("smt-top-badge");
-        if (!modal || !talkPage || !wxSetPage || !topBadge) { setTimeout(mountUltimateSettingsV5, 200); return; }
+        if (!modal || !talkPage || !wxSetPage || !topBadge) { setTimeout(mountUltimateSettingsV6, 200); return; }
 
         hookFetch();
         applyVisualsAndPin();
@@ -4461,11 +4589,16 @@ bootSumoulApp();
         const st = topDoc.createElement("style");
         st.id = "sumoul-wx-fullscreen-css";
         st.innerHTML = `
-            @keyframes vcPulseOut { 0% { transform: scale(0.82); opacity: 0.75; } 100% { transform: scale(1.45); opacity: 0; } }
-            @keyframes vcWaveJump { 0%, 100% { height: 5px; opacity: 0.45; } 50% { height: 16px; opacity: 0.95; } }
-            #seoul-mini-theater-modal .vc-pulse-ring { position: absolute !important; width: 88px !important; height: 88px !important; border-radius: 50% !important; border: 1.2px solid #9A9AA5 !important; box-shadow: 0 0 12px #FFFFFF !important; pointer-events: none !important; animation: vcPulseOut 2.4s cubic-bezier(0.16,1,0.3,1) infinite !important; }
-            #seoul-mini-theater-modal .vc-pulse-ring.r2 { animation-delay: 1.2s !important; }
-            #seoul-mini-theater-modal .vc-wave-bar { width: 2.5px !important; height: 6px !important; border-radius: 99px !important; background: #484852 !important; display: inline-block !important; animation: vcWaveJump 1.1s ease-in-out infinite !important; }
+            @keyframes vcRingBreathe { 0%, 100% { transform: scale(0.95); opacity: 0.45; } 50% { transform: scale(1.08); opacity: 0.95; } }
+            @keyframes vcRingSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            @keyframes vcThinWave { 0%, 100% { height: 3px; opacity: 0.3; } 50% { height: 11px; opacity: 0.85; } }
+            @keyframes vcDotBlink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+            #seoul-mini-theater-modal .vc-svg-ring1 { transform-origin: center; animation: vcRingBreathe 3.2s ease-in-out infinite !important; }
+            #seoul-mini-theater-modal .vc-svg-ring2 { transform-origin: center; animation: vcRingSpin 24s linear infinite !important; }
+            #seoul-mini-theater-modal .vc-thin-wave { width: 1.5px !important; height: 4px !important; border-radius: 99px !important; background: #55555E !important; display: inline-block !important; animation: vcThinWave 1.2s ease-in-out infinite !important; }
+            #seoul-mini-theater-modal .vc-ctrl-circle { width: 46px !important; height: 46px !important; border-radius: 50% !important; background: #FFFFFF !important; border: 1px solid #E4E4EE !important; color: #3A3A42 !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important; transition: all 0.2s ease !important; }
+            #seoul-mini-theater-modal .vc-ctrl-circle.active-ctrl { background: #F0F0F5 !important; border-color: #3A3A42 !important; }
 
             #seoul-mini-theater-modal #smt-page-talk .smt-wx-top-bar { display: none !important; }
             #seoul-mini-theater-modal .smt-fs-body:has(#smt-page-talk.active) { padding: 0 !important; max-width: 100% !important; }
@@ -4482,7 +4615,7 @@ bootSumoulApp();
             #seoul-mini-theater-modal .ios-row.last { border-bottom: none !important; }
             #seoul-mini-theater-modal .ios-lbl { font-size: 10.2px !important; font-weight: 700 !important; color: #2C2C32 !important; flex-shrink: 0 !important; display: flex !important; align-items: center !important; gap: 7px !important; }
 
-            /* 🔥 最高权重彻底杀死一切 input 边框与背景，100% 根除双边框！ */
+            /* 最高权重剥离所有 input 边框，100% 根除双边框 */
             #seoul-mini-theater-modal #smt-page-wx_settings input,
             #seoul-mini-theater-modal #smt-page-wx_settings input[type="text"],
             #seoul-mini-theater-modal #smt-page-wx_settings input[type="number"],
@@ -4502,7 +4635,7 @@ bootSumoulApp();
             #seoul-mini-theater-modal .ios-switch.on { background: #2C2C34 !important; border-color: #2C2C34 !important; }
             #seoul-mini-theater-modal .ios-switch.on::after { background: #FFFFFF !important; transform: translateX(16px) !important; }
 
-            #seoul-mini-theater-modal .ios-chip { display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 24px !important; padding: 0 10px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1px solid #E4E4EE !important; font-size: 8.8px !important; font-weight: 600 !important; color: #666670 !important; cursor: pointer !important; white-space: nowrap !important; }
+            #seoul-mini-theater-modal .ios-chip { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; height: 24px !important; padding: 0 10px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1px solid #E4E4EE !important; font-size: 8.8px !important; font-weight: 600 !important; color: #55555E !important; cursor: pointer !important; white-space: nowrap !important; }
             #seoul-mini-theater-modal .ios-chip.selected { background: #2C2C34 !important; border-color: #2C2C34 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; }
         `;
         topDoc.head.appendChild(st);
@@ -4534,6 +4667,7 @@ bootSumoulApp();
         hiddenBox.style.cssText = "display:none!important;";
         [elTimeTitle, elTimeToggle, elClockBig].forEach((el) => el && hiddenBox.appendChild(el));
 
+        // 构建 100% 零 Emoji 的 10 大纯白模块设置页
         wxSetPage.innerHTML = `
             <div id="ios-wxset-root" style="display:flex;flex-direction:column;height:100%;background:#FFFFFF!important;overflow:hidden;">
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 10px 2px;background:#FFFFFF!important;border-bottom:1px solid #F4F4F8;flex-shrink:0;">
@@ -4567,22 +4701,22 @@ bootSumoulApp();
                     <div class="ios-sec-header"><span>02 · VOICE CALL &amp; PROACTIVE · 实时语音通话与主动消息</span></div>
                     <div class="ios-group-card" style="padding:12px 14px!important;">
                         <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid #F2F2F7;margin-bottom:10px;">
-                            <div><div class="ios-lbl">${ICO.phoneCall}<span>向 TA 发起实时微信语音通话</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:21px;">进入全屏白雾声波通话界面，听 TA 贴耳低语与环境音</div></div>
-                            <span class="smt-pill-btn dark" id="ios-start-voice-call" style="height:28px!important;padding:0 12px!important;">📞 立即拨打语音</span>
+                            <div><div class="ios-lbl">${ICO.phoneCall}<span>向 TA 发起实时微信语音通话</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:20px;">进入高定清冷雾白通话界面，听 TA 贴耳低语与环境音</div></div>
+                            <span class="smt-pill-btn dark" id="ios-start-voice-call" style="height:28px!important;padding:0 12px!important;gap:5px!important;">${ICO.phoneCall}<span>立即拨打语音</span></span>
                         </div>
                         <div style="font-size:8.8px;font-weight:700;color:#55555E;margin-bottom:7px;">或者点击下方情境，让 TA 现在主动发微信消息找你：</div>
                         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
-                            <span class="ios-chip" data-proact="突然想你了，主动发微信问你在干嘛">✦ 日常想你</span>
-                            <span class="ios-chip" data-proact="深夜睡不着，主动发微信查岗撒娇">✦ 深夜查岗</span>
-                            <span class="ios-chip" data-proact="看到你没回消息有点吃醋，主动发消息试探">✦ 吃醋试探</span>
-                            <span class="ios-chip" data-proact="在首尔街头看到好吃的，主动拍给你看并给你发微信转账买零食">✦ 报备转账</span>
+                            <span class="ios-chip" data-proact="突然想你了，主动发微信问你在干嘛">${ICO.spark}<span>日常想你</span></span>
+                            <span class="ios-chip" data-proact="深夜睡不着，主动发微信查岗撒娇">${ICO.spark}<span>深夜查岗</span></span>
+                            <span class="ios-chip" data-proact="看到你没回消息有点吃醋，主动发消息试探">${ICO.spark}<span>吃醋试探</span></span>
+                            <span class="ios-chip" data-proact="在首尔街头看到好吃的，主动拍给你看并给你发微信转账买零食">${ICO.spark}<span>报备转账</span></span>
                         </div>
                     </div>
 
                     <div class="ios-sec-header"><span>03 · WEATHER &amp; CITY · 真实天气与城市环境同步</span></div>
                     <div class="ios-group-card">
                         <div class="ios-row" id="ios-row-weather-sw" style="cursor:pointer;">
-                            <div><div class="ios-lbl">${ICO.cloudSnow}<span>开启真实天气与温度感知</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:22px;">TA 会在微信聊天和电话里自然提及此刻的天气冷暖</div></div>
+                            <div><div class="ios-lbl">${ICO.cloudSnow}<span>开启真实天气与温度感知</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:21px;">TA 会在微信聊天和电话里自然提及此刻的天气冷暖</div></div>
                             <div class="ios-switch on" id="ios-sw-weather"></div>
                         </div>
                         <div class="ios-row"><span class="ios-lbl">当前所在城市</span><input type="text" id="ios-inp-wcity" class="ios-clean-inp" placeholder="如：Seoul · 首尔 / 上海" /></div>
@@ -4590,15 +4724,15 @@ bootSumoulApp();
                             <span class="ios-lbl">当前实时天气状态</span>
                             <div style="display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end;">
                                 <input type="text" id="ios-inp-wdesc" class="ios-clean-inp" placeholder="如：初雪微雾 · -1°C" />
-                                <span class="ios-chip selected" id="ios-btn-fetch-weather" style="padding:0 8px!important;">↻ 联网实况</span>
+                                <span class="ios-chip selected" id="ios-btn-fetch-weather" style="padding:0 8px!important;">${ICO.sync}<span>联网实况</span></span>
                             </div>
                         </div>
                         <div class="ios-row last" style="padding:8px 0!important;">
                             <span style="font-size:8.5px;color:#8E8E98;font-weight:700;">一键切换氛围天气：</span>
-                            <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;">
-                                <span class="ios-chip" data-wpreset="初雪飘落 · -2°C">❄️ 初雪 -2°C</span>
-                                <span class="ios-chip" data-wpreset="冷雨夜幕 · 11°C">🌧️ 雨夜 11°C</span>
-                                <span class="ios-chip" data-wpreset="晴朗微风 · 21°C">☀️ 晴朗 21°C</span>
+                            <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+                                <span class="ios-chip" data-wpreset="初雪飘落 · -2°C">${ICO.snow}<span>初雪 -2°C</span></span>
+                                <span class="ios-chip" data-wpreset="冷雨夜幕 · 11°C">${ICO.rain}<span>雨夜 11°C</span></span>
+                                <span class="ios-chip" data-wpreset="晴朗微风 · 21°C">${ICO.sun}<span>晴朗 21°C</span></span>
                             </div>
                         </div>
                     </div>
@@ -4707,11 +4841,11 @@ bootSumoulApp();
                     <div class="ios-sec-header"><span>08 · MEMORY &amp; TIME · 记忆同步与区间总结</span></div>
                     <div class="ios-group-card">
                         <div class="ios-row" id="ios-row-sync" style="cursor:pointer;">
-                            <div><div class="ios-lbl">${ICO.sync}<span>微信记忆实时同步至酒馆主线</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:22px;" id="ios-sync-sub">开启后主线剧情将自动感知微信聊天内容</div></div>
+                            <div><div class="ios-lbl">${ICO.sync}<span>微信记忆实时同步至酒馆主线</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:20px;" id="ios-sync-sub">开启后主线剧情将自动感知微信聊天内容</div></div>
                             <div class="ios-switch" id="ios-sw-sync"></div>
                         </div>
                         <div class="ios-row" id="ios-row-time" style="cursor:pointer;">
-                            <div><div class="ios-lbl">${ICO.clock}<span>真实现实时间与昼夜感知</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:22px;" id="ios-time-sub">开启后 TA 会感知你手机当前的真实时间</div></div>
+                            <div><div class="ios-lbl">${ICO.clock}<span>真实现实时间与昼夜感知</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:21px;" id="ios-time-sub">开启后 TA 会感知你手机当前的真实时间</div></div>
                             <div class="ios-switch on" id="ios-sw-time"></div>
                         </div>
                         <div class="ios-row last" id="ios-open-sum-row" style="cursor:pointer;">
@@ -4724,20 +4858,23 @@ bootSumoulApp();
                     <div class="ios-sec-header"><span>09 · WORLD INFO · 世界书导入与角色自动读取</span></div>
                     <div class="ios-group-card" style="padding:12px 14px!important;">
                         <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #F2F2F7;margin-bottom:10px;">
-                            <div><div class="ios-lbl">${ICO.book}<span>启用角色世界书自动读取</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:22px;">在微信聊天与全应用中自动注入世界观设定</div></div>
+                            <div><div class="ios-lbl">${ICO.book}<span>启用角色世界书自动读取</span></div><div style="font-size:8px;color:#9A9AA5;margin-left:21px;">在微信聊天与全应用中自动注入世界观设定</div></div>
                             <div class="ios-switch on" id="ios-sw-wi"></div>
+                                                    </div>
+                        <div style="display:flex;gap:6px;margin-bottom:7px;">
+                            <label class="smt-pill-btn dark" style="flex:1.15;height:28px!important;cursor:pointer;border-radius:10px!important;gap:4px!important;">${ICO.upload}<span>导入世界书 (.json/.txt)</span><input type="file" id="smt-wi-file-inp" accept=".json,.txt,.world" multiple style="display:none;" /></label>
+                            <span class="smt-pill-btn" id="smt-wi-sync-st-btn" style="flex:1;height:28px!important;border-radius:10px!important;gap:4px!important;">${ICO.sync}<span>读取酒馆世界书</span></span>
+                            <span class="smt-pill-btn" id="smt-wi-open-add-drawer" style="height:28px!important;padding:0 10px!important;border-radius:10px!important;gap:3px!important;">${ICO.plus}<span>新增</span></span>
                         </div>
-                        <div style="display:flex;gap:6px;margin-bottom:9px;">
-                            <label class="smt-pill-btn dark" style="flex:1.15;height:28px!important;cursor:pointer;border-radius:10px!important;">${ICO.upload}<span>导入世界书 (.json/.txt)</span><input type="file" id="smt-wi-file-inp" accept=".json,.txt,.world" multiple style="display:none;" /></label>
-                            <span class="smt-pill-btn" id="smt-wi-sync-st-btn" style="flex:1;height:28px!important;border-radius:10px!important;">${ICO.sync}<span>读取酒馆世界书</span></span>
-                            <span class="smt-pill-btn" id="smt-wi-open-add-drawer" style="height:28px!important;padding:0 10px!important;border-radius:10px!important;">${ICO.plus}<span>新增</span></span>
-                        </div>
+                        <div id="smt-wi-sync-status" style="display:none;font-size:8.5px;font-weight:700;color:#484852;background:#F8F8FA;border:1px solid #EAEAF0;border-radius:8px;padding:5px 9px;margin-bottom:8px;"></div>
+
                         <div id="smt-wi-add-drawer" style="display:none;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:12px;padding:8px 12px;margin-bottom:9px;">
                             <div class="ios-row"><span class="ios-lbl">设定标题</span><input type="text" id="smt-wi-new-title" class="ios-clean-inp" placeholder="如：两人的初遇设定" /></div>
                             <div class="ios-row"><span class="ios-lbl">触发关键词</span><input type="text" id="smt-wi-new-keys" class="ios-clean-inp" placeholder="逗号隔开 (留空则常驻生效)" /></div>
                             <textarea id="smt-wi-new-content" style="width:100%;height:48px;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:9px;padding:6px 8px;font-size:9.8px;color:#2C2C32;box-sizing:border-box;resize:none;outline:none;margin:6px 0;" placeholder="写下该条世界书的具体设定内容..."></textarea>
-                            <div style="display:flex;justify-content:flex-end;gap:5px;"><span class="smt-pill-btn" id="smt-wi-cancel-add" style="height:24px!important;">收起</span><span class="smt-pill-btn dark" id="smt-wi-add-btn" style="height:24px!important;">✓ 存入世界书</span></div>
+                            <div style="display:flex;justify-content:flex-end;gap:5px;"><span class="smt-pill-btn" id="smt-wi-cancel-add" style="height:24px!important;">收起</span><span class="smt-pill-btn dark" id="smt-wi-add-btn" style="height:24px!important;gap:3px!important;">${ICO.check}<span>存入世界书</span></span></div>
                         </div>
+
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <span style="font-size:8.5px;font-weight:800;color:#7A7A85;" id="smt-wi-count-txt">已挂载设定 (0)</span>
                             <div style="display:flex;gap:10px;align-items:center;"><span id="smt-wi-mode-btn" style="font-size:8px;font-weight:700;color:#55555E;cursor:pointer;border:1px solid #EAEAF0;padding:2px 7px;border-radius:99px;">模式: 常驻+词触发</span><span id="smt-wi-clear-btn" style="font-size:8px;font-weight:700;color:#9A6868;cursor:pointer;">清空</span></div>
@@ -4749,12 +4886,12 @@ bootSumoulApp();
                     <div class="ios-sec-header"><span>10 · DATA &amp; SYSTEM · 聊天记录备份与管理</span></div>
                     <div class="ios-group-card" style="padding:12px 14px!important;">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-                            <span class="smt-pill-btn" id="ios-export-chat-btn" style="height:28px!important;border-radius:10px!important;">${ICO.download}<span>导出聊天备份 (.json)</span></span>
-                            <label class="smt-pill-btn" style="height:28px!important;border-radius:10px!important;cursor:pointer;">${ICO.sync}<span>导入恢复聊天记录</span><input type="file" id="ios-import-chat-inp" accept=".json" style="display:none;" /></label>
+                            <span class="smt-pill-btn" id="ios-export-chat-btn" style="height:28px!important;border-radius:10px!important;gap:4px!important;">${ICO.download}<span>导出聊天备份 (.json)</span></span>
+                            <label class="smt-pill-btn" style="height:28px!important;border-radius:10px!important;cursor:pointer;gap:4px!important;">${ICO.sync}<span>导入恢复聊天记录</span><input type="file" id="ios-import-chat-inp" accept=".json" style="display:none;" /></label>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-                            <span class="smt-pill-btn" id="ios-clear-wx-btn" style="height:28px!important;border-radius:10px!important;color:#9A6868!important;">${ICO.trash}<span>清空当前聊天记录</span></span>
-                            <span class="smt-pill-btn" id="ios-open-admin-btn" style="height:28px!important;border-radius:10px!important;">${ICO.shield}<span>管理员 / 锁屏后台</span></span>
+                            <span class="smt-pill-btn" id="ios-clear-wx-btn" style="height:28px!important;border-radius:10px!important;color:#9A6868!important;gap:4px!important;">${ICO.trash}<span>清空当前聊天记录</span></span>
+                            <span class="smt-pill-btn" id="ios-open-admin-btn" style="height:28px!important;border-radius:10px!important;gap:4px!important;">${ICO.shield}<span>管理员 / 锁屏后台</span></span>
                         </div>
                         <div style="display:flex;gap:8px;"><div id="ios-reset-slot" style="flex:0.8;display:flex;"></div><div id="ios-save-slot" style="flex:1.4;display:flex;"></div></div>
                     </div>
@@ -4763,6 +4900,7 @@ bootSumoulApp();
             </div>`;
         wxSetPage.appendChild(hiddenBox);
 
+        // 挂载原节点
         if (elBackChat) { elBackChat.style.cssText = "height:28px!important;padding:0 12px!important;background:#FFFFFF!important;border:1px solid #E6E6EE!important;border-radius:999px!important;font-size:9.5px!important;font-weight:800!important;color:#2C2C32!important;"; topDoc.getElementById("ios-back-slot").appendChild(elBackChat); }
         if (elTimePill) { elTimePill.style.cssText = "height:26px!important;padding:0 10px!important;background:#FFFFFF!important;border:1px solid #ECECF2!important;border-radius:999px!important;font-size:8.5px!important;font-weight:700!important;color:#6E6E77!important;"; topDoc.getElementById("ios-time-slot").appendChild(elTimePill); }
         if (elMyAvaPrev) { elMyAvaPrev.style.cssText = "width:56px!important;height:56px!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #EAEAF0!important;display:block!important;"; topDoc.getElementById("ios-myava-img-slot").appendChild(elMyAvaPrev); }
@@ -4780,10 +4918,17 @@ bootSumoulApp();
 
         if (elBgNote) { elBgNote.style.cssText = "width:100%!important;height:44px!important;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:10px!important;padding:6px 8px!important;font-size:9.8px!important;color:#2C2C32!important;box-sizing:border-box!important;resize:none!important;outline:none!important;"; topDoc.getElementById("ios-bgnote-slot").appendChild(elBgNote); }
         if (elResetBtn) { elResetBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:9.5px!important;font-weight:700!important;background:#FFFFFF!important;"; topDoc.getElementById("ios-reset-slot").appendChild(elResetBtn); }
-        if (elSaveBtn) { elSaveBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:10px!important;font-weight:800!important;background:#2C2C34!important;border-color:#2C2C34!important;"; elSaveBtn.innerHTML = `${ICO.check}<span>保存全部设置并返回</span>`; topDoc.getElementById("ios-save-slot").appendChild(elSaveBtn); }
+        if (elSaveBtn) { elSaveBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:10px!important;font-weight:800!important;background:#2C2C34!important;border-color:#2C2C34!important;gap:4px!important;"; elSaveBtn.innerHTML = `${ICO.check}<span>保存全部设置并返回</span>`; topDoc.getElementById("ios-save-slot").appendChild(elSaveBtn); }
 
         if (sumDrawer) { sumDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:12px!important;padding:10px!important;margin:4px 0 10px 0!important;"; topDoc.getElementById("ios-sum-slot").appendChild(sumDrawer); }
         if (cssDrawer) { cssDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:12px!important;padding:10px!important;margin:4px 0 10px 0!important;"; topDoc.getElementById("ios-css-slot").appendChild(cssDrawer); }
+
+        function showWiStatus(msg) {
+            const box = topDoc.getElementById("smt-wi-sync-status");
+            if (!box) return;
+            box.textContent = msg;
+            box.style.display = "block";
+        }
 
         function syncAllUI() {
             const ex = loadExtra();
@@ -4840,9 +4985,10 @@ bootSumoulApp();
         topDoc.getElementById("ios-start-voice-call").onclick = () => { saveFromInputs(); openVoiceCallModal(); };
         topDoc.getElementById("ios-row-weather-sw").onclick = () => { const ex = loadExtra(); ex.weatherEnabled = !(ex.weatherEnabled !== false); saveExtra(ex); syncAllUI(); };
         topDoc.getElementById("ios-btn-fetch-weather").onclick = async (e) => {
-            e.target.textContent = "获取中...";
+            const btn = e.currentTarget, orig = btn.innerHTML;
+            btn.textContent = "获取中...";
             const res = await fetchRealLiveWeather(topDoc.getElementById("ios-inp-wcity").value.trim());
-            e.target.textContent = "↻ 联网实况";
+            btn.innerHTML = orig;
             if (res) { const ex = loadExtra(); ex.weatherCity = res.city; ex.weatherDesc = res.weather; saveExtra(ex); syncAllUI(); }
             else alert("实时天气拉取超时，可直接点击下方快捷天气标签或手动输入！");
         };
@@ -4873,7 +5019,7 @@ bootSumoulApp();
                 let list = [];
                 try { list = JSON.parse(localStorage.getItem(chatKey) || "[]"); } catch (e) {}
                 const d = new Date(), tStr = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                list.push({ role: "sys", text: `✦ 触发情境：TA ${scene}`, time: tStr });
+                list.push({ role: "sys", text: `触发情境：TA ${scene}`, time: tStr });
                 localStorage.setItem(chatKey, JSON.stringify(list));
                 topDoc.getElementById("smt-wx-reply-btn")?.click();
             }, 120);
@@ -4909,6 +5055,15 @@ bootSumoulApp();
             }
         };
 
+        const cssUpload = topDoc.getElementById("smt-wx-css-upload");
+        if (cssUpload) {
+            cssUpload.onchange = async (ev) => {
+                const f = ev.target.files?.[0]; if (!f) return;
+                const ta = topDoc.getElementById("smt-wx-css-textarea");
+                if (ta) ta.value = await f.text();
+            };
+        }
+
         topDoc.getElementById("ios-export-chat-btn").onclick = () => {
             const raw = localStorage.getItem(`sumoul_v16_wx__${getCharScope()}`) || "[]";
             const a = topDoc.createElement("a");
@@ -4920,13 +5075,14 @@ bootSumoulApp();
             const f = e.target.files?.[0]; if (!f) return;
             try {
                 const arr = JSON.parse(await f.text());
-                if (Array.isArray(arr)) { localStorage.setItem(`sumoul_v16_wx__${getCharScope()}`, JSON.stringify(arr)); alert(`✓ 已恢复 ${arr.length} 条记录！`); elBackChat?.click(); }
-            } catch (err) { alert("备份文件格式有误！"); }
+                if (Array.isArray(arr)) { localStorage.setItem(`sumoul_v16_wx__${getCharScope()}`, JSON.stringify(arr)); alert(`已恢复 ${arr.length} 条记录`); elBackChat?.click(); }
+            } catch (err) { alert("备份文件格式有误"); }
         };
 
         topDoc.getElementById("ios-clear-wx-btn").onclick = () => { if (confirm("确定清空与当前角色的微信聊天记录吗？")) { topDoc.getElementById("smt-wx-clear")?.click(); elBackChat?.click(); } };
         topDoc.getElementById("ios-open-admin-btn").onclick = () => topDoc.getElementById("smt-api-open-admin")?.click();
 
+        // 世界书列表渲染（零 Emoji）
         function renderWiList() {
             const wi = loadWi();
             topDoc.getElementById("ios-sw-wi")?.classList.toggle("on", wi.enabled);
@@ -4942,7 +5098,7 @@ bootSumoulApp();
             listEl.innerHTML = wi.entries.map((it, idx) => {
                 const isConst = wi.mode === "all" || it.constant || !it.keys?.length;
                 const badge = isConst ? `<span style="background:#2C2C34;color:#FFF;padding:1px 6px;border-radius:99px;font-size:7.5px;">常驻</span>` : `<span style="border:1px solid #E2E2EA;color:#55555E;padding:1px 6px;border-radius:99px;font-size:7.5px;">词:${it.keys.slice(0, 3).join(",")}</span>`;
-                return `<div style="background:#FFFFFF;border:1px solid ${it.enabled ? "#E2E2EC" : "#F2F2F6"};border-radius:11px;padding:7px 10px;opacity:${it.enabled ? "1" : "0.5"};"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;"><label style="display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:800;color:#2C2C32;cursor:pointer;"><input type="checkbox" data-witog="${idx}" ${it.enabled ? "checked" : ""} style="accent-color:#2C2C34;flex:none!important;width:13px!important;height:13px!important;" /><span>${it.title.replace(/</g, "&lt;")}</span>${badge}</label><div style="display:flex;gap:8px;align-items:center;"><span data-wicon="${idx}" style="font-size:8px;color:#7A7A85;cursor:pointer;">${it.constant ? "改词触发" : "设为常驻"}</span><span data-widel="${idx}" style="font-size:9.5px;color:#9A6868;cursor:pointer;font-weight:700;">✕</span></div></div><div style="font-size:8.8px;color:#6E6E77;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-left:18px;">${it.content.replace(/</g, "&lt;")}</div></div>`;
+                return `<div style="background:#FFFFFF;border:1px solid ${it.enabled ? "#E2E2EC" : "#F2F2F6"};border-radius:11px;padding:7px 10px;opacity:${it.enabled ? "1" : "0.5"};"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;"><label style="display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:800;color:#2C2C32;cursor:pointer;"><input type="checkbox" data-witog="${idx}" ${it.enabled ? "checked" : ""} style="accent-color:#2C2C34;flex:none!important;width:13px!important;height:13px!important;" /><span>${it.title.replace(/</g, "&lt;")}</span>${badge}</label><div style="display:flex;gap:8px;align-items:center;"><span data-wicon="${idx}" style="font-size:8px;color:#7A7A85;cursor:pointer;">${it.constant ? "改词触发" : "设为常驻"}</span><span data-widel="${idx}" style="color:#9A6868;cursor:pointer;display:inline-flex;align-items:center;">${ICO.close}</span></div></div><div style="font-size:8.8px;color:#6E6E77;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-left:18px;">${it.content.replace(/</g, "&lt;")}</div></div>`;
             }).join("");
 
             listEl.querySelectorAll("[data-witog]").forEach((cb) => cb.onchange = (e) => { const d = loadWi(); d.entries[Number(cb.getAttribute("data-witog"))].enabled = e.target.checked; saveWi(d); renderWiList(); });
@@ -4959,26 +5115,46 @@ bootSumoulApp();
             const files = Array.from(e.target.files || []); if (!files.length) return;
             const d = loadWi(); let cnt = 0;
             for (const f of files) { const t = await f.text(); parseWorldBookJson(t, f.name).forEach((it) => { d.entries.unshift(it); cnt++; }); }
-            saveWi(d); e.target.value = ""; renderWiList(); alert(`✓ 成功导入 ${cnt} 条世界书设定！`);
+            saveWi(d); e.target.value = ""; renderWiList();
+            showWiStatus(`已成功导入 ${cnt} 条世界书设定，角色聊天时将自动读取。`);
         };
+
+        // 4通道读取酒馆世界书（带实时状态栏反馈）
         topDoc.getElementById("smt-wi-sync-st-btn").onclick = async (e) => {
-            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "读取中...";
-            const found = await extractTavernLore(); btn.innerHTML = orig;
-            if (!found.length) return alert("未检测到内嵌世界书，请直接点击左侧「导入世界书」上传文件！");
+            const btn = e.currentTarget, orig = btn.innerHTML;
+            btn.textContent = "读取中...";
+            showWiStatus("正在扫描酒馆角色卡内嵌世界书、绑定世界书与核心人设...");
+            const found = await extractTavernLore();
+            btn.innerHTML = orig;
+            if (!found.length) {
+                showWiStatus("未检测到当前角色卡或酒馆激活的世界书，请点击左侧「导入世界书 (.json/.txt)」手动上传。");
+                return;
+            }
             const d = loadWi(); let cnt = 0;
-            found.forEach((it) => { if (!d.entries.some((x) => x.title === it.title && x.content === it.content)) { d.entries.unshift(it); cnt++; } });
-            saveWi(d); renderWiList(); alert(`✓ 已同步导入 ${cnt} 条世界书设定！`);
+            found.forEach((it) => {
+                if (!d.entries.some((x) => x.title === it.title && x.content === it.content)) {
+                    d.entries.unshift(it); cnt++;
+                }
+            });
+            saveWi(d); renderWiList();
+            showWiStatus(cnt > 0 ? `已从酒馆成功同步导入 ${cnt} 条世界书与角色核心设定！` : `酒馆中的 ${found.length} 条设定已在列表中，无需重复导入。`);
         };
+
         topDoc.getElementById("smt-wi-add-btn").onclick = () => {
             const tInp = topDoc.getElementById("smt-wi-new-title"), kInp = topDoc.getElementById("smt-wi-new-keys"), cInp = topDoc.getElementById("smt-wi-new-content");
-            const content = cInp.value.trim(); if (!content) return alert("请填写设定内容！");
+            const content = cInp.value.trim(); if (!content) return showWiStatus("请先填写设定内容再存入。");
             const keys = kInp.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean);
             const title = tInp.value.trim() || keys[0] || `自定义设定 #${loadWi().entries.length + 1}`;
             const d = loadWi(); d.entries.unshift({ id: Date.now(), title, keys, content, enabled: true, constant: keys.length === 0 });
             saveWi(d); tInp.value = ""; kInp.value = ""; cInp.value = "";
-            topDoc.getElementById("smt-wi-add-drawer").style.display = "none"; renderWiList();
+            topDoc.getElementById("smt-wi-add-drawer").style.display = "none";
+            renderWiList();
+            showWiStatus(`已添加自定义设定「${title}」。`);
         };
-        topDoc.getElementById("smt-wi-clear-btn").onclick = () => { if (confirm("确定清空世界书条目吗？")) { const d = loadWi(); d.entries = []; saveWi(d); renderWiList(); } };
+
+        topDoc.getElementById("smt-wi-clear-btn").onclick = () => {
+            if (confirm("确定清空世界书条目吗？")) { const d = loadWi(); d.entries = []; saveWi(d); renderWiList(); showWiStatus("已清空当前角色的世界书条目。"); }
+        };
 
         topDoc.getElementById("smt-wx-cfg-btn")?.addEventListener("click", () => {
             setTimeout(() => { syncAllUI(); renderWiList(); }, 30);
@@ -4988,5 +5164,6 @@ bootSumoulApp();
         renderWiList();
     }
 
-    mountUltimateSettingsV5();
+    mountUltimateSettingsV6();
 })();
+
