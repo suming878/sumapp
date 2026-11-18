@@ -4097,3 +4097,444 @@ bootSumoulApp();
 
     mountPrivateServerV46();
 })();
+// ==========================================================================
+// 📚 【Sumoul App 微信设置 · 世界书(World Info)导入与角色自动读取感知补丁】
+// 用法：直接粘贴在你 index.js 的最末尾最后一行后面！无需改动前面任何代码！
+// 功能：1.在「个人/聊天设置」增加导入.json/.txt世界书与一键读取酒馆世界书 2.微信私聊与全应用AI自动读取世界书设定
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+
+    // 获取当前角色的安全存档后缀（与主代码 getSafeScopedKey 保持完全一致）
+    function getCharScope() {
+        let scope = "";
+        try {
+            const st = topWin.SillyTavern?.getContext?.();
+            if (st) {
+                if (st.characterId !== undefined && st.characters?.[st.characterId]) {
+                    const c = st.characters[st.characterId];
+                    scope = c.avatar || c.name || String(st.characterId);
+                } else if (st.groupId) {
+                    scope = "group_" + String(st.groupId);
+                } else if (st.name2) {
+                    scope = st.name2;
+                }
+            }
+        } catch (e) {}
+        if (!scope) {
+            const selCh = topDoc.querySelector("#rm_button_selected_ch h2, #character_name_pole");
+            if (selCh?.textContent?.trim()) scope = selCh.textContent.trim();
+        }
+        if (!scope) scope = "PARTNER";
+        return String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+    }
+
+    function getWiStorageKey() {
+        return `sumoul_v16_worldinfo__${getCharScope()}`;
+    }
+
+    // 读取当前角色的世界书配置
+    function loadWorldInfo() {
+        const def = {
+            enabled: true,
+            mode: "smart", // "smart": 常驻+关键词触发 | "all": 全部强制注入
+            entries: []    // { id, title, keys: [], content, enabled: true, constant: true }
+        };
+        try {
+            return Object.assign(def, JSON.parse(localStorage.getItem(getWiStorageKey()) || "{}"));
+        } catch (e) {
+            return def;
+        }
+    }
+
+    function saveWorldInfo(data) {
+        try {
+            localStorage.setItem(getWiStorageKey(), JSON.stringify(data));
+        } catch (e) {}
+    }
+
+    // 🔍 解析酒馆标准世界书 JSON（兼容 SillyTavern WorldInfo JSON / V2 Character Book / 字典或数组格式）
+    function parseWorldBookJson(rawText, fileName = "导入世界书") {
+        const extracted = [];
+        try {
+            const obj = JSON.parse(rawText);
+            let rawEntries = [];
+
+            if (obj && typeof obj.entries === "object" && obj.entries !== null) {
+                rawEntries = Array.isArray(obj.entries) ? obj.entries : Object.values(obj.entries);
+            } else if (obj && obj.data && typeof obj.data.entries === "object") {
+                rawEntries = Array.isArray(obj.data.entries) ? obj.data.entries : Object.values(obj.data.entries);
+            } else if (obj && obj.character_book && obj.character_book.entries) {
+                rawEntries = Array.isArray(obj.character_book.entries) ? obj.character_book.entries : Object.values(obj.character_book.entries);
+            } else if (Array.isArray(obj)) {
+                rawEntries = obj;
+            }
+
+            rawEntries.forEach((item, idx) => {
+                if (!item || typeof item !== "object") return;
+                const content = String(item.content || item.entry || item.mes || item.description || "").trim();
+                if (!content) return;
+
+                let keys = [];
+                if (Array.isArray(item.key)) keys = item.key;
+                else if (Array.isArray(item.keys)) keys = item.keys;
+                else if (typeof item.key === "string") keys = item.key.split(/[,，]/);
+                keys = keys.map((k) => String(k).trim()).filter(Boolean);
+
+                const title = String(item.comment || item.name || item.title || keys[0] || `${fileName} #${idx + 1}`).trim();
+                const isDisabled = item.disable === true || item.enabled === false;
+                const isConst = Boolean(item.constant) || keys.length === 0;
+
+                extracted.push({
+                    id: Date.now() + idx + Math.floor(Math.random() * 1000),
+                    title,
+                    keys,
+                    content,
+                    enabled: !isDisabled,
+                    constant: isConst
+                });
+            });
+        } catch (e) {
+            // 如果不是 JSON，则按纯文本段落导入
+            if (rawText && rawText.trim()) {
+                extracted.push({
+                    id: Date.now(),
+                    title: fileName.replace(/\.[^.]+$/, ""),
+                    keys: [],
+                    content: rawText.trim(),
+                    enabled: true,
+                    constant: true
+                });
+            }
+        }
+        return extracted;
+    }
+
+    // 🔄 从酒馆当前角色卡 & 酒馆全局世界书自动提取条目
+    async function extractTavernActiveLore() {
+        const found = [];
+        try {
+            const st = topWin.SillyTavern?.getContext?.();
+            // 1. 提取当前角色卡自带的内嵌世界书 (character_book)
+            if (st && st.characterId !== undefined && st.characters?.[st.characterId]) {
+                const charObj = st.characters[st.characterId];
+                const cBook = charObj?.data?.character_book || charObj?.character_book;
+                if (cBook && cBook.entries) {
+                    const list = Array.isArray(cBook.entries) ? cBook.entries : Object.values(cBook.entries);
+                    list.forEach((item, idx) => {
+                        const content = String(item?.content || item?.entry || "").trim();
+                        if (!content) return;
+                        const keys = (Array.isArray(item.keys) ? item.keys : (Array.isArray(item.key) ? item.key : [])).map(String).filter(Boolean);
+                        found.push({
+                            id: Date.now() + idx,
+                            title: String(item.comment || item.name || keys[0] || `角色专属设定 #${idx + 1}`),
+                            keys,
+                            content,
+                            enabled: item.enabled !== false && item.disable !== true,
+                            constant: Boolean(item.constant) || keys.length === 0
+                        });
+                    });
+                }
+            }
+
+            // 2. 尝试读取酒馆页面已加载的世界书 DOM 或全局 world_info
+            if (topWin.world_info && typeof topWin.world_info === "object") {
+                const wiEntries = topWin.world_info.entries ? Object.values(topWin.world_info.entries) : [];
+                wiEntries.forEach((item, idx) => {
+                    const content = String(item?.content || "").trim();
+                    if (!content) return;
+                    const keys = (Array.isArray(item.key) ? item.key : []).map(String).filter(Boolean);
+                    found.push({
+                        id: Date.now() + 500 + idx,
+                        title: String(item.comment || keys[0] || `酒馆世界书 #${idx + 1}`),
+                        keys,
+                        content,
+                        enabled: !item.disable,
+                        constant: Boolean(item.constant) || keys.length === 0
+                    });
+                });
+            }
+        } catch (e) {}
+        return found;
+    }
+
+    // 🧠 根据当前聊天内容，动态拼装需要注入给角色的【世界书提示词】
+    function buildActiveWorldInfoPrompt(contextText = "") {
+        const wi = loadWorldInfo();
+        if (!wi.enabled || !Array.isArray(wi.entries) || wi.entries.length === 0) return "";
+
+        const activeEntries = wi.entries.filter((e) => e && e.enabled && e.content);
+        if (activeEntries.length === 0) return "";
+
+        const matched = [];
+        const searchPool = String(contextText || "").toLowerCase();
+
+        activeEntries.forEach((entry) => {
+            if (wi.mode === "all" || entry.constant || !entry.keys || entry.keys.length === 0) {
+                matched.push(`【${entry.title}】：${entry.content}`);
+            } else {
+                // 智能关键词触发：检查聊天记录或人设中是否出现了该条目的触发词
+                const hit = entry.keys.some((k) => k && searchPool.includes(k.toLowerCase()));
+                if (hit) {
+                    matched.push(`【${entry.title} (触发词:${entry.keys.join(",")})】：${entry.content}`);
+                }
+            }
+        });
+
+        if (matched.length === 0) return "";
+        return `\n\n【📚 角色必须严格遵守的世界书 (World Info / Lorebook) 核心设定】：\n${matched.join("\n")}\n（请在回复中自然融入并严格遵守以上世界书设定与人物关系！）`;
+    }
+
+    // 🛡️ 底层拦截 window.fetch：当插件向独立 API 发起 `/chat/completions` 请求时，自动把世界书设定注入给角色！
+    function hookFetchForWorldInfo() {
+        const targetWin = window;
+        if (targetWin.__sumoul_wi_fetch_hooked) return;
+        targetWin.__sumoul_wi_fetch_hooked = true;
+
+        const origFetch = targetWin.fetch.bind(targetWin);
+        targetWin.fetch = async function (input, init) {
+            try {
+                const urlStr = typeof input === "string" ? input : (input?.url || "");
+                if (urlStr.includes("/chat/completions") && init && init.method === "POST" && typeof init.body === "string") {
+                    const bodyObj = JSON.parse(init.body);
+                    if (bodyObj && Array.isArray(bodyObj.messages) && bodyObj.messages.length > 0) {
+                        const allMsgText = bodyObj.messages.map((m) => m.content || "").join("\n");
+                        const wiBlock = buildActiveWorldInfoPrompt(allMsgText);
+                        if (wiBlock && !allMsgText.includes("【📚 角色必须严格遵守的世界书")) {
+                            const sysMsg = bodyObj.messages.find((m) => m.role === "system") || bodyObj.messages[0];
+                            if (sysMsg) {
+                                sysMsg.content = `${sysMsg.content}${wiBlock}`;
+                                init.body = JSON.stringify(bodyObj);
+                            }
+                        }
+                    }
+                }
+            } catch (e) {}
+            return origFetch(input, init);
+        };
+    }
+
+    // 🎨 在「个人/聊天设置 (#smt-page-wx_settings)」中挂载高定【世界书导入与管理】面板
+    function mountWxWorldInfoUI() {
+        const wxSetPage = topDoc.getElementById("smt-page-wx_settings");
+        const bgNoteInput = topDoc.getElementById("smt-cfg-bgnote");
+        if (!wxSetPage || !bgNoteInput) {
+            setTimeout(mountWxWorldInfoUI, 200);
+            return;
+        }
+
+        hookFetchForWorldInfo();
+
+        if (topDoc.getElementById("smt-wi-manager-card")) return;
+
+        const lastCard = bgNoteInput.closest(".smt-prof-card");
+        if (!lastCard) return;
+
+        const wiCard = topDoc.createElement("div");
+        wiCard.id = "smt-wi-manager-card";
+        wiCard.className = "smt-prof-card";
+        wiCard.innerHTML = `
+            <div class="smt-sec-title" style="margin-bottom:8px!important;">
+                <span style="display:inline-flex;align-items:center;gap:5px;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#484852" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <span>WORLD INFO · 世界书导入与角色自动读取</span>
+                </span>
+                <span class="smt-pill-btn dark" id="smt-wi-toggle-btn">已开启读取</span>
+            </div>
+
+            <div style="font-size:8.5px;color:#7A7A85;line-height:1.5;margin-bottom:8px;">
+                💡 导入世界书后，TA 在<b>微信聊天、发动态、情侣空间、查手机</b>时会实时读取下方的世界观与专属设定！
+            </div>
+
+            <!-- 导入与操作按钮栏 -->
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+                <label class="smt-pill-btn dark" style="cursor:pointer;flex:1;height:26px!important;">
+                    <span>📁 导入世界书 (.json/.txt)</span>
+                    <input type="file" id="smt-wi-file-inp" accept=".json,.txt,.world" multiple style="display:none;" />
+                </label>
+                <span class="smt-pill-btn" id="smt-wi-sync-st-btn" style="flex:1;height:26px!important;">🔄 读取酒馆当前世界书</span>
+                <span class="smt-pill-btn" id="smt-wi-mode-btn" style="height:26px!important;" title="点击切换注入模式">模式: 智能触发</span>
+            </div>
+
+            <!-- 手动快速添加单条世界书设定 -->
+            <div style="background:#FFFFFF;border:1px solid #EAEAF0;border-radius:11px;padding:8px 9px;margin-bottom:8px;">
+                <div style="display:flex;gap:5px;margin-bottom:5px;">
+                    <input type="text" id="smt-wi-new-title" class="smt-wx-input" style="width:38%!important;flex:none!important;height:24px!important;font-size:9.5px!important;" placeholder="条目名 (如:青梅竹马设定)" />
+                    <input type="text" id="smt-wi-new-keys" class="smt-wx-input" style="flex:1!important;height:24px!important;font-size:9.5px!important;" placeholder="触发词逗号隔开 (留空则常驻生效)" />
+                    <span class="smt-pill-btn dark" id="smt-wi-add-btn" style="height:24px!important;">＋添加条目</span>
+                </div>
+                <textarea id="smt-wi-new-content" style="width:100%;height:42px;background:#F8F8FA;border:1px solid #E6E6EC;border-radius:8px;padding:5px 7px;font-size:9.5px;color:#3A3A40;box-sizing:border-box;resize:none;outline:none;" placeholder="输入该条世界书的具体设定内容（角色在微信聊天时会自动读取）..."></textarea>
+            </div>
+
+            <!-- 已挂载的世界书条目列表 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                <span style="font-size:8.8px;font-weight:700;color:#484852;" id="smt-wi-count-txt">📚 当前已挂载条目 (0)</span>
+                <span id="smt-wi-clear-btn" style="font-size:8.5px;color:#9A6868;cursor:pointer;font-weight:700;">清空全部</span>
+            </div>
+            <div id="smt-wi-entries-list" style="max-height:145px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
+        `;
+
+        // 插入在补充背景卡片的正上方
+        lastCard.parentNode.insertBefore(wiCard, lastCard);
+
+        function renderWiPanel() {
+            const wi = loadWorldInfo();
+            const toggleBtn = topDoc.getElementById("smt-wi-toggle-btn");
+            const modeBtn = topDoc.getElementById("smt-wi-mode-btn");
+            const countTxt = topDoc.getElementById("smt-wi-count-txt");
+            const listEl = topDoc.getElementById("smt-wi-entries-list");
+
+            if (toggleBtn) {
+                toggleBtn.className = `smt-pill-btn ${wi.enabled ? "dark" : ""}`;
+                toggleBtn.textContent = wi.enabled ? "✓ 角色自动读取: ON" : "角色读取: OFF";
+            }
+            if (modeBtn) {
+                modeBtn.textContent = wi.mode === "all" ? "模式: 全部强注" : "模式: 常驻+词触发";
+            }
+
+            const enabledCnt = (wi.entries || []).filter((x) => x.enabled).length;
+            if (countTxt) {
+                countTxt.textContent = `📚 已挂载世界书条目 (启用 ${enabledCnt} / 共 ${wi.entries.length} 条)`;
+            }
+
+            if (!wi.entries || wi.entries.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center;padding:12px;background:#FFF;border:1px dashed #E2E2EA;border-radius:9px;font-size:9px;color:#9A9AA5;">暂无世界书条目 · 点击上方「导入世界书」或「读取酒馆当前世界书」</div>`;
+                return;
+            }
+
+            listEl.innerHTML = wi.entries.map((item, idx) => {
+                const badgeTxt = (wi.mode === "all" || item.constant || !item.keys?.length)
+                    ? `<span style="background:#484852;color:#FFF;padding:1px 5px;border-radius:99px;font-size:7.5px;">⚡常驻</span>`
+                    : `<span style="background:#EAEAF0;color:#55555E;padding:1px 5px;border-radius:99px;font-size:7.5px;">🔍词:${item.keys.slice(0, 3).join(",")}</span>`;
+
+                return `
+                    <div style="background:#FFFFFF;border:1px solid ${item.enabled ? "#DCDCE6" : "#F0F0F5"};border-radius:9px;padding:6px 9px;opacity:${item.enabled ? "1" : "0.55"};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                            <label style="display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;color:#2C2C32;cursor:pointer;">
+                                <input type="checkbox" data-witoggle="${idx}" ${item.enabled ? "checked" : ""} />
+                                <span>${item.title.replace(/</g, "&lt;")}</span>
+                                ${badgeTxt}
+                            </label>
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <span data-wiconst="${idx}" style="font-size:8px;color:#6E6E77;cursor:pointer;text-decoration:underline;" title="切换常驻/关键词触发">${item.constant ? "改词触发" : "设为常驻"}</span>
+                                <span data-widel="${idx}" style="font-size:9px;color:#9A6868;cursor:pointer;font-weight:700;">✕</span>
+                            </div>
+                        </div>
+                        <div style="font-size:8.8px;color:#6E6E77;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                            ${item.content.replace(/</g, "&lt;")}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            listEl.querySelectorAll("[data-witoggle]").forEach((cb) => cb.onchange = (e) => {
+                const i = Number(cb.getAttribute("data-witoggle")), d = loadWorldInfo();
+                if (d.entries[i]) { d.entries[i].enabled = e.target.checked; saveWorldInfo(d); renderWiPanel(); }
+            });
+            listEl.querySelectorAll("[data-wiconst]").forEach((btn) => btn.onclick = () => {
+                const i = Number(btn.getAttribute("data-wiconst")), d = loadWorldInfo();
+                if (d.entries[i]) { d.entries[i].constant = !d.entries[i].constant; saveWorldInfo(d); renderWiPanel(); }
+            });
+            listEl.querySelectorAll("[data-widel]").forEach((btn) => btn.onclick = () => {
+                const i = Number(btn.getAttribute("data-widel")), d = loadWorldInfo();
+                d.entries.splice(i, 1); saveWorldInfo(d); renderWiPanel();
+            });
+        }
+
+        // 绑定开关与模式切换
+        topDoc.getElementById("smt-wi-toggle-btn").onclick = () => {
+            const d = loadWorldInfo(); d.enabled = !d.enabled; saveWorldInfo(d); renderWiPanel();
+        };
+        topDoc.getElementById("smt-wi-mode-btn").onclick = () => {
+            const d = loadWorldInfo(); d.mode = d.mode === "all" ? "smart" : "all"; saveWorldInfo(d); renderWiPanel();
+        };
+
+        // 绑定上传本地 .json / .txt 世界书文件
+        topDoc.getElementById("smt-wi-file-inp").onchange = async (e) => {
+            const files = Array.from(e.target.files || []);
+            if (!files.length) return;
+            const d = loadWorldInfo();
+            let totalAdded = 0;
+
+            for (const f of files) {
+                const text = await f.text();
+                const parsed = parseWorldBookJson(text, f.name);
+                parsed.forEach((item) => {
+                    d.entries.unshift(item);
+                    totalAdded++;
+                });
+            }
+            saveWorldInfo(d);
+            e.target.value = "";
+            renderWiPanel();
+            alert(`✓ 成功导入 ${totalAdded} 条世界书设定！角色在微信与全应用中将自动读取！`);
+        };
+
+        // 绑定一键读取酒馆当前角色世界书
+        topDoc.getElementById("smt-wi-sync-st-btn").onclick = async (e) => {
+            e.target.textContent = "⏳ 正在读取...";
+            const found = await extractTavernActiveLore();
+            e.target.textContent = "🔄 读取酒馆当前世界书";
+            if (!found.length) {
+                return alert("未检测到当前角色卡内嵌世界书，你可以直接点击左侧「📁 导入世界书 (.json/.txt)」上传你的世界书文件！");
+            }
+            const d = loadWorldInfo();
+            let added = 0;
+            found.forEach((item) => {
+                if (!d.entries.some((x) => x.title === item.title && x.content === item.content)) {
+                    d.entries.unshift(item);
+                    added++;
+                }
+            });
+            saveWorldInfo(d);
+            renderWiPanel();
+            alert(`✓ 已从酒馆当前角色同步导入 ${added} 条世界书设定！`);
+        };
+
+        // 绑定手动添加单条世界书
+        topDoc.getElementById("smt-wi-add-btn").onclick = () => {
+            const titleInp = topDoc.getElementById("smt-wi-new-title");
+            const keysInp = topDoc.getElementById("smt-wi-new-keys");
+            const contInp = topDoc.getElementById("smt-wi-new-content");
+            const content = contInp.value.trim();
+            if (!content) return alert("请填写世界书条目的具体设定内容！");
+
+            const keys = keysInp.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean);
+            const title = titleInp.value.trim() || keys[0] || `自定义设定 #${loadWorldInfo().entries.length + 1}`;
+
+            const d = loadWorldInfo();
+            d.entries.unshift({
+                id: Date.now(),
+                title,
+                keys,
+                content,
+                enabled: true,
+                constant: keys.length === 0
+            });
+            saveWorldInfo(d);
+            titleInp.value = "";
+            keysInp.value = "";
+            contInp.value = "";
+            renderWiPanel();
+        };
+
+        // 清空全部
+        topDoc.getElementById("smt-wi-clear-btn").onclick = () => {
+            if (!confirm("确定清空当前角色挂载的所有世界书条目吗？")) return;
+            const d = loadWorldInfo();
+            d.entries = [];
+            saveWorldInfo(d);
+            renderWiPanel();
+        };
+
+        // 每次点进「个人/聊天设置」时自动刷新当前角色的世界书列表
+        topDoc.getElementById("smt-wx-cfg-btn")?.addEventListener("click", () => {
+            setTimeout(renderWiPanel, 50);
+        });
+
+        renderWiPanel();
+    }
+
+    mountWxWorldInfoUI();
+})();
