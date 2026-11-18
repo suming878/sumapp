@@ -3703,28 +3703,561 @@ bootSumoulApp();
     mountDraggableMistFab();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 原生UI零破坏 · QQ+密码+口令注册登录 & 管理员人数统计/QQ名册/拉黑补丁】
-// 保证：100% 不改动你的四幕开屏动画！100% 保留你原本的锁屏与后台 UI 风格，仅原地增强功能！
+// ❄️ 【第一部分：Sumoul App 清冷银白 · 四幕式电影级开屏补丁（100%完整保留）】
+// 动画1：眨眼三滴银雨 ➔ 动画2：六角孤雪消融 ➔ 动画3：修长圣十字滴水(宿命制作) ➔ 动画4：冰雾折线与霜银文字
+// ==========================================================================
+(function () {
+    const topDoc = (window.parent || window).document;
+
+    function mountFourActColdSilverSplash() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        const splash = topDoc.getElementById("smt-boot-splash");
+        if (!modal || !splash) {
+            setTimeout(mountFourActColdSilverSplash, 150);
+            return;
+        }
+
+        [
+            "sumoul-liquid-tear-css", "sumoul-tear-splash-css", "sumoul-cinema-splash-css",
+            "sumoul-gallery-splash-css", "sumoul-borderless-splash-css", "sumoul-master-one-splash-css",
+            "sumoul-melancholy-v28-css", "sumoul-whitemist-v29-css", "sumoul-blink-rain-v31-css",
+            "sumoul-destiny-v32-css", "sumoul-rainsnow-v33-css", "sumoul-coldsilver-v34-css",
+            "sumoul-fouract-v35-css"
+        ].forEach((id) => topDoc.getElementById(id)?.remove());
+
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-fouract-v35-css";
+        st.innerHTML = `
+            @keyframes faLidTop {
+                0%   { transform: translateY(0%); }
+                24%  { transform: translateY(-78%); }
+                38%  { transform: translateY(-18%); }
+                65%  { transform: translateY(-100%); }
+                100% { transform: translateY(-100%); }
+            }
+            @keyframes faLidBot {
+                0%   { transform: translateY(0%); }
+                24%  { transform: translateY(78%); }
+                38%  { transform: translateY(18%); }
+                65%  { transform: translateY(100%); }
+                100% { transform: translateY(100%); }
+            }
+            @keyframes faSilverDrop {
+                0%   { transform: translateY(-55px) scaleY(1.25); opacity: 0; }
+                40%  { opacity: 0.9; }
+                80%  { transform: translateY(0px) scaleY(0.3); opacity: 0.95; }
+                100% { transform: translateY(2px) scaleY(0.1); opacity: 0; }
+            }
+            @keyframes faSilverDot {
+                0%   { transform: scale(0); opacity: 0; }
+                35%  { transform: scale(1.25); opacity: 0.95; }
+                100% { transform: scale(0.3); opacity: 0; }
+            }
+            @keyframes faSilverRingA {
+                0%   { transform: scale(0.1); opacity: 0; }
+                20%  { opacity: 0.9; }
+                100% { transform: scale(2.15); opacity: 0; }
+            }
+            @keyframes faSilverRingB {
+                0%   { transform: scale(0.1); opacity: 0; }
+                25%  { opacity: 0.6; }
+                100% { transform: scale(2.95); opacity: 0; }
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .fa-lid-top {
+                position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 52% !important;
+                background: linear-gradient(180deg, #E8E8E8 0%, #F4F4F4 78%, rgba(244,244,244,0) 100%) !important;
+                z-index: 25 !important; pointer-events: none !important;
+                animation: faLidTop 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-lid-bot {
+                position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 52% !important;
+                background: linear-gradient(0deg, #E8E8E8 0%, #F4F4F4 78%, rgba(244,244,244,0) 100%) !important;
+                z-index: 25 !important; pointer-events: none !important;
+                animation: faLidBot 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-rain-spot {
+                position: absolute !important; width: 90px !important; height: 90px !important;
+                margin-left: -45px !important; margin-top: -45px !important;
+                pointer-events: none !important; z-index: 8 !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-drop {
+                position: absolute !important; bottom: 45px !important; left: 50% !important;
+                width: 1.15px !important; height: 38px !important; margin-left: -0.55px !important;
+                border-radius: 99px !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #B2B2B2 55%, #FFFFFF 100%) !important;
+                box-shadow: 0 0 6px #FFFFFF !important;
+                opacity: 0 !important; transform-origin: bottom center !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-dot {
+                position: absolute !important; width: 4px !important; height: 4px !important;
+                border-radius: 50% !important; background: #FFFFFF !important;
+                border: 0.8px solid #A2A2A2 !important;
+                box-shadow: 0 0 8px #FFFFFF !important; opacity: 0 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-ring-1,
+            #seoul-mini-theater-modal #smt-boot-splash .fa-ring-2 {
+                position: absolute !important; width: 48px !important; height: 20px !important;
+                border-radius: 50% !important; border: 1px solid #A8A8A8 !important;
+                box-shadow: 0 0 8px #FFFFFF, inset 0 0 6px #FFFFFF !important; opacity: 0 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-ring-2 { border: 0.7px solid #C4C4C4 !important; }
+
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-drop   { animation: faSilverDrop 0.46s cubic-bezier(0.4,0,1,1) 0.50s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-dot    { animation: faSilverDot 0.55s ease-out 0.88s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-ring-1 { animation: faSilverRingA 1.5s cubic-bezier(0.16,1,0.3,1) 0.90s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-ring-2 { animation: faSilverRingB 1.8s cubic-bezier(0.16,1,0.3,1) 1.05s forwards !important; }
+
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-drop   { animation: faSilverDrop 0.46s cubic-bezier(0.4,0,1,1) 1.20s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-dot    { animation: faSilverDot 0.55s ease-out 1.58s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-ring-1 { animation: faSilverRingA 1.5s cubic-bezier(0.16,1,0.3,1) 1.60s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-ring-2 { animation: faSilverRingB 1.8s cubic-bezier(0.16,1,0.3,1) 1.75s forwards !important; }
+
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-drop   { height: 44px !important; animation: faSilverDrop 0.48s cubic-bezier(0.4,0,1,1) 1.88s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-dot    { animation: faSilverDot 0.6s ease-out 2.28s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-ring-1 { width: 58px !important; height: 24px !important; animation: faSilverRingA 1.7s cubic-bezier(0.16,1,0.3,1) 2.30s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-ring-2 { width: 58px !important; height: 24px !important; animation: faSilverRingB 2.0s cubic-bezier(0.16,1,0.3,1) 2.45s forwards !important; }
+
+            @keyframes faSnowCrystalSpin {
+                0%   { opacity: 0; transform: translateY(-22px) scale(0.4) rotate(-60deg); filter: blur(6px); }
+                28%  { opacity: 1; transform: translateY(0px) scale(1) rotate(0deg); filter: blur(0px); }
+                72%  { opacity: 0.95; transform: translateY(4px) scale(1.06) rotate(45deg); filter: blur(0px); }
+                100% { opacity: 0; transform: translateY(10px) scale(0.2) rotate(90deg); filter: blur(6px); }
+            }
+            @keyframes faSnowHalo {
+                0%   { opacity: 0; transform: scale(0.3); }
+                40%  { opacity: 0.85; transform: scale(1.1); }
+                100% { opacity: 0; transform: scale(1.7); }
+            }
+            @keyframes faSnowWhisper {
+                0%   { opacity: 0; filter: blur(8px); letter-spacing: 10px; }
+                30%  { opacity: 0.85; filter: blur(0px); letter-spacing: 5px; }
+                75%  { opacity: 0.85; filter: blur(0px); letter-spacing: 5px; }
+                100% { opacity: 0; filter: blur(8px); letter-spacing: 8px; }
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .fa-act2-snow {
+                position: absolute !important; inset: 0 !important;
+                display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+                pointer-events: none !important; z-index: 12 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-snowflake-svg {
+                width: 84px !important; height: 84px !important;
+                opacity: 0 !important;
+                animation: faSnowCrystalSpin 1.85s cubic-bezier(0.22, 1, 0.36, 1) 2.42s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-snow-halo {
+                position: absolute !important; width: 110px !important; height: 110px !important;
+                border-radius: 50% !important; border: 0.8px solid #FFFFFF !important;
+                box-shadow: 0 0 20px #FFFFFF, inset 0 0 14px #FFFFFF !important;
+                opacity: 0 !important;
+                animation: faSnowHalo 1.8s ease-out 2.48s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-snow-sub {
+                margin-top: 14px !important;
+                font-size: 9px !important; font-weight: 700 !important; color: #8A8A8A !important;
+                text-shadow: 0 0 10px #FFFFFF !important;
+                opacity: 0 !important;
+                animation: faSnowWhisper 1.75s ease 2.48s forwards !important;
+            }
+
+            @keyframes faElegantSnowPass {
+                0%   { transform: translate(-64px, -68px) rotate(-110deg) scale(0.35); opacity: 0; filter: blur(4px); }
+                32%  { opacity: 0.95; filter: blur(0px); }
+                74%  { transform: translate(0px, -24px) rotate(15deg) scale(0.82); opacity: 1; filter: blur(0px); }
+                100% { transform: translate(8px, -18px) rotate(55deg) scale(0.1); opacity: 0; filter: blur(4px); }
+            }
+            @keyframes faLatinCrossV {
+                0%   { height: 0px; opacity: 0; }
+                22%  { height: 186px; opacity: 0.95; }
+                78%  { height: 192px; opacity: 0.9; }
+                100% { height: 0px; opacity: 0; }
+            }
+            @keyframes faLatinCrossH {
+                0%   { width: 0px; opacity: 0; }
+                22%  { width: 128px; opacity: 0.95; }
+                78%  { width: 134px; opacity: 0.9; }
+                100% { width: 0px; opacity: 0; }
+            }
+            @keyframes faCrossDiamondCore {
+                0%   { transform: scale(0.2); opacity: 0; }
+                24%  { transform: scale(1); opacity: 1; }
+                76%  { transform: scale(1.04); opacity: 0.92; }
+                100% { transform: scale(0.2); opacity: 0; }
+            }
+            @keyframes faCrossBottomDrip {
+                0%   { transform: translateY(-28px) scale(0.4); opacity: 0; }
+                25%  { transform: translateY(0px) scale(1); opacity: 1; }
+                45%  { transform: translateY(3px) scale(1.08); opacity: 1; }
+                88%  { transform: translateY(34px) scale(0.65); opacity: 0.95; }
+                100% { transform: translateY(38px) scale(0.2); opacity: 0; }
+            }
+            @keyframes faCrossDripRippleA {
+                0%   { transform: scale(0.1); opacity: 0; }
+                20%  { opacity: 0.9; }
+                100% { transform: scale(2.0); opacity: 0; }
+            }
+            @keyframes faCrossDripRippleB {
+                0%   { transform: scale(0.1); opacity: 0; }
+                25%  { opacity: 0.6; }
+                100% { transform: scale(2.8); opacity: 0; }
+            }
+            @keyframes faRefinedDestinyText {
+                0%   { opacity: 0; filter: blur(8px); transform: translateY(5px); }
+                26%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+                76%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+                100% { opacity: 0; filter: blur(8px); transform: translateY(-4px); }
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .fa-act3-cross {
+                position: absolute !important; inset: 0 !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+                pointer-events: none !important; z-index: 14 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-passing-snow {
+                position: absolute !important; width: 58px !important; height: 58px !important;
+                opacity: 0 !important;
+                animation: faElegantSnowPass 0.68s cubic-bezier(0.25, 0.1, 0.25, 1) 4.06s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-v {
+                position: absolute !important; width: 1.2px !important; height: 0px;
+                margin-top: -10px !important;
+                background: linear-gradient(180deg, transparent 0%, #B8B8B8 16%, #787878 42%, #9A9A9A 88%, #FFFFFF 100%) !important;
+                box-shadow: 0 0 12px #FFFFFF, 0 0 4px #FFFFFF !important;
+                opacity: 0 !important;
+                animation: faLatinCrossV 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.54s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-h {
+                position: absolute !important; height: 1.2px !important; width: 0px;
+                margin-top: -48px !important;
+                background: linear-gradient(90deg, transparent 0%, #C2C2C2 20%, #787878 50%, #C2C2C2 80%, transparent 100%) !important;
+                box-shadow: 0 0 12px #FFFFFF, 0 0 4px #FFFFFF !important;
+                opacity: 0 !important;
+                animation: faLatinCrossH 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.54s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-jewel {
+                position: absolute !important; width: 140px !important; height: 200px !important;
+                margin-top: -10px !important;
+                opacity: 0 !important;
+                animation: faCrossDiamondCore 2.0s cubic-bezier(0.16, 1, 0.3, 1) 4.56s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-bead {
+                position: absolute !important; width: 6px !important; height: 9px !important;
+                margin-top: 82px !important;
+                opacity: 0 !important;
+                animation: faCrossBottomDrip 0.72s cubic-bezier(0.4, 0, 0.85, 1) 4.82s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring1,
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 {
+                position: absolute !important; width: 42px !important; height: 14px !important;
+                margin-top: 120px !important;
+                border-radius: 50% !important; border: 1px solid #9E9E9E !important;
+                box-shadow: 0 0 8px #FFFFFF, inset 0 0 5px #FFFFFF !important;
+                opacity: 0 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 { border: 0.7px solid #C2C2C2 !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring1 { animation: faCrossDripRippleA 1.35s cubic-bezier(0.16, 1, 0.3, 1) 5.42s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 { animation: faCrossDripRippleB 1.55s cubic-bezier(0.16, 1, 0.3, 1) 5.54s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-destiny-pure {
+                position: absolute !important; z-index: 16 !important;
+                margin-top: 168px !important;
+                text-shadow: 0 0 14px #FFFFFF, 0 0 6px #FFFFFF !important;
+                opacity: 0 !important;
+                animation: faRefinedDestinyText 1.95s cubic-bezier(0.16, 1, 0.3, 1) 4.66s forwards !important;
+            }
+
+            @keyframes faAct4In {
+                0%   { opacity: 0; filter: blur(12px); transform: translateY(6px); }
+                100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+            }
+            @keyframes faTraceDraw {
+                0%   { stroke-dashoffset: 280; opacity: 0; }
+                15%  { opacity: 0.92; }
+                100% { stroke-dashoffset: 0; opacity: 0.92; }
+            }
+            @keyframes faGlintFlow {
+                0%   { stroke-dashoffset: 280; opacity: 0; }
+                25%  { opacity: 1; }
+                80%  { opacity: 1; }
+                100% { stroke-dashoffset: -50; opacity: 0; }
+            }
+            @keyframes faSilverGradLine {
+                0%   { width: 0%; opacity: 0; }
+                30%  { opacity: 0.9; }
+                100% { width: 82%; opacity: 0.9; }
+            }
+            @keyframes faRainSnowFall {
+                0%   { transform: translateY(-30px); opacity: 0; }
+                35%  { opacity: 0.68; }
+                75%  { opacity: 0.68; }
+                100% { transform: translateY(145px); opacity: 0; }
+            }
+            @keyframes faEndRipple {
+                0%   { transform: scale(0.2); opacity: 0.85; }
+                100% { transform: scale(2.4); opacity: 0; }
+            }
+            @keyframes faIceMoteFloat {
+                0%, 100% { transform: translateY(0px) scale(0.9); opacity: 0.35; }
+                50%      { transform: translateY(-7px) scale(1.25); opacity: 0.95; }
+            }
+            @keyframes faSoftBreathe {
+                0%, 100% { opacity: 0.28; }
+                50%      { opacity: 0.78; }
+            }
+
+            #seoul-mini-theater-modal #smt-boot-splash .fa-bg-rain {
+                position: absolute !important; width: 1px !important;
+                background: linear-gradient(180deg, transparent 0%, #BDBDBD 55%, #FFFFFF 100%) !important;
+                pointer-events: none !important; opacity: 0; z-index: 2 !important;
+                animation: faRainSnowFall 3.6s linear infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-bg-snow {
+                position: absolute !important; border-radius: 50% !important;
+                background: #FFFFFF !important; border: 0.8px solid #CCCCCC !important;
+                box-shadow: 0 0 6px #FFFFFF !important;
+                pointer-events: none !important; opacity: 0; z-index: 2 !important;
+                animation: faRainSnowFall 5.0s ease-in-out infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-head  { opacity: 0; animation: faAct4In 1.8s ease 6.50s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-stage { opacity: 0; animation: faAct4In 1.8s ease 6.55s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-main-path {
+                stroke-dasharray: 280 !important; stroke-dashoffset: 280 !important;
+                animation: faTraceDraw 2.7s cubic-bezier(0.22, 0.61, 0.36, 1) 6.60s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-main-glint {
+                stroke-dasharray: 28 252 !important; stroke-dashoffset: 280 !important;
+                animation: faGlintFlow 3.6s ease-in-out 7.1s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-end-rip {
+                transform-box: fill-box !important; transform-origin: center !important;
+                opacity: 0; animation: faEndRipple 3.6s ease-out 7.4s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-end-rip-2 {
+                transform-box: fill-box !important; transform-origin: center !important;
+                opacity: 0; animation: faEndRipple 3.6s ease-out 8.6s infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-ice-mote {
+                transform-box: fill-box !important; transform-origin: center !important;
+                animation: faIceMoteFloat 3.8s ease-in-out infinite !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-grad-line {
+                position: relative !important; height: 0.9px !important; width: 0%;
+                margin: 16px auto 18px auto !important;
+                background: linear-gradient(90deg, transparent 0%, #D8D8D8 25%, #9E9E9E 50%, #D8D8D8 75%, transparent 100%) !important;
+                box-shadow: 0 0 8px #FFFFFF !important;
+                opacity: 0;
+                animation: faSilverGradLine 2.2s cubic-bezier(0.16, 1, 0.3, 1) 6.80s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-grad-line::after {
+                content: "" !important; position: absolute !important; left: 50% !important; top: -2.2px !important;
+                margin-left: -2.5px !important; width: 5px !important; height: 5px !important;
+                background: #FFFFFF !important; border: 0.8px solid #9A9A9A !important;
+                transform: rotate(45deg) !important;
+                box-shadow: 0 0 8px #FFFFFF !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-grad-sub {
+                height: 0.7px !important; width: 0%; margin: 16px auto 0 auto !important;
+                background: linear-gradient(90deg, transparent 0%, #E2E2E2 32%, #B5B5B5 50%, #E2E2E2 68%, transparent 100%) !important;
+                opacity: 0;
+                animation: faSilverGradLine 2.4s cubic-bezier(0.16, 1, 0.3, 1) 7.45s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-title { opacity: 0; animation: faAct4In 2.0s cubic-bezier(0.16,1,0.3,1) 6.70s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-kr    { opacity: 0; animation: faAct4In 2.1s cubic-bezier(0.16,1,0.3,1) 7.10s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-cn    { opacity: 0; animation: faAct4In 2.1s cubic-bezier(0.16,1,0.3,1) 7.45s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-t-foot  { opacity: 0; animation: faAct4In 2.0s cubic-bezier(0.16,1,0.3,1) 7.80s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-breathe { animation: faSoftBreathe 3.6s ease-in-out infinite !important; }
+        `;
+        topDoc.head.appendChild(st);
+
+        function playFourActSplash() {
+            splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 42%, #FFFFFF 0%, #F6F6F6 56%, #ECECEC 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.75s ease!important;padding:max(32px,env(safe-area-inset-top,32px)) 24px max(36px,env(safe-area-inset-bottom,36px)) 24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','PingFang SC','Microsoft YaHei',sans-serif!important;";
+
+            splash.innerHTML = `
+                <div class="fa-bg-rain" style="left:16%;top:10%;height:46px;animation-delay:0.3s;"></div>
+                <div class="fa-bg-rain" style="left:83%;top:16%;height:52px;animation-delay:1.5s;"></div>
+                <div class="fa-bg-rain" style="left:26%;top:46%;height:42px;animation-delay:2.6s;"></div>
+                <div class="fa-bg-rain" style="left:74%;top:50%;height:48px;animation-delay:0.8s;"></div>
+                <div class="fa-bg-snow" style="left:21%;top:22%;width:4px;height:4px;animation-delay:0.2s;"></div>
+                <div class="fa-bg-snow" style="left:79%;top:30%;width:3.5px;height:3.5px;animation-delay:1.7s;"></div>
+                <div class="fa-bg-snow" style="left:34%;top:62%;width:4px;height:4px;animation-delay:2.9s;"></div>
+                <div class="fa-bg-snow" style="left:67%;top:25%;width:3.5px;height:3.5px;animation-delay:2.1s;"></div>
+
+                <div class="fa-lid-top"></div>
+                <div class="fa-lid-bot"></div>
+
+                <div class="fa-rain-spot f-spot-1" style="left:26%;top:30%;">
+                    <div class="fa-drop"></div><div class="fa-dot"></div><div class="fa-ring-1"></div><div class="fa-ring-2"></div>
+                </div>
+                <div class="fa-rain-spot f-spot-2" style="left:74%;top:58%;">
+                    <div class="fa-drop"></div><div class="fa-dot"></div><div class="fa-ring-1"></div><div class="fa-ring-2"></div>
+                </div>
+                <div class="fa-rain-spot f-spot-3" style="left:50%;top:42%;">
+                    <div class="fa-drop"></div><div class="fa-dot"></div><div class="fa-ring-1"></div><div class="fa-ring-2"></div>
+                </div>
+
+                <div class="fa-act2-snow">
+                    <div class="fa-snow-halo"></div>
+                    <svg class="fa-snowflake-svg" viewBox="0 0 100 100" fill="none">
+                        <g stroke="#8E8E8E" stroke-width="1.1" stroke-linecap="round">
+                            <line x1="50" y1="12" x2="50" y2="88" />
+                            <line x1="17" y1="31" x2="83" y2="69" />
+                            <line x1="83" y1="31" x2="17" y2="69" />
+                            <path d="M44 22 L50 28 L56 22 M44 78 L50 72 L56 78" />
+                            <path d="M23 41 L31 39 L29 31 M77 59 L69 61 L71 69" />
+                            <path d="M71 31 L69 39 L77 41 M29 69 L31 61 L23 59" />
+                        </g>
+                        <polygon points="50,36 62,43 62,57 50,64 38,57 38,43" fill="rgba(255,255,255,0.75)" stroke="#FFFFFF" stroke-width="1.2" />
+                        <circle cx="50" cy="50" r="3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
+                    </svg>
+                    <div class="fa-snow-sub">FIRST SNOW · 初雪化雨</div>
+                </div>
+
+                <div class="fa-act3-cross">
+                    <svg class="fa-passing-snow" viewBox="0 0 100 100" fill="none">
+                        <g stroke="#8E8E8E" stroke-width="1.15" stroke-linecap="round">
+                            <line x1="50" y1="12" x2="50" y2="88" />
+                            <line x1="17" y1="31" x2="83" y2="69" />
+                            <line x1="83" y1="31" x2="17" y2="69" />
+                            <path d="M44 22 L50 28 L56 22 M44 78 L50 72 L56 78" />
+                            <path d="M23 41 L31 39 L29 31 M77 59 L69 61 L71 69" />
+                            <path d="M71 31 L69 39 L77 41 M29 69 L31 61 L23 59" />
+                        </g>
+                        <polygon points="50,36 62,43 62,57 50,64 38,57 38,43" fill="rgba(255,255,255,0.85)" stroke="#FFFFFF" stroke-width="1.2" />
+                        <circle cx="50" cy="50" r="3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
+                    </svg>
+                    <div class="fa-cross-v"></div>
+                    <div class="fa-cross-h"></div>
+                    <svg class="fa-cross-jewel" viewBox="0 0 140 200" fill="none">
+                        <polygon points="70,60 82,76 70,92 58,76" fill="rgba(255,255,255,0.65)" stroke="#FFFFFF" stroke-width="1.2" />
+                        <path d="M 70 54 Q 70 76 92 76 Q 70 76 70 98 Q 70 76 48 76 Q 70 76 70 54 Z" fill="#FFFFFF" stroke="#8A8A8A" stroke-width="0.85" stroke-linejoin="round" />
+                        <circle cx="70" cy="76" r="2.0" fill="#7A7A7A" />
+                        <circle cx="70" cy="36" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
+                        <circle cx="38" cy="76" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
+                        <circle cx="102" cy="76" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
+                        <circle cx="70" cy="126" r="1.7" fill="#FFFFFF" stroke="#8E8E8E" stroke-width="0.85" />
+                        <circle cx="70" cy="186" r="1.8" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
+                    </svg>
+                    <svg class="fa-cross-drip-bead" viewBox="0 0 12 18" fill="none">
+                        <path d="M 6 1 C 6 1 1.5 8.5 1.5 12 C 1.5 14.8 3.5 16.8 6 16.8 C 8.5 16.8 10.5 14.8 10.5 12 C 10.5 8.5 6 1 6 1 Z" fill="#FFFFFF" stroke="#828282" stroke-width="1.1" />
+                    </svg>
+                    <div class="fa-cross-drip-ring1"></div>
+                    <div class="fa-cross-drip-ring2"></div>
+                    <div class="fa-destiny-pure">
+                        <div style="font-size:11.5px;font-weight:700;color:#555555!important;letter-spacing:11px;text-indent:11px;">宿命制作</div>
+                        <div style="font-size:6.2px;font-weight:600;color:#A0A0A0!important;letter-spacing:3.8px;margin-top:4px;">DESTINY PRODUCTION</div>
+                    </div>
+                </div>
+
+                <div class="fa-a4-head" style="width:100%;max-width:300px;display:flex;justify-content:space-between;align-items:center;font-size:7.2px;font-weight:600;color:#A8A8A8!important;letter-spacing:3.5px;font-family:monospace;z-index:5;">
+                    <span>SUMOUL · 宿命制作</span>
+                    <span>04:00 AM</span>
+                </div>
+
+                <div style="width:100%;max-width:316px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:5;">
+                    <div class="fa-a4-stage" style="width:100%;height:158px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+                        <svg viewBox="0 0 220 158" width="220" height="158" fill="none" style="overflow:visible!important;">
+                            <defs>
+                                <linearGradient id="faColdTraceGrad" x1="110" y1="6" x2="110" y2="140" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.1" />
+                                    <stop offset="22%" stop-color="#B8B8B8" stop-opacity="0.75" />
+                                    <stop offset="65%" stop-color="#8A8A8A" stop-opacity="0.9" />
+                                    <stop offset="100%" stop-color="#B0B0B0" stop-opacity="0.85" />
+                                </linearGradient>
+                                <filter id="faIceMistBlur" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="3.2" result="blur" />
+                                </filter>
+                            </defs>
+                            <line x1="68" y1="46" x2="152" y2="46" stroke="#EAEAEA" stroke-width="0.7" />
+                            <line x1="110" y1="6" x2="110" y2="142" stroke="#ECECEC" stroke-width="0.7" stroke-dasharray="1.5 3.5" />
+                            <g class="fa-ice-mote">
+                                <line x1="58" y1="20" x2="58" y2="46" stroke="#DCDCDC" stroke-width="0.8" stroke-linecap="round" />
+                                <circle cx="58" cy="50" r="1.4" fill="#FFFFFF" stroke="#B8B8B8" stroke-width="0.7" />
+                            </g>
+                            <g class="fa-ice-mote" style="animation-delay:1.6s;">
+                                <line x1="162" y1="32" x2="162" y2="60" stroke="#DCDCDC" stroke-width="0.8" stroke-linecap="round" />
+                                <circle cx="162" cy="64" r="1.4" fill="#FFFFFF" stroke="#B8B8B8" stroke-width="0.7" />
+                            </g>
+                            <path class="fa-main-path" d="M 110 8 L 110 38 L 99 62 L 119 90 L 103 116 L 110 138" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" filter="url(#faIceMistBlur)" />
+                            <path class="fa-main-path" d="M 110 8 L 110 38 L 99 62 L 119 90 L 103 116 L 110 138" stroke="url(#faColdTraceGrad)" stroke-width="0.95" stroke-linecap="round" stroke-linejoin="round" />
+                            <path class="fa-main-glint" d="M 110 8 L 110 38 L 99 62 L 119 90 L 103 116 L 110 138" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="110" cy="38" r="1.5" fill="#FFFFFF" stroke="#A6A6A6" stroke-width="0.8" />
+                            <path d="M 99 57 L 100.2 60.8 L 104 62 L 100.2 63.2 L 99 67 L 97.8 63.2 L 94 62 L 97.8 60.8 Z" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="0.6" />
+                            <circle cx="119" cy="90" r="1.7" fill="#FFFFFF" stroke="#969696" stroke-width="0.85" />
+                            <circle cx="103" cy="116" r="1.5" fill="#FFFFFF" stroke="#A6A6A6" stroke-width="0.8" />
+                            <path d="M 110 135 C 110 135 107.8 139 107.8 140.8 C 107.8 142.1 108.8 143.2 110 143.2 C 111.2 143.2 112.2 142.1 112.2 140.8 C 112.2 139 110 135 110 135 Z" fill="#FFFFFF" stroke="#909090" stroke-width="0.85" />
+                            <ellipse class="fa-end-rip" cx="110" cy="145" rx="16" ry="3.8" fill="none" stroke="#B0B0B0" stroke-width="0.75" />
+                            <ellipse class="fa-end-rip-2" cx="110" cy="145" rx="16" ry="3.8" fill="none" stroke="#FFFFFF" stroke-width="1.3" />
+                            <ellipse cx="110" cy="145" rx="8" ry="1.8" fill="none" stroke="#FFFFFF" stroke-width="1.0" />
+                        </svg>
+                    </div>
+
+                    <div class="fa-t-title" style="font-size:18.5px;font-weight:700;letter-spacing:6.5px;text-indent:6.5px;color:#5E5E5E!important;text-shadow:0 0 16px #FFFFFF, 0 0 8px #FFFFFF!important;">
+                        Sumoul App
+                    </div>
+                    <div class="fa-t-title" style="font-size:7px;font-weight:600;letter-spacing:4.2px;text-indent:4.2px;color:#A6A6A6!important;margin-top:5px;">
+                        RAIN &amp; SNOW · 宿命制作
+                    </div>
+
+                    <div class="fa-grad-line"></div>
+
+                    <div class="fa-t-kr" style="font-size:10.2px;font-weight:600;color:#6E6E6E!important;line-height:2.1;letter-spacing:1.2px;text-shadow:0 0 12px #FFFFFF!important;">
+                        “ 두 방울의 눈비가 마주쳐 십자로 교차하던 밤,<br>하얀 안개 속에 우리의 계절이 내린다. ”
+                    </div>
+                    <div class="fa-t-cn" style="font-size:8.8px;font-weight:500;color:#969696!important;line-height:1.95;letter-spacing:1.6px;margin-top:6px;text-shadow:0 0 10px #FFFFFF!important;">
+                        两滴雨雪相遇、交错成十字的夜里，<br>白雾深处，正落下属于我们的季节。
+                    </div>
+
+                    <div class="fa-grad-sub"></div>
+                </div>
+
+                <div class="fa-t-foot" style="padding-bottom:4px;z-index:5;">
+                    <div class="fa-breathe" style="font-size:7.5px;font-weight:600;color:#888888!important;letter-spacing:4.2px;font-family:monospace;">
+                        · &nbsp; TOUCH TO WAKE &nbsp; ·
+                    </div>
+                </div>
+            `;
+
+            splash.onclick = () => splash.classList.add("fade-out");
+        }
+
+        playFourActSplash();
+
+        topDoc.addEventListener("click", (e) => {
+            const t = e.target;
+            if (!t || !t.closest) return;
+            if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
+                splash.classList.remove("fade-out");
+                playFourActSplash();
+            }
+        }, true);
+    }
+
+    mountFourActColdSilverSplash();
+})();
+
+
+// ==========================================================================
+// 🔐 【第二部分：QQ + 自设密码 + 口令注册登录系统 & 管理员人数统计/QQ名册/拉黑补丁】
+// 智能兼容任何锁屏 DOM 结构，100% 强制显示「QQ号 + 密码 + 准入口令」三框与「申请注册 / 密码登录」双按钮！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
     const CLOUD_DB_URL = "https://api.npoint.io/7590dee5e1fa18abf191";
-    const K_LOCAL_DB = "sumoul_v45_native_db";
+    const K_LOCAL_DB = "sumoul_v46_auth_db";
 
     function getDefaultDB() {
         return {
-            passcode: "宿命", // 默认注册准入口令（可在后台随时改）
+            passcode: "宿命", // 默认注册口令（可在后台修改）
             users: [],        // [{ qq, pwd, time }]
             blacklist: []     // ["123456"]
         };
     }
 
     function loadLocalDB() {
-        try {
-            return Object.assign(getDefaultDB(), JSON.parse(localStorage.getItem(K_LOCAL_DB) || "{}"));
-        } catch (e) { return getDefaultDB(); }
+        try { return Object.assign(getDefaultDB(), JSON.parse(localStorage.getItem(K_LOCAL_DB) || "{}")); } catch (e) { return getDefaultDB(); }
     }
 
     function saveLocalDB(db) {
@@ -3768,88 +4301,109 @@ bootSumoulApp();
         } catch (e) {}
     }
 
-    function mountNonDestructiveAuth() {
+    function mountUniversalLockAndAdmin() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
-        const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
-        const adminPage = topDoc.getElementById("smt-page-admin");
         if (!modal) {
-            setTimeout(mountNonDestructiveAuth, 200);
+            setTimeout(mountUniversalLockAndAdmin, 200);
             return;
         }
 
+        // 智能定位锁屏层（无论叫 #seoul-boot-lock-layer 还是 #smt-boot-lock）
+        const lockLayer = topDoc.getElementById("seoul-boot-lock-layer")
+            || topDoc.getElementById("smt-boot-lock")
+            || modal.querySelector("[id*='lock']");
+
+        const adminPage = topDoc.getElementById("smt-page-admin")
+            || modal.querySelector("[id*='admin']");
+
         // ══════════════════════════════════════════════════════════════════
-        // 1. 在你原本的锁屏 UI 上原地微创改造（完全保留你原本的卡片样式与排版！）
+        // 1. 改造锁屏卡片内部表单为：「QQ号 + 自设密码 + 口令」注册与登录
         // ══════════════════════════════════════════════════════════════════
-        const qqInput = topDoc.getElementById("smt-lock-qq-input");
-        const codeInput = topDoc.getElementById("smt-lock-code-input");
-        const applyBtn = topDoc.getElementById("smt-lock-apply-btn");
-        const unlockBtn = topDoc.getElementById("smt-lock-unlock-btn");
-        const statusMsg = topDoc.getElementById("smt-lock-status-msg");
+        if (lockLayer && !lockLayer.getAttribute("data-v46-upgraded")) {
+            lockLayer.setAttribute("data-v46-upgraded", "1");
 
-        if (qqInput && codeInput && applyBtn && unlockBtn && !qqInput.getAttribute("data-v45-bound")) {
-            qqInput.setAttribute("data-v45-bound", "1");
+            // 找到锁屏层内部原本的白色卡片容器（保留你原本的外壳背景与边框样式！）
+            const innerCard = lockLayer.querySelector("div") || lockLayer;
 
-            // 仅把原本的两个输入框提示词微调为「QQ账号 + 自设密码」，并在下方顺滑插入一个同款风格的「注册口令框」
-            qqInput.placeholder = "输入你的 QQ 号码（账号）...";
-            codeInput.placeholder = "输入你的登录密码（注册时自设）...";
+            innerCard.innerHTML = `
+                <div style="font-size:8px;font-weight:700;color:#999999;letter-spacing:3px;margin-bottom:4px;">SUMOUL ARCHIVE · 宿命制作</div>
+                <div style="font-size:15px;font-weight:800;color:#333333;letter-spacing:2px;margin-bottom:6px;">通行证登录 · 账号注册</div>
+                <div style="font-size:8.5px;color:#888888;margin-bottom:14px;line-height:1.5;">
+                    首次使用请填写 <b>QQ号 + 自设密码 + 准入口令</b> 点击左侧「申请注册」；<br>已注册用户仅需填写 <b>QQ号 + 密码</b> 点击右侧「密码登录」。
+                </div>
 
-            let tokenInput = topDoc.getElementById("smt-lock-token-input");
-            if (!tokenInput) {
-                tokenInput = topDoc.createElement("input");
-                tokenInput.type = "text";
-                tokenInput.id = "smt-lock-token-input";
-                tokenInput.className = codeInput.className; // 100% 继承你原本输入框的 class 样式！
-                tokenInput.style.cssText = codeInput.style.cssText + ";margin-top:6px;";
-                tokenInput.placeholder = "首次注册请填口令（已注册直接点登录无需填）";
-                codeInput.parentNode.insertBefore(tokenInput, codeInput.nextSibling);
-            }
+                <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-bottom:12px;">
+                    <input type="text" id="v46-qq-inp" class="smt-wx-input" style="width:100%!important;height:34px!important;font-size:10.5px!important;box-sizing:border-box!important;text-align:center!important;" placeholder="1. 输入你的 QQ 号码（作为登录账号）" />
+                    <input type="password" id="v46-pwd-inp" class="smt-wx-input" style="width:100%!important;height:34px!important;font-size:10.5px!important;box-sizing:border-box!important;text-align:center!important;" placeholder="2. 输入登录密码（注册时由你自己设置）" />
+                    <input type="text" id="v46-tk-inp" class="smt-wx-input" style="width:100%!important;height:34px!important;font-size:10.5px!important;box-sizing:border-box!important;text-align:center!important;" placeholder="3. 输入准入口令（仅首次注册必填，登录免填）" />
+                </div>
 
-            // 按钮文字保留你原本的按钮外观，仅改为「申请注册」与「密码登录」
-            applyBtn.textContent = "申请注册";
-            unlockBtn.textContent = "密码登录";
+                <div id="v46-lock-msg" style="min-height:16px;font-size:9px;font-weight:700;color:#777777;margin-bottom:12px;line-height:1.5;"></div>
 
-            // 启动时核验：如果当前已解锁的 QQ 被你拉黑了，立即锁回！
+                <div style="display:flex;gap:8px;width:100%;justify-content:center;">
+                    <span class="smt-pill-btn" id="v46-btn-reg" style="flex:1!important;height:34px!important;font-size:10px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;">
+                        ✨ 申请注册账号
+                    </span>
+                    <span class="smt-pill-btn dark" id="v46-btn-login" style="flex:1!important;height:34px!important;font-size:10px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;">
+                        🔑 账号密码登录
+                    </span>
+                </div>
+            `;
+
+            const qqInp = topDoc.getElementById("v46-qq-inp");
+            const pwdInp = topDoc.getElementById("v46-pwd-inp");
+            const tkInp = topDoc.getElementById("v46-tk-inp");
+            const msgEl = topDoc.getElementById("v46-lock-msg");
+            const regBtn = topDoc.getElementById("v46-btn-reg");
+            const loginBtn = topDoc.getElementById("v46-btn-login");
+
+            // 检查当前登录的 QQ 是否被管理员拉黑
             syncDB().then((db) => {
                 const curQQ = localStorage.getItem("seoul_v15_unlocked_qq") || "";
                 if (curQQ && db.blacklist.includes(String(curQQ))) {
                     localStorage.removeItem("seoul_v15_unlocked_qq");
-                    lockLayer?.classList.remove("smt-unlocked-hide");
-                    if (statusMsg) statusMsg.textContent = `🚫 QQ【${curQQ}】已被管理员拉黑封禁！`;
+                    lockLayer.classList.remove("smt-unlocked-hide");
+                    lockLayer.style.display = "flex";
+                    msgEl.style.color = "#C5221F";
+                    msgEl.textContent = `🚫 你的 QQ【${curQQ}】已被管理员拉黑封禁！`;
                 }
             });
 
-            // 点击左侧【申请注册】按钮（保留你原本的按钮样式）
-            applyBtn.addEventListener("click", async (e) => {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-                const qq = (qqInput.value || "").trim().replace(/\D/g, "");
-                const pwd = (codeInput.value || "").trim();
-                const tk = (tokenInput.value || "").trim();
+            // 点击左侧【✨ 申请注册账号】按钮
+            regBtn.onclick = async (e) => {
+                e.stopPropagation();
+                const qq = (qqInp.value || "").trim().replace(/\D/g, "");
+                const pwd = (pwdInp.value || "").trim();
+                const tk = (tkInp.value || "").trim();
 
                 if (!qq || qq.length < 5 || qq.length > 12) {
-                    if (statusMsg) statusMsg.textContent = "⚠️ 请填写正确的 5~12 位 QQ 号码";
+                    msgEl.style.color = "#C5221F";
+                    msgEl.textContent = "⚠️ 请在第1个框输入正确的 5~12 位 QQ 号码！";
                     return;
                 }
                 if (!pwd) {
-                    if (statusMsg) statusMsg.textContent = "⚠️ 请在第二个框设置你的登录密码";
+                    msgEl.style.color = "#C5221F";
+                    msgEl.textContent = "⚠️ 请在第2个框设置你自己的登录密码！";
                     return;
                 }
 
-                applyBtn.textContent = "注册中...";
+                regBtn.textContent = "注册中...";
                 const db = await syncDB();
 
-                // 检查黑名单
+                // 1. 检查是否被拉黑
                 if (db.blacklist.includes(qq)) {
-                    applyBtn.textContent = "申请注册";
-                    if (statusMsg) statusMsg.textContent = `🚫 该 QQ【${qq}】已被管理员拉黑，禁止注册！`;
+                    regBtn.textContent = "✨ 申请注册账号";
+                    msgEl.style.color = "#C5221F";
+                    msgEl.textContent = `🚫 该 QQ【${qq}】已被管理员拉黑封禁，禁止注册！`;
                     return;
                 }
 
-                // 检查注册口令
+                // 2. 校验第3个框的准入口令
                 const reqTk = (db.passcode || "").trim();
                 if (reqTk && tk !== reqTk && tk.toUpperCase() !== "SUMOUL" && tk !== "0400") {
-                    applyBtn.textContent = "申请注册";
-                    if (statusMsg) statusMsg.textContent = "❌ 注册口令不正确，请向管理员确认口令";
+                    regBtn.textContent = "✨ 申请注册账号";
+                    msgEl.style.color = "#C5221F";
+                    msgEl.textContent = "❌ 第3个框的「准入口令」不正确！请向管理员确认口令。";
                     return;
                 }
 
@@ -3861,52 +4415,56 @@ bootSumoulApp();
                     db.users[idx].pwd = pwd;
                     db.users[idx].time = tStr;
                 } else {
+                    // 新增注册用户（后台总人数自动 +1）
                     db.users.unshift({ qq, pwd, time: tStr });
                 }
 
                 await pushDB(db);
                 localStorage.setItem("seoul_v15_unlocked_qq", qq);
 
-                applyBtn.textContent = "✓ 注册成功";
-                if (statusMsg) statusMsg.textContent = `🎉 注册成功！QQ【${qq}】已记录，正在进入...`;
+                regBtn.textContent = "✓ 注册成功";
+                msgEl.style.color = "#1E7E34";
+                msgEl.textContent = `🎉 注册成功！QQ【${qq}】已计入管理员后台，正在进入...`;
                 setTimeout(() => {
-                    lockLayer?.classList.add("smt-unlocked-hide");
-                    if (window._refreshV45Admin) window._refreshV45Admin();
+                    lockLayer.classList.add("smt-unlocked-hide");
+                    if (window._refreshV46Admin) window._refreshV46Admin();
                 }, 450);
-            }, true);
+            };
 
-            // 点击右侧【密码登录】按钮（保留你原本的按钮样式）
-            unlockBtn.addEventListener("click", async (e) => {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-                const qq = (qqInput.value || "").trim().replace(/\D/g, "");
-                const pwd = (codeInput.value || "").trim();
+            // 点击右侧【🔑 账号密码登录】按钮
+            loginBtn.onclick = async (e) => {
+                e.stopPropagation();
+                const qq = (qqInp.value || "").trim().replace(/\D/g, "");
+                const pwd = (pwdInp.value || "").trim();
 
                 if (!qq || !pwd) {
-                    if (statusMsg) statusMsg.textContent = "⚠️ 请输入 QQ 号码与登录密码";
+                    msgEl.style.color = "#C5221F";
+                    msgEl.textContent = "⚠️ 请输入你的 QQ 号码与登录密码！";
                     return;
                 }
 
-                unlockBtn.textContent = "核验中...";
+                loginBtn.textContent = "登录中...";
                 const db = await syncDB();
-                unlockBtn.textContent = "密码登录";
+                loginBtn.textContent = "🔑 账号密码登录";
 
-                // 1. 黑名单拦截
+                // 1. 检查是否被拉黑
                 if (db.blacklist.includes(qq)) {
-                    if (statusMsg) statusMsg.textContent = `🚫 该 QQ【${qq}】已被管理员拉黑封禁，禁止进入！`;
+                    msgEl.style.color = "#C5221F";
+                    msgEl.textContent = `🚫 该 QQ【${qq}】已被管理员拉黑封禁，禁止登录！`;
                     return;
                 }
 
-                // 2. 校验已注册的账号密码
+                // 2. 核对已注册用户的密码
                 const user = db.users.find((u) => String(u.qq) === qq);
                 if (user && user.pwd === pwd) {
                     localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                    if (statusMsg) statusMsg.textContent = `🎉 登录成功！欢迎 QQ【${qq}】`;
-                    setTimeout(() => lockLayer?.classList.add("smt-unlocked-hide"), 350);
+                    msgEl.style.color = "#1E7E34";
+                    msgEl.textContent = `🎉 登录成功！欢迎回来，QQ【${qq}】`;
+                    setTimeout(() => lockLayer.classList.add("smt-unlocked-hide"), 350);
                     return;
                 }
 
-                // 3. 如果直接用管理员口令或万能码登录，也自动计入后台注册名册（人数+1）并放行！
+                // 3. 管理员口令直通并自动补录进后台名册
                 if ((db.passcode && pwd === db.passcode) || pwd === "0400" || pwd.toUpperCase() === "SUMOUL888") {
                     if (!user) {
                         const d = new Date();
@@ -3915,165 +4473,171 @@ bootSumoulApp();
                         await pushDB(db);
                     }
                     localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                    if (statusMsg) statusMsg.textContent = "🎉 口令核验通过！正在进入...";
+                    msgEl.style.color = "#1E7E34";
+                    msgEl.textContent = "🎉 口令验证通过！正在进入...";
                     setTimeout(() => {
-                        lockLayer?.classList.add("smt-unlocked-hide");
-                        if (window._refreshV45Admin) window._refreshV45Admin();
+                        lockLayer.classList.add("smt-unlocked-hide");
+                        if (window._refreshV46Admin) window._refreshV46Admin();
                     }, 350);
                     return;
                 }
 
-                if (statusMsg) {
-                    statusMsg.textContent = user ? "❌ 登录密码错误！" : "⚠️ 该 QQ 尚未注册，请填口令点左侧「申请注册」";
-                }
-            }, true);
+                msgEl.style.color = "#C5221F";
+                msgEl.textContent = user ? "❌ 登录密码错误！" : "⚠️ 该 QQ 尚未注册！请填第3个框的口令并点左侧「申请注册账号」。";
+            };
         }
 
         // ══════════════════════════════════════════════════════════════════
-        // 2. 在你原本的管理员后台里，恢复所有原版面板，并嵌入同款风格的「人数+QQ名册+拉黑」卡片
+        // 2. 在管理员后台顶部嵌入「已注册总人数 + QQ名册 + 拉黑管理」面板
         // ══════════════════════════════════════════════════════════════════
-        if (adminPage) {
-            // 恢复你原本被隐藏的所有原生后台面板！
-            Array.from(adminPage.children).forEach((ch) => {
-                ch.style.display = "";
-            });
-            ["smt-v44-admin-center", "smt-v43-admin-panel", "smt-v42-admin-panel", "smt-v41-admin-panel", "smt-v40-admin-panel"].forEach((id) => topDoc.getElementById(id)?.remove());
+        if (adminPage && !topDoc.getElementById("smt-v46-admin-box")) {
+            Array.from(adminPage.children).forEach((ch) => (ch.style.display = ""));
+            ["smt-v45-native-box", "smt-v44-admin-center", "smt-v43-admin-panel", "smt-v42-admin-panel"].forEach((id) => topDoc.getElementById(id)?.remove());
 
-            if (!topDoc.getElementById("smt-v45-native-box")) {
-                const box = topDoc.createElement("div");
-                box.id = "smt-v45-native-box";
-                box.className = "smt-section-box"; // 100% 使用你原本的卡片 class 样式！
-                box.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#2C2C32;">📊 注册人数统计 · QQ名册 · 拉黑管理</span>
-                        <span class="smt-pill-btn dark" id="v45-sync-btn" style="height:21px!important;font-size:8px!important;">↻ 刷新人数与名册</span>
+            const box = topDoc.createElement("div");
+            box.id = "smt-v46-admin-box";
+            box.className = "smt-section-box";
+            box.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-size:10px;font-weight:800;color:#2C2C32;">📊 注册人数统计 · QQ名册 · 拉黑系统</span>
+                    <div style="display:flex;gap:4px;">
+                        <span class="smt-pill-btn" id="v46-reopen-lock" style="height:21px!important;font-size:8px!important;" title="点击可立即预览测试锁屏注册界面">🔒 预览锁屏页</span>
+                        <span class="smt-pill-btn dark" id="v46-sync-btn" style="height:21px!important;font-size:8px!important;">↻ 刷新名册</span>
                     </div>
+                </div>
 
-                    <!-- 极简白灰人数统计条 -->
-                    <div style="display:flex;gap:6px;margin-bottom:8px;">
-                        <div style="flex:1;background:#F4F5F8;border:1px solid #E4E6EE;border-radius:10px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;">
-                            <span style="font-size:8.5px;font-weight:700;color:#6E6E78;">已注册总人数</span>
-                            <b id="v45-total-num" style="font-size:13px;font-weight:900;color:#2C2C32;">0 人</b>
-                        </div>
-                        <div style="flex:1;background:#F4F5F8;border:1px solid #E4E6EE;border-radius:10px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;">
-                            <span style="font-size:8.5px;font-weight:700;color:#6E6E78;">已拉黑封禁</span>
-                            <b id="v45-black-num" style="font-size:13px;font-weight:900;color:#2C2C32;">0 人</b>
-                        </div>
+                <!-- 总注册人数与拉黑人数 -->
+                <div style="display:flex;gap:6px;margin-bottom:8px;">
+                    <div style="flex:1;background:#F4F5F8;border:1px solid #E4E6EE;border-radius:10px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:8.5px;font-weight:700;color:#6E6E78;">已注册总人数</span>
+                        <b id="v46-total-num" style="font-size:13px;font-weight:900;color:#2C2C32;">0 人</b>
                     </div>
-
-                    <!-- 注册口令修改与手动拉黑输入行 -->
-                    <div style="display:flex;gap:5px;margin-bottom:6px;">
-                        <input type="text" id="v45-token-inp" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="注册准入口令 (默认:宿命)" />
-                        <span class="smt-pill-btn dark" id="v45-token-save" style="height:26px!important;white-space:nowrap;">改口令</span>
+                    <div style="flex:1;background:#F4F5F8;border:1px solid #E4E6EE;border-radius:10px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:8.5px;font-weight:700;color:#6E6E78;">已拉黑封禁</span>
+                        <b id="v46-black-num" style="font-size:13px;font-weight:900;color:#2C2C32;">0 人</b>
                     </div>
-                    <div style="display:flex;gap:5px;margin-bottom:8px;">
-                        <input type="text" id="v45-black-inp" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="输入要直接拉黑封禁的 QQ 号..." />
-                        <span class="smt-pill-btn dark" id="v45-black-btn" style="height:26px!important;white-space:nowrap;">🚫 拉黑该QQ</span>
-                    </div>
+                </div>
 
-                    <!-- 注册用户 QQ 号与密码列表 -->
-                    <div style="font-size:8.5px;font-weight:800;color:#555560;margin-bottom:4px;">📋 已注册用户 QQ 名册（注册一个自动+1）：</div>
-                    <div id="v45-user-list" style="max-height:150px;overflow-y:auto;margin-bottom:6px;"></div>
+                <!-- 准入口令设置 & 手动拉黑输入 -->
+                <div style="display:flex;gap:5px;margin-bottom:6px;">
+                    <input type="text" id="v46-token-inp" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="设置注册所需的准入口令 (默认:宿命)" />
+                    <span class="smt-pill-btn dark" id="v46-token-save" style="height:26px!important;white-space:nowrap;">保存口令</span>
+                </div>
+                <div style="display:flex;gap:5px;margin-bottom:8px;">
+                    <input type="text" id="v46-black-inp" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="输入要拉黑封禁的 QQ 号码..." />
+                    <span class="smt-pill-btn dark" id="v46-black-btn" style="height:26px!important;white-space:nowrap;">🚫 拉黑该QQ</span>
+                </div>
 
-                    <!-- 已拉黑名单 -->
-                    <div id="v45-black-list" style="max-height:80px;overflow-y:auto;"></div>
-                `;
-                adminPage.prepend(box);
+                <!-- 注册用户名册（显示序号、QQ号、密码、注册时间） -->
+                <div style="font-size:8.5px;font-weight:800;color:#555560;margin-bottom:4px;">📋 已注册用户 QQ 名册（每注册一人自动+1）：</div>
+                <div id="v46-user-list" style="max-height:150px;overflow-y:auto;margin-bottom:6px;"></div>
 
-                async function refreshV45Admin() {
-                    const btn = topDoc.getElementById("v45-sync-btn");
-                    if (btn) btn.textContent = "同步中...";
-                    const db = await syncDB();
-                    if (btn) btn.textContent = "↻ 刷新人数与名册";
+                <!-- 黑名单列表 -->
+                <div id="v46-black-list" style="max-height:80px;overflow-y:auto;"></div>
+            `;
+            adminPage.prepend(box);
 
-                    topDoc.getElementById("v45-total-num").textContent = `${db.users.length} 人`;
-                    topDoc.getElementById("v45-black-num").textContent = `${db.blacklist.length} 人`;
-                    topDoc.getElementById("v45-token-inp").value = db.passcode || "";
+            async function refreshV46Admin() {
+                const btn = topDoc.getElementById("v46-sync-btn");
+                if (btn) btn.textContent = "同步中...";
+                const db = await syncDB();
+                if (btn) btn.textContent = "↻ 刷新名册";
 
-                    const uList = topDoc.getElementById("v45-user-list");
-                    if (!db.users.length) {
-                        uList.innerHTML = `<div style="text-align:center;padding:10px;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;font-size:8.5px;color:#9A9EA8;">暂无注册用户 · 有人注册后会自动显示人数与 QQ 号</div>`;
-                    } else {
-                        uList.innerHTML = db.users.map((u, idx) => {
-                            const isBlk = db.blacklist.includes(String(u.qq));
-                            return `
-                                <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EAEAF0;border-radius:8px;padding:6px 9px;margin-bottom:4px;font-size:9px;">
-                                    <div>
-                                        <b>#${db.users.length - idx} · QQ: ${u.qq}</b>
-                                        <span style="color:#888;margin-left:6px;">密码: ${u.pwd} (${u.time || "刚刚"})</span>
-                                    </div>
-                                    <div style="display:flex;gap:4px;">
-                                        ${isBlk
-                                            ? `<span class="smt-pill-btn" data-v45unblk="${u.qq}" style="height:20px!important;font-size:8px!important;">解封</span>`
-                                            : `<span class="smt-pill-btn dark" data-v45blk="${u.qq}" style="height:20px!important;font-size:8px!important;">拉黑</span>`
-                                        }
-                                        <span class="smt-pill-btn" data-v45del="${u.qq}" style="height:20px!important;font-size:8px!important;">删</span>
-                                    </div>
+                topDoc.getElementById("v46-total-num").textContent = `${db.users.length} 人`;
+                topDoc.getElementById("v46-black-num").textContent = `${db.blacklist.length} 人`;
+                topDoc.getElementById("v46-token-inp").value = db.passcode || "";
+
+                const uList = topDoc.getElementById("v46-user-list");
+                if (!db.users.length) {
+                    uList.innerHTML = `<div style="text-align:center;padding:10px;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;font-size:8.5px;color:#9A9EA8;">暂无注册用户 · 有人注册后会自动增加人数并显示其 QQ 号</div>`;
+                } else {
+                    uList.innerHTML = db.users.map((u, idx) => {
+                        const isBlk = db.blacklist.includes(String(u.qq));
+                        return `
+                            <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EAEAF0;border-radius:8px;padding:6px 9px;margin-bottom:4px;font-size:9px;">
+                                <div>
+                                    <b>#${db.users.length - idx} · QQ: ${u.qq}</b>
+                                    <span style="color:#888;margin-left:6px;">密码: ${u.pwd} (${u.time || "刚刚"})</span>
                                 </div>
-                            `;
-                        }).join("");
-                    }
-
-                    const bList = topDoc.getElementById("v45-black-list");
-                    bList.innerHTML = db.blacklist.map((q) => `
-                        <div style="display:flex;justify-content:space-between;align-items:center;background:#F8F8FA;border:1px dashed #CCCCCC;border-radius:7px;padding:4px 8px;margin-top:3px;font-size:8.5px;color:#555;">
-                            <span>🚫 已拉黑 QQ：<b>${q}</b></span>
-                            <span data-v45unblk="${q}" style="cursor:pointer;text-decoration:underline;">解除拉黑</span>
-                        </div>
-                    `).join("");
-
-                    box.querySelectorAll("[data-v45blk]").forEach((b) => b.onclick = async () => {
-                        const q = String(b.getAttribute("data-v45blk"));
-                        const latest = await syncDB();
-                        if (!latest.blacklist.includes(q)) latest.blacklist.unshift(q);
-                        await pushDB(latest);
-                        refreshV45Admin();
-                    });
-                    box.querySelectorAll("[data-v45unblk]").forEach((b) => b.onclick = async () => {
-                        const q = String(b.getAttribute("data-v45unblk"));
-                        const latest = await syncDB();
-                        latest.blacklist = latest.blacklist.filter((x) => x !== q);
-                        await pushDB(latest);
-                        refreshV45Admin();
-                    });
-                    box.querySelectorAll("[data-v45del]").forEach((b) => b.onclick = async () => {
-                        const q = String(b.getAttribute("data-v45del"));
-                        const latest = await syncDB();
-                        latest.users = latest.users.filter((u) => String(u.qq) !== q);
-                        await pushDB(latest);
-                        refreshV45Admin();
-                    });
+                                <div style="display:flex;gap:4px;">
+                                    ${isBlk
+                                        ? `<span class="smt-pill-btn" data-v46unblk="${u.qq}" style="height:20px!important;font-size:8px!important;">解封</span>`
+                                        : `<span class="smt-pill-btn dark" data-v46blk="${u.qq}" style="height:20px!important;font-size:8px!important;">拉黑</span>`
+                                    }
+                                    <span class="smt-pill-btn" data-v46del="${u.qq}" style="height:20px!important;font-size:8px!important;">删</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
                 }
 
-                window._refreshV45Admin = refreshV45Admin;
-                topDoc.getElementById("v45-sync-btn").onclick = () => refreshV45Admin();
+                const bList = topDoc.getElementById("v46-black-list");
+                bList.innerHTML = db.blacklist.map((q) => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;background:#F8F8FA;border:1px dashed #CCCCCC;border-radius:7px;padding:4px 8px;margin-top:3px;font-size:8.5px;color:#555;">
+                        <span>🚫 已拉黑封禁 QQ：<b>${q}</b></span>
+                        <span data-v46unblk="${q}" style="cursor:pointer;text-decoration:underline;">解除拉黑</span>
+                    </div>
+                `).join("");
 
-                topDoc.getElementById("v45-token-save").onclick = async (e) => {
-                    const latest = await syncDB();
-                    latest.passcode = topDoc.getElementById("v45-token-inp").value.trim();
-                    await pushDB(latest);
-                    e.target.textContent = "✓ 已改";
-                    setTimeout(() => (e.target.textContent = "改口令"), 1000);
-                };
-
-                topDoc.getElementById("v45-black-btn").onclick = async () => {
-                    const q = (topDoc.getElementById("v45-black-inp").value || "").trim().replace(/\D/g, "");
-                    if (!q) return;
-                    topDoc.getElementById("v45-black-inp").value = "";
+                box.querySelectorAll("[data-v46blk]").forEach((b) => b.onclick = async () => {
+                    const q = String(b.getAttribute("data-v46blk"));
                     const latest = await syncDB();
                     if (!latest.blacklist.includes(q)) latest.blacklist.unshift(q);
                     await pushDB(latest);
-                    refreshV45Admin();
-                };
-
-                ["smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
-                    topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(refreshV45Admin, 80));
+                    refreshV46Admin();
                 });
-
-                refreshV45Admin();
+                box.querySelectorAll("[data-v46unblk]").forEach((b) => b.onclick = async () => {
+                    const q = String(b.getAttribute("data-v46unblk"));
+                    const latest = await syncDB();
+                    latest.blacklist = latest.blacklist.filter((x) => x !== q);
+                    await pushDB(latest);
+                    refreshV46Admin();
+                });
+                box.querySelectorAll("[data-v46del]").forEach((b) => b.onclick = async () => {
+                    const q = String(b.getAttribute("data-v46del"));
+                    const latest = await syncDB();
+                    latest.users = latest.users.filter((u) => String(u.qq) !== q);
+                    await pushDB(latest);
+                    refreshV46Admin();
+                });
             }
+
+            window._refreshV46Admin = refreshV46Admin;
+            topDoc.getElementById("v46-sync-btn").onclick = () => refreshV46Admin();
+
+            // 方便你随时点一下就能调出锁屏界面亲眼查看「QQ+密码+口令」注册页！
+            topDoc.getElementById("v46-reopen-lock").onclick = () => {
+                if (lockLayer) {
+                    lockLayer.classList.remove("smt-unlocked-hide");
+                    lockLayer.style.display = "flex";
+                }
+            };
+
+            topDoc.getElementById("v46-token-save").onclick = async (e) => {
+                const latest = await syncDB();
+                latest.passcode = topDoc.getElementById("v46-token-inp").value.trim();
+                await pushDB(latest);
+                e.target.textContent = "✓ 已改";
+                setTimeout(() => (e.target.textContent = "保存口令"), 1000);
+            };
+
+            topDoc.getElementById("v46-black-btn").onclick = async () => {
+                const q = (topDoc.getElementById("v46-black-inp").value || "").trim().replace(/\D/g, "");
+                if (!q) return;
+                topDoc.getElementById("v46-black-inp").value = "";
+                const latest = await syncDB();
+                if (!latest.blacklist.includes(q)) latest.blacklist.unshift(q);
+                await pushDB(latest);
+                refreshV46Admin();
+            };
+
+            ["smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
+                topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(refreshV46Admin, 80));
+            });
+
+            refreshV46Admin();
         }
     }
 
-    mountNonDestructiveAuth();
+    mountUniversalLockAndAdmin();
 })();
