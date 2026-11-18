@@ -2755,17 +2755,17 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// ❄️ 【Sumoul App 清冷银白 · 四幕式电影级开屏补丁（第3幕「四芒水光十字 + 逐字宿命制作」专精升级版）】
-// 动画1：眨眼三滴银雨(保留) ➔ 动画2：六角孤雪消融(保留) ➔ 动画3：四芒水光十字与露珠链+逐字宿命制作(重做升级！) ➔ 动画4：主视觉(保留)
+// ❄️ 【Sumoul App 清冷银白 · 四幕式高定开屏补丁（V37：双雪旋转碰撞碎晶 + 高定满细节清冷十字星轨 + 宿命制作）】
+// 动画1：眨眼三滴银雨 ➔ 动画2：两朵六角雪花旋转碰撞碎裂成冰晶 ➔ 动画3：清冷银白十字星轨阵列(宿命制作) ➔ 动画4：雨雪折线渐线主视觉
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
 
-    function mountFourActColdSilverSplash() {
+    function mountSnowCollisionAndColdCrossSplash() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const splash = topDoc.getElementById("smt-boot-splash");
         if (!modal || !splash) {
-            setTimeout(mountFourActColdSilverSplash, 150);
+            setTimeout(mountSnowCollisionAndColdCrossSplash, 150);
             return;
         }
 
@@ -2784,71 +2784,72 @@ bootSumoulApp();
             "sumoul-rainsnow-v33-css",
             "sumoul-coldsilver-v34-css",
             "sumoul-fouract-v35-css",
-            "sumoul-fouract-v36-css"
+            "sumoul-fouract-v36-css",
+            "sumoul-fouract-v37-css"
         ].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
-        st.id = "sumoul-fouract-v36-css";
+        st.id = "sumoul-fouract-v37-css";
         st.innerHTML = `
             /* ══════════════════════════════════════════════════════
-               【动画 ①：0.0s ~ 2.5s 轻柔眨眼 + 3滴清透银白雨丝涟漪（保持原样）】
+               【动画 ①：0.0s ~ 2.4s 轻柔眨眼 + 3滴清透银白雨丝涟漪】
                ══════════════════════════════════════════════════════ */
-            @keyframes faLidTop {
+            @keyframes v37LidTop {
                 0%   { transform: translateY(0%); }
                 24%  { transform: translateY(-78%); }
                 38%  { transform: translateY(-18%); }
                 65%  { transform: translateY(-100%); }
                 100% { transform: translateY(-100%); }
             }
-            @keyframes faLidBot {
+            @keyframes v37LidBot {
                 0%   { transform: translateY(0%); }
                 24%  { transform: translateY(78%); }
                 38%  { transform: translateY(18%); }
                 65%  { transform: translateY(100%); }
                 100% { transform: translateY(100%); }
             }
-            @keyframes faSilverDrop {
+            @keyframes v37SilverDrop {
                 0%   { transform: translateY(-55px) scaleY(1.25); opacity: 0; }
                 40%  { opacity: 0.9; }
                 80%  { transform: translateY(0px) scaleY(0.3); opacity: 0.95; }
                 100% { transform: translateY(2px) scaleY(0.1); opacity: 0; }
             }
-            @keyframes faSilverDot {
+            @keyframes v37SilverDot {
                 0%   { transform: scale(0); opacity: 0; }
                 35%  { transform: scale(1.25); opacity: 0.95; }
                 100% { transform: scale(0.3); opacity: 0; }
             }
-            @keyframes faSilverRingA {
+            @keyframes v37SilverRingA {
                 0%   { transform: scale(0.1); opacity: 0; }
                 20%  { opacity: 0.9; }
                 100% { transform: scale(2.15); opacity: 0; }
             }
-            @keyframes faSilverRingB {
+            @keyframes v37SilverRingB {
                 0%   { transform: scale(0.1); opacity: 0; }
                 25%  { opacity: 0.6; }
                 100% { transform: scale(2.95); opacity: 0; }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-lid-top {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-lid-top {
                 position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 52% !important;
                 background: linear-gradient(180deg, #E8E8E8 0%, #F4F4F4 78%, rgba(244,244,244,0) 100%) !important;
                 z-index: 25 !important; pointer-events: none !important;
-                animation: faLidTop 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+                animation: v37LidTop 1.75s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-lid-bot {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-lid-bot {
                 position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 52% !important;
                 background: linear-gradient(0deg, #E8E8E8 0%, #F4F4F4 78%, rgba(244,244,244,0) 100%) !important;
                 z-index: 25 !important; pointer-events: none !important;
-                animation: faLidBot 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+                animation: v37LidBot 1.75s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-rain-spot {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-rain-spot {
                 position: absolute !important; width: 90px !important; height: 90px !important;
                 margin-left: -45px !important; margin-top: -45px !important;
                 pointer-events: none !important; z-index: 8 !important;
                 display: flex !important; align-items: center !important; justify-content: center !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-drop {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-drop {
                 position: absolute !important; bottom: 45px !important; left: 50% !important;
                 width: 1.15px !important; height: 38px !important; margin-left: -0.55px !important;
                 border-radius: 99px !important;
@@ -2856,433 +2857,494 @@ bootSumoulApp();
                 box-shadow: 0 0 6px #FFFFFF !important;
                 opacity: 0 !important; transform-origin: bottom center !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-dot {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-dot {
                 position: absolute !important; width: 4px !important; height: 4px !important;
                 border-radius: 50% !important; background: #FFFFFF !important;
                 border: 0.8px solid #A2A2A2 !important;
                 box-shadow: 0 0 8px #FFFFFF !important; opacity: 0 !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-ring-1,
-            #seoul-mini-theater-modal #smt-boot-splash .fa-ring-2 {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-ring-1,
+            #seoul-mini-theater-modal #smt-boot-splash .v37-ring-2 {
                 position: absolute !important; width: 48px !important; height: 20px !important;
                 border-radius: 50% !important; border: 1px solid #A8A8A8 !important;
                 box-shadow: 0 0 8px #FFFFFF, inset 0 0 6px #FFFFFF !important; opacity: 0 !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-ring-2 { border: 0.7px solid #C4C4C4 !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-ring-2 { border: 0.7px solid #C4C4C4 !important; }
 
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-drop   { animation: faSilverDrop 0.46s cubic-bezier(0.4,0,1,1) 0.50s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-dot    { animation: faSilverDot 0.55s ease-out 0.88s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-ring-1 { animation: faSilverRingA 1.5s cubic-bezier(0.16,1,0.3,1) 0.90s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-1 .fa-ring-2 { animation: faSilverRingB 1.8s cubic-bezier(0.16,1,0.3,1) 1.05s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-1 .v37-drop   { animation: v37SilverDrop 0.45s cubic-bezier(0.4,0,1,1) 0.45s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-1 .v37-dot    { animation: v37SilverDot 0.55s ease-out 0.82s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-1 .v37-ring-1 { animation: v37SilverRingA 1.45s cubic-bezier(0.16,1,0.3,1) 0.84s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-1 .v37-ring-2 { animation: v37SilverRingB 1.75s cubic-bezier(0.16,1,0.3,1) 0.98s forwards !important; }
 
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-drop   { animation: faSilverDrop 0.46s cubic-bezier(0.4,0,1,1) 1.20s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-dot    { animation: faSilverDot 0.55s ease-out 1.58s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-ring-1 { animation: faSilverRingA 1.5s cubic-bezier(0.16,1,0.3,1) 1.60s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-2 .fa-ring-2 { animation: faSilverRingB 1.8s cubic-bezier(0.16,1,0.3,1) 1.75s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-2 .v37-drop   { animation: v37SilverDrop 0.45s cubic-bezier(0.4,0,1,1) 1.12s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-2 .v37-dot    { animation: v37SilverDot 0.55s ease-out 1.49s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-2 .v37-ring-1 { animation: v37SilverRingA 1.45s cubic-bezier(0.16,1,0.3,1) 1.51s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-2 .v37-ring-2 { animation: v37SilverRingB 1.75s cubic-bezier(0.16,1,0.3,1) 1.65s forwards !important; }
 
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-drop   { height: 44px !important; animation: faSilverDrop 0.48s cubic-bezier(0.4,0,1,1) 1.88s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-dot    { animation: faSilverDot 0.6s ease-out 2.28s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-ring-1 { width: 58px !important; height: 24px !important; animation: faSilverRingA 1.7s cubic-bezier(0.16,1,0.3,1) 2.30s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .f-spot-3 .fa-ring-2 { width: 58px !important; height: 24px !important; animation: faSilverRingB 2.0s cubic-bezier(0.16,1,0.3,1) 2.45s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-3 .v37-drop   { height: 44px !important; animation: v37SilverDrop 0.46s cubic-bezier(0.4,0,1,1) 1.78s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-3 .v37-dot    { animation: v37SilverDot 0.6s ease-out 2.16s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-3 .v37-ring-1 { width: 58px !important; height: 24px !important; animation: v37SilverRingA 1.65s cubic-bezier(0.16,1,0.3,1) 2.18s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .s-spot-3 .v37-ring-2 { width: 58px !important; height: 24px !important; animation: v37SilverRingB 1.95s cubic-bezier(0.16,1,0.3,1) 2.32s forwards !important; }
 
             /* ══════════════════════════════════════════════════════
-               【动画 ②：2.42s ~ 4.22s 孤雪飘旋 · 凝结化雨（保持原样）】
+               ❄️【全新动画 ②：2.30s ~ 4.25s 两朵六角雪花飘旋靠近 ➔ 碰撞碎裂成漫天冰晶星屑】
                ══════════════════════════════════════════════════════ */
-            @keyframes faSnowCrystalSpin {
-                0%   { opacity: 0; transform: translateY(-22px) scale(0.4) rotate(-60deg); filter: blur(6px); }
-                28%  { opacity: 1; transform: translateY(0px) scale(1) rotate(0deg); filter: blur(0px); }
-                72%  { opacity: 0.95; transform: translateY(4px) scale(1.06) rotate(45deg); filter: blur(0px); }
-                100% { opacity: 0; transform: translateY(10px) scale(0.2) rotate(90deg); filter: blur(6px); }
+            /* 左上雪花旋转飘向中心 (130, 90) */
+            @keyframes v37SnowLeftIn {
+                0%   { transform: translate(-72px, -42px) rotate(-140deg) scale(0.4); opacity: 0; }
+                25%  { opacity: 0.95; }
+                62%  { transform: translate(-4px, -2px) rotate(0deg) scale(1); opacity: 1; }
+                72%  { transform: translate(0px, 0px) rotate(25deg) scale(1.18); opacity: 1; }
+                100% { transform: translate(0px, 0px) rotate(60deg) scale(0.1); opacity: 0; }
             }
-            @keyframes faSnowHalo {
-                0%   { opacity: 0; transform: scale(0.3); }
-                40%  { opacity: 0.85; transform: scale(1.1); }
-                100% { opacity: 0; transform: scale(1.7); }
+            /* 右下雪花旋转飘向中心 (130, 90) 与左雪花迎面相撞！ */
+            @keyframes v37SnowRightIn {
+                0%   { transform: translate(72px, 42px) rotate(140deg) scale(0.4); opacity: 0; }
+                25%  { opacity: 0.95; }
+                62%  { transform: translate(4px, 2px) rotate(0deg) scale(1); opacity: 1; }
+                72%  { transform: translate(0px, 0px) rotate(-25deg) scale(1.18); opacity: 1; }
+                100% { transform: translate(0px, 0px) rotate(-60deg) scale(0.1); opacity: 0; }
             }
-            @keyframes faSnowWhisper {
+            /* 两朵雪花相撞瞬间 (3.35s)：迸发纯白冰雾闪光环与飞溅冰晶星屑！ */
+            @keyframes v37SnowImpactBurst {
+                0%   { transform: scale(0.15); opacity: 0; }
+                25%  { transform: scale(1); opacity: 1; }
+                75%  { transform: scale(1.45); opacity: 0.75; }
+                100% { transform: scale(1.85); opacity: 0; }
+            }
+            @keyframes v37SnowSubText {
                 0%   { opacity: 0; filter: blur(8px); letter-spacing: 10px; }
-                30%  { opacity: 0.85; filter: blur(0px); letter-spacing: 5px; }
-                75%  { opacity: 0.85; filter: blur(0px); letter-spacing: 5px; }
+                30%  { opacity: 0.9; filter: blur(0px); letter-spacing: 4.5px; }
+                75%  { opacity: 0.9; filter: blur(0px); letter-spacing: 4.5px; }
                 100% { opacity: 0; filter: blur(8px); letter-spacing: 8px; }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-act2-snow {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-act2-snow {
                 position: absolute !important; inset: 0 !important;
                 display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
                 pointer-events: none !important; z-index: 12 !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-snowflake-svg {
-                width: 84px !important; height: 84px !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-snow-l {
+                transform-box: fill-box !important; transform-origin: center !important;
                 opacity: 0 !important;
-                animation: faSnowCrystalSpin 1.80s cubic-bezier(0.22, 1, 0.36, 1) 2.42s forwards !important;
+                animation: v37SnowLeftIn 1.55s cubic-bezier(0.25, 0.1, 0.25, 1) 2.30s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-snow-halo {
-                position: absolute !important; width: 110px !important; height: 110px !important;
-                border-radius: 50% !important; border: 0.8px solid #FFFFFF !important;
-                box-shadow: 0 0 20px #FFFFFF, inset 0 0 14px #FFFFFF !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-snow-r {
+                transform-box: fill-box !important; transform-origin: center !important;
                 opacity: 0 !important;
-                animation: faSnowHalo 1.75s ease-out 2.48s forwards !important;
+                animation: v37SnowRightIn 1.55s cubic-bezier(0.25, 0.1, 0.25, 1) 2.30s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-snow-sub {
-                margin-top: 14px !important;
-                font-size: 9px !important; font-weight: 700 !important; color: #8A8A8A !important;
-                text-shadow: 0 0 10px #FFFFFF !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-snow-shards {
+                transform-box: fill-box !important; transform-origin: center !important;
                 opacity: 0 !important;
-                animation: faSnowWhisper 1.72s ease 2.48s forwards !important;
+                animation: v37SnowImpactBurst 1.05s cubic-bezier(0.16, 1, 0.3, 1) 3.30s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-snow-caption {
+                margin-top: 8px !important;
+                font-size: 8.5px !important; font-weight: 700 !important; color: #888888 !important;
+                text-shadow: 0 0 10px #FFFFFF !important; opacity: 0 !important;
+                animation: v37SnowSubText 1.85s ease 2.45s forwards !important;
             }
 
             /* ══════════════════════════════════════════════════════
-               🔥【全新重做 · 动画 ③：4.10s ~ 6.75s 双弧雨丝交汇 ➔ 四芒星水光十字 + 露珠链 + 逐字「宿命制作」】
+               ✝️【全新满细节动画 ③：4.15s ~ 6.80s 清冷高定十字星轨阵列 + 宿命制作】
                ══════════════════════════════════════════════════════ */
-            /* 1. 两条柔美弧线雨丝从上下两端交错奔向中心 (4.10s ~ 4.65s) */
-            @keyframes faArcConverge {
-                0%   { stroke-dashoffset: 180; opacity: 0; }
+            /* 1. 纵横主十字长轴：从中心向全屏两端急速拉开 -> 停留呼吸 -> 收束 */
+            @keyframes v37CrossAxisDraw {
+                0%   { stroke-dashoffset: 260; opacity: 0; }
+                20%  { stroke-dashoffset: 0; opacity: 1; }
+                78%  { stroke-dashoffset: 0; opacity: 0.92; }
+                100% { stroke-dashoffset: -260; opacity: 0; }
+            }
+            /* 2. 十字轴线上的纯白流光脉冲往外滑行 */
+            @keyframes v37CrossPulseOut {
+                0%   { stroke-dashoffset: 140; opacity: 0; }
                 30%  { opacity: 1; }
-                85%  { stroke-dashoffset: 0; opacity: 1; }
-                100% { stroke-dashoffset: -180; opacity: 0; }
+                85%  { opacity: 1; }
+                100% { stroke-dashoffset: -140; opacity: 0; }
             }
-            /* 2. 相撞瞬间 (4.55s)：中心绽开修长清冷的「四芒星水光十字」 */
-            @keyframes faStarCrossBloom {
-                0%   { opacity: 0; transform: scale(0.15) rotate(-8deg); filter: blur(4px); }
-                22%  { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0px); }
-                76%  { opacity: 0.95; transform: scale(1.04) rotate(0deg); filter: blur(0px); }
-                100% { opacity: 0; transform: scale(1.25) rotate(4deg); filter: blur(6px); }
+            /* 3. 中心双层清冷银白刻度罗盘环（外环顺时针慢旋，内环逆时针慢旋） */
+            @keyframes v37CompassCW {
+                0%   { opacity: 0; transform: scale(0.55) rotate(-35deg); }
+                22%  { opacity: 0.9; transform: scale(1) rotate(0deg); }
+                78%  { opacity: 0.85; transform: scale(1.03) rotate(28deg); }
+                100% { opacity: 0; transform: scale(1.22) rotate(45deg); }
             }
-            /* 3. 十字轴线上的 8 颗晶莹雨珠从内向外依次点亮闪烁 */
-            @keyframes faDewChainPop {
-                0%   { opacity: 0; transform: scale(0); }
-                25%  { opacity: 1; transform: scale(1.25); }
-                50%  { opacity: 0.9; transform: scale(1); }
-                80%  { opacity: 0.9; transform: scale(1); }
-                100% { opacity: 0; transform: scale(0); }
+            @keyframes v37CompassCCW {
+                0%   { opacity: 0; transform: scale(0.7) rotate(35deg); }
+                22%  { opacity: 0.85; transform: scale(1) rotate(0deg); }
+                78%  { opacity: 0.8; transform: scale(0.98) rotate(-28deg); }
+                100% { opacity: 0; transform: scale(1.18) rotate(-45deg); }
             }
-            /* 4. 相撞中心向外荡开的三层大直径银白水波环 */
-            @keyframes faCrossRippleWave {
-                0%   { transform: scale(0.1); opacity: 0; }
-                20%  { opacity: 0.85; }
-                100% { transform: scale(2.4); opacity: 0; }
+            /* 4. 十字中心四芒冰晶与四轴露珠链浮现 */
+            @keyframes v37CrossCoreShow {
+                0%   { opacity: 0; transform: scale(0.3); filter: blur(4px); }
+                22%  { opacity: 1; transform: scale(1); filter: blur(0px); }
+                78%  { opacity: 0.95; transform: scale(1.02); filter: blur(0px); }
+                100% { opacity: 0; transform: scale(1.2); filter: blur(6px); }
             }
-            /* 5. 「宿 · 命 · 制 · 作」四个字逐个从白雾失焦中浮现并优雅消散 */
-            @keyframes faCharSingleFloat {
-                0%   { opacity: 0; filter: blur(10px); transform: translateY(8px) scale(0.9); }
-                24%  { opacity: 1; filter: blur(0px); transform: translateY(0px) scale(1); }
-                75%  { opacity: 1; filter: blur(0px); transform: translateY(0px) scale(1); }
-                100% { opacity: 0; filter: blur(8px); transform: translateY(-6px) scale(1.05); }
+            /* 5. 「宿 · 命 · 制 · 作」逐字清冷浮现 */
+            @keyframes v37DestinyWord {
+                0%   { opacity: 0; filter: blur(10px); transform: translateY(6px); }
+                24%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+                76%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+                100% { opacity: 0; filter: blur(8px); transform: translateY(-5px); }
             }
-            /* 署名下方的双向延伸银丝渐线 */
-            @keyframes faSubWingLine {
+            @keyframes v37WingLine {
                 0%   { width: 0px; opacity: 0; }
-                25%  { width: 150px; opacity: 0.9; }
-                75%  { width: 165px; opacity: 0.85; }
+                25%  { width: 170px; opacity: 0.9; }
+                75%  { width: 184px; opacity: 0.85; }
                 100% { width: 0px; opacity: 0; }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-act3-cross {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-act3-cross {
                 position: absolute !important; inset: 0 !important;
                 display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
-                pointer-events: none !important; z-index: 14 !important;
+                pointer-events: none !important; z-index: 15 !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-arc-in {
-                stroke-dasharray: 180 !important; stroke-dashoffset: 180 !important;
-                opacity: 0 !important;
-                animation: faArcConverge 0.62s cubic-bezier(0.35, 0, 0.2, 1) 4.10s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-axis-line {
+                stroke-dasharray: 260 !important; stroke-dashoffset: 260 !important; opacity: 0 !important;
+                animation: v37CrossAxisDraw 2.55s cubic-bezier(0.16, 1, 0.3, 1) 4.15s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-starcross-grp {
-                transform-box: fill-box !important; transform-origin: center !important;
-                opacity: 0 !important;
-                animation: faStarCrossBloom 2.15s cubic-bezier(0.16, 1, 0.3, 1) 4.55s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-axis-glint {
+                stroke-dasharray: 28 240 !important; stroke-dashoffset: 140 !important; opacity: 0 !important;
+                animation: v37CrossPulseOut 1.8s linear 4.35s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-dew-inner {
-                transform-box: fill-box !important; transform-origin: center !important;
-                opacity: 0 !important;
-                animation: faDewChainPop 1.95s ease 4.65s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-ring-cw {
+                transform-box: fill-box !important; transform-origin: center !important; opacity: 0 !important;
+                animation: v37CompassCW 2.50s cubic-bezier(0.16, 1, 0.3, 1) 4.20s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-dew-outer {
-                transform-box: fill-box !important; transform-origin: center !important;
-                opacity: 0 !important;
-                animation: faDewChainPop 1.85s ease 4.82s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-ring-ccw {
+                transform-box: fill-box !important; transform-origin: center !important; opacity: 0 !important;
+                animation: v37CompassCCW 2.50s cubic-bezier(0.16, 1, 0.3, 1) 4.24s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-c-wave-1 {
-                transform-box: fill-box !important; transform-origin: center !important;
-                opacity: 0 !important;
-                animation: faCrossRippleWave 1.9s cubic-bezier(0.16, 1, 0.3, 1) 4.56s forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-c-wave-2 {
-                transform-box: fill-box !important; transform-origin: center !important;
-                opacity: 0 !important;
-                animation: faCrossRippleWave 2.1s cubic-bezier(0.16, 1, 0.3, 1) 4.78s forwards !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v37-core-ornament {
+                transform-box: fill-box !important; transform-origin: center !important; opacity: 0 !important;
+                animation: v37CrossCoreShow 2.48s cubic-bezier(0.16, 1, 0.3, 1) 4.22s forwards !important;
             }
 
-            /* 宿命制作 逐字动画控制 */
-            #seoul-mini-theater-modal #smt-boot-splash .fa-destiny-wrap {
-                position: relative !important; z-index: 16 !important;
-                margin-top: -12px !important;
+            /* 宿命制作 逐字排版 */
+            #seoul-mini-theater-modal #smt-boot-splash .v37-destiny-box {
+                position: relative !important; z-index: 18 !important;
+                margin-top: -8px !important;
                 display: flex !important; flex-direction: column !important; align-items: center !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-chars {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-d-row {
                 display: flex !important; align-items: center !important; justify-content: center !important;
-                gap: 11px !important;
-                font-size: 16px !important; font-weight: 800 !important; color: #444444 !important;
-                text-shadow: 0 0 16px #FFFFFF, 0 0 8px #FFFFFF, 0 2px 10px #FFFFFF !important;
+                gap: 12px !important;
+                font-size: 16.5px !important; font-weight: 800 !important; color: #4A4A4A !important;
+                text-shadow: 0 0 18px #FFFFFF, 0 0 10px #FFFFFF, 0 2px 8px #FFFFFF !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-ch {
-                display: inline-block !important; opacity: 0 !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-ch.c1 { animation: faCharSingleFloat 2.05s cubic-bezier(0.16,1,0.3,1) 4.60s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-ch.c2 { animation: faCharSingleFloat 1.97s cubic-bezier(0.16,1,0.3,1) 4.70s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-ch.c3 { animation: faCharSingleFloat 1.89s cubic-bezier(0.16,1,0.3,1) 4.80s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-ch.c4 { animation: faCharSingleFloat 1.81s cubic-bezier(0.16,1,0.3,1) 4.90s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-w { display: inline-block !important; opacity: 0 !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-w.w1 { animation: v37DestinyWord 2.35s cubic-bezier(0.16,1,0.3,1) 4.28s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-w.w2 { animation: v37DestinyWord 2.27s cubic-bezier(0.16,1,0.3,1) 4.36s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-w.w3 { animation: v37DestinyWord 2.19s cubic-bezier(0.16,1,0.3,1) 4.44s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-w.w4 { animation: v37DestinyWord 2.11s cubic-bezier(0.16,1,0.3,1) 4.52s forwards !important; }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-wing {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-d-wing {
                 height: 1px !important; width: 0px; margin: 7px auto 6px auto !important;
-                background: linear-gradient(90deg, transparent 0%, #999999 50%, transparent 100%) !important;
-                box-shadow: 0 0 6px #FFFFFF !important;
-                opacity: 0 !important;
-                animation: faSubWingLine 1.95s cubic-bezier(0.16,1,0.3,1) 4.72s forwards !important;
+                background: linear-gradient(90deg, transparent 0%, #B8B8B8 25%, #787878 50%, #B8B8B8 75%, transparent 100%) !important;
+                box-shadow: 0 0 6px #FFFFFF !important; opacity: 0 !important;
+                animation: v37WingLine 2.2s cubic-bezier(0.16,1,0.3,1) 4.38s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-d-en {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-d-sub {
                 font-size: 7.2px !important; font-weight: 700 !important; color: #969696 !important;
                 letter-spacing: 3.8px !important; opacity: 0 !important;
                 text-shadow: 0 0 8px #FFFFFF !important;
-                animation: faCharSingleFloat 1.85s ease 4.82s forwards !important;
+                animation: v37DestinyWord 2.1s ease 4.48s forwards !important;
             }
 
             /* ══════════════════════════════════════════════════════
-               【动画 ④：6.65s 起 清冷银白雨痕折线 + 露珠渐线 + 深雾灰粗体主视觉（保持原样）】
+               【动画 ④：6.65s 起 清冷银白雨痕折线 + 露珠渐线 + 深雾灰粗体主视觉】
                ══════════════════════════════════════════════════════ */
-            @keyframes faAct4In {
+            @keyframes v37Act4In {
                 0%   { opacity: 0; filter: blur(10px); transform: translateY(7px); }
                 100% { opacity: 1; filter: blur(0px); transform: translateY(0px); }
             }
-            @keyframes faTraceDraw {
+            @keyframes v37TraceDraw {
                 0%   { stroke-dashoffset: 280; opacity: 0; }
                 15%  { opacity: 1; }
                 100% { stroke-dashoffset: 0; opacity: 1; }
             }
-            @keyframes faGlintFlow {
+            @keyframes v37GlintFlow {
                 0%   { stroke-dashoffset: 280; opacity: 0; }
                 25%  { opacity: 1; }
                 80%  { opacity: 1; }
                 100% { stroke-dashoffset: -50; opacity: 0; }
             }
-            @keyframes faSilverGradLine {
+            @keyframes v37SilverGradLine {
                 0%   { width: 0%; opacity: 0; }
                 30%  { opacity: 1; }
                 100% { width: 100%; opacity: 1; }
             }
-            @keyframes faRainSnowFall {
+            @keyframes v37RainSnowFall {
                 0%   { transform: translateY(-30px); opacity: 0; }
                 35%  { opacity: 0.68; }
                 75%  { opacity: 0.68; }
                 100% { transform: translateY(145px); opacity: 0; }
             }
-            @keyframes faEndRipple {
+            @keyframes v37EndRipple {
                 0%   { transform: scale(0.2); opacity: 0.8; }
                 100% { transform: scale(2.3); opacity: 0; }
             }
-            @keyframes faSoftBreathe {
+            @keyframes v37SoftBreathe {
                 0%, 100% { opacity: 0.35; }
                 50%      { opacity: 0.88; }
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-bg-rain {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-bg-rain {
                 position: absolute !important; width: 1px !important;
                 background: linear-gradient(180deg, transparent 0%, #BDBDBD 55%, #FFFFFF 100%) !important;
                 pointer-events: none !important; opacity: 0; z-index: 2 !important;
-                animation: faRainSnowFall 3.6s linear infinite !important;
+                animation: v37RainSnowFall 3.6s linear infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-bg-snow {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-bg-snow {
                 position: absolute !important; border-radius: 50% !important;
                 background: #FFFFFF !important; border: 0.8px solid #CCCCCC !important;
                 box-shadow: 0 0 6px #FFFFFF !important;
                 pointer-events: none !important; opacity: 0; z-index: 2 !important;
-                animation: faRainSnowFall 5.0s ease-in-out infinite !important;
+                animation: v37RainSnowFall 5.0s ease-in-out infinite !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-head  { opacity: 0; animation: faAct4In 1.6s ease 6.60s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-a4-stage { opacity: 0; animation: faAct4In 1.5s ease 6.65s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-main-path {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-a4-head  { opacity: 0; animation: v37Act4In 1.6s ease 6.60s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-a4-stage { opacity: 0; animation: v37Act4In 1.5s ease 6.65s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-main-path {
                 stroke-dasharray: 280 !important; stroke-dashoffset: 280 !important;
-                animation: faTraceDraw 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) 6.70s forwards !important;
+                animation: v37TraceDraw 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) 6.70s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-main-glint {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-main-glint {
                 stroke-dasharray: 26 254 !important; stroke-dashoffset: 280 !important;
-                animation: faGlintFlow 3.4s ease-in-out 7.2s infinite !important;
+                animation: v37GlintFlow 3.4s ease-in-out 7.2s infinite !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-end-rip {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-end-rip {
                 transform-box: fill-box !important; transform-origin: center !important;
-                opacity: 0; animation: faEndRipple 3.4s ease-out 7.6s infinite !important;
+                opacity: 0; animation: v37EndRipple 3.4s ease-out 7.6s infinite !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-grad-line {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-grad-line {
                 position: relative !important; height: 1px !important; width: 0%;
                 margin: 14px auto 16px auto !important;
                 background: linear-gradient(90deg, transparent 0%, #CCCCCC 22%, #7A7A7A 50%, #CCCCCC 78%, transparent 100%) !important;
                 opacity: 0;
-                animation: faSilverGradLine 2.0s cubic-bezier(0.16, 1, 0.3, 1) 6.90s forwards !important;
+                animation: v37SilverGradLine 2.0s cubic-bezier(0.16, 1, 0.3, 1) 6.90s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-grad-line::after {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-grad-line::after {
                 content: "" !important; position: absolute !important; left: 50% !important; top: -2.2px !important;
                 margin-left: -2.5px !important; width: 5px !important; height: 5px !important;
                 border-radius: 50% !important; background: #FFFFFF !important; border: 1px solid #888888 !important;
                 box-shadow: 0 0 6px #FFFFFF !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-grad-sub {
+            #seoul-mini-theater-modal #smt-boot-splash .v37-grad-sub {
                 height: 0.8px !important; width: 0%; margin: 14px auto 0 auto !important;
                 background: linear-gradient(90deg, transparent 0%, #D8D8D8 30%, #9A9A9A 50%, #D8D8D8 70%, transparent 100%) !important;
                 opacity: 0;
-                animation: faSilverGradLine 2.2s cubic-bezier(0.16, 1, 0.3, 1) 7.55s forwards !important;
+                animation: v37SilverGradLine 2.2s cubic-bezier(0.16, 1, 0.3, 1) 7.55s forwards !important;
             }
 
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-title { opacity: 0; animation: faAct4In 1.8s cubic-bezier(0.16,1,0.3,1) 6.80s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-kr    { opacity: 0; animation: faAct4In 1.9s cubic-bezier(0.16,1,0.3,1) 7.20s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-cn    { opacity: 0; animation: faAct4In 1.9s cubic-bezier(0.16,1,0.3,1) 7.55s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-t-foot  { opacity: 0; animation: faAct4In 1.8s cubic-bezier(0.16,1,0.3,1) 7.90s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .fa-breathe { animation: faSoftBreathe 3.2s ease-in-out infinite !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-t-title { opacity: 0; animation: v37Act4In 1.8s cubic-bezier(0.16,1,0.3,1) 6.80s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-t-kr    { opacity: 0; animation: v37Act4In 1.9s cubic-bezier(0.16,1,0.3,1) 7.20s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-t-cn    { opacity: 0; animation: v37Act4In 1.9s cubic-bezier(0.16,1,0.3,1) 7.55s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-t-foot  { opacity: 0; animation: v37Act4In 1.8s cubic-bezier(0.16,1,0.3,1) 7.90s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v37-breathe { animation: v37SoftBreathe 3.2s ease-in-out infinite !important; }
         `;
         topDoc.head.appendChild(st);
 
-        function playFourActSplash() {
+        // 生成单朵清冷六角雪花 SVG 内部路径
+        function makeSnowflakePath() {
+            return `
+                <g stroke="#8A8A8A" stroke-width="1.15" stroke-linecap="round">
+                    <line x1="0" y1="-26" x2="0" y2="26" />
+                    <line x1="-22.5" y1="-13" x2="22.5" y2="13" />
+                    <line x1="22.5" y1="-13" x2="-22.5" y2="13" />
+                    <!-- 六角冰晶分叉 -->
+                    <path d="M -5 -18 L 0 -13 L 5 -18 M -5 18 L 0 13 L 5 18" />
+                    <path d="M -18 -5 L -11 -6.5 L -13 -13 M 18 5 L 11 6.5 L 13 13" />
+                    <path d="M 13 -13 L 11 -6.5 L 18 -5 M -13 13 L -11 6.5 L -18 5" />
+                </g>
+                <polygon points="0,-10 8.6,-5 8.6,5 0,10 -8.6,5 -8.6,-5" fill="rgba(255,255,255,0.85)" stroke="#FFFFFF" stroke-width="1.2" />
+                <circle cx="0" cy="0" r="2.2" fill="#FFFFFF" stroke="#888888" stroke-width="0.8" />
+            `;
+        }
+
+        function playV37Splash() {
+            // 通透清冷的纯白雾至浅银灰背景 (#FFFFFF -> #F6F6F6 -> #ECECEC)
             splash.style.cssText = "position:absolute!important;inset:0!important;background:radial-gradient(circle at 50% 42%, #FFFFFF 0%, #F6F6F6 56%, #ECECEC 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;transition:opacity 0.75s ease!important;padding:max(32px,env(safe-area-inset-top,32px)) 24px max(36px,env(safe-area-inset-bottom,36px)) 24px!important;text-align:center!important;cursor:pointer!important;box-sizing:border-box!important;overflow:hidden!important;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','PingFang SC','Microsoft YaHei',sans-serif!important;";
 
             splash.innerHTML = `
                 <!-- ❄️ 全场背景无声飘落的半透明银白雨丝与雪点 -->
-                <div class="fa-bg-rain" style="left:16%;top:10%;height:46px;animation-delay:0.3s;"></div>
-                <div class="fa-bg-rain" style="left:83%;top:16%;height:52px;animation-delay:1.5s;"></div>
-                <div class="fa-bg-rain" style="left:26%;top:46%;height:42px;animation-delay:2.6s;"></div>
-                <div class="fa-bg-rain" style="left:74%;top:50%;height:48px;animation-delay:0.8s;"></div>
-                <div class="fa-bg-snow" style="left:21%;top:22%;width:4px;height:4px;animation-delay:0.2s;"></div>
-                <div class="fa-bg-snow" style="left:79%;top:30%;width:3.5px;height:3.5px;animation-delay:1.7s;"></div>
-                <div class="fa-bg-snow" style="left:34%;top:62%;width:4px;height:4px;animation-delay:2.9s;"></div>
-                <div class="fa-bg-snow" style="left:67%;top:25%;width:3.5px;height:3.5px;animation-delay:2.1s;"></div>
+                <div class="v37-bg-rain" style="left:16%;top:10%;height:46px;animation-delay:0.3s;"></div>
+                <div class="v37-bg-rain" style="left:83%;top:16%;height:52px;animation-delay:1.5s;"></div>
+                <div class="v37-bg-rain" style="left:26%;top:46%;height:42px;animation-delay:2.6s;"></div>
+                <div class="v37-bg-rain" style="left:74%;top:50%;height:48px;animation-delay:0.8s;"></div>
+                <div class="v37-bg-snow" style="left:21%;top:22%;width:4px;height:4px;animation-delay:0.2s;"></div>
+                <div class="v37-bg-snow" style="left:79%;top:30%;width:3.5px;height:3.5px;animation-delay:1.7s;"></div>
+                <div class="v37-bg-snow" style="left:34%;top:62%;width:4px;height:4px;animation-delay:2.9s;"></div>
+                <div class="v37-bg-snow" style="left:67%;top:25%;width:3.5px;height:3.5px;animation-delay:2.1s;"></div>
 
                 <!-- ══════════════════════════════════════════════════
-                     【动画 ①：眨眼苏醒 + 3滴清透银白雨丝涟漪（原样保留）】
+                     【动画 ①：眨眼苏醒 + 3滴清透银白雨丝涟漪】
                      ══════════════════════════════════════════════════ -->
-                <div class="fa-lid-top"></div>
-                <div class="fa-lid-bot"></div>
+                <div class="v37-lid-top"></div>
+                <div class="v37-lid-bot"></div>
 
-                <div class="fa-rain-spot f-spot-1" style="left:26%;top:30%;">
-                    <div class="fa-drop"></div><div class="fa-dot"></div><div class="fa-ring-1"></div><div class="fa-ring-2"></div>
+                <div class="v37-rain-spot s-spot-1" style="left:26%;top:30%;">
+                    <div class="v37-drop"></div><div class="v37-dot"></div><div class="v37-ring-1"></div><div class="v37-ring-2"></div>
                 </div>
-                <div class="fa-rain-spot f-spot-2" style="left:74%;top:58%;">
-                    <div class="fa-drop"></div><div class="fa-dot"></div><div class="fa-ring-1"></div><div class="fa-ring-2"></div>
+                <div class="v37-rain-spot s-spot-2" style="left:74%;top:58%;">
+                    <div class="v37-drop"></div><div class="v37-dot"></div><div class="v37-ring-1"></div><div class="v37-ring-2"></div>
                 </div>
-                <div class="fa-rain-spot f-spot-3" style="left:50%;top:42%;">
-                    <div class="fa-drop"></div><div class="fa-dot"></div><div class="fa-ring-1"></div><div class="fa-ring-2"></div>
+                <div class="v37-rain-spot s-spot-3" style="left:50%;top:42%;">
+                    <div class="v37-drop"></div><div class="v37-dot"></div><div class="v37-ring-1"></div><div class="v37-ring-2"></div>
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     【动画 ②：六角孤雪旋转飘落 · 凝结化雨（原样保留）】
+                     ❄️【全新动画 ②：两朵六角冰晶雪花飘旋靠近 ➔ 半空碰撞碎裂成漫天冰晶星屑】
                      ══════════════════════════════════════════════════ -->
-                <div class="fa-act2-snow">
-                    <div class="fa-snow-halo"></div>
-                    <svg class="fa-snowflake-svg" viewBox="0 0 100 100" fill="none">
-                        <g stroke="#8E8E8E" stroke-width="1.1" stroke-linecap="round">
-                            <line x1="50" y1="12" x2="50" y2="88" />
-                            <line x1="17" y1="31" x2="83" y2="69" />
-                            <line x1="83" y1="31" x2="17" y2="69" />
-                            <path d="M44 22 L50 28 L56 22 M44 78 L50 72 L56 78" />
-                            <path d="M23 41 L31 39 L29 31 M77 59 L69 61 L71 69" />
-                            <path d="M71 31 L69 39 L77 41 M29 69 L31 61 L23 59" />
+                <div class="v37-act2-snow">
+                    <svg viewBox="0 0 260 180" width="260" height="180" fill="none" style="overflow:visible!important;">
+                        <!-- 第一朵雪花（从左上旋转飘入中心 130,90） -->
+                        <g transform="translate(130, 90)">
+                            <g class="v37-snow-l">${makeSnowflakePath()}</g>
                         </g>
-                        <polygon points="50,36 62,43 62,57 50,64 38,57 38,43" fill="rgba(255,255,255,0.75)" stroke="#FFFFFF" stroke-width="1.2" />
-                        <circle cx="50" cy="50" r="3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
+                        <!-- 第二朵雪花（从右下旋转飘入中心 130,90 与第一朵相撞！） -->
+                        <g transform="translate(130, 90)">
+                            <g class="v37-snow-r">${makeSnowflakePath()}</g>
+                        </g>
+
+                        <!-- 两朵雪花相撞瞬间 (3.30s)：迸发的纯白冰雾闪光环 + 12颗飞溅冰晶碎屑！ -->
+                        <g transform="translate(130, 90)">
+                            <g class="v37-snow-shards">
+                                <!-- 碰撞中心纯白冰环 -->
+                                <circle cx="0" cy="0" r="24" stroke="#FFFFFF" stroke-width="2.2" />
+                                <circle cx="0" cy="0" r="36" stroke="#B0B0B0" stroke-width="0.8" stroke-dasharray="2 4" />
+                                <!-- 向四周飞溅的棱角冰晶星屑 (Ice Shards) -->
+                                <polygon points="0,-32 2,-26 0,-20 -2,-26" fill="#FFFFFF" stroke="#888888" stroke-width="0.7" />
+                                <polygon points="0,32 2,26 0,20 -2,26" fill="#FFFFFF" stroke="#888888" stroke-width="0.7" />
+                                <polygon points="-32,0 -26,2 -20,0 -26,-2" fill="#FFFFFF" stroke="#888888" stroke-width="0.7" />
+                                <polygon points="32,0 26,2 20,0 26,-2" fill="#FFFFFF" stroke="#888888" stroke-width="0.7" />
+                                <circle cx="-22" cy="-22" r="2" fill="#FFFFFF" stroke="#999999" stroke-width="0.8" />
+                                <circle cx="22" cy="-22" r="1.8" fill="#FFFFFF" stroke="#999999" stroke-width="0.8" />
+                                <circle cx="-22" cy="22" r="1.8" fill="#FFFFFF" stroke="#999999" stroke-width="0.8" />
+                                <circle cx="22" cy="22" r="2" fill="#FFFFFF" stroke="#999999" stroke-width="0.8" />
+                                <circle cx="-38" cy="-12" r="1.3" fill="#888888" />
+                                <circle cx="38" cy="12" r="1.3" fill="#888888" />
+                                <circle cx="-12" cy="38" r="1.3" fill="#888888" />
+                                <circle cx="12" cy="-38" r="1.3" fill="#888888" />
+                            </g>
+                        </g>
                     </svg>
-                    <div class="fa-snow-sub">FIRST SNOW · 初雪化雨</div>
+                    <div class="v37-snow-caption">SNOW COLLISION · 双雪相撞</div>
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     🔥【全新重做 · 动画 ③：双弧雨丝交错相撞 ➔ 高定四芒星水光十字 + 8颗露珠链 + 逐字「宿命制作」】
+                     ✝️【全新满细节动画 ③：清冷银白圣十字星轨阵列（双罗盘环 + 四角微标 + 四轴露珠 + 宿命制作）】
                      ══════════════════════════════════════════════════ -->
-                <div class="fa-act3-cross">
-                    <svg viewBox="0 0 280 240" width="280" height="240" fill="none" style="overflow:visible!important;">
+                <div class="v37-act3-cross">
+                    <svg viewBox="0 0 300 250" width="300" height="250" fill="none" style="overflow:visible!important;">
                         <defs>
-                            <!-- 十字轴线两端自然渐隐的清冷银白渐变 -->
-                            <linearGradient id="faCrossGradH" x1="10" y1="120" x2="270" y2="120" gradientUnits="userSpaceOnUse">
+                            <!-- 清冷银白十字渐隐渐变（绝不发黑，温润银灰 #686868 -> 透明） -->
+                            <linearGradient id="v37CrossH" x1="6" y1="125" x2="294" y2="125" gradientUnits="userSpaceOnUse">
                                 <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
-                                <stop offset="22%" stop-color="#C2C2C2" stop-opacity="0.7" />
-                                <stop offset="50%" stop-color="#6E6E6E" stop-opacity="1" />
-                                <stop offset="78%" stop-color="#C2C2C2" stop-opacity="0.7" />
+                                <stop offset="18%" stop-color="#C8C8C8" stop-opacity="0.7" />
+                                <stop offset="50%" stop-color="#686868" stop-opacity="1" />
+                                <stop offset="82%" stop-color="#C8C8C8" stop-opacity="0.7" />
                                 <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
                             </linearGradient>
-                            <linearGradient id="faCrossGradV" x1="140" y1="5" x2="140" y2="235" gradientUnits="userSpaceOnUse">
+                            <linearGradient id="v37CrossV" x1="150" y1="4" x2="150" y2="246" gradientUnits="userSpaceOnUse">
                                 <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
-                                <stop offset="22%" stop-color="#C2C2C2" stop-opacity="0.7" />
-                                <stop offset="50%" stop-color="#6E6E6E" stop-opacity="1" />
-                                <stop offset="78%" stop-color="#C2C2C2" stop-opacity="0.7" />
+                                <stop offset="18%" stop-color="#C8C8C8" stop-opacity="0.7" />
+                                <stop offset="50%" stop-color="#686868" stop-opacity="1" />
+                                <stop offset="82%" stop-color="#C8C8C8" stop-opacity="0.7" />
                                 <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
                             </linearGradient>
                         </defs>
 
-                        <!-- 1. 两道柔美弧线雨丝从左上、右下交错滑入中心 (140, 120) 相撞 -->
-                        <path class="fa-arc-in" d="M 30 40 Q 95 55 140 120" stroke="#9A9A9A" stroke-width="1.3" stroke-linecap="round" />
-                        <path class="fa-arc-in" d="M 250 200 Q 185 185 140 120" stroke="#9A9A9A" stroke-width="1.3" stroke-linecap="round" />
-                        <path class="fa-arc-in" d="M 30 40 Q 95 55 140 120" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.7" />
-
-                        <!-- 2. 相撞中心荡开的双层清透水波涟漪 -->
-                        <circle class="fa-c-wave-1" cx="140" cy="120" r="34" stroke="#FFFFFF" stroke-width="1.8" />
-                        <circle class="fa-c-wave-1" cx="140" cy="120" r="34" stroke="#A8A8A8" stroke-width="0.8" />
-                        <circle class="fa-c-wave-2" cx="140" cy="120" r="46" stroke="#BCBCBC" stroke-width="0.7" stroke-dasharray="2 4" />
-
-                        <!-- 3. 绽放的「高定四芒星水光十字」主体 -->
-                        <g class="fa-starcross-grp">
-                            <!-- 底层纯白柔光水雾十字衬底 -->
-                            <line x1="12" y1="120" x2="268" y2="120" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.85" />
-                            <line x1="140" y1="8" x2="140" y2="232" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.85" />
-
-                            <!-- 主十字渐隐银丝 -->
-                            <line x1="12" y1="120" x2="268" y2="120" stroke="url(#faCrossGradH)" stroke-width="1.2" stroke-linecap="round" />
-                            <line x1="140" y1="8" x2="140" y2="232" stroke="url(#faCrossGradV)" stroke-width="1.2" stroke-linecap="round" />
-
-                            <!-- 对角线极细微光星芒丝 -->
-                            <line x1="112" y1="92" x2="168" y2="148" stroke="#CCCCCC" stroke-width="0.7" stroke-linecap="round" />
-                            <line x1="168" y1="92" x2="112" y2="148" stroke="#CCCCCC" stroke-width="0.7" stroke-linecap="round" />
-
-                            <!-- 中心高定纤长四芒冰晶星 (4-Pointed Starlight) -->
-                            <path d="M 140 94 Q 140 120 166 120 Q 140 120 140 146 Q 140 120 114 120 Q 140 120 140 94 Z" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" stroke-linejoin="round" />
-                            <circle cx="140" cy="120" r="2.2" fill="#6E6E6E" />
+                        <!-- 1. 中心双层反向慢旋的「清冷银白星轨罗盘环」（丰富视觉层次！） -->
+                        <g class="v37-ring-cw">
+                            <circle cx="150" cy="125" r="68" stroke="#FFFFFF" stroke-width="2.5" opacity="0.85" />
+                            <circle cx="150" cy="125" r="68" stroke="#A6A6A6" stroke-width="0.85" stroke-dasharray="8 5 2 5" />
+                            <!-- 罗盘环四角微距取景刻度 ⌜ ⌝ ⌞ ⌟ -->
+                            <path d="M 92 75 L 92 67 L 100 67" stroke="#909090" stroke-width="1" stroke-linecap="round" />
+                            <path d="M 208 75 L 208 67 L 200 67" stroke="#909090" stroke-width="1" stroke-linecap="round" />
+                            <path d="M 92 175 L 92 183 L 100 183" stroke="#909090" stroke-width="1" stroke-linecap="round" />
+                            <path d="M 208 175 L 208 183 L 200 183" stroke="#909090" stroke-width="1" stroke-linecap="round" />
+                        </g>
+                        <g class="v37-ring-ccw">
+                            <circle cx="150" cy="125" r="46" stroke="#B8B8B8" stroke-width="0.75" />
+                            <circle cx="150" cy="125" r="32" stroke="#FFFFFF" stroke-width="1.4" stroke-dasharray="3 3" />
+                            <!-- 45度对角线极细银丝 -->
+                            <line x1="102" y1="77" x2="198" y2="173" stroke="#CCCCCC" stroke-width="0.7" stroke-dasharray="2 3" />
+                            <line x1="198" y1="77" x2="102" y2="173" stroke="#CCCCCC" stroke-width="0.7" stroke-dasharray="2 3" />
                         </g>
 
-                        <!-- 4. 沿十字四轴依次向外点亮的 8 颗晶莹挂壁露珠链 -->
-                        <g class="fa-dew-inner">
-                            <circle cx="140" cy="76" r="2.3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
-                            <circle cx="140" cy="164" r="2.3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
-                            <circle cx="96" cy="120" r="2.3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
-                            <circle cx="184" cy="120" r="2.3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
-                        </g>
-                        <g class="fa-dew-outer">
-                            <circle cx="140" cy="44" r="1.5" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
-                            <circle cx="140" cy="196" r="1.5" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
-                            <circle cx="64" cy="120" r="1.5" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
-                            <circle cx="216" cy="120" r="1.5" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
+                        <!-- 2. 主十字纵横轴线（底层纯白水雾柔光 + 1.25px 清冷银灰十字线） -->
+                        <line class="v37-axis-line" x1="8" y1="125" x2="292" y2="125" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" />
+                        <line class="v37-axis-line" x1="150" y1="5" x2="150" y2="245" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" />
+
+                        <line class="v37-axis-line" x1="8" y1="125" x2="292" y2="125" stroke="url(#v37CrossH)" stroke-width="1.25" stroke-linecap="round" />
+                        <line class="v37-axis-line" x1="150" y1="5" x2="150" y2="245" stroke="url(#v37CrossV)" stroke-width="1.25" stroke-linecap="round" />
+
+                        <!-- 十字两侧平行极细副轨丝（增加高定精密感） -->
+                        <line class="v37-axis-line" x1="56" y1="121" x2="244" y2="121" stroke="#DCDCDC" stroke-width="0.6" />
+                        <line class="v37-axis-line" x1="56" y1="129" x2="244" y2="129" stroke="#DCDCDC" stroke-width="0.6" />
+                        <line class="v37-axis-line" x1="146" y1="35" x2="146" y2="215" stroke="#DCDCDC" stroke-width="0.6" />
+                        <line class="v37-axis-line" x1="154" y1="35" x2="154" y2="215" stroke="#DCDCDC" stroke-width="0.6" />
+
+                        <!-- 沿十字四轴向外滑行的纯白流光 -->
+                        <line class="v37-axis-glint" x1="8" y1="125" x2="292" y2="125" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" />
+                        <line class="v37-axis-glint" x1="150" y1="5" x2="150" y2="245" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" />
+
+                        <!-- 3. 十字中心立体四芒冰晶 + 四轴对称凝结的 12 颗晶莹雨珠与刻度点 -->
+                        <g class="v37-core-ornament">
+                            <!-- 中心四芒冰晶星 -->
+                            <path d="M 150 96 Q 150 125 179 125 Q 150 125 150 154 Q 150 125 121 125 Q 150 125 150 96 Z" fill="#FFFFFF" stroke="#828282" stroke-width="0.95" stroke-linejoin="round" />
+                            <polygon points="150,115 160,125 150,135 140,125" fill="rgba(255,255,255,0.9)" stroke="#9A9A9A" stroke-width="0.8" />
+                            <circle cx="150" cy="125" r="2.2" fill="#686868" />
+
+                            <!-- 内圈四轴雨珠 -->
+                            <circle cx="150" cy="79" r="2.5" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
+                            <circle cx="150" cy="171" r="2.5" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
+                            <circle cx="104" cy="125" r="2.5" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
+                            <circle cx="196" cy="125" r="2.5" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
+
+                            <!-- 中圈四轴雨珠 -->
+                            <circle cx="150" cy="57" r="1.9" fill="#FFFFFF" stroke="#909090" stroke-width="0.9" />
+                            <circle cx="150" cy="193" r="1.9" fill="#FFFFFF" stroke="#909090" stroke-width="0.9" />
+                            <circle cx="82" cy="125" r="1.9" fill="#FFFFFF" stroke="#909090" stroke-width="0.9" />
+                            <circle cx="218" cy="125" r="1.9" fill="#FFFFFF" stroke="#909090" stroke-width="0.9" />
+
+                            <!-- 外圈四轴微光点 -->
+                            <circle cx="150" cy="32" r="1.4" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
+                            <circle cx="150" cy="218" r="1.4" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
+                            <circle cx="52" cy="125" r="1.4" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
+                            <circle cx="248" cy="125" r="1.4" fill="#FFFFFF" stroke="#AAAAAA" stroke-width="0.8" />
                         </g>
                     </svg>
 
-                    <!-- 5. 逐字从白雾中对焦浮现的「宿 · 命 · 制 · 作」 -->
-                    <div class="fa-destiny-wrap">
-                        <div class="fa-d-chars">
-                            <span class="fa-d-ch c1">宿</span>
-                            <span class="fa-d-ch c2">命</span>
-                            <span class="fa-d-ch c3">制</span>
-                            <span class="fa-d-ch c4">作</span>
+                    <!-- 4. 逐字浮现的清冷粗体署名：宿 · 命 · 制 · 作 -->
+                    <div class="v37-destiny-box">
+                        <div class="v37-d-row">
+                            <span class="v37-w w1">宿</span>
+                            <span class="v37-w w2">命</span>
+                            <span class="v37-w w3">制</span>
+                            <span class="v37-w w4">作</span>
                         </div>
-                        <div class="fa-d-wing"></div>
-                        <div class="fa-d-en">DESTINY PRODUCTION</div>
+                        <div class="v37-d-wing"></div>
+                        <div class="v37-d-sub">DESTINY PRODUCTION · 宿命</div>
                     </div>
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     【动画 ④：清冷银白雨痕折线 + 露珠渐线 + 高级深雾灰粗体文字（原样保留）】
+                     【动画 ④：清冷银白雨痕折线 + 露珠渐线 + 高级深雾灰粗体文字】
                      ══════════════════════════════════════════════════ -->
-                <div class="fa-a4-head" style="width:100%;max-width:310px;display:flex;justify-content:space-between;align-items:center;font-size:7.8px;font-weight:700;color:#949494!important;letter-spacing:2.8px;z-index:5;">
+                <div class="v37-a4-head" style="width:100%;max-width:310px;display:flex;justify-content:space-between;align-items:center;font-size:7.8px;font-weight:700;color:#949494!important;letter-spacing:2.8px;z-index:5;">
                     <span>SUMOUL · 宿命制作</span>
                     <span>04:00 AM</span>
                 </div>
 
                 <div style="width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;z-index:5;">
                     
-                    <div class="fa-a4-stage" style="width:100%;height:154px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
+                    <div class="v37-a4-stage" style="width:100%;height:154px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
                         <svg viewBox="0 0 220 154" width="220" height="154" fill="none" style="overflow:visible!important;">
                             <line x1="42" y1="68" x2="178" y2="68" stroke="#E4E4E4" stroke-width="0.8" stroke-dasharray="2 4" />
                             <line x1="110" y1="6" x2="110" y2="140" stroke="#E8E8E8" stroke-width="0.8" stroke-dasharray="2 4" />
@@ -3292,9 +3354,9 @@ bootSumoulApp();
                             <line x1="166" y1="26" x2="166" y2="62" stroke="#D0D0D0" stroke-width="0.9" stroke-linecap="round" stroke-dasharray="12 5" />
                             <circle cx="166" cy="66" r="1.4" fill="#FFFFFF" stroke="#A8A8A8" stroke-width="0.8" />
 
-                            <path class="fa-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
-                            <path class="fa-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#7A7A7A" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" />
-                            <path class="fa-main-glint" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                            <path class="v37-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path class="v37-main-path" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#7A7A7A" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" />
+                            <path class="v37-main-glint" d="M 110 10 L 110 36 L 96 60 L 122 88 L 102 114 L 110 136" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
 
                             <circle cx="110" cy="36" r="1.8" fill="#FFFFFF" stroke="#8C8C8C" stroke-width="0.9" />
                             <circle cx="96" cy="60" r="2.1" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="1.0" />
@@ -3302,33 +3364,33 @@ bootSumoulApp();
                             <circle cx="102" cy="114" r="1.9" fill="#FFFFFF" stroke="#8C8C8C" stroke-width="0.9" />
 
                             <path d="M 110 133 C 110 133 107.6 137.2 107.6 139 C 107.6 140.4 108.7 141.5 110 141.5 C 111.3 141.5 112.4 140.4 112.4 139 C 112.4 137.2 110 133 110 133 Z" fill="#FFFFFF" stroke="#7A7A7A" stroke-width="0.95" />
-                            <ellipse class="fa-end-rip" cx="110" cy="143" rx="15" ry="3.8" fill="none" stroke="#9E9E9E" stroke-width="0.8" />
+                            <ellipse class="v37-end-rip" cx="110" cy="143" rx="15" ry="3.8" fill="none" stroke="#9E9E9E" stroke-width="0.8" />
                             <ellipse cx="110" cy="143" rx="9" ry="2.2" fill="none" stroke="#FFFFFF" stroke-width="1.1" />
                         </svg>
                     </div>
 
-                    <div class="fa-t-title" style="font-size:20px;font-weight:800;letter-spacing:5px;color:#424242!important;">
+                    <div class="v37-t-title" style="font-size:20px;font-weight:800;letter-spacing:5px;color:#424242!important;">
                         Sumoul App
                     </div>
-                    <div class="fa-t-title" style="font-size:8px;font-weight:700;letter-spacing:3.5px;color:#999999!important;margin-top:4px;">
+                    <div class="v37-t-title" style="font-size:8px;font-weight:700;letter-spacing:3.5px;color:#999999!important;margin-top:4px;">
                         RAIN &amp; SNOW · 宿命制作
                     </div>
 
-                    <div class="fa-grad-line"></div>
+                    <div class="v37-grad-line"></div>
 
-                    <div class="fa-t-kr" style="font-size:10.8px;font-weight:700;color:#555555!important;line-height:2.0;letter-spacing:0.9px;">
-                        “ 두 방울의 눈비가 마주쳐 십자로 교차하던 밤,<br>하얀 안개 속에 우리의 계절이 내린다. ”
+                    <div class="v37-t-kr" style="font-size:10.8px;font-weight:700;color:#555555!important;line-height:2.0;letter-spacing:0.9px;">
+                        “ 두 송이 눈꽃이 부딪혀 은빛 십자로 교차하던 밤,<br>하얀 안개 속에 우리의 계절이 내린다. ”
                     </div>
-                    <div class="fa-t-cn" style="font-size:9.4px;font-weight:600;color:#828282!important;line-height:1.9;letter-spacing:1.3px;margin-top:6px;">
-                        两滴雨雪相遇、交错成十字的夜里，<br>白雾深处，正落下属于我们的季节。
+                    <div class="v37-t-cn" style="font-size:9.4px;font-weight:600;color:#828282!important;line-height:1.9;letter-spacing:1.3px;margin-top:6px;">
+                        两朵雪花相撞、交错成银白十字的夜里，<br>白雾深处，正落下属于我们的季节。
                     </div>
 
-                    <div class="fa-grad-sub"></div>
+                    <div class="v37-grad-sub"></div>
                 </div>
 
                 <!-- 底部：清冷呼吸唤醒提示 -->
-                <div class="fa-t-foot" style="padding-bottom:4px;z-index:5;">
-                    <div class="fa-breathe" style="font-size:8px;font-weight:700;color:#6E6E6E!important;letter-spacing:3.8px;">
+                <div class="v37-t-foot" style="padding-bottom:4px;z-index:5;">
+                    <div class="v37-breathe" style="font-size:8px;font-weight:700;color:#6E6E6E!important;letter-spacing:3.8px;">
                         — &nbsp; TOUCH TO WAKE · 触碰唤醒 &nbsp; —
                     </div>
                 </div>
@@ -3339,22 +3401,20 @@ bootSumoulApp();
             };
         }
 
-        playFourActSplash();
+        playV37Splash();
 
         topDoc.addEventListener("click", (e) => {
             const t = e.target;
             if (!t || !t.closest) return;
             if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
                 splash.classList.remove("fade-out");
-                playFourActSplash();
+                playV37Splash();
             }
         }, true);
     }
 
-    mountFourActColdSilverSplash();
+    mountSnowCollisionAndColdCrossSplash();
 })();
-
-
 // ==========================================================================
 // 🤍 【Sumoul App 悬浮球高定重塑补丁：白雾磨砂星芒圆球 + 自由拖拽移动 + 贴边隐身/彻底隐藏】
 // 用法：直接粘贴在 index.js 最末尾最后一行后面！
