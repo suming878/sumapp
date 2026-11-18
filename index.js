@@ -2755,8 +2755,7 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// ❄️ 【Sumoul App 清冷银白 · 四幕式电影级开屏补丁（1、2、4幕100%原封不动，第3幕改为：一瓣雪花飘过化作极简清冷银丝十字）】
-// 动画1：眨眼三滴银雨(未动) ➔ 动画2：六角孤雪旋转消融(未动) ➔ 动画3：一片雪花飘过化作极简十字+宿命制作(极简清冷版) ➔ 动画4：主视觉(未动)
+// ❄️ 【Sumoul App 清冷银白 · 四幕式电影级开屏补丁（1、2、4幕100%原封不动，第3幕升级：同款精致六角雪花化修长圣十字 † + 底部滴水涟漪 + 精致小字宿命制作）】
 // ==========================================================================
 (function () {
     const topDoc = (window.parent || window).document;
@@ -2934,41 +2933,60 @@ bootSumoulApp();
             }
 
             /* ══════════════════════════════════════════════════════
-               ❄️【极简清冷版 · 动画 ③：4.10s ~ 6.55s 一片雪花轻盈飘过 ➔ 化作极简纯白银丝十字 + 宿命制作】
+               💧【高定审美版 · 动画 ③：4.08s ~ 6.58s 精致六角雪花飘过 ➔ 化作修长圣十字(†) + 底部滴水涟漪 + 精致小字宿命制作】
                ══════════════════════════════════════════════════════ */
-            /* 1. 一片雪花从左上方带着微光弧度轻盈飘过中心，并在中心融化为十字 (4.08s ~ 4.72s) */
-            @keyframes faPassingSnow {
-                0%   { transform: translate(-76px, -48px) rotate(-90deg) scale(0.45); opacity: 0; filter: blur(4px); }
-                30%  { opacity: 0.95; filter: blur(0px); }
-                75%  { transform: translate(0px, 0px) rotate(15deg) scale(1); opacity: 1; filter: blur(0px); }
-                100% { transform: translate(12px, 8px) rotate(45deg) scale(0.15); opacity: 0; filter: blur(5px); }
+            /* 1. 同款精致六角冰晶雪花从斜上方轻盈旋转掠过交汇点 (0, -24px) */
+            @keyframes faElegantSnowPass {
+                0%   { transform: translate(-64px, -68px) rotate(-110deg) scale(0.35); opacity: 0; filter: blur(4px); }
+                32%  { opacity: 0.95; filter: blur(0px); }
+                74%  { transform: translate(0px, -24px) rotate(15deg) scale(0.82); opacity: 1; filter: blur(0px); }
+                100% { transform: translate(8px, -18px) rotate(55deg) scale(0.1); opacity: 0; filter: blur(4px); }
             }
-            /* 2. 雪花融化在中心的瞬间 (4.58s)：静静舒展开一道极简、修长、清冷的银白十字细丝 */
-            @keyframes faMinimalCrossV {
+            /* 2. 雪花融化瞬间 (4.54s)：舒展开黄金比例修长圣十字 († 上短下长) */
+            @keyframes faLatinCrossV {
                 0%   { height: 0px; opacity: 0; }
-                24%  { height: 220px; opacity: 0.95; }
-                76%  { height: 228px; opacity: 0.85; }
+                22%  { height: 186px; opacity: 0.95; }
+                78%  { height: 192px; opacity: 0.9; }
                 100% { height: 0px; opacity: 0; }
             }
-            @keyframes faMinimalCrossH {
+            @keyframes faLatinCrossH {
                 0%   { width: 0px; opacity: 0; }
-                24%  { width: 200px; opacity: 0.95; }
-                76%  { width: 208px; opacity: 0.85; }
+                22%  { width: 128px; opacity: 0.95; }
+                78%  { width: 134px; opacity: 0.9; }
                 100% { width: 0px; opacity: 0; }
             }
-            /* 十字交汇心仅留一点极小巧的纯白冰晶呼吸微光（零杂乱圆圈！） */
-            @keyframes faCrossCenterSpark {
-                0%   { transform: scale(0); opacity: 0; }
-                25%  { transform: scale(1); opacity: 1; }
-                75%  { transform: scale(1.08); opacity: 0.9; }
-                100% { transform: scale(0); opacity: 0; }
+            /* 3. 十字交汇处的纤长菱形冰晶核与四端露珠呼吸浮现 */
+            @keyframes faCrossDiamondCore {
+                0%   { transform: scale(0.2); opacity: 0; }
+                24%  { transform: scale(1); opacity: 1; }
+                76%  { transform: scale(1.04); opacity: 0.92; }
+                100% { transform: scale(0.2); opacity: 0; }
             }
-            /* 清冷无框「宿命制作」从十字微光中柔和浮现 */
-            @keyframes faPureTextFloat {
-                0%   { opacity: 0; filter: blur(10px); letter-spacing: 14px; transform: translateY(5px); }
-                26%  { opacity: 1; filter: blur(0px); letter-spacing: 9.5px; transform: translateY(0px); }
-                74%  { opacity: 1; filter: blur(0px); letter-spacing: 9.5px; transform: translateY(0px); }
-                100% { opacity: 0; filter: blur(10px); letter-spacing: 13px; transform: translateY(-4px); }
+            /* 4. 水光顺着十字竖轴往下流淌至最底端，凝成水滴垂直坠落！(4.85s ~ 5.50s) */
+            @keyframes faCrossBottomDrip {
+                0%   { transform: translateY(-28px) scale(0.4); opacity: 0; }
+                25%  { transform: translateY(0px) scale(1); opacity: 1; }
+                45%  { transform: translateY(3px) scale(1.08); opacity: 1; }
+                88%  { transform: translateY(34px) scale(0.65); opacity: 0.95; }
+                100% { transform: translateY(38px) scale(0.2); opacity: 0; }
+            }
+            /* 5. 水滴落在十字架最底部水面 (5.38s)，激起两圈清透银白椭圆涟漪！ */
+            @keyframes faCrossDripRippleA {
+                0%   { transform: scale(0.1); opacity: 0; }
+                20%  { opacity: 0.9; }
+                100% { transform: scale(2.0); opacity: 0; }
+            }
+            @keyframes faCrossDripRippleB {
+                0%   { transform: scale(0.1); opacity: 0; }
+                25%  { opacity: 0.6; }
+                100% { transform: scale(2.8); opacity: 0; }
+            }
+            /* 6. 缩小精修后的「宿命制作」克制浮现 */
+            @keyframes faRefinedDestinyText {
+                0%   { opacity: 0; filter: blur(8px); transform: translateY(5px); }
+                26%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+                76%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+                100% { opacity: 0; filter: blur(8px); transform: translateY(-4px); }
             }
 
             #seoul-mini-theater-modal #smt-boot-splash .fa-act3-cross {
@@ -2976,44 +2994,70 @@ bootSumoulApp();
                 display: flex !important; align-items: center !important; justify-content: center !important;
                 pointer-events: none !important; z-index: 14 !important;
             }
-            /* 轻盈飘过中心的那片孤雪 */
+            /* 掠过十字交汇点的同款精致六角雪花 */
             #seoul-mini-theater-modal #smt-boot-splash .fa-passing-snow {
-                position: absolute !important; width: 38px !important; height: 38px !important;
+                position: absolute !important; width: 58px !important; height: 58px !important;
                 opacity: 0 !important;
-                animation: faPassingSnow 0.66s cubic-bezier(0.25, 0.1, 0.25, 1) 4.08s forwards !important;
+                animation: faElegantSnowPass 0.68s cubic-bezier(0.25, 0.1, 0.25, 1) 4.06s forwards !important;
             }
-            /* 极简修长的竖向银白水光丝（中间纯白透亮，两端融于白雾） */
+            /* 修长圣十字竖轴（纯白柔光包裹浅银细芯） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-v {
-                position: absolute !important; width: 1px !important; height: 0px;
-                background: linear-gradient(180deg, transparent 0%, #D0D0D0 22%, #828282 50%, #D0D0D0 78%, transparent 100%) !important;
+                position: absolute !important; width: 1.2px !important; height: 0px;
+                margin-top: -10px !important;
+                background: linear-gradient(180deg, transparent 0%, #B8B8B8 16%, #787878 42%, #9A9A9A 88%, #FFFFFF 100%) !important;
                 box-shadow: 0 0 12px #FFFFFF, 0 0 4px #FFFFFF !important;
                 opacity: 0 !important;
-                animation: faMinimalCrossV 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.58s forwards !important;
+                animation: faLatinCrossV 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.54s forwards !important;
             }
-            /* 极简修长的横向银白水光丝 */
+            /* 修长圣十字横轴（位于中心偏上 24px 黄金比例处，形成修长 † 圣十字！） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-cross-h {
-                position: absolute !important; height: 1px !important; width: 0px;
-                background: linear-gradient(90deg, transparent 0%, #D0D0D0 22%, #828282 50%, #D0D0D0 78%, transparent 100%) !important;
+                position: absolute !important; height: 1.2px !important; width: 0px;
+                margin-top: -48px !important;
+                background: linear-gradient(90deg, transparent 0%, #C2C2C2 20%, #787878 50%, #C2C2C2 80%, transparent 100%) !important;
                 box-shadow: 0 0 12px #FFFFFF, 0 0 4px #FFFFFF !important;
                 opacity: 0 !important;
-                animation: faMinimalCrossH 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.58s forwards !important;
+                animation: faLatinCrossH 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.54s forwards !important;
             }
-            /* 十字交汇处唯一的极小纯白星点 */
-            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-spark {
-                position: absolute !important; width: 5px !important; height: 5px !important;
-                border-radius: 50% !important; background: #FFFFFF !important;
-                border: 0.9px solid #888888 !important;
-                box-shadow: 0 0 12px #FFFFFF, 0 0 6px #FFFFFF !important;
+            /* 十字交汇心精致冰晶菱形与挂壁小水珠（让十字不再单调素净，又极其清冷！） */
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-jewel {
+                position: absolute !important; width: 140px !important; height: 200px !important;
+                margin-top: -10px !important;
                 opacity: 0 !important;
-                animation: faCrossCenterSpark 2.0s ease 4.58s forwards !important;
+                animation: faCrossDiamondCore 2.0s cubic-bezier(0.16, 1, 0.3, 1) 4.56s forwards !important;
             }
-            /* 十字下方的无框清冷署名 */
+            /* 十字最底端凝结并垂直滴落的那颗晶莹水滴 */
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-bead {
+                position: absolute !important; width: 6px !important; height: 9px !important;
+                margin-top: 82px !important;
+                opacity: 0 !important;
+                animation: faCrossBottomDrip 0.72s cubic-bezier(0.4, 0, 0.85, 1) 4.82s forwards !important;
+            }
+            /* 十字最底端滴水处荡开的双层清透椭圆水波涟漪 */
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring1,
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 {
+                position: absolute !important; width: 42px !important; height: 14px !important;
+                margin-top: 120px !important;
+                border-radius: 50% !important; border: 1px solid #9E9E9E !important;
+                box-shadow: 0 0 8px #FFFFFF, inset 0 0 5px #FFFFFF !important;
+                opacity: 0 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 {
+                border: 0.7px solid #C2C2C2 !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring1 {
+                animation: faCrossDripRippleA 1.35s cubic-bezier(0.16, 1, 0.3, 1) 5.42s forwards !important;
+            }
+            #seoul-mini-theater-modal #smt-boot-splash .fa-cross-drip-ring2 {
+                animation: faCrossDripRippleB 1.55s cubic-bezier(0.16, 1, 0.3, 1) 5.54s forwards !important;
+            }
+
+            /* 缩小精修后的清冷「宿命制作」署名（位于底部滴水涟漪下方） */
             #seoul-mini-theater-modal #smt-boot-splash .fa-destiny-pure {
-                position: relative !important; z-index: 16 !important;
-                margin-top: 66px !important;
-                text-shadow: 0 0 16px #FFFFFF, 0 0 8px #FFFFFF, 0 2px 10px rgba(255,255,255,0.95) !important;
+                position: absolute !important; z-index: 16 !important;
+                margin-top: 168px !important;
+                text-shadow: 0 0 14px #FFFFFF, 0 0 6px #FFFFFF !important;
                 opacity: 0 !important;
-                animation: faPureTextFloat 2.02s cubic-bezier(0.16, 1, 0.3, 1) 4.62s forwards !important;
+                animation: faRefinedDestinyText 1.95s cubic-bezier(0.16, 1, 0.3, 1) 4.66s forwards !important;
             }
 
             /* ══════════════════════════════════════════════════════
@@ -3163,31 +3207,59 @@ bootSumoulApp();
                 </div>
 
                 <!-- ══════════════════════════════════════════════════
-                     ❄️【极简清冷版 · 动画 ③：一片雪花轻盈飘过 ➔ 化作极简纯白银丝十字 + 宿命制作】
+                     💧【高定审美版 · 动画 ③：同款精致六角雪花飘过 ➔ 化作修长圣十字(†) + 底部凝结滴水涟漪 + 精致小字宿命制作】
                      ══════════════════════════════════════════════════ -->
                 <div class="fa-act3-cross">
-                    <!-- 1. 轻盈飘过中心的那片孤雪 -->
-                    <svg class="fa-passing-snow" viewBox="0 0 60 60" fill="none">
-                        <g stroke="#929292" stroke-width="1.1" stroke-linecap="round">
-                            <line x1="30" y1="8" x2="30" y2="52" />
-                            <line x1="11" y1="19" x2="49" y2="41" />
-                            <line x1="49" y1="19" x2="11" y2="41" />
+                    <!-- 1. 与第2幕完全同款的精致分叉六角冰晶雪花从斜上方轻盈旋转掠过 -->
+                    <svg class="fa-passing-snow" viewBox="0 0 100 100" fill="none">
+                        <g stroke="#8E8E8E" stroke-width="1.15" stroke-linecap="round">
+                            <line x1="50" y1="12" x2="50" y2="88" />
+                            <line x1="17" y1="31" x2="83" y2="69" />
+                            <line x1="83" y1="31" x2="17" y2="69" />
+                            <path d="M44 22 L50 28 L56 22 M44 78 L50 72 L56 78" />
+                            <path d="M23 41 L31 39 L29 31 M77 59 L69 61 L71 69" />
+                            <path d="M71 31 L69 39 L77 41 M29 69 L31 61 L23 59" />
                         </g>
-                        <circle cx="30" cy="30" r="2.5" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
+                        <polygon points="50,36 62,43 62,57 50,64 38,57 38,43" fill="rgba(255,255,255,0.85)" stroke="#FFFFFF" stroke-width="1.2" />
+                        <circle cx="50" cy="50" r="3" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
                     </svg>
 
-                    <!-- 2. 雪花掠过中心瞬间化作的 1px 极简修长银白十字丝（干净通透，无任何多余圆圈罗盘！） -->
+                    <!-- 2. 黄金比例修长圣十字 († 上短下长，清冷修长) -->
                     <div class="fa-cross-v"></div>
                     <div class="fa-cross-h"></div>
-                    <div class="fa-cross-spark"></div>
 
-                    <!-- 3. 无框清冷「宿命制作」 -->
+                    <!-- 3. 圣十字交汇处的精致冰晶菱形核与挂壁小水珠（恰到好处的清冷精致度） -->
+                    <svg class="fa-cross-jewel" viewBox="0 0 140 200" fill="none">
+                        <!-- 交汇点(70, 76)外围极淡的冰晶菱形光晕 -->
+                        <polygon points="70,60 82,76 70,92 58,76" fill="rgba(255,255,255,0.65)" stroke="#FFFFFF" stroke-width="1.2" />
+                        <!-- 交汇核心纤长四芒冰晶 -->
+                        <path d="M 70 54 Q 70 76 92 76 Q 70 76 70 98 Q 70 76 48 76 Q 70 76 70 54 Z" fill="#FFFFFF" stroke="#8A8A8A" stroke-width="0.85" stroke-linejoin="round" />
+                        <circle cx="70" cy="76" r="2.0" fill="#7A7A7A" />
+                        <!-- 十字横轴与竖轴上凝结的 4 颗微小纯白挂壁露珠 -->
+                        <circle cx="70" cy="36" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
+                        <circle cx="38" cy="76" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
+                        <circle cx="102" cy="76" r="1.5" fill="#FFFFFF" stroke="#9A9A9A" stroke-width="0.8" />
+                        <circle cx="70" cy="126" r="1.7" fill="#FFFFFF" stroke="#8E8E8E" stroke-width="0.85" />
+                        <!-- 最底端尖角处欲滴落的微露珠 -->
+                        <circle cx="70" cy="186" r="1.8" fill="#FFFFFF" stroke="#888888" stroke-width="0.9" />
+                    </svg>
+
+                    <!-- 4. 从十字架最底部尖角处凝结并垂直坠落的那滴晶莹水珠！ -->
+                    <svg class="fa-cross-drip-bead" viewBox="0 0 12 18" fill="none">
+                        <path d="M 6 1 C 6 1 1.5 8.5 1.5 12 C 1.5 14.8 3.5 16.8 6 16.8 C 8.5 16.8 10.5 14.8 10.5 12 C 10.5 8.5 6 1 6 1 Z" fill="#FFFFFF" stroke="#828282" stroke-width="1.1" />
+                    </svg>
+
+                    <!-- 5. 水滴落在底部激起的两圈清透银白水波涟漪 -->
+                    <div class="fa-cross-drip-ring1"></div>
+                    <div class="fa-cross-drip-ring2"></div>
+
+                    <!-- 6. 缩小精修后的高冷小字号「宿命制作」（克制留白，绝不喧宾夺主！） -->
                     <div class="fa-destiny-pure">
-                        <div style="font-size:15.5px;font-weight:800;color:#464646!important;letter-spacing:9.5px;text-indent:9.5px;">
+                        <div style="font-size:11.5px;font-weight:700;color:#555555!important;letter-spacing:11px;text-indent:11px;">
                             宿命制作
                         </div>
-                        <div style="font-size:7px;font-weight:700;color:#9A9A9A!important;letter-spacing:3.5px;margin-top:4px;">
-                            RAIN &amp; SNOW · DESTINY
+                        <div style="font-size:6.2px;font-weight:600;color:#A0A0A0!important;letter-spacing:3.8px;margin-top:4px;">
+                            DESTINY PRODUCTION
                         </div>
                     </div>
                 </div>
