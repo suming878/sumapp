@@ -3703,19 +3703,17 @@ bootSumoulApp();
     mountDraggableMistFab();
 })();
 // ==========================================================================
-// ☁️ 【Sumoul App 真实云端跨设备同步终极版（自带1秒自动创建真实云数据库 + 跨手机实时同步）】
-// 解决假ID 404导致看不到别人申请的问题！
+// ☁️ 【Sumoul App 专属真实云端跨设备同步终极版（已绑定宿命专属云库：7590dee5e1fa18abf191）】
+// 效果：全网任何手机点击「提交申请」 -> 实时写入你的专属 npoint 云库 -> 你在管理员后台点刷新直接看见并一键批准！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    // 🔥 【核心第12行】你在管理员后台点一下「自动创建专属云端库」后，把生成的那行网址粘贴替换到这里并上传 GitHub！
-    let MY_REAL_CLOUD_URL = "https://www.npoint.io/docs/7590dee5e1fa18abf191"; 
+    // 🔥 已直接绑死你的专属真实 npoint 云端 API 地址（全网跨手机互通！）
+    const MY_REAL_CLOUD_URL = "https://api.npoint.io/7590dee5e1fa18abf191";
 
-    const K_LOCAL_CLOUD_URL = "sumoul_v41_real_cloud_url";
-
-    // 一Q一码加密算法（保底双保险）
+    // 一Q一码加密算法（断网/双保险保底）
     function calcExclusiveCode(qq) {
         const clean = String(qq || "").replace(/\D/g, "");
         if (!clean || clean.length < 5) return "";
@@ -3731,94 +3729,69 @@ bootSumoulApp();
         return `SM${letter}${num}`;
     }
 
-    function getActiveCloudUrl() {
-        return (MY_REAL_CLOUD_URL || localStorage.getItem(K_LOCAL_CLOUD_URL) || "").trim();
-    }
-
-    // ☁️ 自动向免费云平台申请创建一个真实可用的专属 JSON 数据库！
-    async function createNewRealCloudBox() {
-        const initPayload = { pending: [], approved: [], created: Date.now() };
-        // 通道1：JSONBlob 官方创建接口 (POST 返回 Location 真实地址)
-        try {
-            const r = await fetch("https://jsonblob.com/api/jsonBlob", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify(initPayload)
-            });
-            if (r.ok || r.status === 201) {
-                const loc = r.headers.get("Location") || r.headers.get("location") || "";
-                if (loc) {
-                    const fullUrl = loc.startsWith("http") ? loc.replace("http://", "https://") : `https://jsonblob.com${loc}`;
-                    localStorage.setItem(K_LOCAL_CLOUD_URL, fullUrl);
-                    return fullUrl;
-                }
-            }
-        } catch (e) {}
-
-        // 通道2：JSONStorage 备用免费接口
-        try {
-            const r2 = await fetch("https://api.jsonstorage.net/v1/json", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(initPayload)
-            });
-            if (r2.ok) {
-                const d2 = await r2.json();
-                if (d2 && d2.uri) {
-                    localStorage.setItem(K_LOCAL_CLOUD_URL, d2.uri);
-                    return d2.uri;
-                }
-            }
-        } catch (e) {}
-        return "";
-    }
-
-    // 从真实云端读取数据
+    // ☁️ 从你的专属云库 7590dee5e1fa18abf191 读取所有设备提交的 QQ 申请
     async function fetchRealCloudData() {
         let localBak = { pending: [], approved: [] };
-        try { localBak = Object.assign(localBak, JSON.parse(localStorage.getItem("sumoul_v41_bak") || "{}")); } catch (e) {}
-
-        const url = getActiveCloudUrl();
-        if (!url) return { data: localBak, ok: false, reason: "尚未配置云端地址" };
+        try {
+            localBak = Object.assign(localBak, JSON.parse(localStorage.getItem("sumoul_v42_bak") || "{}"));
+        } catch (e) {}
 
         try {
-            const r = await fetch(url + (url.includes("?") ? "&" : "?") + "_t=" + Date.now(), {
+            const r = await fetch(`${MY_REAL_CLOUD_URL}?_t=${Date.now()}`, {
                 method: "GET",
                 headers: { "Accept": "application/json", "Cache-Control": "no-cache" }
             });
             if (r.ok) {
                 const d = await r.json();
+                // 如果云端还是初始模板（没有 pending 数组），自动初始化成标准结构写回云端！
+                if (!d || (!Array.isArray(d.pending) && !Array.isArray(d.approved))) {
+                    const initData = { pending: [], approved: [] };
+                    await pushRealCloudData(initData);
+                    return { data: initData, ok: true };
+                }
                 const norm = {
-                    pending: Array.isArray(d?.pending) ? d.pending : [],
-                    approved: Array.isArray(d?.approved) ? d.approved : []
+                    pending: Array.isArray(d.pending) ? d.pending : [],
+                    approved: Array.isArray(d.approved) ? d.approved : []
                 };
-                localStorage.setItem("sumoul_v41_bak", JSON.stringify(norm));
-                return { data: norm, ok: true, url };
+                localStorage.setItem("sumoul_v42_bak", JSON.stringify(norm));
+                return { data: norm, ok: true };
             }
-            return { data: localBak, ok: false, reason: `HTTP ${r.status}` };
+            return { data: localBak, ok: false, reason: `需在npoint网页点一次💾保存 (${r.status})` };
         } catch (err) {
-            return { data: localBak, ok: false, reason: "网络拦截" };
+            return { data: localBak, ok: false, reason: "网络波动" };
         }
     }
 
-    // 写入真实云端数据
+    // ☁️ 将新提交的 QQ 或批准结果写入你的专属云库（npoint 支持 POST 更新 JSON）
     async function pushRealCloudData(newData) {
-        localStorage.setItem("sumoul_v41_bak", JSON.stringify(newData));
-        const url = getActiveCloudUrl();
-        if (!url) return false;
+        localStorage.setItem("sumoul_v42_bak", JSON.stringify(newData));
         try {
-            const r = await fetch(url, {
+            const r = await fetch(MY_REAL_CLOUD_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(newData)
+            });
+            if (r.ok) return true;
+        } catch (err) {}
+        try {
+            const r2 = await fetch(MY_REAL_CLOUD_URL, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify(newData)
             });
-            return r.ok;
+            return r2.ok;
         } catch (err) {
             return false;
         }
     }
 
     function copyStr(txt) {
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(txt);
+                return;
+            }
+        } catch (e) {}
         try {
             const ta = topDoc.createElement("textarea");
             ta.value = txt;
@@ -3830,12 +3803,12 @@ bootSumoulApp();
         } catch (e) {}
     }
 
-    function mountRealCloudSystem() {
+    function mountBoundCloudSystem() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
         const adminPage = topDoc.getElementById("smt-page-admin");
         if (!modal) {
-            setTimeout(mountRealCloudSystem, 200);
+            setTimeout(mountBoundCloudSystem, 200);
             return;
         }
 
@@ -3845,9 +3818,12 @@ bootSumoulApp();
         const unlockBtn = topDoc.getElementById("smt-lock-unlock-btn");
         const statusMsg = topDoc.getElementById("smt-lock-status-msg");
 
-        // 1. 锁屏【提交申请】：直接推送到你配置好的真实云端URL！
-        if (applyBtn && !applyBtn.getAttribute("data-v41-bound")) {
-            applyBtn.setAttribute("data-v41-bound", "1");
+        const savedQQ = localStorage.getItem("sumoul_my_apply_qq") || "";
+        if (qqInput && savedQQ && !qqInput.value) qqInput.value = savedQQ;
+
+        // 1. 锁屏【提交申请】：直接把别人手机填的 QQ 上传到你的 7590dee5e1fa18abf191 云端！
+        if (applyBtn && !applyBtn.getAttribute("data-v42-bound")) {
+            applyBtn.setAttribute("data-v42-bound", "1");
             applyBtn.addEventListener("click", async (e) => {
                 e.stopImmediatePropagation();
                 e.preventDefault();
@@ -3859,15 +3835,18 @@ bootSumoulApp();
                 localStorage.setItem("sumoul_my_apply_qq", qq);
                 applyBtn.textContent = "⏳ 正在上传云端...";
 
-                const { data: cloud, ok } = await fetchRealCloudData();
+                const { data: cloud } = await fetchRealCloudData();
+
+                // 如果你已经在后台批准过他了，直接解锁！
                 if (cloud.approved.includes(qq)) {
                     localStorage.setItem("seoul_v15_unlocked_qq", qq);
                     applyBtn.textContent = "✓ 已获批";
-                    if (statusMsg) statusMsg.textContent = "🎉 管理员已批准你的 QQ！正在自动进入...";
+                    if (statusMsg) statusMsg.textContent = "🎉 管理员已批准你的 QQ！正在自动解锁进入...";
                     setTimeout(() => lockLayer?.classList.add("smt-unlocked-hide"), 500);
                     return;
                 }
 
+                // 加入你的云端待审批列表
                 if (!cloud.pending.some((x) => x.qq === qq)) {
                     const d = new Date();
                     const tStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
@@ -3875,42 +3854,57 @@ bootSumoulApp();
                 }
                 const pushed = await pushRealCloudData(cloud);
 
+                // 同步写一份到本地兼容表
+                try {
+                    const oldList = JSON.parse(localStorage.getItem("seoul_v15_pending_qqs") || "[]");
+                    if (!oldList.some((x) => x.qq === qq)) {
+                        oldList.unshift({ qq, status: "pending", time: "刚刚" });
+                        localStorage.setItem("seoul_v15_pending_qqs", JSON.stringify(oldList));
+                    }
+                } catch (err) {}
+
                 if (pushed) {
                     applyBtn.textContent = "✓ 已送达管理员后台";
-                    if (statusMsg) statusMsg.innerHTML = `✅ QQ【<b>${qq}</b>】已成功上传至管理员云端后台！<br><span style="font-size:8.5px;color:#777;">管理员点击批准后，你直接点下方「验证进入」即可免密解锁！</span>`;
+                    if (statusMsg) {
+                        statusMsg.innerHTML = `✅ QQ【<b>${qq}</b>】已实时送达管理员云端后台！<br><span style="font-size:8.5px;color:#777;">管理员在后台点击「批准」后，你直接点下方「验证进入」即可免密解锁！</span>`;
+                    }
                 } else {
                     copyStr(`【Sumoul申请】QQ:${qq}`);
-                    applyBtn.textContent = "✓ 已复制申请单";
-                    if (statusMsg) statusMsg.innerHTML = `⚠️ 当前未配置云端库或网络受限，已自动复制申请单，请将你的QQ【<b>${qq}</b>】发给管理员获取专属码！`;
+                    applyBtn.textContent = "✓ 已复制申请凭条";
+                    if (statusMsg) {
+                        statusMsg.innerHTML = `✅ 已复制申请凭条【QQ:${qq}】，请发送给管理员获取专属激活码！`;
+                    }
                 }
             }, true);
         }
 
-        // 2. 锁屏【验证进入】
-        if (unlockBtn && !unlockBtn.getAttribute("data-v41-bound")) {
-            unlockBtn.setAttribute("data-v41-bound", "1");
+        // 2. 锁屏【验证进入】：既检查云端是否已批准，也支持专属激活码核验
+        if (unlockBtn && !unlockBtn.getAttribute("data-v42-bound")) {
+            unlockBtn.setAttribute("data-v42-bound", "1");
             unlockBtn.addEventListener("click", async (e) => {
                 const qq = (qqInput?.value || localStorage.getItem("sumoul_my_apply_qq") || "").trim().replace(/\D/g, "");
                 const code = (codeInput?.value || "").trim().toUpperCase();
 
+                // ① 检查是否填对了该 QQ 绑定的唯一专属码
                 if (qq && code && code === calcExclusiveCode(qq)) {
                     e.stopImmediatePropagation();
                     e.preventDefault();
                     localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                    if (statusMsg) statusMsg.textContent = "🎉 专属激活码核验通过！";
+                    if (statusMsg) statusMsg.textContent = "🎉 专属激活码验证通过！正在进入...";
                     lockLayer?.classList.add("smt-unlocked-hide");
                     return;
                 }
 
-                if (qq && getActiveCloudUrl()) {
-                    unlockBtn.textContent = "⏳ 核验云端...";
+                // ② 联网检查管理员是不是已经在云端批准了该 QQ（已批准直接免密进！）
+                if (qq) {
+                    unlockBtn.textContent = "⏳ 核验云端授权...";
                     const { data: cloud } = await fetchRealCloudData();
                     unlockBtn.textContent = "验证进入";
                     if (cloud.approved.includes(qq)) {
                         e.stopImmediatePropagation();
                         e.preventDefault();
                         localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                        if (statusMsg) statusMsg.textContent = "🎉 云端批准验证通过！正在解锁...";
+                        if (statusMsg) statusMsg.textContent = "🎉 管理员已在云端批准你的申请！正在解锁...";
                         lockLayer?.classList.add("smt-unlocked-hide");
                         return;
                     }
@@ -3920,181 +3914,146 @@ bootSumoulApp();
 
         // 3. 管理员后台面板
         if (adminPage) {
-            ["smt-cloud-admin-box", "smt-zero-server-admin", "smt-v40-admin-panel", "smt-v41-admin-panel"].forEach((id) => topDoc.getElementById(id)?.remove());
+            ["smt-cloud-admin-box", "smt-zero-server-admin", "smt-v40-admin-panel", "smt-v41-admin-panel", "smt-v42-admin-panel"].forEach((id) => topDoc.getElementById(id)?.remove());
 
             const panel = topDoc.createElement("div");
-            panel.id = "smt-v41-admin-panel";
+            panel.id = "smt-v42-admin-panel";
             panel.className = "smt-section-box";
             panel.style.cssText = "border:1.5px solid #2C2C32!important;background:#F8F8FA!important;margin-bottom:12px!important;";
             panel.innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                     <div>
-                        <span style="font-size:10.5px;font-weight:800;color:#2C2C32;">☁️ 真实跨设备云端 QQ 审批后台</span>
-                        <span id="v41-status-tag" style="font-size:8px;font-weight:700;padding:1.5px 6px;border-radius:99px;margin-left:4px;background:#EAEAF0;color:#555;">未建库</span>
+                        <span style="font-size:10.5px;font-weight:800;color:#2C2C32;">☁️ 跨设备云端 QQ 审批中心</span>
+                        <span id="v42-status-tag" style="font-size:8px;font-weight:700;padding:1.5px 6px;border-radius:99px;margin-left:4px;background:#EAEAF0;color:#555;">连接中...</span>
                     </div>
-                    <span class="smt-pill-btn dark" id="v41-refresh-btn" style="height:22px!important;font-size:8.5px!important;">↻ 刷新申请列表</span>
-                </div>
-
-                <!-- 🔥 1秒创建真实云数据库配置区 -->
-                <div style="background:#FFFFFF;border:1px solid #DCDCE6;border-radius:10px;padding:9px 10px;margin-bottom:10px;">
-                    <div style="font-size:8.5px;font-weight:800;color:#2C2C32;margin-bottom:5px;">
-                        🛠️ 第一步（必做一次）：生成你的真实云端库地址并粘到代码第12行
-                    </div>
-                    <div style="display:flex;gap:5px;margin-bottom:5px;">
-                        <input type="text" id="v41-url-inp" class="smt-wx-input" style="height:25px!important;font-size:9px!important;" placeholder="真实云端接口URL (点击右侧按钮自动生成)..." value="${getActiveCloudUrl()}" />
-                        <span class="smt-pill-btn dark" id="v41-create-cloud-btn" style="height:25px!important;font-size:8.5px!important;white-space:nowrap;">⚡ 自动创建云端库</span>
-                    </div>
-                    <div id="v41-create-tip" style="font-size:8px;color:#6E6E77;line-height:1.5;">
-                        💡 也可以电脑/手机打开免费网站 <b>npoint.io</b> 点 <b>+New</b> 输入 <code>{"pending":[],"approved":[]}</code> 点 Save，把底部生成的 API 网址粘贴到上方输入框即可！
-                    </div>
+                    <span class="smt-pill-btn dark" id="v42-refresh-btn" style="height:22px!important;font-size:8.5px!important;">↻ 刷新其他设备申请</span>
                 </div>
 
                 <!-- 云端待审批列表 -->
-                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">📥 其他设备提交的待审 QQ (<span id="v41-pend-cnt">0</span>)</div>
-                <div id="v41-pend-list" style="max-height:150px;overflow-y:auto;margin-bottom:10px;"></div>
+                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">📥 其他设备提交的待审 QQ (<span id="v42-pend-cnt">0</span>)</div>
+                <div id="v42-pend-list" style="max-height:160px;overflow-y:auto;margin-bottom:10px;"></div>
 
                 <!-- 手动算码/秒批 -->
                 <div style="background:#FFFFFF;border:1px solid #E2E2EC;border-radius:10px;padding:8px 10px;margin-bottom:10px;">
-                    <div style="font-size:8.5px;font-weight:800;color:#484852;margin-bottom:5px;">🔑 保底神器：输入对方 QQ 直接批准 + 算唯一激活码</div>
+                    <div style="font-size:8.5px;font-weight:800;color:#484852;margin-bottom:5px;">🔑 手动输入 QQ 直接云端批准 + 复制唯一激活码</div>
                     <div style="display:flex;gap:5px;">
-                        <input type="text" id="v41-manual-qq" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="输入对方的QQ号..." />
-                        <span class="smt-pill-btn dark" id="v41-manual-btn" style="height:26px!important;white-space:nowrap;">批准并复制专属码</span>
+                        <input type="text" id="v42-manual-qq" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="输入对方的QQ号..." />
+                        <span class="smt-pill-btn dark" id="v42-manual-btn" style="height:26px!important;white-space:nowrap;">云端批准+复制专属码</span>
                     </div>
-                    <div id="v41-manual-res" style="display:none;font-size:9px;font-weight:700;color:#2C2C32;margin-top:6px;"></div>
+                    <div id="v42-manual-res" style="display:none;font-size:9px;font-weight:700;color:#2C2C32;margin-top:6px;"></div>
                 </div>
 
                 <!-- 已批准白名单 -->
-                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">✅ 云端已批准白名单 (<span id="v41-app-cnt">0</span>)</div>
-                <div id="v41-app-list" style="max-height:100px;overflow-y:auto;"></div>
+                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">✅ 云端已批准白名单 (<span id="v42-app-cnt">0</span>)</div>
+                <div id="v42-app-list" style="max-height:110px;overflow-y:auto;"></div>
             `;
             adminPage.prepend(panel);
 
-            async function renderV41Admin() {
-                const tag = topDoc.getElementById("v41-status-tag");
-                const rBtn = topDoc.getElementById("v41-refresh-btn");
+            async function renderV42Admin() {
+                const tag = topDoc.getElementById("v42-status-tag");
+                const rBtn = topDoc.getElementById("v42-refresh-btn");
                 if (rBtn) rBtn.textContent = "⏳ 同步中...";
 
                 const { data: cloud, ok, reason } = await fetchRealCloudData();
-                if (rBtn) rBtn.textContent = "↻ 刷新申请列表";
+                if (rBtn) rBtn.textContent = "↻ 刷新其他设备申请";
 
                 if (tag) {
-                    tag.textContent = ok ? "🟢 云端实时互通中" : `🔴 ${reason}`;
+                    tag.textContent = ok ? "🟢 云端已连通 (7590dee)" : `🔴 ${reason}`;
                     tag.style.background = ok ? "#E6F4EA" : "#FCE8E6";
                     tag.style.color = ok ? "#1E7E34" : "#C5221F";
                 }
 
-                topDoc.getElementById("v41-pend-cnt").textContent = cloud.pending.length;
-                topDoc.getElementById("v41-app-cnt").textContent = cloud.approved.length;
+                // 同步更新主代码原本的本地缓存列表，让下方旧表格也同步显示
+                try {
+                    const mergedOld = cloud.pending.map((x) => ({ qq: x.qq, time: x.time, status: "pending" }))
+                        .concat(cloud.approved.map((q) => ({ qq: q, time: "已批准", status: "approved" })));
+                    localStorage.setItem("seoul_v15_pending_qqs", JSON.stringify(mergedOld));
+                } catch (e) {}
 
-                const pEl = topDoc.getElementById("v41-pend-list");
+                topDoc.getElementById("v42-pend-cnt").textContent = cloud.pending.length;
+                topDoc.getElementById("v42-app-cnt").textContent = cloud.approved.length;
+
+                const pEl = topDoc.getElementById("v42-pend-list");
                 if (!cloud.pending.length) {
-                    pEl.innerHTML = `<div style="text-align:center;padding:11px;background:#FFF;border:1px solid #EFEFF4;border-radius:9px;font-size:9px;color:#9A9AA5;">${ok ? "云端暂无新申请 · 其他设备点提交后点右上角刷新即可看到" : "请先点击上方【⚡ 自动创建云端库】"}</div>`;
+                    pEl.innerHTML = `<div style="text-align:center;padding:12px;background:#FFF;border:1px solid #EFEFF4;border-radius:9px;font-size:9px;color:#9A9AA5;">${ok ? "云端暂无待审申请 · 别人点提交后你点右上角「刷新」即可看到" : "请先去 npoint.io/docs/7590dee5e1fa18abf191 网页顶部点一下💾保存图标激活云库"}</div>`;
                 } else {
                     pEl.innerHTML = cloud.pending.map((item) => `
                         <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EAEAF0;border-radius:9px;padding:7px 10px;margin-bottom:5px;">
                             <div>
                                 <div style="font-size:10px;font-weight:800;color:#2C2C32;">申请 QQ：${item.qq}</div>
-                                <div style="font-size:8px;color:#8E8E98;">时间：${item.time || "刚刚"} · 专属码：<b>${calcExclusiveCode(item.qq)}</b></div>
+                                <div style="font-size:8px;color:#8E8E98;">时间：${item.time || "刚刚"} · 专属码：<b style="color:#2C2C32;user-select:all;">${calcExclusiveCode(item.qq)}</b></div>
                             </div>
                             <div style="display:flex;gap:4px;">
-                                <span class="smt-pill-btn dark" data-v41ok="${item.qq}" style="height:22px!important;font-size:8.5px!important;">✓ 批准</span>
-                                <span class="smt-pill-btn" data-v41no="${item.qq}" style="height:22px!important;font-size:8.5px!important;">拒绝</span>
+                                <span class="smt-pill-btn dark" data-v42ok="${item.qq}" style="height:22px!important;font-size:8.5px!important;">✓ 云端批准</span>
+                                <span class="smt-pill-btn" data-v42no="${item.qq}" style="height:22px!important;font-size:8.5px!important;">拒绝</span>
                             </div>
                         </div>
                     `).join("");
                 }
 
-                const aEl = topDoc.getElementById("v41-app-list");
+                const aEl = topDoc.getElementById("v42-app-list");
                 aEl.innerHTML = cloud.approved.length
                     ? cloud.approved.map((q) => `
                         <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;padding:5px 10px;margin-bottom:4px;font-size:9px;font-weight:700;">
-                            <span>✓ QQ: ${q} <span style="color:#8E8E98;">(码:${calcExclusiveCode(q)})</span></span>
-                            <span data-v41rev="${q}" style="color:#8E8E98;cursor:pointer;font-size:8px;">移除</span>
+                            <span>✓ QQ: ${q} <span style="color:#8E8E98;">(专属码:${calcExclusiveCode(q)})</span></span>
+                            <span data-v42rev="${q}" style="color:#8E8E98;cursor:pointer;font-size:8px;">移除授权</span>
                         </div>
                     `).join("")
                     : `<div style="text-align:center;padding:8px;font-size:8.5px;color:#9A9AA5;">暂无已批准的 QQ</div>`;
 
-                pEl.querySelectorAll("[data-v41ok]").forEach((b) => b.onclick = async () => {
-                    const qNum = b.getAttribute("data-v41ok");
-                    b.textContent = "处理中...";
+                pEl.querySelectorAll("[data-v42ok]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-v42ok");
+                    b.textContent = "批准中...";
                     const { data: latest } = await fetchRealCloudData();
                     latest.pending = latest.pending.filter((x) => x.qq !== qNum);
                     if (!latest.approved.includes(qNum)) latest.approved.unshift(qNum);
                     await pushRealCloudData(latest);
-                    renderV41Admin();
+                    renderV42Admin();
                 });
 
-                pEl.querySelectorAll("[data-v41no]").forEach((b) => b.onclick = async () => {
-                    const qNum = b.getAttribute("data-v41no");
+                pEl.querySelectorAll("[data-v42no]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-v42no");
                     const { data: latest } = await fetchRealCloudData();
                     latest.pending = latest.pending.filter((x) => x.qq !== qNum);
                     await pushRealCloudData(latest);
-                    renderV41Admin();
+                    renderV42Admin();
                 });
 
-                aEl.querySelectorAll("[data-v41rev]").forEach((b) => b.onclick = async () => {
-                    const qNum = b.getAttribute("data-v41rev");
+                aEl.querySelectorAll("[data-v42rev]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-v42rev");
                     const { data: latest } = await fetchRealCloudData();
                     latest.approved = latest.approved.filter((x) => x !== qNum);
                     await pushRealCloudData(latest);
-                    renderV41Admin();
+                    renderV42Admin();
                 });
             }
 
-            // 点击自动创建真实云端库按钮
-            topDoc.getElementById("v41-create-cloud-btn").onclick = async (e) => {
-                const inp = topDoc.getElementById("v41-url-inp");
-                const tip = topDoc.getElementById("v41-create-tip");
-                // 如果输入框里用户自己粘了地址，直接保存该地址！
-                if (inp.value.trim() && inp.value.trim() !== getActiveCloudUrl()) {
-                    const customU = inp.value.trim();
-                    localStorage.setItem(K_LOCAL_CLOUD_URL, customU);
-                    copyStr(`let MY_REAL_CLOUD_URL = "${customU}";`);
-                    tip.innerHTML = `<span style="color:#1E7E34;font-weight:800;">✅ 已绑定并复制代码：<code>let MY_REAL_CLOUD_URL = "${customU}";</code>！请粘贴替换到补丁第12行上传GitHub，全网所有手机即可互通！</span>`;
-                    renderV41Admin();
-                    return;
-                }
+            topDoc.getElementById("v42-refresh-btn").onclick = () => renderV42Admin();
 
-                e.target.textContent = "⏳ 创建中...";
-                const newUrl = await createNewRealCloudBox();
-                e.target.textContent = "⚡ 自动创建云端库";
-                if (newUrl) {
-                    inp.value = newUrl;
-                    const codeLine = `let MY_REAL_CLOUD_URL = "${newUrl}";`;
-                    copyStr(codeLine);
-                    tip.innerHTML = `<div style="background:#E6F4EA;color:#1E7E34;padding:6px 8px;border-radius:7px;font-weight:800;margin-top:4px;">🎉 创建成功！已自动复制下面这行代码：<br><code style="user-select:all;background:#FFF;padding:2px 4px;border-radius:4px;display:inline-block;margin:3px 0;">${codeLine}</code><br>👉 <b>最后一步：把上面这行代码粘贴替换到你 index.js 最末尾补丁的第 12 行并上传 GitHub</b>，所有人的手机就彻底连进你这同一个云端后台了！</div>`;
-                    renderV41Admin();
-                } else {
-                    tip.innerHTML = `<span style="color:#C5221F;font-weight:700;">⚠️ 自动创建被当前网络拦截，请浏览器打开免费网站 <b>https://www.npoint.io</b> 点 <b>+New</b>，输入 <code>{"pending":[],"approved":[]}</code> 点 Save，把底下生成的 API URL 粘贴到上方输入框点此按钮即可！</span>`;
-                }
-            };
-
-            topDoc.getElementById("v41-refresh-btn").onclick = () => renderV41Admin();
-
-            topDoc.getElementById("v41-manual-btn").onclick = async () => {
-                const qVal = (topDoc.getElementById("v41-manual-qq").value || "").trim().replace(/\D/g, "");
+            topDoc.getElementById("v42-manual-btn").onclick = async () => {
+                const qVal = (topDoc.getElementById("v42-manual-qq").value || "").trim().replace(/\D/g, "");
                 if (!qVal || qVal.length < 5) return alert("请输入有效的 QQ 号！");
                 const code = calcExclusiveCode(qVal);
                 copyStr(code);
-                const resEl = topDoc.getElementById("v41-manual-res");
+                const resEl = topDoc.getElementById("v42-manual-res");
                 resEl.style.display = "block";
-                resEl.innerHTML = `✅ 已复制 QQ【<b>${qVal}</b>】的唯一专属码：<span style="background:#2C2C32;color:#FFF;padding:2px 7px;border-radius:5px;user-select:all;">${code}</span>`;
-                topDoc.getElementById("v41-manual-qq").value = "";
+                resEl.innerHTML = `✅ 已云端批准并复制 QQ【<b>${qVal}</b>】的唯一专属码：<span style="background:#2C2C32;color:#FFF;padding:2px 7px;border-radius:5px;user-select:all;">${code}</span>`;
+                topDoc.getElementById("v42-manual-qq").value = "";
 
                 const { data: latest } = await fetchRealCloudData();
                 latest.pending = latest.pending.filter((x) => x.qq !== qVal);
-                if (!latest.approved.includes(qVal)) latest.approved.unshift(qNum);
+                if (!latest.approved.includes(qVal)) latest.approved.unshift(qVal);
                 await pushRealCloudData(latest);
-                renderV41Admin();
+                renderV42Admin();
             };
 
             ["smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
-                topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(renderV41Admin, 80));
+                topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(renderV42Admin, 80));
             });
 
-            renderV41Admin();
+            renderV42Admin();
         }
     }
 
-    mountRealCloudSystem();
+    mountBoundCloudSystem();
 })();
