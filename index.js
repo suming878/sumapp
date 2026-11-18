@@ -1772,7 +1772,7 @@ bootSumoulApp();
     patchCleanMelancholySplash();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 韩系动态流 · 读取酒馆真实Char列表 + 省略号收尾 + 无边框放大椭圆泡泡版】
+// 🤍 【Sumoul App 韩系动态流 · 按最近聊天排序Char头像 + User/AI全纯白无边框椭圆泡泡版】
 // 用法：直接替换 index.js 最末尾的旧动态补丁！
 // ==========================================================================
 (function () {
@@ -1787,6 +1787,25 @@ bootSumoulApp();
         if (!modal || !spacePage || !homePage || !fsBody) {
             setTimeout(mountKoreanFinalMoments, 250);
             return;
+        }
+
+        const K_RECENT_CHARS = "sumoul_v20_recent_chars";
+        function recordRecentChar(name, ava) {
+            if (!name || name === "PARTNER" || name === "GROUP") return;
+            try {
+                let list = JSON.parse(localStorage.getItem(K_RECENT_CHARS) || "[]");
+                list = list.filter((x) => x.name !== name);
+                list.unshift({ name, ava, time: Date.now() });
+                localStorage.setItem(K_RECENT_CHARS, JSON.stringify(list.slice(0, 30)));
+            } catch (e) {}
+        }
+        function getRecentCharMap() {
+            try {
+                const list = JSON.parse(localStorage.getItem(K_RECENT_CHARS) || "[]");
+                const map = {};
+                list.forEach((x) => { map[x.name] = x.time; });
+                return map;
+            } catch (e) { return {}; }
         }
 
         const mkIco = (d, sz = 17, stroke = "%232C2C32", fill = "none", sw = "1.85") => `<img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${fill}' stroke='${stroke}' stroke-width='${sw}' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E" style="width:${sz}px!important;height:${sz}px!important;display:inline-block!important;vertical-align:middle!important;pointer-events:none!important;" />`;
@@ -1850,13 +1869,14 @@ bootSumoulApp();
                 width: 64px !important;
             }
 
-            /* ── 2. 无边框 + 稍微放大一点点的柔和椭圆云朵冒泡 (Borderless Soft Pill) ── */
+            /* ── 2. User 与 AI 统一纯白 (#FFFFFF) 无边框椭圆云朵冒泡 ── */
             #seoul-mini-theater-modal .ig-note-cloud {
                 position: absolute !important;
                 top: -14px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 background: #FFFFFF !important;
+                background-color: #FFFFFF !important;
                 border: none !important;
                 border-radius: 20px !important;
                 padding: 5px 11px !important;
@@ -1865,7 +1885,7 @@ bootSumoulApp();
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                min-width: 38px !important;
+                min-width: 40px !important;
             }
             #seoul-mini-theater-modal .ig-note-cloud span {
                 display: block !important;
@@ -1878,7 +1898,6 @@ bootSumoulApp();
                 text-overflow: ellipsis !important;
                 line-height: 1.2 !important;
             }
-            /* 无边框一体感小水滴底座 */
             #seoul-mini-theater-modal .ig-note-cloud::before {
                 content: "" !important;
                 position: absolute !important;
@@ -1888,6 +1907,7 @@ bootSumoulApp();
                 height: 7.5px !important;
                 border-radius: 50% !important;
                 background: #FFFFFF !important;
+                background-color: #FFFFFF !important;
                 border: none !important;
                 box-shadow: 0 3px 5px rgba(20, 20, 30, 0.07) !important;
                 z-index: -1 !important;
@@ -1901,27 +1921,28 @@ bootSumoulApp();
                 height: 4.2px !important;
                 border-radius: 50% !important;
                 background: #FFFFFF !important;
+                background-color: #FFFFFF !important;
                 border: none !important;
                 box-shadow: 0 2px 3px rgba(20, 20, 30, 0.08) !important;
                 z-index: -2 !important;
             }
-            /* User 未填状态时的轻柔浅灰提示椭圆 */
+            /* User 未填写时同样保持纯白 #FFFFFF 底色，仅文字颜色柔和一点 */
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint {
-                background: #F6F6FA !important;
-                padding: 4px 9px !important;
-                box-shadow: 0 3px 10px rgba(20, 20, 30, 0.06) !important;
+                background: #FFFFFF !important;
+                background-color: #FFFFFF !important;
             }
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint span {
-                color: #9A9AA5 !important;
-                font-size: 8.2px !important;
-                font-weight: 600 !important;
+                color: #8E8E98 !important;
+                font-size: 8.8px !important;
+                font-weight: 700 !important;
             }
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint::before,
             #seoul-mini-theater-modal .ig-note-cloud.empty-hint::after {
-                background: #F6F6FA !important;
+                background: #FFFFFF !important;
+                background-color: #FFFFFF !important;
             }
 
-            /* ── 3. Char 圆头像边框：稍微淡一点的柔炭黑 (Soft Charcoal Ring) ── */
+            /* ── 3. Char 圆头像边框：稍微淡一点的柔炭黑 ── */
             #seoul-mini-theater-modal .kr-ava-ring {
                 width: 56px !important;
                 height: 56px !important;
@@ -1935,7 +1956,6 @@ bootSumoulApp();
                 box-sizing: border-box !important;
                 position: relative !important;
             }
-            /* 当前激活 Char 的边框：稍微淡一点的柔炭黑 (0.52 透明度，不刺眼不死黑) */
             #seoul-mini-theater-modal .kr-ava-ring.unread {
                 border: 1.6px solid rgba(58, 58, 64, 0.52) !important;
             }
@@ -2197,7 +2217,7 @@ bootSumoulApp();
             <div id="smt-mom-stream" style="flex:1;min-height:0;overflow-y:auto;padding-bottom:16px;"></div>
         `;
 
-        // 读取当前角色与酒馆全部角色列表 (`otherChars`)
+        // 🔥 读取当前角色 + 按「最近聊天时间 (date_last_chat)」倒序排列酒馆其余角色！
         function getCtx() {
             let userName = "ME", charName = "", charScopeId = "";
             let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
@@ -2225,33 +2245,33 @@ bootSumoulApp();
                     if (Array.isArray(st.chat) && st.chat.length) {
                         recentChat = st.chat.slice(-8).map((m) => `${m.is_user ? userName : (charName || "TA")}: ${m.mes}`).join("\n");
                     }
-                    // 🔥 读取酒馆里的所有角色卡，过滤掉当前角色，只取前 3 个展示，剩余计入省略号！
+
+                    // 记录当前角色为最近聊天
+                    if (charName) recordRecentChar(charName, charAvatar);
+                    const recentMap = getRecentCharMap();
+
                     if (Array.isArray(st.characters) && st.characters.length > 0) {
-                        const allOthers = st.characters.filter((ch, idx) => ch && ch.name && String(idx) !== String(st.characterId) && ch.name !== charName);
+                        const allOthers = st.characters
+                            .filter((ch, idx) => ch && ch.name && String(idx) !== String(st.characterId) && ch.name !== charName)
+                            .map((ch) => {
+                                // 综合读取：Sumoul最近访问时间 > 酒馆 date_last_chat > chat_size
+                                const stLastTime = Number(ch.date_last_chat) || Date.parse(ch.date_last_chat || "") || Number(ch.create_date) || 0;
+                                const localTime = recentMap[ch.name] || 0;
+                                const sortScore = Math.max(localTime, stLastTime);
+                                return {
+                                    name: ch.name,
+                                    ava: ch.avatar ? `/characters/${encodeURIComponent(ch.avatar)}` : "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg",
+                                    sortScore,
+                                    story: `【${ch.name} 的限时快拍】最近与你聊过天，刚刚更新了一条日常随手拍动态。`
+                                };
+                            })
+                            .sort((a, b) => b.sortScore - a.sortScore); // 按最近聊天时间从近到远倒序排列！
+
                         totalOtherCount = allOthers.length;
-                        otherChars = allOthers.slice(0, 3).map((ch) => ({
-                            name: ch.name,
-                            ava: ch.avatar ? `/characters/${encodeURIComponent(ch.avatar)}` : "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg",
-                            story: `【${ch.name} 的限时快拍】刚刚更新了一条日常随手拍动态。`
-                        }));
+                        otherChars = allOthers.slice(0, 3);
                     }
                 }
             } catch (e) {}
-
-            // 若酒馆角色列表还在加载，尝试从 DOM 里的角色卡片抓取
-            if (otherChars.length === 0) {
-                const domCards = topDoc.querySelectorAll(".character_select");
-                if (domCards.length > 0) {
-                    const temp = [];
-                    domCards.forEach((el) => {
-                        const n = el.querySelector(".ch_name")?.textContent?.trim();
-                        const a = el.querySelector("img")?.src;
-                        if (n && n !== charName) temp.push({ name: n, ava: a || "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `【${n} 的快拍】更新了一条日常状态。` });
-                    });
-                    totalOtherCount = temp.length;
-                    otherChars = temp.slice(0, 3);
-                }
-            }
 
             const selCh = topDoc.querySelector("#rm_button_selected_ch h2, #character_name_pole");
             if (!charName && selCh?.textContent?.trim()) charName = selCh.textContent.trim();
@@ -2272,6 +2292,21 @@ bootSumoulApp();
             }
             if (!charName) charName = "PARTNER";
             if (!charScopeId) charScopeId = charName;
+            recordRecentChar(charName, charAvatar);
+
+            // 若从 st.characters 没拿到其他角色，从本地最近聊天缓存补齐
+            if (otherChars.length === 0) {
+                try {
+                    const cachedList = JSON.parse(localStorage.getItem(K_RECENT_CHARS) || "[]").filter((x) => x.name !== charName);
+                    totalOtherCount = cachedList.length;
+                    otherChars = cachedList.slice(0, 3).map((x) => ({
+                        name: x.name,
+                        ava: x.ava || "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg",
+                        story: `【${x.name} 的限时快拍】最近与你聊过天，更新了一条日常状态。`
+                    }));
+                } catch (e) {}
+            }
+
             const safeScope = String(charScopeId).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
 
             try {
@@ -2367,7 +2402,6 @@ bootSumoulApp();
             const filterCharBtn = topDoc.getElementById("smt-filter-char-btn");
             if (filterCharBtn) filterCharBtn.textContent = `只看 ${c.charName}`;
 
-            // 如果酒馆里还有其他角色，展示前 3 个角色；若只有当前 1 个角色，用 2 个默认摄影号兜底
             const extraList = c.otherChars.length > 0 ? c.otherChars : [
                 { name: "서윤", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `刚冲洗出来的黑白胶卷。` },
                 { name: "한남동", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `玻璃窗上的雨痕与浓缩咖啡。` }
@@ -2375,13 +2409,14 @@ bootSumoulApp();
             const remainCount = Math.max(0, c.totalOtherCount - extraList.length);
 
             const storiesBar = topDoc.getElementById("smt-ins-stories-bar");
+            // User 与 AI 均为纯白 (#FFFFFF) 无边框椭圆泡泡！
             const myBubbleHtml = data.myNote
                 ? `<div class="ig-note-cloud"><span>${data.myNote}</span></div>`
                 : `<div class="ig-note-cloud empty-hint"><span>想法...</span></div>`;
             const charBubbleHtml = `<div class="ig-note-cloud"><span>${data.charNote || "想你了"}</span></div>`;
 
             storiesBar.innerHTML = `
-                <!-- 1. 我的圆头像（无边框微放大椭圆泡泡） -->
+                <!-- 1. 我的圆头像（纯白无边框椭圆泡泡） -->
                 <div class="kr-note-unit" id="smt-story-me" title="点击修改我的状态泡泡">
                     ${myBubbleHtml}
                     <div class="kr-ava-ring">
@@ -2391,7 +2426,7 @@ bootSumoulApp();
                     <div class="kr-unit-name">${c.userName}</div>
                 </div>
 
-                <!-- 2. 当前 Char 的圆头像（柔炭黑边框 + 无边框微放大椭圆泡泡） -->
+                <!-- 2. 当前正在聊天的 Char（排在最前 + 柔炭黑边框 + 纯白无边框椭圆泡泡） -->
                 <div class="kr-note-unit" id="smt-story-char">
                     ${charBubbleHtml}
                     <div class="kr-ava-ring unread">
@@ -2400,7 +2435,7 @@ bootSumoulApp();
                     <div class="kr-unit-name">${c.charName}</div>
                 </div>
 
-                <!-- 3~5. 自动读取的酒馆其他 Char 头像（干净不冒泡，柔淡灰黑细环） -->
+                <!-- 3~5. 按最近聊天时间倒序排列的酒馆其他 Char 头像 -->
                 ${extraList.map((ch, idx) => `
                     <div class="kr-note-unit" data-otheridx="${idx}">
                         <div class="kr-ava-ring">
@@ -2411,7 +2446,7 @@ bootSumoulApp();
                 `).join("")}
 
                 <!-- 6. 末尾省略号圆圈 (...) -->
-                <div class="kr-note-unit" id="smt-story-more-dots" title="更多酒馆角色">
+                <div class="kr-note-unit" id="smt-story-more-dots" title="更多最近聊天的角色">
                     <div class="kr-ava-ring">
                         <div class="kr-ava-inner" style="background:#F6F6FA!important;">${KR_ICO.dots}</div>
                     </div>
@@ -2421,7 +2456,7 @@ bootSumoulApp();
 
             topDoc.getElementById("smt-story-me").onclick = () => {
                 const d = getFeedData();
-                const v = prompt("写下你头像上方的想法小泡泡（留空则恢复默认提示）：", d.myNote || "");
+                const v = prompt("写下你头像上方的纯白想法泡泡（留空则恢复默认提示）：", d.myNote || "");
                 if (v !== null) { d.myNote = v.trim().slice(0, 8); saveFeedData(d); renderKrMoments(); }
             };
 
@@ -2469,11 +2504,11 @@ bootSumoulApp();
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <div style="display:flex;align-items:center;gap:7px;">
                                 <img src="${ch.ava}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" />
-                                <b style="font-size:10px;color:#2C2C32;">${ch.name} · 角色快拍</b>
+                                <b style="font-size:10px;color:#2C2C32;">${ch.name} · 最近聊天角色快拍</b>
                             </div>
                             <span id="smt-fr-st-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span>
                         </div>
-                        <div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#484852;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:11px 12px;">${ch.story}（在酒馆切换到该角色卡即可进入 TA 的专属动态主页）</div>
+                        <div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#484852;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:11px 12px;">${ch.story}</div>
                     `;
                     viewer.querySelector("#smt-fr-st-close").onclick = () => (viewer.style.display = "none");
                 };
@@ -2483,11 +2518,11 @@ bootSumoulApp();
                 viewer.style.display = "block";
                 viewer.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <b style="font-size:10px;color:#2C2C32;">ALL CHARACTERS · 酒馆角色列表</b>
+                        <b style="font-size:10px;color:#2C2C32;">RECENT CHARACTERS · 最近聊天角色排序</b>
                         <span id="smt-dots-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span>
                     </div>
                     <div style="font-size:10px;font-weight:600;line-height:1.6;color:#55555E;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:10px 12px;">
-                        当前动态流已绑定角色 <b>${c.charName}</b>（共检测到酒馆内还有 ${c.totalOtherCount} 位其他角色）。在酒馆切换任意角色卡后，Sumoul App 会自动切换为对应角色的独立微信、动态与情侣空间。
+                        顶部头像已按你<b>最近聊天的先后顺序</b>自动排列（共检测到酒馆内还有 ${c.totalOtherCount} 位其他角色）。
                     </div>
                 `;
                 viewer.querySelector("#smt-dots-close").onclick = () => (viewer.style.display = "none");
