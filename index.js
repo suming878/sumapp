@@ -5166,4 +5166,398 @@ bootSumoulApp();
 
     mountUltimateSettingsV6();
 })();
+// ==========================================================================
+// 🍎 【Sumoul App 苹果 iOS 18 × 韩系清冷柔焦「原生级语音通话 UI」美学重塑补丁】
+// 特点：TA头像全屏高斯柔焦雾化背景 + 苹果顶部大字排版 + 歌词式悬浮贴耳低语 + iOS经典 3x2 磨砂圆钮矩阵！
+// 用法：直接粘贴在 index.js 最末尾最后一行后面，自动覆盖旧通话界面！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+
+    // 苹果 iOS 原生级线性矢量图标 (零 Emoji)
+    const iosSvg = (p, sz = 22, sw = "1.6") =>
+        `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:block;pointer-events:none;">${p}</svg>`;
+
+    const IOS_CALL_ICO = {
+        micOff: iosSvg(`<line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>`, 21),
+        keypad: iosSvg(`<circle cx="6" cy="6" r="1.2" fill="currentColor"/><circle cx="12" cy="6" r="1.2" fill="currentColor"/><circle cx="18" cy="6" r="1.2" fill="currentColor"/><circle cx="6" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="18" cy="12" r="1.2" fill="currentColor"/><circle cx="6" cy="18" r="1.2" fill="currentColor"/><circle cx="12" cy="18" r="1.2" fill="currentColor"/><circle cx="18" cy="18" r="1.2" fill="currentColor"/>`, 21),
+        speaker: iosSvg(`<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`, 21),
+        chatBubble: iosSvg(`<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>`, 20),
+        wave: iosSvg(`<path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/>`, 20),
+        user: iosSvg(`<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`, 20),
+        hangup: `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(135deg);display:block;pointer-events:none;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+        sendUp: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`
+    };
+
+    // 注入苹果 iOS 18 × 韩系清冷磨砂通话专属 CSS
+    topDoc.getElementById("sumoul-apple-call-css")?.remove();
+    const st = topDoc.createElement("style");
+    st.id = "sumoul-apple-call-css";
+    st.innerHTML = `
+        @keyframes iosCallFadeIn {
+            from { opacity: 0; transform: scale(1.03); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes iosSubBreath {
+            0%, 100% { opacity: 0.55; }
+            50%      { opacity: 0.95; }
+        }
+        @keyframes iosVoiceTextIn {
+            from { opacity: 0; filter: blur(6px); transform: translateY(6px); }
+            to   { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+        }
+
+        #seoul-mini-theater-modal #smt-voice-call-overlay {
+            position: absolute !important;
+            inset: 0 !important;
+            z-index: 2147483646 !important;
+            background: #F4F4F7 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: max(42px, env(safe-area-inset-top, 42px)) 28px max(34px, env(safe-area-inset-bottom, 34px)) 28px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            animation: iosCallFadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
+        }
+
+        /* 底层：TA 的头像化作全屏深度高斯柔焦海报 + 韩系冷白雾化蒙版 */
+        #seoul-mini-theater-modal .ios-call-bg-poster {
+            position: absolute !important;
+            inset: -40px !important;
+            background-size: cover !important;
+            background-position: center !important;
+            filter: blur(54px) saturate(75%) brightness(1.08) !important;
+            -webkit-filter: blur(54px) saturate(75%) brightness(1.08) !important;
+            opacity: 0.42 !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+        }
+        #seoul-mini-theater-modal .ios-call-bg-frost {
+            position: absolute !important;
+            inset: 0 !important;
+            background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(246,246,250,0.78) 55%, rgba(238,238,244,0.92) 100%) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            z-index: 2 !important;
+            pointer-events: none !important;
+        }
+
+        /* 苹果 iOS 经典 3x2 磨砂毛玻璃圆形功能键 */
+        #seoul-mini-theater-modal .ios-keypad-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            column-gap: 24px !important;
+            row-gap: 18px !important;
+            width: 100% !important;
+            max-width: 286px !important;
+            margin: 0 auto !important;
+            z-index: 5 !important;
+        }
+        #seoul-mini-theater-modal .ios-key-unit {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 7px !important;
+            cursor: pointer !important;
+            user-select: none !important;
+        }
+        #seoul-mini-theater-modal .ios-key-circle {
+            width: 62px !important;
+            height: 62px !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.62) !important;
+            backdrop-filter: blur(18px) !important;
+            -webkit-backdrop-filter: blur(18px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.85) !important;
+            box-shadow: 0 6px 20px rgba(25, 25, 35, 0.05) !important;
+            color: #2C2C34 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+        #seoul-mini-theater-modal .ios-key-unit:active .ios-key-circle {
+            transform: scale(0.92) !important;
+        }
+        /* 按下激活态：反转为苹果经典深色实心圆钮 */
+        #seoul-mini-theater-modal .ios-key-circle.ios-active {
+            background: #2C2C34 !important;
+            border-color: #2C2C34 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 8px 22px rgba(44, 44, 52, 0.18) !important;
+        }
+        #seoul-mini-theater-modal .ios-key-label {
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            color: #484854 !important;
+            letter-spacing: 0.3px !important;
+        }
+
+        /* 底部正中央挂断圆钮（韩系高级低饱和绯红 / 深炭灰可选，这里用极具质感的苹果柔雾绯红） */
+        #seoul-mini-theater-modal .ios-end-btn {
+            width: 64px !important;
+            height: 64px !important;
+            border-radius: 50% !important;
+            background: #D9534F !important;
+            border: none !important;
+            box-shadow: 0 10px 26px rgba(217, 83, 79, 0.28) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            margin: 18px auto 0 auto !important;
+            transition: transform 0.18s ease !important;
+            z-index: 5 !important;
+        }
+        #seoul-mini-theater-modal .ios-end-btn:active {
+            transform: scale(0.92) !important;
+        }
+    `;
+    topDoc.head.appendChild(st);
+
+    function getCharContext() {
+        let userName = "ME", charName = "PARTNER", scope = "PARTNER";
+        let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg", charDesc = "";
+        try {
+            const st = topWin.SillyTavern?.getContext?.();
+            if (st) {
+                userName = st.name1 || userName;
+                if (st.characterId !== undefined && st.characters?.[st.characterId]) {
+                    const c = st.characters[st.characterId];
+                    charName = c.name || st.name2 || charName;
+                    scope = c.avatar || c.name || String(st.characterId);
+                    if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
+                    charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
+                } else if (st.name2) { charName = st.name2; scope = st.name2; }
+            }
+        } catch (e) {}
+        const safeScope = String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc };
+    }
+
+    let callTimer = null, secs = 0;
+    const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+
+    async function askVoiceAI(userSpoke = "") {
+        const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
+        const k = topDoc.getElementById("smt-api-key")?.value?.trim();
+        const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
+        if (!u || !k) throw new Error("请先在【API设置】填写独立 API 地址与 Key");
+        const ctx = getCharContext();
+        const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
+        const sysPrompt = `你是${ctx.charName}，正与${ctx.userName}通电话（iOS语音通话）。\n人设：${ctx.charDesc.slice(0, 1000)}\n请严格只输出JSON格式：{"env":"电话那头的细微环境声或动作声(12字内，如:衣料摩擦声与低沉呼吸)","voice":"你在电话里贴着TA耳边说的话(42字以内，自然口语、带一点停顿与亲昵感)"}`;
+        const usrPrompt = userSpoke ? `${ctx.userName}在电话那头对你说：“${userSpoke}”。请回应：` : `电话刚接通，请主动开口对${ctx.userName}说第一句话：`;
+        const r = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` },
+            body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: sysPrompt }, { role: "user", content: usrPrompt }] })
+        });
+        const d = await r.json(), raw = d?.choices?.[0]?.message?.content?.trim() || "";
+        const match = raw.match(/\{[\s\S]*\}/);
+        if (match) { try { return JSON.parse(match[0]); } catch (e) {} }
+        return { env: "听筒里传来浅浅的呼吸声", voice: raw.replace(/```json|```/g, "").trim() || "喂？这么晚还没睡吗……" };
+    }
+
+    // 🍎 启动苹果 iOS 18 × 韩系清冷柔焦全屏通话界面
+    function launchAppleKoreanVoiceCall() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        if (!modal) return;
+
+        const ctx = getCharContext();
+        let wCfg = {}, exCfg = {};
+        try { wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${ctx.safeScope}`) || "{}"); } catch (e) {}
+        try { exCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxextra__${ctx.safeScope}`) || "{}"); } catch (e) {}
+        const charName = wCfg.remark || ctx.charName;
+        const charAva = wCfg.charAva || ctx.charAvatar;
+        const weatherStr = exCfg.weatherDesc ? `${exCfg.weatherCity || "SEOUL"} · ${exCfg.weatherDesc}` : "SUMOUL AUDIO · HD";
+
+        topDoc.getElementById("smt-voice-call-overlay")?.remove();
+        const layer = topDoc.createElement("div");
+        layer.id = "smt-voice-call-overlay";
+
+        layer.innerHTML = `
+            <!-- 1. 底层：TA 头像的全屏高斯模糊柔焦海报 + 清冷雾白磨砂层 -->
+            <div class="ios-call-bg-poster" style="background-image:url('${charAva}');"></div>
+            <div class="ios-call-bg-frost"></div>
+
+            <!-- 2. 顶部：苹果 iOS Contact Poster 原生大字排版（极简无框！） -->
+            <div style="position:relative;z-index:5;text-align:center;width:100%;margin-top:4px;">
+                <div style="display:inline-flex;align-items:center;gap:6px;font-size:9.5px;font-weight:600;color:#7A7A88;letter-spacing:1.2px;margin-bottom:8px;">
+                    <span>${weatherStr}</span>
+                </div>
+                <div style="font-size:28px;font-weight:700;color:#1C1C22;letter-spacing:1px;line-height:1.15;">
+                    ${charName}
+                </div>
+                <div id="ios-call-timer" style="font-size:13.5px;font-weight:500;color:#6E6E7A;letter-spacing:1.5px;margin-top:6px;font-variant-numeric:tabular-nums;">
+                    正在呼叫...
+                </div>
+            </div>
+
+            <!-- 3. 中央：清冷小头像徽章 + 苹果歌词式无框悬浮听筒字幕 -->
+            <div style="position:relative;z-index:5;width:100%;max-width:310px;display:flex;flex-direction:column;align-items:center;justify-content:center;my:auto;padding:10px 0;">
+                <div style="width:68px;height:68px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.9);box-shadow:0 10px 28px rgba(20,20,30,0.08);margin-bottom:18px;">
+                    <img src="${charAva}" style="width:100%;height:100%;object-fit:cover;display:block;" />
+                </div>
+
+                <!-- 听筒微弱环境音提示 -->
+                <div id="ios-call-env" style="font-size:10px;font-weight:600;color:#8A8A96;letter-spacing:0.6px;margin-bottom:10px;animation:iosSubBreath 3s ease-in-out infinite;">
+                    * 正在建立加密语音连接... *
+                </div>
+
+                <!-- Apple Music 歌词级悬浮语音大字（无笨重边框！） -->
+                <div id="ios-call-voice" style="font-size:15px;font-weight:700;color:#1E1E26;line-height:1.75;letter-spacing:0.5px;text-align:center;min-height:52px;padding:0 8px;text-shadow:0 2px 12px rgba(255,255,255,0.9);">
+                    “ 喂……？ ”
+                </div>
+
+                <!-- 默认收起的极简胶囊回应输入条（点下方「回应TA」或直接点击即可输入） -->
+                <div id="ios-call-talk-bar" style="width:100%;display:flex;align-items:center;background:rgba(255,255,255,0.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.95);border-radius:999px;padding:4px 5px 4px 16px;margin-top:18px;box-shadow:0 6px 20px rgba(20,20,30,0.04);">
+                    <input type="text" id="ios-call-inp" placeholder="在电话里跟 TA 说句话..." style="flex:1;height:28px!important;border:0!important;outline:0!important;background:transparent!important;font-size:11px!important;font-weight:600!important;color:#22222A!important;text-align:left!important;" />
+                    <span id="ios-call-send" style="width:28px;height:28px;border-radius:50%;background:#2C2C34;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+                        ${IOS_CALL_ICO.sendUp}
+                    </span>
+                </div>
+            </div>
+
+            <!-- 4. 底部：苹果 iOS 18 原生 3x2 磨砂毛玻璃圆钮矩阵 + 底部挂断圆钮 -->
+            <div style="position:relative;z-index:5;width:100%;">
+                <div class="ios-keypad-grid">
+                    <div class="ios-key-unit" id="ios-k-mute">
+                        <div class="ios-key-circle">${IOS_CALL_ICO.micOff}</div>
+                        <span class="ios-key-label">静音</span>
+                    </div>
+                    <div class="ios-key-unit" id="ios-k-pad">
+                        <div class="ios-key-circle">${IOS_CALL_ICO.keypad}</div>
+                        <span class="ios-key-label">拨号键盘</span>
+                    </div>
+                    <div class="ios-key-unit" id="ios-k-speaker">
+                        <div class="ios-key-circle ios-active">${IOS_CALL_ICO.speaker}</div>
+                        <span class="ios-key-label">免提</span>
+                    </div>
+                    <div class="ios-key-unit" id="ios-k-focus">
+                        <div class="ios-key-circle">${IOS_CALL_ICO.chatBubble}</div>
+                        <span class="ios-key-label">对TA说话</span>
+                    </div>
+                    <div class="ios-key-unit" id="ios-k-next">
+                        <div class="ios-key-circle">${IOS_CALL_ICO.wave}</div>
+                        <span class="ios-key-label">继续听TA说</span>
+                    </div>
+                    <div class="ios-key-unit" id="ios-k-prof">
+                        <div class="ios-key-circle">${IOS_CALL_ICO.user}</div>
+                        <span class="ios-key-label">人设名片</span>
+                    </div>
+                </div>
+
+                <!-- 苹果原生挂断圆钮 -->
+                <div class="ios-end-btn" id="ios-call-hangup" title="结束通话">
+                    ${IOS_CALL_ICO.hangup}
+                </div>
+            </div>
+        `;
+        modal.appendChild(layer);
+
+        secs = 0;
+        if (callTimer) clearInterval(callTimer);
+        callTimer = setInterval(() => {
+            secs++;
+            const tEl = topDoc.getElementById("ios-call-timer");
+            if (tEl) tEl.textContent = fmtTime(secs);
+        }, 1000);
+
+        function updateVoiceDisplay(envTxt, voiceTxt) {
+            const eEl = topDoc.getElementById("ios-call-env");
+            const vEl = topDoc.getElementById("ios-call-voice");
+            if (eEl && envTxt) eEl.textContent = `* ${envTxt.replace(/^\*|\*$/g, "").trim()} *`;
+            if (vEl && voiceTxt) {
+                vEl.style.animation = "none";
+                void vEl.offsetWidth;
+                vEl.style.animation = "iosVoiceTextIn 0.4s ease forwards";
+                vEl.textContent = `“ ${voiceTxt.replace(/^[“"]|[”"]$/g, "").trim()} ”`;
+            }
+        }
+
+        // 接通瞬间触发第一句贴耳低语
+        (async () => {
+            try {
+                const res = await askVoiceAI("");
+                updateVoiceDisplay(res.env, res.voice);
+            } catch (err) {
+                updateVoiceDisplay("信号提示", err.message);
+            }
+        })();
+
+        // 发送语音回应
+        const inp = topDoc.getElementById("ios-call-inp");
+        const sendBtn = topDoc.getElementById("ios-call-send");
+        const doSpeak = async () => {
+            const val = inp.value.trim();
+            if (!val) return;
+            inp.value = "";
+            updateVoiceDisplay(`正在倾听你说：“${val.slice(0, 15)}”...`, "……");
+            try {
+                const res = await askVoiceAI(val);
+                updateVoiceDisplay(res.env, res.voice);
+            } catch (err) {
+                updateVoiceDisplay("网络波动", err.message);
+            }
+        };
+        sendBtn.onclick = doSpeak;
+        inp.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); doSpeak(); } };
+
+        // 6个圆形功能键交互
+        topDoc.getElementById("ios-k-mute").onclick = (e) => e.currentTarget.querySelector(".ios-key-circle")?.classList.toggle("ios-active");
+        topDoc.getElementById("ios-k-speaker").onclick = (e) => e.currentTarget.querySelector(".ios-key-circle")?.classList.toggle("ios-active");
+        topDoc.getElementById("ios-k-pad").onclick = (e) => e.currentTarget.querySelector(".ios-key-circle")?.classList.toggle("ios-active");
+        topDoc.getElementById("ios-k-focus").onclick = () => inp.focus();
+        topDoc.getElementById("ios-k-next").onclick = async () => {
+            updateVoiceDisplay("听筒那头传来动静...", "……");
+            try {
+                const res = await askVoiceAI("（电话那头安静了几秒，请继续对TA说下一句贴耳悄悄话）");
+                updateVoiceDisplay(res.env, res.voice);
+            } catch (err) {}
+        };
+        topDoc.getElementById("ios-k-prof").onclick = () => {
+            updateVoiceDisplay(`当前通话对象：${charName}`, `关系状态：${exCfg.relationStage || "亲密连线中"}`);
+        };
+
+        // 挂断电话并记入微信聊天记录
+        topDoc.getElementById("ios-call-hangup").onclick = () => {
+            if (callTimer) clearInterval(callTimer);
+            const dur = fmtTime(secs || 1);
+            const lastV = topDoc.getElementById("ios-call-voice")?.textContent || "";
+            layer.remove();
+
+            const chatKey = `sumoul_v16_wx__${ctx.safeScope}`;
+            try {
+                const list = JSON.parse(localStorage.getItem(chatKey) || "[]");
+                const d = new Date(), tStr = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                list.push({ role: "sys", text: `语音通话已结束 · 通话时长 ${dur}`, time: tStr });
+                if (lastV && !lastV.includes("API") && lastV !== "“ …… ”") {
+                    list.push({ role: "ai", text: `[语音通话] ${lastV}`, time: tStr });
+                }
+                localStorage.setItem(chatKey, JSON.stringify(list));
+            } catch (e) {}
+
+            if (topDoc.getElementById("smt-page-wx_settings")?.classList.contains("active")) {
+                topDoc.getElementById("smt-wxset-back-chat")?.click();
+            } else {
+                topDoc.querySelector('.smt-tab-item[data-page="talk"]')?.click();
+            }
+        };
+    }
+
+    // 捕获接管「立即拨打语音」和微信底栏「语音通话」按钮，全部指向全新苹果韩系通话界面！
+    topDoc.addEventListener("click", (e) => {
+        const t = e.target;
+        if (!t || !t.closest) return;
+        if (t.closest("#ios-start-voice-call") || t.closest("#smt-wx-quick-call-btn")) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            launchAppleKoreanVoiceCall();
+        }
+    }, true);
+})();
 
