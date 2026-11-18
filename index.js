@@ -2755,183 +2755,661 @@ bootSumoulApp();
     mountMomentsAndFullCoupleApp();
 })();
 // ==========================================================================
-// 💧 【Sumoul App 专属开屏补丁：泪痕折线 · 缓慢连结 (Tear-Trace Polyline) + 点击才进入】
-// 用法：直接粘贴在 index.js 最末尾最后一行后面！绝不影响任何其他模块！
+// 🤍 【Sumoul App 强行破壁接管补丁：全新韩国杂志画报级动态流 + 泪水折线慢连结开屏 + 满配独立情侣空间】
+// 特性：自带防覆盖霸权锁，无视前面残留的旧补丁，粘在 index.js 最末尾 100% 立即生效！
 // ==========================================================================
 (function () {
-    const topDoc = (window.parent || window).document;
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
 
-    function mountTearLineSplash() {
+    // 停掉之前旧补丁可能残留的冲突标记
+    topWin.__SUMOUL_V25_ACTIVE = true;
+
+    function forceMountV25() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
-        const splash = topDoc.getElementById("smt-boot-splash");
-        if (!modal || !splash) {
-            setTimeout(mountTearLineSplash, 200);
+        const spacePage = topDoc.getElementById("smt-page-space");
+        const homePage = topDoc.getElementById("smt-page-home");
+        const fsBody = modal?.querySelector(".smt-fs-body");
+        if (!modal || !spacePage || !homePage || !fsBody) {
+            setTimeout(forceMountV25, 200);
             return;
         }
 
-        // 1. 注入「泪痕折线缓慢连结 + 泪滴凝结涟漪」专属 CSS 动画
-        topDoc.getElementById("sumoul-tear-splash-css")?.remove();
+        // 1. 挂载防崩隐形护盾（防止主代码找不到旧ID报错）
+        if (!topDoc.getElementById("smt-legacy-shield")) {
+            const shield = topDoc.createElement("div");
+            shield.id = "smt-legacy-shield";
+            shield.style.cssText = "display:none!important;";
+            [
+                "smt-sp-hero-card", "smt-sp-char-scope-tag", "smt-sp-uava", "smt-sp-cava", "smt-sp-uname", "smt-sp-cname",
+                "smt-sp-days", "smt-sp-mood", "smt-sp-couple-names", "smt-sp-live-bio", "smt-stat-pet", "smt-stat-petname",
+                "smt-stat-fund", "smt-badge-pet", "smt-badge-bpm", "smt-badge-coupon", "smt-badge-todo", "smt-ab-ins-grid",
+                "smt-ins-detail-pop", "smt-pet-name", "smt-pet-lv", "smt-pet-hunger-txt", "smt-pet-hunger-bar",
+                "smt-pet-mood-txt", "smt-pet-mood-bar", "smt-pet-log", "smt-4cut-stage", "smt-qa-q", "smt-qa-my-txt",
+                "smt-qa-char-label", "smt-qa-char-txt", "smt-mood-stage", "smt-coupon-list", "smt-coupon-log",
+                "smt-sp-notes-list", "smt-sp-todo-list"
+            ].forEach((id) => {
+                const d = topDoc.createElement("div");
+                d.id = id;
+                shield.appendChild(d);
+            });
+            modal.appendChild(shield);
+        }
+
+        // 2. 注入全新「韩国独立摄影杂志风动态流 + 泪水折线慢连结开屏」最高权重 CSS
+        ["sumoul-moments-css", "sumoul-ins-feed-css", "sumoul-minimal-space-css", "sumoul-v25-master-css"].forEach((id) => topDoc.getElementById(id)?.remove());
         const st = topDoc.createElement("style");
-        st.id = "sumoul-tear-splash-css";
+        st.id = "sumoul-v25-master-css";
         st.innerHTML = `
-            /* 泪痕折线从无到有缓慢连结动画 (3.2秒) */
-            @keyframes tearLineDraw {
-                0% { stroke-dashoffset: 320; opacity: 0.2; }
+            /* ── 💧 泪水折线缓慢连结开屏动画 ── */
+            @keyframes v25TearDraw {
+                0% { stroke-dashoffset: 360; opacity: 0.15; }
                 15% { opacity: 1; }
                 100% { stroke-dashoffset: 0; opacity: 1; }
             }
-            /* 折线背景虚影轨迹渐显 */
-            @keyframes tearGhostFade {
-                0% { opacity: 0; }
-                100% { opacity: 0.28; }
-            }
-            /* 转折节点上的微小水珠依次亮起 */
-            @keyframes tearNodePop {
+            @keyframes v25NodeBead {
                 0% { transform: scale(0); opacity: 0; }
-                70% { transform: scale(1.25); opacity: 0.9; }
-                100% { transform: scale(1); opacity: 0.75; }
+                65% { transform: scale(1.3); opacity: 1; }
+                100% { transform: scale(1); opacity: 0.9; }
             }
-            /* 终点泪滴凝结并轻微欲坠 */
-            @keyframes tearDropForm {
-                0% { transform: translateY(-6px) scale(0.2); opacity: 0; }
-                60% { transform: translateY(1px) scale(1.06); opacity: 1; }
+            @keyframes v25DropFall {
+                0% { transform: translateY(-8px) scale(0.2); opacity: 0; }
+                60% { transform: translateY(1.5px) scale(1.05); opacity: 1; }
                 100% { transform: translateY(0px) scale(1); opacity: 1; }
             }
-            @keyframes tearDropFloat {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(3.5px); }
+            @keyframes v25Ripple {
+                0% { r: 2px; opacity: 0.75; stroke-width: 1.3px; }
+                100% { r: 19px; opacity: 0; stroke-width: 0.2px; }
             }
-            /* 泪滴下方的水波涟漪扩散 */
-            @keyframes tearRippleOut {
-                0% { r: 2px; opacity: 0.75; stroke-width: 1.2px; }
-                100% { r: 16px; opacity: 0; stroke-width: 0.3px; }
+            #seoul-mini-theater-modal #smt-boot-splash .v25-tear-line {
+                stroke-dasharray: 360 !important;
+                stroke-dashoffset: 360 !important;
+                animation: v25TearDraw 3.4s cubic-bezier(0.32, 0, 0.2, 1) forwards !important;
             }
-
-            #seoul-mini-theater-modal #smt-boot-splash .tear-main-path {
-                stroke-dasharray: 320 !important;
-                stroke-dashoffset: 320 !important;
-                animation: tearLineDraw 3.2s cubic-bezier(0.35, 0, 0.2, 1) forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .tear-ghost-path {
-                stroke-dasharray: 2 3.5 !important;
-                opacity: 0 !important;
-                animation: tearGhostFade 2s ease 0.4s forwards !important;
-            }
-            #seoul-mini-theater-modal #smt-boot-splash .t-node {
+            #seoul-mini-theater-modal #smt-boot-splash .v25-bead {
                 transform-box: fill-box !important;
                 transform-origin: center !important;
                 opacity: 0 !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .t-node.n1 { animation: tearNodePop 0.6s ease 0.25s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .t-node.n2 { animation: tearNodePop 0.6s ease 0.85s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .t-node.n3 { animation: tearNodePop 0.6s ease 1.45s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .t-node.n4 { animation: tearNodePop 0.6s ease 2.05s forwards !important; }
-            #seoul-mini-theater-modal #smt-boot-splash .t-node.n5 { animation: tearNodePop 0.6s ease 2.60s forwards !important; }
-
-            #seoul-mini-theater-modal #smt-boot-splash .tear-final-drop {
+            #seoul-mini-theater-modal #smt-boot-splash .v25-bead.b1 { animation: v25NodeBead 0.55s ease 0.3s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v25-bead.b2 { animation: v25NodeBead 0.55s ease 0.95s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v25-bead.b3 { animation: v25NodeBead 0.55s ease 1.55s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v25-bead.b4 { animation: v25NodeBead 0.55s ease 2.15s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v25-bead.b5 { animation: v25NodeBead 0.55s ease 2.70s forwards !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v25-tear-drop {
                 transform-box: fill-box !important;
                 transform-origin: center top !important;
                 opacity: 0 !important;
-                animation: tearDropForm 0.85s cubic-bezier(0.22, 1, 0.36, 1) 2.85s forwards, tearDropFloat 2.8s ease-in-out 3.7s infinite !important;
+                animation: v25DropFall 0.85s cubic-bezier(0.22, 1, 0.36, 1) 2.95s forwards !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .tear-ripple-1 {
-                opacity: 0 !important;
-                animation: tearRippleOut 2.6s ease-out 3.1s infinite !important;
+            #seoul-mini-theater-modal #smt-boot-splash .v25-rip-1 { opacity: 0 !important; animation: v25Ripple 2.6s ease-out 3.2s infinite !important; }
+            #seoul-mini-theater-modal #smt-boot-splash .v25-rip-2 { opacity: 0 !important; animation: v25Ripple 2.6s ease-out 4.1s infinite !important; }
+
+            /* ── 底部第2栏图标 ── */
+            #seoul-mini-theater-modal .smt-tab-item[data-page="space"] .smt-tab-ico {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A7A85' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='5'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Ccircle cx='17.5' cy='6.5' r='1' fill='%237A7A85'/%3E%3C/svg%3E") !important;
             }
-            #seoul-mini-theater-modal #smt-boot-splash .tear-ripple-2 {
-                opacity: 0 !important;
-                animation: tearRippleOut 2.6s ease-out 3.9s infinite !important;
+            #seoul-mini-theater-modal .smt-tab-item[data-page="space"].active .smt-tab-ico {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232C2C32' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='5'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Ccircle cx='17.5' cy='6.5' r='1' fill='%232C2C32'/%3E%3C/svg%3E") !important;
             }
+
+            /* ── 1. 顶部纯白无底色头像栏 + 纯白无边框放大版椭圆泡泡 ── */
+            #seoul-mini-theater-modal #smt-page-space { padding: 0 !important; gap: 0 !important; background: #FFFFFF !important; }
+            #seoul-mini-theater-modal .v25-stories-row {
+                display: flex !important; align-items: flex-end !important; gap: 15px !important;
+                overflow-x: auto !important; padding: 26px 8px 13px 8px !important;
+                background: #FFFFFF !important; border-bottom: 1px solid #F0F0F5 !important;
+                flex-shrink: 0 !important; scrollbar-width: none !important;
+            }
+            #seoul-mini-theater-modal .v25-stories-row::-webkit-scrollbar { display: none !important; }
+            #seoul-mini-theater-modal .v25-story-cell {
+                display: flex !important; flex-direction: column !important; align-items: center !important;
+                position: relative !important; cursor: pointer !important; flex-shrink: 0 !important; width: 64px !important;
+            }
+            /* 纯白无边框微放大椭圆冒泡 */
+            #seoul-mini-theater-modal .v25-white-bubble {
+                position: absolute !important; top: -15px !important; left: 50% !important; transform: translateX(-50%) !important;
+                background: #FFFFFF !important; background-color: #FFFFFF !important; border: none !important;
+                border-radius: 22px !important; padding: 5.5px 12px !important; z-index: 6 !important;
+                box-shadow: 0 4px 14px rgba(20, 20, 30, 0.11), 0 1px 4px rgba(20, 20, 30, 0.05) !important;
+                display: inline-flex !important; align-items: center !important; justify-content: center !important; min-width: 42px !important;
+            }
+            #seoul-mini-theater-modal .v25-white-bubble span {
+                display: block !important; font-size: 9.3px !important; font-weight: 700 !important; color: #2C2C32 !important;
+                white-space: nowrap !important; max-width: 70px !important; overflow: hidden !important; text-overflow: ellipsis !important; line-height: 1.15 !important;
+            }
+            #seoul-mini-theater-modal .v25-white-bubble.muted span { color: #8E8E98 !important; font-size: 8.8px !important; }
+            #seoul-mini-theater-modal .v25-white-bubble::before {
+                content: "" !important; position: absolute !important; bottom: -4px !important; left: 13px !important;
+                width: 7.5px !important; height: 7.5px !important; border-radius: 50% !important;
+                background: #FFFFFF !important; border: none !important; box-shadow: 0 3px 5px rgba(20, 20, 30, 0.07) !important; z-index: -1 !important;
+            }
+            #seoul-mini-theater-modal .v25-white-bubble::after {
+                content: "" !important; position: absolute !important; bottom: -8px !important; left: 17px !important;
+                width: 4.2px !important; height: 4.2px !important; border-radius: 50% !important;
+                background: #FFFFFF !important; border: none !important; box-shadow: 0 2px 3px rgba(20, 20, 30, 0.08) !important; z-index: -2 !important;
+            }
+
+            /* 柔炭黑半透明头像环 */
+            #seoul-mini-theater-modal .v25-ring {
+                width: 56px !important; height: 56px !important; border-radius: 50% !important; padding: 2.5px !important;
+                background: #FFFFFF !important; border: 1.4px solid rgba(58, 58, 64, 0.22) !important;
+                display: flex !important; align-items: center !important; justify-content: center !important; box-sizing: border-box !important; position: relative !important;
+            }
+            #seoul-mini-theater-modal .v25-ring.active-char {
+                border: 1.7px solid rgba(58, 58, 64, 0.55) !important;
+            }
+            #seoul-mini-theater-modal .v25-ring-in {
+                width: 100% !important; height: 100% !important; border-radius: 50% !important; overflow: hidden !important;
+                background: #F4F4F8 !important; display: flex !important; align-items: center !important; justify-content: center !important;
+            }
+            #seoul-mini-theater-modal .v25-ring-in img { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block !important; }
+            #seoul-mini-theater-modal .v25-plus-dot {
+                position: absolute !important; right: -1px !important; bottom: -1px !important; width: 18px !important; height: 18px !important;
+                border-radius: 50% !important; background: #484852 !important; border: 2px solid #FFFFFF !important;
+                display: flex !important; align-items: center !important; justify-content: center !important; z-index: 4 !important;
+            }
+            #seoul-mini-theater-modal .v25-story-label {
+                font-size: 9px !important; font-weight: 700 !important; color: #2C2C32 !important; margin-top: 6px !important;
+                white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; max-width: 62px !important;
+            }
+
+            /* ── 2. 全新样式：韩国独立杂志画报风动态流 (K-Magazine Editorial Feed) ── */
+            #seoul-mini-theater-modal .v25-filter-bar {
+                display: flex !important; align-items: center !important; justify-content: space-between !important;
+                padding: 9px 6px !important; border-bottom: 1px solid #F2F2F6 !important; background: #FFFFFF !important; flex-shrink: 0 !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-post {
+                background: #FFFFFF !important;
+                border-bottom: 1px solid #EAEAF0 !important;
+                padding: 18px 4px 20px 4px !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-head {
+                display: flex !important; align-items: center !important; justify-content: space-between !important;
+                margin-bottom: 12px !important; padding: 0 4px !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-author {
+                display: flex !important; align-items: center !important; gap: 10px !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-ava {
+                width: 38px !important; height: 38px !important; border-radius: 50% !important;
+                object-fit: cover !important; border: 1px solid rgba(58,58,64,0.25) !important; padding: 2px !important; background: #FFF !important;
+            }
+            /* 银盐灰白杂志画报相纸框（带四角极细取景准星与胶片编号） */
+            #seoul-mini-theater-modal .v25-mag-canvas {
+                background: linear-gradient(180deg, #F7F7FA 0%, #EFEFF4 100%) !important;
+                border: 1px solid #E4E4EC !important;
+                border-radius: 4px !important;
+                padding: 26px 20px 22px 20px !important;
+                margin: 0 2px 12px 2px !important;
+                position: relative !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-canvas::before {
+                content: "⌜" !important; position: absolute !important; top: 6px !important; left: 8px !important;
+                font-size: 11px !important; color: #9A9AA5 !important; line-height: 1 !important; pointer-events: none !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-canvas::after {
+                content: "⌟" !important; position: absolute !important; bottom: 6px !important; right: 8px !important;
+                font-size: 11px !important; color: #9A9AA5 !important; line-height: 1 !important; pointer-events: none !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-canvas img.v25-real-img {
+                width: 100% !important; max-height: 240px !important; object-fit: cover !important;
+                border-radius: 3px !important; display: block !important; margin-bottom: 12px !important;
+            }
+            #seoul-mini-theater-modal .v25-canvas-top {
+                display: flex !important; justify-content: space-between !important; align-items: center !important;
+                font-size: 7.5px !important; font-weight: 700 !important; color: #8E8E98 !important;
+                letter-spacing: 1.6px !important; font-family: monospace !important; margin-bottom: 14px !important;
+            }
+            #seoul-mini-theater-modal .v25-canvas-desc {
+                font-size: 11px !important; font-weight: 600 !important; line-height: 1.75 !important;
+                color: #3A3A40 !important; text-align: center !important; padding: 4px 8px !important;
+            }
+            /* INS 原版极简图标操作栏 */
+            #seoul-mini-theater-modal .v25-mag-tools {
+                display: flex !important; align-items: center !important; justify-content: space-between !important;
+                padding: 2px 6px 8px 6px !important;
+            }
+            #seoul-mini-theater-modal .v25-mag-text {
+                padding: 0 6px !important; font-size: 11.5px !important; font-weight: 600 !important;
+                line-height: 1.65 !important; color: #2C2C32 !important;
+            }
+            /* 左侧竖线缩进式高冷评论区 */
+            #seoul-mini-theater-modal .v25-mag-cmts {
+                margin: 10px 6px 0 6px !important; padding: 6px 0 2px 10px !important;
+                border-left: 2px solid #E2E2EA !important; font-size: 10.2px !important; font-weight: 600 !important; line-height: 1.6 !important;
+            }
+
+            /* ── 3. 严格控制独立情侣空间 App 仅在激活时显示，绝不串页！ ── */
+            #seoul-mini-theater-modal #smt-page-couple_app {
+                display: none !important; flex-direction: column !important; flex: 1 !important;
+                min-height: 0 !important; overflow-y: auto !important; padding: 2px 2px 20px 2px !important; gap: 11px !important;
+            }
+            #seoul-mini-theater-modal #smt-page-couple_app.active { display: flex !important; }
+            #seoul-mini-theater-modal .cp-hero-box { background: #F8F8FA !important; border: 1px solid #EAEAF0 !important; border-radius: 22px !important; padding: 15px !important; background-size: cover !important; background-position: center !important; flex-shrink: 0 !important; }
+            #seoul-mini-theater-modal .cp-hero-glass { background: rgba(255, 255, 255, 0.94) !important; border: 1px solid #EFEFF4 !important; border-radius: 17px !important; padding: 16px 12px 13px 12px !important; }
+            #seoul-mini-theater-modal .cp-live-row { display: grid !important; grid-template-columns: 1.15fr 0.85fr !important; gap: 9px !important; flex-shrink: 0 !important; }
+            #seoul-mini-theater-modal .cp-live-card { background: #F8F8FA !important; border: 1px solid #EAEAF0 !important; border-radius: 17px !important; padding: 12px 13px !important; cursor: pointer !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
+            #seoul-mini-theater-modal .cp-bento-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 9px !important; flex-shrink: 0 !important; }
+            #seoul-mini-theater-modal .cp-bento-card { background: #F8F8FA !important; border: 1px solid #EAEAF0 !important; border-radius: 18px !important; padding: 13px 14px !important; cursor: pointer !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; min-height: 88px !important; }
+            #seoul-mini-theater-modal .cp-bento-top { display: flex !important; align-items: center !important; justify-content: space-between !important; margin-bottom: 9px !important; }
+            #seoul-mini-theater-modal .cp-bento-ico { width: 38px !important; height: 38px !important; border-radius: 12px !important; background: #FFFFFF !important; border: 1px solid #E6E6EC !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+            #seoul-mini-theater-modal .cp-bento-badge { font-size: 8px !important; font-weight: 700 !important; color: #484852 !important; background: #FFFFFF !important; border: 1px solid #EAEAF0 !important; border-radius: 99px !important; padding: 2.5px 8px !important; }
+            #seoul-mini-theater-modal .smt-ticket-card { display: flex !important; align-items: stretch !important; background: #FFFFFF !important; border: 1px solid #E6E6EC !important; border-radius: 13px !important; margin-bottom: 8px !important; overflow: hidden !important; }
+            #seoul-mini-theater-modal .smt-ticket-left { flex: 1 !important; padding: 10px 12px !important; border-right: 1.5px dashed #E4E4EC !important; }
+            #seoul-mini-theater-modal .smt-ticket-right { width: 72px !important; background: #F8F8FA !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px !important; cursor: pointer !important; }
         `;
         topDoc.head.appendChild(st);
 
-        // 2. 构建「泪痕折线缓慢连结」白灰忧郁开屏结构
-        function renderTearSplashDOM() {
+        // 3. 挂载「泪水折线缓慢连结」开屏动画
+        const splash = topDoc.getElementById("smt-boot-splash");
+        function renderTearBootSplash() {
+            if (!splash) return;
             splash.style.cssText = "position:absolute!important;inset:0!important;background:linear-gradient(180deg,#FFFFFF 0%,#F5F5F8 58%,#ECECF0 100%)!important;z-index:10!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;transition:opacity 0.65s ease!important;padding:24px!important;text-align:center!important;cursor:pointer!important;";
-
             splash.innerHTML = `
-                <div style="border:1px solid #E2E2EA!important;border-radius:6px!important;padding:34px 26px 28px 26px!important;background:rgba(255,255,255,0.84)!important;max-width:286px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 12px 32px rgba(30,30,40,0.03)!important;">
-                    <!-- 顶部极细档案编号 -->
+                <div style="border:1px solid #E2E2EA!important;border-radius:6px!important;padding:34px 26px 28px 26px!important;background:rgba(255,255,255,0.86)!important;max-width:286px!important;width:100%!important;box-sizing:border-box!important;position:relative!important;box-shadow:0 12px 32px rgba(30,30,40,0.03)!important;">
                     <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;color:#9A9AA5!important;letter-spacing:2px;font-family:monospace;border-bottom:1px solid #EFEFF4!important;padding-bottom:8px;margin-bottom:18px;">
-                        <span>SUMOUL APP</span>
-                        <span>TEAR TRACE · 04:00</span>
+                        <span>SUMOUL APP</span><span>TEAR TRACE · 04:00</span>
                     </div>
-
-                    <!-- 💧 核心舞台：缓慢连结的泪痕折线与末端凝结泪滴 SVG -->
                     <div style="width:100%;height:112px;display:flex;align-items:center;justify-content:center;margin:4px 0 14px 0;">
                         <svg viewBox="0 0 220 108" width="210" height="104" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible!important;">
                             <defs>
-                                <!-- 泪水光泽渐变 -->
-                                <linearGradient id="tearLineGrad" x1="28" y1="12" x2="184" y2="82" gradientUnits="userSpaceOnUse">
-                                    <stop offset="0%" stop-color="#C8C8D2" />
-                                    <stop offset="55%" stop-color="#7A7A85" />
-                                    <stop offset="100%" stop-color="#3A3A40" />
+                                <linearGradient id="v25LineG" x1="24" y1="12" x2="186" y2="82" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#C8C8D2" /><stop offset="55%" stop-color="#7A7A85" /><stop offset="100%" stop-color="#3A3A40" />
                                 </linearGradient>
-                                <linearGradient id="tearDropGrad" x1="184" y1="68" x2="184" y2="92" gradientUnits="userSpaceOnUse">
-                                    <stop offset="0%" stop-color="#FFFFFF" />
-                                    <stop offset="45%" stop-color="#D8D8E2" />
-                                    <stop offset="100%" stop-color="#55555E" />
+                                <linearGradient id="v25DropG" x1="184" y1="68" x2="184" y2="92" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#FFFFFF" /><stop offset="45%" stop-color="#D8D8E2" /><stop offset="100%" stop-color="#55555E" />
                                 </linearGradient>
                             </defs>
-
-                            <!-- 底层极细虚线轨迹（代表干涸的旧泪痕） -->
-                            <polyline class="tear-ghost-path" points="28,16 66,44 102,24 142,60 166,46 184,70" fill="none" stroke="#B0B0BA" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
-
-                            <!-- 主泪水折线：一折一折缓慢延伸连结 -->
-                            <polyline class="tear-main-path" points="28,16 66,44 102,24 142,60 166,46 184,70" fill="none" stroke="url(#tearLineGrad)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" />
-
-                            <!-- 折线转折点上凝结的 5 颗微小泪珠（随折线经过依次亮起） -->
-                            <circle class="t-node n1" cx="28" cy="16" r="2.2" fill="#FFFFFF" stroke="#8E8E98" stroke-width="1.2" />
-                            <circle class="t-node n2" cx="66" cy="44" r="2.5" fill="#FFFFFF" stroke="#7A7A85" stroke-width="1.2" />
-                            <circle class="t-node n3" cx="102" cy="24" r="2.2" fill="#FFFFFF" stroke="#7A7A85" stroke-width="1.2" />
-                            <circle class="t-node n4" cx="142" cy="60" r="2.8" fill="#FFFFFF" stroke="#55555E" stroke-width="1.3" />
-                            <circle class="t-node n5" cx="166" cy="46" r="2.2" fill="#FFFFFF" stroke="#484852" stroke-width="1.2" />
-
-                            <!-- 终点处扩散的泪水涟漪 -->
-                            <circle class="tear-ripple-1" cx="184" cy="90" r="3" fill="none" stroke="#8E8E98" />
-                            <circle class="tear-ripple-2" cx="184" cy="90" r="3" fill="none" stroke="#A0A0AA" />
-
-                            <!-- 折线尽头缓慢凝结成形、欲落未落的立体泪滴 -->
-                            <g class="tear-final-drop">
-                                <path d="M184 69 C184 69 176.5 79.5 176.5 84.5 C176.5 88.8 179.8 92 184 92 C188.2 92 191.5 88.8 191.5 84.5 C191.5 79.5 184 69 184 69 Z" fill="url(#tearDropGrad)" stroke="#3A3A40" stroke-width="1.25" stroke-linejoin="round" />
-                                <!-- 泪滴内部的高光月牙反光 -->
+                            <polyline points="26,16 66,44 104,24 142,60 166,46 184,70" fill="none" stroke="#E2E2EA" stroke-width="1" stroke-dasharray="2 3.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <polyline class="v25-tear-line" points="26,16 66,44 104,24 142,60 166,46 184,70" fill="none" stroke="url(#v25LineG)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle class="v25-bead b1" cx="26" cy="16" r="2.3" fill="#FFFFFF" stroke="#8E8E98" stroke-width="1.2" />
+                            <circle class="v25-bead b2" cx="66" cy="44" r="2.6" fill="#FFFFFF" stroke="#7A7A85" stroke-width="1.2" />
+                            <circle class="v25-bead b3" cx="104" cy="24" r="2.3" fill="#FFFFFF" stroke="#7A7A85" stroke-width="1.2" />
+                            <circle class="v25-bead b4" cx="142" cy="60" r="2.8" fill="#FFFFFF" stroke="#55555E" stroke-width="1.3" />
+                            <circle class="v25-bead b5" cx="166" cy="46" r="2.3" fill="#FFFFFF" stroke="#484852" stroke-width="1.2" />
+                            <circle class="v25-rip-1" cx="184" cy="90" r="3" fill="none" stroke="#8E8E98" />
+                            <circle class="v25-rip-2" cx="184" cy="90" r="3" fill="none" stroke="#A0A0AA" />
+                            <g class="v25-tear-drop">
+                                <path d="M184 69 C184 69 176.5 79.5 176.5 84.5 C176.5 88.8 179.8 92 184 92 C188.2 92 191.5 88.8 191.5 84.5 C191.5 79.5 184 69 184 69 Z" fill="url(#v25DropG)" stroke="#3A3A40" stroke-width="1.25" stroke-linejoin="round" />
                                 <path d="M180.5 82.5 C180 84.5 181 87 182.8 88" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" />
                             </g>
                         </svg>
                     </div>
-
-                    <!-- 标题与忧郁韩文诗句 -->
                     <div style="font-size:14.5px;font-weight:700;letter-spacing:3px;color:#2C2C32!important;margin-bottom:7px;">눈물의 궤적 · 泪之轨迹</div>
                     <div style="font-size:9.5px;color:#6E6E77!important;line-height:1.85;letter-spacing:0.4px;margin-bottom:20px;">
                         “ 천천히 이어지는 회색빛 눈물의 선,<br>그 끝에서 다시 너를 만난다. ”<br>
                         <span style="font-size:8.2px;color:#9A9AA5!important;display:block;margin-top:4px;">缓慢连结的灰白泪线，在尽头处与你重逢。</span>
                     </div>
-
-                    <!-- 底部点击进入胶囊 -->
                     <div style="display:inline-block;padding:6px 20px;background:#F4F4F8!important;border:1px solid #E2E2EA!important;border-radius:999px;font-size:8px;color:#484852!important;letter-spacing:2px;font-weight:700;">
                         TOUCH TO CONNECT · 触碰连结
                     </div>
                 </div>
-                <div style="font-size:7.5px;color:#A5A5B0!important;letter-spacing:1.8px;margin-top:16px;">SUMOUL APP · MONOCHROME TEAR ARCHIVE</div>
             `;
+            splash.onclick = () => splash.classList.add("fade-out");
+        }
+        renderTearBootSplash();
 
-            splash.onclick = () => {
-                splash.classList.add("fade-out");
-            };
+        // 4. 矢量图标库
+        const mkIco = (d, sz = 18, stroke = "%232C2C32", fill = "none", sw = "1.75") => `<img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${fill}' stroke='${stroke}' stroke-width='${sw}' stroke-linecap='round' stroke-linejoin='round'%3E${d}%3C/svg%3E" style="width:${sz}px!important;height:${sz}px!important;display:inline-block!important;vertical-align:middle!important;pointer-events:none!important;" />`;
+        const V_ICO = {
+            heart: mkIco("%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E", 19, "%232C2C32", "none"),
+            heartFill: mkIco("%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/%3E", 19, "%232C2C32", "%232C2C32"),
+            cmt: mkIco("%3Cpath d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'/%3E", 18, "%232C2C32", "none"),
+            send: mkIco("%3Cline x1='22' y1='2' x2='11' y2='13'/%3E%3Cpolygon points='22 2 15 22 11 13 2 9 22 2'/%3E", 17, "%232C2C32", "none"),
+            mark: mkIco("%3Cpath d='m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z'/%3E", 18, "%232C2C32", "none"),
+            more: mkIco("%3Ccircle cx='12' cy='12' r='1.2'/%3E%3Ccircle cx='19' cy='12' r='1.2'/%3E%3Ccircle cx='5' cy='12' r='1.2'/%3E", 15, "%237A7A85", "none", "2.2"),
+            dots: mkIco("%3Ccircle cx='12' cy='12' r='1.5' fill='%2355555E'/%3E%3Ccircle cx='18' cy='12' r='1.5' fill='%2355555E'/%3E%3Ccircle cx='6' cy='12' r='1.5' fill='%2355555E'/%3E", 20, "%2355555E", "none", "2"),
+            plus: mkIco("%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E", 10, "%23FFFFFF", "none", "2.5"),
+            pin: mkIco("%3Cpath d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E", 11, "%238E8E98", "none", "1.8")
+        };
+
+        const K_RECENT_CHARS = "sumoul_v21_recent_chars";
+        function recordRecentChar(name, ava) {
+            if (!name || name === "PARTNER" || name === "GROUP") return;
+            try {
+                let list = JSON.parse(localStorage.getItem(K_RECENT_CHARS) || "[]");
+                list = list.filter((x) => x.name !== name);
+                list.unshift({ name, ava, time: Date.now() });
+                localStorage.setItem(K_RECENT_CHARS, JSON.stringify(list.slice(0, 30)));
+            } catch (e) {}
+        }
+        function getRecentCharMap() {
+            try {
+                const list = JSON.parse(localStorage.getItem(K_RECENT_CHARS) || "[]");
+                const map = {};
+                list.forEach((x) => { map[x.name] = x.time; });
+                return map;
+            } catch (e) { return {}; }
         }
 
-        renderTearSplashDOM();
+        function getCtx() {
+            let userName = "ME", charName = "", charScopeId = "";
+            let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
+            let charDesc = "", recentChat = "", otherChars = [], totalOtherCount = 0;
+            try {
+                const st = topWin.SillyTavern?.getContext?.();
+                if (st) {
+                    userName = st.name1 || userName;
+                    if (st.characterId !== undefined && st.characters?.[st.characterId]) {
+                        const c = st.characters[st.characterId];
+                        charName = c.name || st.name2 || "";
+                        charScopeId = c.avatar || c.name || String(st.characterId);
+                        if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
+                        charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
+                    } else if (st.name2) { charName = st.name2; charScopeId = st.name2; }
+                    if (Array.isArray(st.chat) && st.chat.length) {
+                        recentChat = st.chat.slice(-8).map((m) => `${m.is_user ? userName : (charName || "TA")}: ${m.mes}`).join("\n");
+                    }
+                    if (charName) recordRecentChar(charName, charAvatar);
+                    const recentMap = getRecentCharMap();
+                    if (Array.isArray(st.characters) && st.characters.length > 0) {
+                        const allOthers = st.characters
+                            .filter((ch, idx) => ch && ch.name && String(idx) !== String(st.characterId) && ch.name !== charName)
+                            .map((ch) => {
+                                const stLastTime = Number(ch.date_last_chat) || Date.parse(ch.date_last_chat || "") || Number(ch.create_date) || 0;
+                                const localTime = recentMap[ch.name] || 0;
+                                return {
+                                    name: ch.name,
+                                    ava: ch.avatar ? `/characters/${encodeURIComponent(ch.avatar)}` : "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg",
+                                    sortScore: Math.max(localTime, stLastTime),
+                                    story: `【${ch.name} · 限时快拍】最近与你聊过天，更新了一条日常状态。`
+                                };
+                            })
+                            .sort((a, b) => b.sortScore - a.sortScore);
+                        totalOtherCount = allOthers.length;
+                        otherChars = allOthers.slice(0, 3);
+                    }
+                }
+            } catch (e) {}
 
-        // 3. 每次重新点击打开 Sumoul App 时，自动重置并重新播放一次「泪痕折线缓慢连结」动画
-        topDoc.addEventListener("click", (e) => {
-            const t = e.target;
-            if (!t || !t.closest) return;
-            if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
-                splash.classList.remove("fade-out");
-                renderTearSplashDOM();
+            const aiMes = topDoc.querySelectorAll('#chat .mes:not([is_user="true"]):not(.is_user)');
+            if (aiMes.length > 0) {
+                const lastAi = aiMes[aiMes.length - 1];
+                charName = lastAi.querySelector(".name_text")?.textContent?.trim() || charName;
+                charAvatar = lastAi.querySelector(".avatar img")?.src || charAvatar;
             }
+            const uMes = topDoc.querySelectorAll('#chat .mes[is_user="true"], #chat .mes.is_user');
+            if (uMes.length > 0) {
+                const lastU = uMes[uMes.length - 1];
+                userName = lastU.querySelector(".name_text")?.textContent?.trim() || userName;
+                userAvatar = lastU.querySelector(".avatar img")?.src || userAvatar;
+            }
+            if (!charName) charName = "PARTNER";
+            if (!charScopeId) charScopeId = charName;
+            recordRecentChar(charName, charAvatar);
+
+            const safeScope = String(charScopeId).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+            try {
+                const wRaw = localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || localStorage.getItem(`seoul_v15_wxcfg__${safeScope}`);
+                if (wRaw) {
+                    const wc = JSON.parse(wRaw);
+                    if (wc.myNick) userName = wc.myNick;
+                    if (wc.remark) charName = wc.remark;
+                    if (wc.myAva) userAvatar = wc.myAva;
+                    if (wc.charAva) charAvatar = wc.charAva;
+                }
+            } catch (e) {}
+            return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat, otherChars, totalOtherCount };
+        }
+
+        // 5. 强行重建 `#smt-page-space` 为全新的「韩国杂志画报级动态流」
+        spacePage.innerHTML = `
+            <div class="v25-stories-row" id="v25-stories-bar"></div>
+            <div id="v25-story-pop" style="display:none;background:#F8F8FA!important;border-bottom:1px solid #EAEAF0!important;padding:12px 14px!important;flex-shrink:0!important;"></div>
+            <div class="v25-filter-bar">
+                <div style="display:flex;gap:5px;">
+                    <span class="smt-pill-btn dark" data-v25filter="all">ALL · 全部画报</span>
+                    <span class="smt-pill-btn" data-v25filter="char" id="v25-filter-char">ONLY · TA</span>
+                </div>
+                <div style="display:flex;gap:5px;">
+                    <span class="smt-pill-btn" id="v25-user-post-btn">＋ 我发日常</span>
+                    <span class="smt-pill-btn dark" id="v25-ai-post-btn">✦ 让TA发新帖</span>
+                </div>
+            </div>
+            <div id="v25-post-drawer" class="smt-section-box" style="display:none;margin:8px 4px!important;flex-shrink:0;">
+                <div style="font-size:9.5px;font-weight:700;color:#2C2C32;margin-bottom:6px;">NEW EDITORIAL · 发布我的新动态</div>
+                <textarea id="v25-post-txt" style="width:100%;height:52px;background:#FFF;border:1px solid #E4E4EC;border-radius:9px;padding:7px;font-size:10.5px;font-weight:600;box-sizing:border-box;resize:none;margin-bottom:6px;outline:none;" placeholder="写下一句心情..."></textarea>
+                <input type="text" id="v25-post-img" class="smt-wx-input" style="width:100%;height:26px!important;font-size:9.5px!important;box-sizing:border-box;margin-bottom:7px;" placeholder="照片画面描述 或 粘贴图片URL (选填)..." />
+                <div style="display:flex;justify-content:flex-end;gap:5px;">
+                    <span class="smt-pill-btn" id="v25-post-cancel">取消</span>
+                    <span class="smt-pill-btn dark" id="v25-post-submit">发布</span>
+                </div>
+            </div>
+            <div id="v25-feed-stream" style="flex:1;min-height:0;overflow-y:auto;padding-bottom:18px;"></div>
+        `;
+
+        function getFeedKey() { return `sumoul_v19_boldfeed__${getCtx().safeScope}`; }
+        function getFeedData() {
+            const c = getCtx(), key = getFeedKey();
+            const def = {
+                owner: c.charName, myNote: "", charNote: "想你了",
+                charStory: `凌晨 · ${c.charName} 随手拍下窗外灰白色的街景，玻璃上映出半张侧脸，配文：“又到了会想起你的时间。”`,
+                posts: [{
+                    id: 1, isMe: false, author: c.charName, loc: "SEOUL · 한남동", time: "18分钟前", filmNo: "KODAK 400 · 01",
+                    photoDesc: `灰白色的雨夜车窗外，街角便利店的冷白灯光映在后视镜里，${c.charName} 的指尖搭在方向盘上，副驾驶座放着给你带的热饮。`,
+                    imgUrl: "", text: "비가 오니까 또 네 생각이 나네. 데리러 갈까?\n下雨了，又想起你。要去接你吗？",
+                    liked: true, likesCount: 52, comments: [{ who: "共同好友", text: "这副驾驶的位置永远是专属预留啊😏" }, { who: c.charName, text: "嗯，不载别人。" }]
+                }]
+            };
+            try { return Object.assign(def, JSON.parse(localStorage.getItem(key) || "{}")); } catch (e) { return def; }
+        }
+        function saveFeedData(d) { localStorage.setItem(getFeedKey(), JSON.stringify(d)); }
+
+        let curFilter = "all";
+
+        function renderV25Feed() {
+            const c = getCtx(), data = getFeedData();
+            const fBtn = topDoc.getElementById("v25-filter-char");
+            if (fBtn) fBtn.textContent = `只看 ${c.charName}`;
+
+            const extraList = c.otherChars.length > 0 ? c.otherChars : [
+                { name: "서윤", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `刚冲洗出来的黑白胶卷。` },
+                { name: "한남동", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `玻璃窗上的雨痕与浓缩咖啡。` }
+            ];
+            const remainCount = Math.max(0, c.totalOtherCount - extraList.length);
+
+            const bar = topDoc.getElementById("v25-stories-bar");
+            if (!bar) return;
+
+            const myBub = data.myNote
+                ? `<div class="v25-white-bubble"><span>${data.myNote}</span></div>`
+                : `<div class="v25-white-bubble muted"><span>想法...</span></div>`;
+            const charBub = `<div class="v25-white-bubble"><span>${data.charNote || "想你了"}</span></div>`;
+
+            bar.innerHTML = `
+                <div class="v25-story-cell" id="v25-st-me">
+                    ${myBub}
+                    <div class="v25-ring"><div class="v25-ring-in"><img src="${c.userAvatar}" /></div><span class="v25-plus-dot">${V_ICO.plus}</span></div>
+                    <div class="v25-story-label">${c.userName}</div>
+                </div>
+                <div class="v25-story-cell" id="v25-st-char">
+                    ${charBub}
+                    <div class="v25-ring active-char"><div class="v25-ring-in"><img src="${c.charAvatar}" /></div></div>
+                    <div class="v25-story-label">${c.charName}</div>
+                </div>
+                ${extraList.map((ch, idx) => `
+                    <div class="v25-story-cell" data-v25other="${idx}">
+                        <div class="v25-ring"><div class="v25-ring-in"><img src="${ch.ava}" /></div></div>
+                        <div class="v25-story-label">${ch.name}</div>
+                    </div>
+                `).join("")}
+                <div class="v25-story-cell" id="v25-st-dots">
+                    <div class="v25-ring"><div class="v25-ring-in" style="background:#F6F6FA!important;">${V_ICO.dots}</div></div>
+                    <div class="v25-story-label" style="color:#8E8E98!important;">${remainCount > 0 ? `+${remainCount} 更多` : "···"}</div>
+                </div>
+            `;
+
+            topDoc.getElementById("v25-st-me").onclick = () => {
+                const d = getFeedData(), v = prompt("写下你头像上方的纯白想法泡泡（留空则恢复默认）：", d.myNote || "");
+                if (v !== null) { d.myNote = v.trim().slice(0, 8); saveFeedData(d); renderV25Feed(); }
+            };
+
+            const pop = topDoc.getElementById("v25-story-pop");
+            topDoc.getElementById("v25-st-char").onclick = () => {
+                const d = getFeedData(); pop.style.display = "block";
+                pop.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:10px;color:#2C2C32;">${c.charName} · 24H 限时快拍</b><span id="v25-pop-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span></div><div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#3A3A40;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:10px 12px;">${d.charStory}</div>`;
+                pop.querySelector("#v25-pop-close").onclick = () => (pop.style.display = "none");
+            };
+
+            bar.querySelectorAll("[data-v25other]").forEach((el) => el.onclick = () => {
+                const ch = extraList[Number(el.getAttribute("data-v25other"))]; if (!ch) return;
+                pop.style.display = "block";
+                pop.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:10px;color:#2C2C32;">${ch.name} · 最近聊天快拍</b><span id="v25-pop-close2" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span></div><div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#3A3A40;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:10px 12px;">${ch.story}</div>`;
+                pop.querySelector("#v25-pop-close2").onclick = () => (pop.style.display = "none");
+            });
+
+            topDoc.getElementById("v25-st-dots").onclick = () => {
+                pop.style.display = "block";
+                pop.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:10px;color:#2C2C32;">RECENT CHARS · 最近聊天排序</b><span id="v25-pop-close3" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span></div><div style="font-size:10px;font-weight:600;color:#55555E;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:10px 12px;">已按你最近聊天的先后顺序排列（酒馆内共有 ${c.totalOtherCount} 位其他角色）。</div>`;
+                pop.querySelector("#v25-pop-close3").onclick = () => (pop.style.display = "none");
+            };
+
+            // 渲染全新「韩国独立摄影杂志画报流」
+            const stream = topDoc.getElementById("v25-feed-stream");
+            const posts = (data.posts || []).filter((p) => curFilter === "all" || !p.isMe);
+            if (!posts.length) {
+                stream.innerHTML = `<div style="text-align:center;padding:44px 16px;font-size:10.5px;font-weight:700;color:#9A9AA5;">暂无画报动态 · 点击右上角「让TA发新帖」</div>`;
+                return;
+            }
+
+            stream.innerHTML = posts.map((p, idx) => {
+                const ava = p.isMe ? c.userAvatar : c.charAvatar;
+                const name = p.isMe ? c.userName : c.charName;
+                const cmtsHtml = (p.comments && p.comments.length) ? `
+                    <div class="v25-mag-cmts">
+                        ${p.comments.map((cm) => `<div style="margin-bottom:3px;"><b style="color:#2C2C32;margin-right:5px;">${cm.who}</b><span style="color:#55555E;">${cm.text.replace(/</g, "&lt;")}</span></div>`).join("")}
+                    </div>` : "";
+
+                return `
+                    <div class="v25-mag-post">
+                        <div class="v25-mag-head">
+                            <div class="v25-mag-author">
+                                <img class="v25-mag-ava" src="${ava}" />
+                                <div>
+                                    <div style="font-size:11.5px;font-weight:800;color:#2C2C32;letter-spacing:.2px;">${name}</div>
+                                    <div style="display:flex;align-items:center;gap:3px;font-size:8.5px;font-weight:600;color:#8E8E98;margin-top:2px;">
+                                        ${V_ICO.pin}<span>${p.loc || "SEOUL"} · ${p.time || "刚刚"}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:8px;font-weight:700;color:#9A9AA5;font-family:monospace;">NO.0${idx + 1}</span>
+                                <span data-v25del="${p.id}" style="cursor:pointer;padding:4px;">${V_ICO.more}</span>
+                            </div>
+                        </div>
+
+                        <!-- 杂志级银盐灰白取景画幅 -->
+                        <div class="v25-mag-canvas">
+                            <div class="v25-canvas-top">
+                                <span>${p.filmNo || "MONO ARCHIVE · 35MM"}</span>
+                                <span>SEOUL EDITION</span>
+                            </div>
+                            ${p.imgUrl && /^https?:|^data:/.test(p.imgUrl) ? `<img class="v25-real-img" src="${p.imgUrl}" />` : ""}
+                            ${p.photoDesc ? `<div class="v25-canvas-desc">“ ${p.photoDesc.replace(/</g, "&lt;")} ”</div>` : ""}
+                        </div>
+
+                        <!-- 原版 INS 极简四图标栏 -->
+                        <div class="v25-mag-tools">
+                            <div style="display:flex;align-items:center;gap:15px;">
+                                <span data-v25like="${p.id}" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+                                    ${p.liked ? V_ICO.heartFill : V_ICO.heart}
+                                    <b style="font-size:10.5px;color:#2C2C32;">${p.likesCount || 42}</b>
+                                </span>
+                                <span data-v25cmt="${p.id}" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+                                    ${V_ICO.cmt}
+                                    <b style="font-size:10px;color:#55555E;">${(p.comments || []).length}</b>
+                                </span>
+                                <span style="cursor:pointer;display:inline-flex;align-items:center;">${V_ICO.send}</span>
+                            </div>
+                            <span style="cursor:pointer;display:inline-flex;align-items:center;">${V_ICO.mark}</span>
+                        </div>
+
+                        <!-- 粗体用户名与双语正文 -->
+                        <div class="v25-mag-text">
+                            <div style="white-space:pre-wrap;"><b style="margin-right:6px;font-weight:800;">${name}</b>${(p.text || "").replace(/</g, "&lt;")}</div>
+                        </div>
+
+                        ${cmtsHtml}
+                        <div data-v25cmt="${p.id}" style="padding:6px 6px 0 6px;font-size:9px;font-weight:600;color:#9A9AA5;cursor:pointer;">댓글 달기... 点击写下评论（TA会秒回你）</div>
+                    </div>
+                `;
+            }).join("");
+
+            stream.querySelectorAll("[data-v25like]").forEach((b) => b.onclick = () => {
+                const pid = Number(b.getAttribute("data-v25like")), d = getFeedData(), t = d.posts.find((x) => x.id === pid);
+                if (t) { t.liked = !t.liked; t.likesCount = Math.max(1, (t.likesCount || 10) + (t.liked ? 1 : -1)); saveFeedData(d); renderV25Feed(); }
+            });
+            stream.querySelectorAll("[data-v25del]").forEach((b) => b.onclick = () => {
+                if (!confirm("删除这条动态吗？")) return;
+                const pid = Number(b.getAttribute("data-v25del")), d = getFeedData();
+                d.posts = d.posts.filter((x) => x.id !== pid); saveFeedData(d); renderV25Feed();
+            });
+            stream.querySelectorAll("[data-v25cmt]").forEach((b) => b.onclick = async () => {
+                const pid = Number(b.getAttribute("data-v25cmt")), d = getFeedData(), target = d.posts.find((x) => x.id === pid);
+                if (!target) return;
+                const txt = prompt(`评论 ${target.author}：`); if (!txt || !txt.trim()) return;
+                const ctx = getCtx(); target.comments = target.comments || []; target.comments.push({ who: ctx.userName, text: txt.trim() }); saveFeedData(d); renderV25Feed();
+                try {
+                    const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, ""), k = topDoc.getElementById("smt-api-key")?.value?.trim(), m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
+                    if (!u || !k) return;
+                    const ep = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
+                    const r = await fetch(ep, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: `你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 900)}` }, { role: "user", content: `在动态「${target.text}」下方，${ctx.userName}评论了：“${txt.trim()}”。请简短回复(35字以内)：` }] }) });
+                    const resJson = await r.json(), aiReply = resJson?.choices?.[0]?.message?.content?.trim();
+                    if (aiReply) { const latest = getFeedData(), t2 = latest.posts.find((x) => x.id === pid); if (t2) { t2.comments.push({ who: `${ctx.charName} ▸ ${ctx.userName}`, text: aiReply }); saveFeedData(latest); renderV25Feed(); } }
+                } catch (e) {}
+            });
+        }
+
+        spacePage.querySelectorAll("[data-v25filter]").forEach((b) => b.onclick = () => {
+            spacePage.querySelectorAll("[data-v25filter]").forEach((x) => x.classList.remove("dark"));
+            b.classList.add("dark"); curFilter = b.getAttribute("data-v25filter"); renderV25Feed();
+        });
+
+        const pDrawer = topDoc.getElementById("v25-post-drawer");
+        topDoc.getElementById("v25-user-post-btn").onclick = () => { pDrawer.style.display = pDrawer.style.display === "none" ? "block" : "none"; };
+        topDoc.getElementById("v25-post-cancel").onclick = () => (pDrawer.style.display = "none");
+        topDoc.getElementById("v25-post-submit").onclick = () => {
+            const txt = topDoc.getElementById("v25-post-txt").value.trim(), imgInput = topDoc.getElementById("v25-post-img").value.trim();
+            if (!txt && !imgInput) return;
+            const c = getCtx(), d = getFeedData(), isUrl = /^https?:|^data:/.test(imgInput);
+            d.posts.unshift({ id: Date.now(), isMe: true, author: c.userName, loc: "SEOUL", time: "刚刚", filmNo: "MY FILM · 35MM", text: txt, imgUrl: isUrl ? imgInput : "", photoDesc: isUrl ? "" : (imgInput || "随手定格的日常瞬间"), liked: true, likesCount: 19, comments: [] });
+            saveFeedData(d); topDoc.getElementById("v25-post-txt").value = ""; topDoc.getElementById("v25-post-img").value = ""; pDrawer.style.display = "none"; renderV25Feed();
+        };
+
+        topDoc.getElementById("v25-ai-post-btn").onclick = async (e) => {
+            const c = getCtx(); e.target.textContent = "⏳ 生成中...";
+            try {
+                const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, ""), k = topDoc.getElementById("smt-api-key")?.value?.trim(), m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
+                if (!u || !k) { topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click(); throw new Error("请先在05.API设置填写地址与Key"); }
+                const ep = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
+                const r = await fetch(ep, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: `你是${c.charName}。人设：${c.charDesc.slice(0, 1000)}\n近期剧情：${c.recentChat}` }, { role: "user", content: `请在你的个人社交主页发一条新动态（韩国清冷白灰文艺风，与${c.userName}有关）。严格只输出JSON：{"loc":"首尔地点","note":"你头顶的5字以内纯白泡泡状态词","photoDesc":"45字以内的照片画面细腻描写","text":"动态正文(含1句韩文+中文翻译)","friendName":"1位共同好友的名字","friendComment":"该好友在底下的评论"}` }] }) });
+                const resJson = await r.json(), raw = resJson?.choices?.[0]?.message?.content?.trim() || "";
+                const mt = raw.match(/\{[\s\S]*\}/);
+                if (mt) {
+                    const obj = JSON.parse(mt[0]), d = getFeedData();
+                    if (obj.note) d.charNote = obj.note;
+                    d.posts.unshift({ id: Date.now(), isMe: false, author: c.charName, loc: obj.loc || "SEOUL", time: "刚刚", filmNo: "KODAK 400 · FILM", photoDesc: obj.photoDesc || "", imgUrl: "", text: obj.text || "", liked: false, likesCount: Math.floor(Math.random() * 50) + 25, comments: obj.friendComment ? [{ who: obj.friendName || "好友", text: obj.friendComment }] : [] });
+                    saveFeedData(d); renderV25Feed();
+                }
+            } catch (err) { alert(err.message); } finally { e.target.textContent = "✦ 让TA发新帖"; }
+        };
+
+        renderV25Feed();
+
+        // 6. 守护锁：如果前面残留的旧定时器试图把 spacePage 改回旧的 .kr-notes-tray，立即毫秒级拦截并重绘 V25 新版！
+        const guard = new MutationObserver(() => {
+            if (!topDoc.getElementById("v25-stories-bar")) {
+                renderV25Feed();
+            }
+        });
+        guard.observe(spacePage, { childList: true });
+
+        topDoc.querySelector('.smt-tab-item[data-page="space"]')?.addEventListener("click", () => {
+            topDoc.getElementById("smt-page-couple_app")?.classList.remove("active");
+            setTimeout(renderV25Feed, 20);
         }, true);
     }
 
-    mountTearLineSplash();
+    forceMountV25();
 })();
