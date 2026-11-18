@@ -4098,397 +4098,273 @@ bootSumoulApp();
     mountPrivateServerV46();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 微信沉浸全屏 + 韩系高定纯白磨砂「聊天设置中心」+ 世界书自动读取终极美学版】
-// 特点：0彩色Emoji！全套 1.5px 极细冷灰线性SVG图标 + iOS丝滑拨杆开关 + 韩系Bento磨砂卡片！
-// 用法：直接替换 index.js 最末尾刚才那段世界书/全屏补丁即可！
+// 🤍 【Sumoul App 微信全屏 + 100%纯白无灰底设置中心 + 4大新增微信玩法 + 世界书自动读取（完整无截断版）】
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    // ── 1. 全套高定 1.5px 极细冷灰 SVG 线性矢量图标库（零彩色 Emoji！） ──
-    const svgLine = (path, sz = 16, color = "#3A3A40", sw = "1.6") =>
-        `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${path}</svg>`;
+    const svgLine = (p, sz = 15, c = "#3A3A40", sw = "1.5") =>
+        `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
-    const LUX_ICO = {
+    const ICO = {
         sliders: svgLine(`<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>`, 14, "#3A3A40", "1.7"),
-        back: svgLine(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2C32", "1.9"),
-        sync: svgLine(`<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>`, 16, "#3A3A40"),
-        clock: svgLine(`<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>`, 16, "#3A3A40"),
-        summary: svgLine(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/>`, 16, "#3A3A40"),
-        palette: svgLine(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`, 16, "#3A3A40"),
-        book: svgLine(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`, 16, "#3A3A40"),
+        user: svgLine(`<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`),
+        camera: svgLine(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 12, "#484852"),
+        sync: svgLine(`<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>`),
+        clock: svgLine(`<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>`),
+        summary: svgLine(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/>`),
+        palette: svgLine(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`),
+        image: svgLine(`<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`),
+        feather: svgLine(`<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>`),
+        book: svgLine(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`),
         upload: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>`, 13, "#FFFFFF", "1.8"),
-        sparkle: svgLine(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13, "#3A3A40", "1.6"),
-        user: svgLine(`<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`, 15, "#3A3A40"),
-        camera: svgLine(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 13, "#55555E"),
-        trash: svgLine(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 14, "#9A6868"),
-        shield: svgLine(`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, 14, "#55555E"),
-        plus: svgLine(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13, "#3A3A40", "1.8"),
+        plus: svgLine(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
+        trash: svgLine(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 13, "#9A6868"),
+        shield: svgLine(`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, 13),
         check: svgLine(`<polyline points="20 6 9 17 4 12"/>`, 13, "#FFFFFF", "2"),
-        linkHeart: svgLine(`<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`, 14, "#8E8E98", "1.6")
+        heart: svgLine(`<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`, 13, "#9A9AA5"),
+        pin: svgLine(`<line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>`, 12, "#55555E")
     };
 
-    // ── 2. 世界书底层存储与解析引擎 ──
     function getCharScope() {
-        let scope = "";
+        let s = "";
         try {
             const st = topWin.SillyTavern?.getContext?.();
             if (st) {
-                if (st.characterId !== undefined && st.characters?.[st.characterId]) {
-                    const c = st.characters[st.characterId];
-                    scope = c.avatar || c.name || String(st.characterId);
-                } else if (st.groupId) scope = "group_" + String(st.groupId);
-                else if (st.name2) scope = st.name2;
+                if (st.characterId !== undefined && st.characters?.[st.characterId]) s = st.characters[st.characterId].avatar || st.characters[st.characterId].name || String(st.characterId);
+                else if (st.groupId) s = "group_" + String(st.groupId);
+                else if (st.name2) s = st.name2;
             }
         } catch (e) {}
-        if (!scope) {
-            const selCh = topDoc.querySelector("#rm_button_selected_ch h2, #character_name_pole");
-            if (selCh?.textContent?.trim()) scope = selCh.textContent.trim();
-        }
-        if (!scope) scope = "PARTNER";
-        return String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+        if (!s) s = topDoc.querySelector("#rm_button_selected_ch h2, #character_name_pole")?.textContent?.trim() || "PARTNER";
+        return String(s).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
     }
 
-    function getWiStorageKey() { return `sumoul_v16_worldinfo__${getCharScope()}`; }
+    function getExtraKey() { return `sumoul_v16_wxextra__${getCharScope()}`; }
+    function loadExtra() {
+        const def = { petNameForMe: "", pokeSuffix: "的小脑袋", pinNotice: "", replyCount: "2~4", styleTags: ["日常自然短句"], wallpaperUrl: "", wallpaperMask: "light" };
+        try { return Object.assign(def, JSON.parse(localStorage.getItem(getExtraKey()) || "{}")); } catch (e) { return def; }
+    }
+    function saveExtra(d) { try { localStorage.setItem(getExtraKey(), JSON.stringify(d)); } catch (e) {} }
 
-    function loadWorldInfo() {
+    function getWiKey() { return `sumoul_v16_worldinfo__${getCharScope()}`; }
+    function loadWi() {
         const def = { enabled: true, mode: "smart", entries: [] };
-        try { return Object.assign(def, JSON.parse(localStorage.getItem(getWiStorageKey()) || "{}")); } catch (e) { return def; }
+        try { return Object.assign(def, JSON.parse(localStorage.getItem(getWiKey()) || "{}")); } catch (e) { return def; }
     }
-    function saveWorldInfo(data) {
-        try { localStorage.setItem(getWiStorageKey(), JSON.stringify(data)); } catch (e) {}
+    function saveWi(d) { try { localStorage.setItem(getWiKey(), JSON.stringify(d)); } catch (e) {} }
+
+    function compressImg(file, maxDim = 720) {
+        return new Promise((res) => {
+            const r = new FileReader();
+            r.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = topDoc.createElement("canvas");
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
+                    else { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
+                    c.width = w; c.height = h; c.getContext("2d").drawImage(img, 0, 0, w, h);
+                    res(c.toDataURL("image/jpeg", 0.82));
+                };
+                img.src = String(ev.target?.result || "");
+            };
+            r.readAsDataURL(file);
+        });
+    }
+
+    function applyWallpaperAndPin() {
+        const ex = loadExtra();
+        const stream = topDoc.getElementById("smt-wx-stream");
+        const talkPage = topDoc.getElementById("smt-page-talk");
+        if (!stream || !talkPage) return;
+
+        if (ex.wallpaperUrl) {
+            let ov = "";
+            if (ex.wallpaperMask === "light") ov = "linear-gradient(rgba(255,255,255,0.55),rgba(255,255,255,0.55)),";
+            else if (ex.wallpaperMask === "mist") ov = "linear-gradient(rgba(255,255,255,0.82),rgba(255,255,255,0.82)),";
+            stream.style.setProperty("background-image", `${ov}url('${ex.wallpaperUrl}')`, "important");
+            stream.style.setProperty("background-size", "cover", "important");
+            stream.style.setProperty("background-position", "center", "important");
+        } else {
+            stream.style.removeProperty("background-image");
+        }
+
+        let pinBar = topDoc.getElementById("smt-wx-pin-banner");
+        if (!ex.pinNotice || !ex.pinNotice.trim()) {
+            if (pinBar) pinBar.style.display = "none";
+        } else {
+            if (!pinBar) {
+                pinBar = topDoc.createElement("div");
+                pinBar.id = "smt-wx-pin-banner";
+                pinBar.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:#FFFFFF;border-bottom:1px solid #F0F0F5;padding:6px 14px;font-size:9.5px;font-weight:600;color:#484852;flex-shrink:0;z-index:4;";
+                talkPage.insertBefore(pinBar, stream);
+            }
+            pinBar.style.display = "flex";
+            pinBar.innerHTML = `<div style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${ICO.pin}<span style="color:#2C2C32;">${ex.pinNotice.replace(/</g, "&lt;")}</span></div><span style="font-size:8px;color:#9A9AA5;flex-shrink:0;margin-left:8px;">PINNED</span>`;
+        }
     }
 
     function parseWorldBookJson(rawText, fileName = "WorldBook") {
-        const extracted = [];
+        const out = [];
         try {
             const obj = JSON.parse(rawText);
-            let rawEntries = [];
-            if (obj && typeof obj.entries === "object" && obj.entries !== null) {
-                rawEntries = Array.isArray(obj.entries) ? obj.entries : Object.values(obj.entries);
-            } else if (obj && obj.data && typeof obj.data.entries === "object") {
-                rawEntries = Array.isArray(obj.data.entries) ? obj.data.entries : Object.values(obj.data.entries);
-            } else if (obj && obj.character_book && obj.character_book.entries) {
-                rawEntries = Array.isArray(obj.character_book.entries) ? obj.character_book.entries : Object.values(obj.character_book.entries);
-            } else if (Array.isArray(obj)) {
-                rawEntries = obj;
-            }
-            rawEntries.forEach((item, idx) => {
-                if (!item || typeof item !== "object") return;
-                const content = String(item.content || item.entry || item.mes || item.description || "").trim();
+            let list = [];
+            if (obj?.entries) list = Array.isArray(obj.entries) ? obj.entries : Object.values(obj.entries);
+            else if (obj?.data?.entries) list = Array.isArray(obj.data.entries) ? obj.data.entries : Object.values(obj.data.entries);
+            else if (obj?.character_book?.entries) list = Array.isArray(obj.character_book.entries) ? obj.character_book.entries : Object.values(obj.character_book.entries);
+            else if (Array.isArray(obj)) list = obj;
+            list.forEach((it, idx) => {
+                if (!it || typeof it !== "object") return;
+                const content = String(it.content || it.entry || it.mes || it.description || "").trim();
                 if (!content) return;
-                let keys = [];
-                if (Array.isArray(item.key)) keys = item.key;
-                else if (Array.isArray(item.keys)) keys = item.keys;
-                else if (typeof item.key === "string") keys = item.key.split(/[,，]/);
+                let keys = Array.isArray(it.key) ? it.key : (Array.isArray(it.keys) ? it.keys : (typeof it.key === "string" ? it.key.split(/[,，]/) : []));
                 keys = keys.map((k) => String(k).trim()).filter(Boolean);
-                const title = String(item.comment || item.name || item.title || keys[0] || `${fileName} #${idx + 1}`).trim();
-                const isDisabled = item.disable === true || item.enabled === false;
-                const isConst = Boolean(item.constant) || keys.length === 0;
-                extracted.push({
-                    id: Date.now() + idx + Math.floor(Math.random() * 1000),
-                    title, keys, content, enabled: !isDisabled, constant: isConst
-                });
+                const title = String(it.comment || it.name || it.title || keys[0] || `${fileName} #${idx + 1}`).trim();
+                out.push({ id: Date.now() + idx + Math.floor(Math.random() * 1000), title, keys, content, enabled: !(it.disable === true || it.enabled === false), constant: Boolean(it.constant) || keys.length === 0 });
             });
         } catch (e) {
-            if (rawText && rawText.trim()) {
-                extracted.push({
-                    id: Date.now(), title: fileName.replace(/\.[^.]+$/, ""),
-                    keys: [], content: rawText.trim(), enabled: true, constant: true
-                });
-            }
+            if (rawText?.trim()) out.push({ id: Date.now(), title: fileName.replace(/\.[^.]+$/, ""), keys: [], content: rawText.trim(), enabled: true, constant: true });
         }
-        return extracted;
+        return out;
     }
 
-    async function extractTavernActiveLore() {
+    async function extractTavernLore() {
         const found = [];
         try {
             const st = topWin.SillyTavern?.getContext?.();
-            if (st && st.characterId !== undefined && st.characters?.[st.characterId]) {
-                const charObj = st.characters[st.characterId];
-                const cBook = charObj?.data?.character_book || charObj?.character_book;
-                if (cBook && cBook.entries) {
-                    const list = Array.isArray(cBook.entries) ? cBook.entries : Object.values(cBook.entries);
-                    list.forEach((item, idx) => {
-                        const content = String(item?.content || item?.entry || "").trim();
-                        if (!content) return;
-                        const keys = (Array.isArray(item.keys) ? item.keys : (Array.isArray(item.key) ? item.key : [])).map(String).filter(Boolean);
-                        found.push({
-                            id: Date.now() + idx,
-                            title: String(item.comment || item.name || keys[0] || `角色设定 #${idx + 1}`),
-                            keys, content,
-                            enabled: item.enabled !== false && item.disable !== true,
-                            constant: Boolean(item.constant) || keys.length === 0
-                        });
-                    });
-                }
-            }
-            if (topWin.world_info && typeof topWin.world_info === "object") {
-                const wiEntries = topWin.world_info.entries ? Object.values(topWin.world_info.entries) : [];
-                wiEntries.forEach((item, idx) => {
-                    const content = String(item?.content || "").trim();
+            const cBook = st?.characters?.[st.characterId]?.data?.character_book || st?.characters?.[st.characterId]?.character_book;
+            if (cBook?.entries) {
+                const list = Array.isArray(cBook.entries) ? cBook.entries : Object.values(cBook.entries);
+                list.forEach((it, i) => {
+                    const content = String(it?.content || it?.entry || "").trim();
                     if (!content) return;
-                    const keys = (Array.isArray(item.key) ? item.key : []).map(String).filter(Boolean);
-                    found.push({
-                        id: Date.now() + 500 + idx,
-                        title: String(item.comment || keys[0] || `世界书 #${idx + 1}`),
-                        keys, content, enabled: !item.disable,
-                        constant: Boolean(item.constant) || keys.length === 0
-                    });
+                    const keys = (Array.isArray(it.keys) ? it.keys : (Array.isArray(it.key) ? it.key : [])).map(String).filter(Boolean);
+                    found.push({ id: Date.now() + i, title: String(it.comment || it.name || keys[0] || `角色设定 #${i + 1}`), keys, content, enabled: it.enabled !== false && it.disable !== true, constant: Boolean(it.constant) || keys.length === 0 });
+                });
+            }
+            if (topWin.world_info?.entries) {
+                Object.values(topWin.world_info.entries).forEach((it, i) => {
+                    const content = String(it?.content || "").trim();
+                    if (!content) return;
+                    const keys = (Array.isArray(it.key) ? it.key : []).map(String).filter(Boolean);
+                    found.push({ id: Date.now() + 500 + i, title: String(it.comment || keys[0] || `世界书 #${i + 1}`), keys, content, enabled: !it.disable, constant: Boolean(it.constant) || keys.length === 0 });
                 });
             }
         } catch (e) {}
         return found;
     }
 
-    function buildActiveWorldInfoPrompt(contextText = "") {
-        const wi = loadWorldInfo();
-        if (!wi.enabled || !Array.isArray(wi.entries) || wi.entries.length === 0) return "";
-        const activeEntries = wi.entries.filter((e) => e && e.enabled && e.content);
-        if (activeEntries.length === 0) return "";
-        const matched = [];
-        const searchPool = String(contextText || "").toLowerCase();
-        activeEntries.forEach((entry) => {
-            if (wi.mode === "all" || entry.constant || !entry.keys || entry.keys.length === 0) {
-                matched.push(`【${entry.title}】：${entry.content}`);
-            } else {
-                const hit = entry.keys.some((k) => k && searchPool.includes(k.toLowerCase()));
-                if (hit) matched.push(`【${entry.title} (触发词:${entry.keys.join(",")})】：${entry.content}`);
-            }
-        });
-        if (matched.length === 0) return "";
-        return `\n\n【角色必须严格遵守的世界书 (World Info / Lorebook) 核心设定】：\n${matched.join("\n")}\n（请在回复中自然融入并严格遵守以上世界书设定与人物关系！）`;
+    function buildPromptInjection(contextText = "") {
+        let block = "";
+        const ex = loadExtra();
+        const rules = [];
+        if (ex.petNameForMe) rules.push(`你在微信里对用户的专属亲密称呼是「${ex.petNameForMe}」，请自然使用该称呼`);
+        if (ex.replyCount) rules.push(`每次请分 ${ex.replyCount} 条短句气泡回复（换行分隔）`);
+        if (ex.styleTags?.length) rules.push(`你的线上打字风格偏好：${ex.styleTags.join("、")}`);
+        if (rules.length) block += `\n\n【微信私聊语感与称呼要求】：${rules.join("；")}。`;
+
+        const wi = loadWi();
+        if (wi.enabled && wi.entries?.length) {
+            const matched = [];
+            const pool = String(contextText || "").toLowerCase();
+            wi.entries.filter((e) => e && e.enabled && e.content).forEach((e) => {
+                if (wi.mode === "all" || e.constant || !e.keys?.length || e.keys.some((k) => k && pool.includes(k.toLowerCase()))) {
+                    matched.push(`【${e.title}】：${e.content}`);
+                }
+            });
+            if (matched.length) block += `\n\n【角色必须遵守的世界书(World Info)核心设定】：\n${matched.join("\n")}`;
+        }
+        return block;
     }
 
-    function hookFetchForWorldInfo() {
-        const targetWin = window;
-        if (targetWin.__sumoul_wi_fetch_hooked) return;
-        targetWin.__sumoul_wi_fetch_hooked = true;
-        const origFetch = targetWin.fetch.bind(targetWin);
-        targetWin.fetch = async function (input, init) {
+    function hookFetch() {
+        if (window.__sumoul_wi_hook_v3) return;
+        window.__sumoul_wi_hook_v3 = true;
+        const orig = window.fetch.bind(window);
+        window.fetch = async function (input, init) {
             try {
-                const urlStr = typeof input === "string" ? input : (input?.url || "");
-                if (urlStr.includes("/chat/completions") && init && init.method === "POST" && typeof init.body === "string") {
-                    const bodyObj = JSON.parse(init.body);
-                    if (bodyObj && Array.isArray(bodyObj.messages) && bodyObj.messages.length > 0) {
-                        const allMsgText = bodyObj.messages.map((m) => m.content || "").join("\n");
-                        const wiBlock = buildActiveWorldInfoPrompt(allMsgText);
-                        if (wiBlock && !allMsgText.includes("【角色必须严格遵守的世界书")) {
-                            const sysMsg = bodyObj.messages.find((m) => m.role === "system") || bodyObj.messages[0];
-                            if (sysMsg) {
-                                sysMsg.content = `${sysMsg.content}${wiBlock}`;
-                                init.body = JSON.stringify(bodyObj);
-                            }
+                const u = typeof input === "string" ? input : (input?.url || "");
+                if (u.includes("/chat/completions") && init?.method === "POST" && typeof init.body === "string") {
+                    const body = JSON.parse(init.body);
+                    if (Array.isArray(body?.messages) && body.messages.length) {
+                        const allTxt = body.messages.map((m) => m.content || "").join("\n");
+                        const extra = buildPromptInjection(allTxt);
+                        if (extra && !allTxt.includes("【微信私聊语感与称呼要求】") && !allTxt.includes("【角色必须遵守的世界书")) {
+                            const sys = body.messages.find((m) => m.role === "system") || body.messages[0];
+                            if (sys) { sys.content += extra; init.body = JSON.stringify(body); }
                         }
                     }
                 }
             } catch (e) {}
-            return origFetch(input, init);
+            return orig(input, init);
         };
     }
 
-    // ── 3. 构建韩系高定纯白磨砂设置页 & 微信全屏视图 ──
-    function mountLuxuryKoreanSettings() {
+    function mountPureWhiteSettings() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const talkPage = topDoc.getElementById("smt-page-talk");
         const wxSetPage = topDoc.getElementById("smt-page-wx_settings");
         const topBadge = topDoc.getElementById("smt-top-badge");
         if (!modal || !talkPage || !wxSetPage || !topBadge) {
-            setTimeout(mountLuxuryKoreanSettings, 200);
+            setTimeout(mountPureWhiteSettings, 200);
             return;
         }
 
-        hookFetchForWorldInfo();
+        hookFetch();
+        applyWallpaperAndPin();
 
-        // 注入韩系高定设置页 & 微信全屏 CSS
+        // 注入 100% 纯白无灰底 CSS
         topDoc.getElementById("sumoul-wx-fullscreen-css")?.remove();
         const st = topDoc.createElement("style");
         st.id = "sumoul-wx-fullscreen-css";
         st.innerHTML = `
-            /* ── 1. 微信聊天页真·全屏沉浸化 ── */
-            #seoul-mini-theater-modal #smt-page-talk .smt-wx-top-bar {
-                display: none !important;
-            }
-            #seoul-mini-theater-modal .smt-fs-body:has(#smt-page-talk.active) {
-                padding: 0 !important;
-                max-width: 100% !important;
-            }
-            #seoul-mini-theater-modal #smt-page-talk {
-                padding: 0 !important;
-                background: #FFFFFF !important;
-            }
-            #seoul-mini-theater-modal #smt-wx-stream {
-                border: none !important;
-                border-radius: 0 !important;
-                margin-bottom: 0 !important;
-                padding: 14px 14px 10px 14px !important;
-                flex: 1 !important;
-            }
-            #seoul-mini-theater-modal #smt-page-talk .smt-wx-quick {
-                padding: 6px 12px 6px 12px !important;
-                background: #FFFFFF !important;
-                border-top: 1px solid #F4F4F8 !important;
-                margin: 0 !important;
-            }
-            #seoul-mini-theater-modal #smt-page-talk .smt-wx-bar {
-                margin: 0 10px 8px 10px !important;
-                border-radius: 999px !important;
-            }
-            #seoul-mini-theater-modal #smt-wx-reply-preview,
-            #seoul-mini-theater-modal #smt-wx-emoji-drawer {
-                margin: 0 10px 6px 10px !important;
-            }
+            #seoul-mini-theater-modal #smt-page-talk .smt-wx-top-bar { display: none !important; }
+            #seoul-mini-theater-modal .smt-fs-body:has(#smt-page-talk.active) { padding: 0 !important; max-width: 100% !important; }
+            #seoul-mini-theater-modal #smt-page-talk { padding: 0 !important; background: #FFFFFF !important; }
+            #seoul-mini-theater-modal #smt-wx-stream { border: none !important; border-radius: 0 !important; margin-bottom: 0 !important; padding: 14px 14px 10px 14px !important; flex: 1 !important; }
+            #seoul-mini-theater-modal #smt-page-talk .smt-wx-quick { padding: 6px 12px !important; background: #FFFFFF !important; border-top: 1px solid #F2F2F6 !important; margin: 0 !important; }
+            #seoul-mini-theater-modal #smt-page-talk .smt-wx-bar { margin: 0 10px 8px 10px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1px solid #EAEAF0 !important; }
+            #seoul-mini-theater-modal #smt-wx-reply-preview, #seoul-mini-theater-modal #smt-wx-emoji-drawer { margin: 0 10px 6px 10px !important; background: #FFFFFF !important; }
 
-            /* ── 2. 韩系高定聊天设置页 (#smt-page-wx_settings) 专属美学样式 ── */
-            #seoul-mini-theater-modal #smt-page-wx_settings {
-                background: #F6F6F9 !important;
-                margin: -10px -14px !important;
-                padding: 12px 14px 28px 14px !important;
-            }
-            #seoul-mini-theater-modal .lux-card {
-                background: #FFFFFF !important;
-                border: 1px solid #ECECF2 !important;
-                border-radius: 20px !important;
-                padding: 15px !important;
-                margin-bottom: 11px !important;
-                box-shadow: 0 4px 18px rgba(20, 20, 30, 0.025) !important;
-                flex-shrink: 0 !important;
-            }
-            #seoul-mini-theater-modal .lux-card-head {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                margin-bottom: 12px !important;
-            }
-            #seoul-mini-theater-modal .lux-card-title {
-                display: flex !important;
-                align-items: center !important;
-                gap: 7px !important;
-                font-size: 10.5px !important;
-                font-weight: 800 !important;
-                color: #2C2C32 !important;
-                letter-spacing: 0.4px !important;
-            }
-            #seoul-mini-theater-modal .lux-ico-box {
-                width: 30px !important;
-                height: 30px !important;
-                border-radius: 10px !important;
-                background: #F6F6F9 !important;
-                border: 1px solid #EAEAF0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                flex-shrink: 0 !important;
-            }
+            /* 设置页 100% 纯白背景 + 纯白无灰底极细下划线输入框 */
+            #seoul-mini-theater-modal #smt-page-wx_settings { background: #FFFFFF !important; margin: 0 !important; padding: 4px 2px 24px 2px !important; }
+            #seoul-mini-theater-modal .pw-card { background: #FFFFFF !important; border: 1px solid #EAEAF0 !important; border-radius: 18px !important; padding: 14px 15px !important; margin-bottom: 11px !important; box-shadow: 0 2px 10px rgba(0,0,0,0.015) !important; flex-shrink: 0 !important; }
+            #seoul-mini-theater-modal .pw-card-head { display: flex !important; align-items: center !important; justify-content: space-between !important; margin-bottom: 10px !important; padding-bottom: 8px !important; border-bottom: 1px solid #F4F4F8 !important; }
+            #seoul-mini-theater-modal .pw-card-title { display: flex !important; align-items: center !important; gap: 7px !important; font-size: 10.5px !important; font-weight: 800 !important; color: #2C2C32 !important; }
+            #seoul-mini-theater-modal .pw-ico-circle { width: 27px !important; height: 27px !important; border-radius: 9px !important; background: #FFFFFF !important; border: 1px solid #E6E6EE !important; display: flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; }
 
-            /* 韩系 iOS 丝滑胶囊拨杆开关 (Toggle Switch) */
-            #seoul-mini-theater-modal .lux-switch {
-                position: relative !important;
-                width: 38px !important;
-                height: 21px !important;
-                border-radius: 999px !important;
-                background: #E2E2EA !important;
-                cursor: pointer !important;
-                transition: background 0.25s ease !important;
-                flex-shrink: 0 !important;
-            }
-            #seoul-mini-theater-modal .lux-switch::after {
-                content: "" !important;
-                position: absolute !important;
-                top: 2.5px !important;
-                left: 2.5px !important;
-                width: 16px !important;
-                height: 16px !important;
-                border-radius: 50% !important;
-                background: #FFFFFF !important;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12) !important;
-                transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
-            }
-            #seoul-mini-theater-modal .lux-switch.on {
-                background: #3A3A42 !important;
-            }
-            #seoul-mini-theater-modal .lux-switch.on::after {
-                transform: translateX(17px) !important;
-            }
+            #seoul-mini-theater-modal .pw-line-row { display: flex !important; align-items: center !important; background: #FFFFFF !important; border: none !important; border-bottom: 1px solid #EFEFF5 !important; padding: 0 2px !important; height: 34px !important; margin-bottom: 2px !important; }
+            #seoul-mini-theater-modal .pw-line-row:focus-within { border-bottom-color: #3A3A42 !important; }
+            #seoul-mini-theater-modal .pw-line-lbl { font-size: 9.2px !important; font-weight: 700 !important; color: #7A7A85 !important; width: 68px !important; flex-shrink: 0 !important; text-align: left !important; }
+            #seoul-mini-theater-modal .pw-line-inp { flex: 1 !important; border: none !important; background: #FFFFFF !important; background-color: #FFFFFF !important; font-size: 10.5px !important; font-weight: 600 !important; color: #2C2C32 !important; outline: none !important; min-width: 0 !important; padding: 0 !important; height: 100% !important; }
+            #seoul-mini-theater-modal .pw-line-inp::placeholder { color: #B8B8C2 !important; font-weight: 500 !important; }
 
-            /* 2x2 高定快捷控制网格 */
-            #seoul-mini-theater-modal .lux-bento-grid {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 8px !important;
-            }
-            #seoul-mini-theater-modal .lux-bento-item {
-                background: #F9F9FB !important;
-                border: 1px solid #ECECF2 !important;
-                border-radius: 15px !important;
-                padding: 11px 12px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                cursor: pointer !important;
-                transition: all 0.18s ease !important;
-            }
-            #seoul-mini-theater-modal .lux-bento-item:active {
-                transform: scale(0.98) !important;
-                background: #F2F2F6 !important;
-            }
-            #seoul-mini-theater-modal .lux-bento-item.active-tab {
-                background: #FFFFFF !important;
-                border-color: #3A3A42 !important;
-                box-shadow: 0 4px 12px rgba(40, 40, 50, 0.06) !important;
-            }
+            #seoul-mini-theater-modal .pw-switch { position: relative !important; width: 36px !important; height: 20px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1.2px solid #D5D5E0 !important; cursor: pointer !important; transition: all 0.22s ease !important; flex-shrink: 0 !important; box-sizing: border-box !important; }
+            #seoul-mini-theater-modal .pw-switch::after { content: "" !important; position: absolute !important; top: 2px !important; left: 2px !important; width: 13.5px !important; height: 13.5px !important; border-radius: 50% !important; background: #9A9AA5 !important; transition: all 0.22s cubic-bezier(0.22,1,0.36,1) !important; }
+            #seoul-mini-theater-modal .pw-switch.on { background: #3A3A42 !important; border-color: #3A3A42 !important; }
+            #seoul-mini-theater-modal .pw-switch.on::after { background: #FFFFFF !important; transform: translateX(16px) !important; }
 
-            /* 干净细腻的无感输入行 */
-            #seoul-mini-theater-modal .lux-field-row {
-                display: flex !important;
-                align-items: center !important;
-                background: #F8F8FA !important;
-                border: 1px solid #ECECF2 !important;
-                border-radius: 11px !important;
-                padding: 0 11px !important;
-                height: 32px !important;
-                margin-bottom: 6px !important;
-            }
-            #seoul-mini-theater-modal .lux-field-lbl {
-                font-size: 9px !important;
-                font-weight: 700 !important;
-                color: #8E8E98 !important;
-                width: 54px !important;
-                flex-shrink: 0 !important;
-                text-align: left !important;
-            }
-            #seoul-mini-theater-modal .lux-field-inp {
-                flex: 1 !important;
-                border: none !important;
-                background: transparent !important;
-                font-size: 10.5px !important;
-                font-weight: 600 !important;
-                color: #2C2C32 !important;
-                outline: none !important;
-                min-width: 0 !important;
-            }
+            #seoul-mini-theater-modal .pw-grid-2x2 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+            #seoul-mini-theater-modal .pw-grid-cell { background: #FFFFFF !important; border: 1px solid #EAEAF0 !important; border-radius: 13px !important; padding: 10px 11px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; cursor: pointer !important; }
+            #seoul-mini-theater-modal .pw-grid-cell.active-cell { border-color: #3A3A42 !important; }
+
+            #seoul-mini-theater-modal .pw-chip { display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 24px !important; padding: 0 10px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1px solid #E4E4EC !important; font-size: 8.8px !important; font-weight: 600 !important; color: #6E6E77 !important; cursor: pointer !important; }
+            #seoul-mini-theater-modal .pw-chip.selected { background: #3A3A42 !important; border-color: #3A3A42 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; }
         `;
         topDoc.head.appendChild(st);
 
-        // 改造主顶栏右上角按钮：高定极细三道滑杆线性图标 + 「设置」
-        topBadge.innerHTML = `${LUX_ICO.sliders}<span style="margin-left:3px;font-weight:700;letter-spacing:0.5px;">设置</span>`;
-        topBadge.style.cssText = "display:inline-flex!important;align-items:center!important;gap:3px!important;height:26px!important;padding:0 10px!important;background:#F8F8FA!important;border:1px solid #E6E6EE!important;border-radius:999px!important;font-size:9px!important;color:#3A3A40!important;cursor:pointer!important;z-index:2!important;";
+        topBadge.innerHTML = `${ICO.sliders}<span style="margin-left:3px;font-weight:700;">设置</span>`;
+        topBadge.style.cssText = "display:inline-flex!important;align-items:center!important;gap:3px!important;height:26px!important;padding:0 10px!important;background:#FFFFFF!important;border:1px solid #E6E6EE!important;border-radius:999px!important;font-size:9px!important;color:#3A3A40!important;cursor:pointer!important;z-index:2!important;";
         topBadge.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (wxSetPage.classList.contains("active")) {
-                topDoc.getElementById("smt-wxset-back-chat")?.click();
-            } else {
-                topDoc.getElementById("smt-wx-cfg-btn")?.click();
-            }
+            e.preventDefault(); e.stopPropagation();
+            if (wxSetPage.classList.contains("active")) topDoc.getElementById("smt-wxset-back-chat")?.click();
+            else topDoc.getElementById("smt-wx-cfg-btn")?.click();
         };
 
-        // ── 把原本主代码里的旧 input 元素暂存起来（保持原有 ID 不变，直接嵌入新高级卡片中，100% 兼容主代码保存逻辑！） ──
         const cssDrawer = topDoc.getElementById("smt-wx-css-drawer");
         const sumDrawer = topDoc.getElementById("smt-wx-sum-drawer");
-
         const elBackChat = topDoc.getElementById("smt-wxset-back-chat");
         const elTimePill = topDoc.getElementById("smt-wxset-time-pill");
         const elTimeTitle = topDoc.getElementById("smt-wxset-time-title");
@@ -4512,485 +4388,446 @@ bootSumoulApp();
         const elResetBtn = topDoc.getElementById("smt-cfg-reset-btn");
         const elSaveBtn = topDoc.getElementById("smt-cfg-save-btn");
 
-        if (!elMyNick || topDoc.getElementById("lux-wxset-root")) return;
+        if (!elMyNick || topDoc.getElementById("pw-wxset-root")) return;
 
-        // 赋予旧 input 高定无边框样式
         [elMyNick, elMyBio, elMyAvaUrl, elRemark, elCharBio, elCharAvaUrl, elAvaSize].forEach((inp) => {
-            if (inp) inp.className = "lux-field-inp";
+            if (inp) {
+                inp.className = "pw-line-inp";
+                inp.style.cssText = "background:#FFFFFF!important;border:none!important;border-radius:0!important;padding:0!important;margin:0!important;height:100%!important;width:100%!important;font-size:10.5px!important;color:#2C2C32!important;outline:none!important;";
+            }
         });
 
-        // 隐藏主代码原本用于兼容的旧节点外壳，重新装配进全新高定布局
-        const hiddenCompatBox = topDoc.createElement("div");
-        hiddenCompatBox.style.cssText = "display:none!important;";
-        if (elTimeTitle) hiddenCompatBox.appendChild(elTimeTitle);
-        if (elTimeToggle) hiddenCompatBox.appendChild(elTimeToggle);
-        if (elClockBig) hiddenCompatBox.appendChild(elClockBig);
+        const hiddenBox = topDoc.createElement("div");
+        hiddenBox.style.cssText = "display:none!important;";
+        [elTimeTitle, elTimeToggle, elClockBig].forEach((el) => el && hiddenBox.appendChild(el));
 
-        // 重绘整个 #smt-page-wx_settings 为韩系高定纯白磨砂界面
         wxSetPage.innerHTML = `
-            <div id="lux-wxset-root" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
-                <!-- 顶部极简导航条 -->
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 12px 2px;flex-shrink:0;">
-                    <div id="lux-back-slot"></div>
-                    <div id="lux-time-slot"></div>
+            <div id="pw-wxset-root" style="display:flex;flex-direction:column;height:100%;background:#FFFFFF!important;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 10px 2px;background:#FFFFFF!important;flex-shrink:0;">
+                    <div id="pw-back-slot"></div>
+                    <div id="pw-time-slot"></div>
                 </div>
 
-                <!-- 滚动主内容区 -->
-                <div style="flex:1;min-height:0;overflow-y:auto;padding-right:2px;">
+                <div style="flex:1;min-height:0;overflow-y:auto;background:#FFFFFF!important;padding-right:2px;">
 
-                    <!-- 🤍 卡片 1：高定双人连结头像与人设名片 (COUPLE PROFILE) -->
-                    <div class="lux-card">
-                        <div class="lux-card-head">
-                            <div class="lux-card-title">
-                                <div class="lux-ico-box">${LUX_ICO.user}</div>
-                                <div>
-                                    <div>PROFILE &amp; AVATAR · 双人名片设置</div>
-                                    <div style="font-size:8px;font-weight:600;color:#9A9AA5;margin-top:1px;">点击上方圆形头像可直接从相册更换图片</div>
-                                </div>
+                    <!-- 模块 01：双人纯白头像与名片 -->
+                    <div class="pw-card">
+                        <div class="pw-card-head">
+                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.user}</div><span>01 · 双人头像与微信名片</span></div>
+                            <span style="font-size:8px;color:#9A9AA5;font-weight:600;">点击圆形头像直接换图</span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;text-align:center;background:#FFFFFF;border:1px solid #EFEFF5;border-radius:15px;padding:13px 8px;margin-bottom:10px;">
+                            <div style="display:flex;flex-direction:column;align-items:center;">
+                                <label style="position:relative;cursor:pointer;display:inline-block;">
+                                    <div id="pw-myava-img-slot"></div>
+                                    <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;">${ICO.camera}</span>
+                                    <div id="pw-myava-file-slot" style="display:none;"></div>
+                                </label>
+                                <span style="font-size:8.5px;font-weight:800;color:#484852;margin-top:5px;">ME · 我</span>
+                            </div>
+                            <div style="display:flex;flex-direction:column;align-items:center;">${ICO.heart}<div style="width:20px;height:1px;background:#EAEAF0;margin-top:4px;"></div></div>
+                            <div style="display:flex;flex-direction:column;align-items:center;">
+                                <label style="position:relative;cursor:pointer;display:inline-block;">
+                                    <div id="pw-charava-img-slot"></div>
+                                    <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;">${ICO.camera}</span>
+                                    <div id="pw-charava-file-slot" style="display:none;"></div>
+                                </label>
+                                <span style="font-size:8.5px;font-weight:800;color:#484852;margin-top:5px;">PARTNER · TA</span>
                             </div>
                         </div>
-
-                        <!-- 双人对称头像展示台 -->
-                        <div style="display:grid;grid-template-columns:1fr 36px 1fr;align-items:center;text-align:center;background:#F9F9FB;border:1px solid #EFEFF5;border-radius:16px;padding:14px 10px;margin-bottom:12px;">
-                            <div style="display:flex;flex-direction:column;align-items:center;">
-                                <label style="position:relative;cursor:pointer;display:inline-block;" title="点击更换我的头像">
-                                    <div id="lux-myava-img-slot"></div>
-                                    <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);">${LUX_ICO.camera}</span>
-                                    <div id="lux-myava-file-slot" style="display:none;"></div>
-                                </label>
-                                <span style="font-size:8.5px;font-weight:800;color:#55555E;margin-top:6px;letter-spacing:0.5px;">MY PROFILE · 我</span>
-                            </div>
-
-                            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0.65;">
-                                ${LUX_ICO.linkHeart}
-                                <div style="width:20px;height:1px;background:#DCDCE6;margin-top:4px;"></div>
-                            </div>
-
-                            <div style="display:flex;flex-direction:column;align-items:center;">
-                                <label style="position:relative;cursor:pointer;display:inline-block;" title="点击更换TA的头像">
-                                    <div id="lux-charava-img-slot"></div>
-                                    <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);">${LUX_ICO.camera}</span>
-                                    <div id="lux-charava-file-slot" style="display:none;"></div>
-                                </label>
-                                <span style="font-size:8.5px;font-weight:800;color:#55555E;margin-top:6px;letter-spacing:0.5px;">PARTNER · 对方</span>
-                            </div>
-                        </div>
-
-                        <!-- 我的信息表单 -->
-                        <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin:0 0 5px 4px;letter-spacing:0.5px;">01 / 我的微信资料</div>
-                        <div class="lux-field-row"><span class="lux-field-lbl">我的昵称</span><div id="lux-mynick-slot" style="flex:1;display:flex;"></div></div>
-                        <div class="lux-field-row"><span class="lux-field-lbl">状态签名</span><div id="lux-mybio-slot" style="flex:1;display:flex;"></div></div>
-                        <div class="lux-field-row" style="margin-bottom:12px!important;"><span class="lux-field-lbl">头像链接</span><div id="lux-myavaurl-slot" style="flex:1;display:flex;"></div></div>
-
-                        <!-- 对方信息表单 -->
-                        <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin:0 0 5px 4px;letter-spacing:0.5px;">02 / 对方备注与头像尺寸</div>
-                        <div class="lux-field-row"><span class="lux-field-lbl">专属备注</span><div id="lux-remark-slot" style="flex:1;display:flex;"></div></div>
-                        <div class="lux-field-row"><span class="lux-field-lbl">顶栏签名</span><div id="lux-charbio-slot" style="flex:1;display:flex;"></div></div>
-                        <div style="display:grid;grid-template-columns:1fr 105px;gap:6px;">
-                            <div class="lux-field-row" style="margin-bottom:0!important;"><span class="lux-field-lbl">TA头像URL</span><div id="lux-charavaurl-slot" style="flex:1;display:flex;"></div></div>
-                            <div class="lux-field-row" style="margin-bottom:0!important;padding:0 8px!important;"><span class="lux-field-lbl" style="width:42px!important;">尺寸px</span><div id="lux-avasize-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="pw-line-row"><span class="pw-line-lbl">我的昵称</span><div id="pw-mynick-slot" style="flex:1;height:100%;"></div></div>
+                        <div class="pw-line-row"><span class="pw-line-lbl">我的签名</span><div id="pw-mybio-slot" style="flex:1;height:100%;"></div></div>
+                        <div class="pw-line-row"><span class="pw-line-lbl">我的头像URL</span><div id="pw-myavaurl-slot" style="flex:1;height:100%;"></div></div>
+                        <div class="pw-line-row"><span class="pw-line-lbl">TA的备注名</span><div id="pw-remark-slot" style="flex:1;height:100%;"></div></div>
+                        <div class="pw-line-row"><span class="pw-line-lbl">TA顶栏状态</span><div id="pw-charbio-slot" style="flex:1;height:100%;"></div></div>
+                        <div style="display:grid;grid-template-columns:1fr 110px;gap:10px;">
+                            <div class="pw-line-row" style="border-bottom:none!important;"><span class="pw-line-lbl">TA头像URL</span><div id="pw-charavaurl-slot" style="flex:1;height:100%;"></div></div>
+                            <div class="pw-line-row" style="border-bottom:none!important;"><span class="pw-line-lbl" style="width:52px!important;">头像尺寸</span><div id="pw-avasize-slot" style="flex:1;height:100%;"></div></div>
                         </div>
                     </div>
 
-                    <!-- 🤍 卡片 2：韩系 2x2 智能控制中心 (记忆同步 / 真实时间 / 区间总结 / 气泡CSS) -->
-                    <div class="lux-card">
-                        <div class="lux-card-head">
-                            <div class="lux-card-title">
-                                <div class="lux-ico-box">${LUX_ICO.sparkle}</div>
-                                <div>
-                                    <div>CHAT STUDIO · 聊天控制与美化工作台</div>
-                                    <div style="font-size:8px;font-weight:600;color:#9A9AA5;margin-top:1px;">原微信顶栏功能已全部收纳至此</div>
-                                </div>
+                    <!-- 模块 02：亲密互动与 TA 的打字语感 -->
+                    <div class="pw-card">
+                        <div class="pw-card-head">
+                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.feather}</div><span>02 · 专属亲密称呼与 TA 的打字语感</span></div>
+                            <span style="font-size:8px;color:#9A9AA5;font-weight:600;">AI 实时感知</span>
+                        </div>
+                        <div class="pw-line-row"><span class="pw-line-lbl">TA叫我什么</span><input type="text" id="pw-inp-petname" class="pw-line-inp" placeholder="如：姐姐 / 宝宝 / 小笨蛋 (TA会在微信这样叫你)" /></div>
+                        <div class="pw-line-row"><span class="pw-line-lbl">拍一拍尾巴</span><input type="text" id="pw-inp-poke" class="pw-line-inp" placeholder="如：的小脑袋说今天也很想你" /></div>
+                        <div class="pw-line-row" style="margin-bottom:10px!important;"><span class="pw-line-lbl">置顶小横幅</span><input type="text" id="pw-inp-pin" class="pw-line-inp" placeholder="显示在聊天框最顶部的纪念句子 (留空隐藏)" /></div>
+
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+                            <span style="font-size:9px;font-weight:700;color:#55555E;">单次连发气泡数</span>
+                            <div style="display:flex;gap:5px;" id="pw-reply-cnt-group">
+                                <span class="pw-chip" data-rcnt="1~2">1~2条 (克制)</span>
+                                <span class="pw-chip selected" data-rcnt="2~4">2~4条 (自然)</span>
+                                <span class="pw-chip" data-rcnt="4~6">4~6条 (话痨)</span>
                             </div>
                         </div>
-
-                        <div class="lux-bento-grid">
-                            <!-- 拨杆 1：主线记忆互通 -->
-                            <div class="lux-bento-item" id="lux-card-sync">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.sync}</div>
-                                    <div style="text-align:left;">
-                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">主线记忆互通</div>
-                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;" id="lux-sync-sub">同步至酒馆上下文</div>
-                                    </div>
-                                </div>
-                                <div class="lux-switch" id="lux-sw-sync"></div>
-                            </div>
-
-                            <!-- 拨杆 2：真实时间感知 -->
-                            <div class="lux-bento-item" id="lux-card-time">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.clock}</div>
-                                    <div style="text-align:left;">
-                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">真实时间感知</div>
-                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;" id="lux-time-sub">感知现实昼夜时间</div>
-                                    </div>
-                                </div>
-                                <div class="lux-switch on" id="lux-sw-time"></div>
-                            </div>
-
-                            <!-- 抽屉触发 3：区间记忆总结 -->
-                            <div class="lux-bento-item" id="lux-card-sum">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.summary}</div>
-                                    <div style="text-align:left;">
-                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">微信区间总结</div>
-                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;">提炼记忆并注入主线</div>
-                                    </div>
-                                </div>
-                                <span style="font-size:10px;color:#8E8E98;font-weight:700;">▾</span>
-                            </div>
-
-                            <!-- 抽屉触发 4：气泡与尾巴 CSS 美化 -->
-                            <div class="lux-bento-item" id="lux-card-css">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div class="lux-ico-box" style="background:#FFFFFF!important;">${LUX_ICO.palette}</div>
-                                    <div style="text-align:left;">
-                                        <div style="font-size:10px;font-weight:800;color:#2C2C32;">气泡 CSS 美化</div>
-                                        <div style="font-size:7.8px;color:#8E8E98;margin-top:1px;">自定义气泡与小尾巴</div>
-                                    </div>
-                                </div>
-                                <span style="font-size:10px;color:#8E8E98;font-weight:700;">▾</span>
-                            </div>
+                        <div style="font-size:9px;font-weight:700;color:#55555E;margin-bottom:6px;">TA 的线上打字风格偏好（可多选）</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="pw-style-tags-group">
+                            <span class="pw-chip" data-stag="日常自然短句">日常自然短句</span>
+                            <span class="pw-chip" data-stag="清冷克制少话">清冷克制少话</span>
+                            <span class="pw-chip" data-stag="高粘人秒回撒娇">高粘人秒回撒娇</span>
+                            <span class="pw-chip" data-stag="句末爱带语气词">句末爱带语气词</span>
+                            <span class="pw-chip" data-stag="偶尔夹杂韩文短句">偶尔夹杂韩文</span>
+                            <span class="pw-chip" data-stag="带括号描写微表情动作">带括号神态动作</span>
                         </div>
-
-                        <!-- 总结与CSS展开插槽 -->
-                        <div id="lux-drawers-holder" style="margin-top:8px;"></div>
                     </div>
 
-                    <!-- 🤍 卡片 3：高定世界书挂载与角色自动读取 (WORLD INFO ARCHIVE) -->
-                    <div class="lux-card">
-                        <div class="lux-card-head" style="margin-bottom:8px!important;">
-                            <div class="lux-card-title">
-                                <div class="lux-ico-box">${LUX_ICO.book}</div>
-                                <div>
-                                    <div>WORLD INFO · 世界书导入与角色自动读取</div>
-                                    <div style="font-size:8px;font-weight:600;color:#9A9AA5;margin-top:1px;">微信私聊与全应用互动时自动读取世界观</div>
-                                </div>
+                    <!-- 模块 03：聊天背景壁纸 + 顶栏4大功能总控 -->
+                    <div class="pw-card">
+                        <div class="pw-card-head">
+                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.image}</div><span>03 · 聊天背景壁纸与控制工作台</span></div>
+                        </div>
+                        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+                            <label class="smt-pill-btn dark" style="height:26px!important;cursor:pointer;flex-shrink:0;">
+                                ${ICO.upload}<span>相册选壁纸</span>
+                                <input type="file" id="pw-wp-file" accept="image/*" style="display:none;" />
+                            </label>
+                            <div class="pw-line-row" style="flex:1;height:26px!important;margin:0!important;">
+                                <input type="text" id="pw-wp-url" class="pw-line-inp" placeholder="或粘贴聊天背景图 URL..." />
                             </div>
-                            <div class="lux-switch on" id="lux-sw-wi" title="开启/关闭角色自动读取世界书"></div>
+                            <span class="smt-pill-btn" id="pw-wp-clear" style="height:26px!important;">清除</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #F4F4F8;">
+                            <span style="font-size:8.5px;color:#8E8E98;font-weight:600;">壁纸白雾柔化度</span>
+                            <div style="display:flex;gap:5px;" id="pw-wp-mask-group">
+                                <span class="pw-chip" data-wpmask="none">原图清晰</span>
+                                <span class="pw-chip selected" data-wpmask="light">55% 柔白雾</span>
+                                <span class="pw-chip" data-wpmask="mist">82% 纯白雾</span>
+                            </div>
                         </div>
 
-                        <!-- 极简高定操作按钮排 -->
+                        <div class="pw-grid-2x2">
+                            <div class="pw-grid-cell" id="pw-cell-sync">
+                                <div style="display:flex;align-items:center;gap:7px;">${ICO.sync}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">主线记忆互通</div><div style="font-size:7.8px;color:#9A9AA5;" id="pw-sync-sub">同步至酒馆</div></div></div>
+                                <div class="pw-switch" id="pw-sw-sync"></div>
+                            </div>
+                            <div class="pw-grid-cell" id="pw-cell-time">
+                                <div style="display:flex;align-items:center;gap:7px;">${ICO.clock}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">真实时间感知</div><div style="font-size:7.8px;color:#9A9AA5;" id="pw-time-sub">感知现实昼夜</div></div></div>
+                                <div class="pw-switch on" id="pw-sw-time"></div>
+                            </div>
+                            <div class="pw-grid-cell" id="pw-cell-sum">
+                                <div style="display:flex;align-items:center;gap:7px;">${ICO.summary}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">微信区间总结</div><div style="font-size:7.8px;color:#9A9AA5;">提炼核心记忆</div></div></div>
+                                <span style="font-size:10px;color:#9A9AA5;">▾</span>
+                            </div>
+                            <div class="pw-grid-cell" id="pw-cell-css">
+                                <div style="display:flex;align-items:center;gap:7px;">${ICO.palette}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">气泡 CSS 美化</div><div style="font-size:7.8px;color:#9A9AA5;">气泡与双尾巴</div></div></div>
+                                <span style="font-size:10px;color:#9A9AA5;">▾</span>
+                            </div>
+                        </div>
+                        <div id="pw-drawers-holder" style="margin-top:8px;"></div>
+                    </div>
+
+                    <!-- 模块 04：世界书导入与自动读取 -->
+                    <div class="pw-card">
+                        <div class="pw-card-head">
+                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.book}</div><span>04 · 世界书 (World Info) 导入与自动读取</span></div>
+                            <div class="pw-switch on" id="pw-sw-wi"></div>
+                        </div>
                         <div style="display:flex;gap:6px;margin-bottom:9px;">
                             <label class="smt-pill-btn dark" style="flex:1.15;height:28px!important;cursor:pointer;border-radius:10px!important;">
-                                ${LUX_ICO.upload}<span>导入世界书 (.json/.txt)</span>
+                                ${ICO.upload}<span>导入世界书 (.json/.txt)</span>
                                 <input type="file" id="smt-wi-file-inp" accept=".json,.txt,.world" multiple style="display:none;" />
                             </label>
                             <span class="smt-pill-btn" id="smt-wi-sync-st-btn" style="flex:1;height:28px!important;border-radius:10px!important;">
-                                ${LUX_ICO.sync}<span>读取酒馆世界书</span>
+                                ${ICO.sync}<span>读取酒馆世界书</span>
                             </span>
-                            <span class="smt-pill-btn" id="smt-wi-open-add-drawer" style="height:28px!important;padding:0 10px!important;border-radius:10px!important;" title="手动新增单条设定">
-                                ${LUX_ICO.plus}<span>新增</span>
+                            <span class="smt-pill-btn" id="smt-wi-open-add-drawer" style="height:28px!important;padding:0 10px!important;border-radius:10px!important;">
+                                ${ICO.plus}<span>新增</span>
                             </span>
                         </div>
 
-                        <!-- 默认折叠的「手动新增世界书条目」精致抽屉 -->
-                        <div id="smt-wi-add-drawer" style="display:none;background:#F9F9FB;border:1px solid #EAEAF0;border-radius:13px;padding:10px;margin-bottom:9px;">
-                            <div style="display:flex;gap:6px;margin-bottom:6px;">
-                                <input type="text" id="smt-wi-new-title" class="smt-wx-input" style="width:38%!important;flex:none!important;height:26px!important;font-size:9.5px!important;border-radius:8px!important;" placeholder="设定标题 (如:同居规则)" />
-                                <input type="text" id="smt-wi-new-keys" class="smt-wx-input" style="flex:1!important;height:26px!important;font-size:9.5px!important;border-radius:8px!important;" placeholder="触发词逗号隔开 (留空则常驻生效)" />
-                            </div>
-                            <textarea id="smt-wi-new-content" style="width:100%;height:48px;background:#FFFFFF;border:1px solid #E6E6EC;border-radius:9px;padding:6px 8px;font-size:9.8px;color:#3A3A40;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;" placeholder="写下该条世界书的具体设定内容..."></textarea>
+                        <div id="smt-wi-add-drawer" style="display:none;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:13px;padding:10px;margin-bottom:9px;">
+                            <div class="pw-line-row"><span class="pw-line-lbl">设定标题</span><input type="text" id="smt-wi-new-title" class="pw-line-inp" placeholder="如：两人的初遇设定" /></div>
+                            <div class="pw-line-row"><span class="pw-line-lbl">触发关键词</span><input type="text" id="smt-wi-new-keys" class="pw-line-inp" placeholder="逗号隔开 (留空则常驻生效)" /></div>
+                            <textarea id="smt-wi-new-content" style="width:100%;height:48px;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:9px;padding:6px 8px;font-size:9.8px;color:#2C2C32;box-sizing:border-box;resize:none;outline:none;margin:6px 0;" placeholder="写下该条世界书的具体设定内容..."></textarea>
                             <div style="display:flex;justify-content:flex-end;gap:5px;">
                                 <span class="smt-pill-btn" id="smt-wi-cancel-add" style="height:24px!important;">收起</span>
                                 <span class="smt-pill-btn dark" id="smt-wi-add-btn" style="height:24px!important;">✓ 存入世界书</span>
                             </div>
                         </div>
 
-                        <!-- 世界书状态栏 -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0 2px;margin-bottom:6px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <span style="font-size:8.5px;font-weight:800;color:#7A7A85;" id="smt-wi-count-txt">已挂载设定 (0)</span>
                             <div style="display:flex;gap:10px;align-items:center;">
-                                <span id="smt-wi-mode-btn" style="font-size:8px;font-weight:700;color:#55555E;cursor:pointer;background:#F4F4F8;padding:2px 7px;border-radius:99px;">模式: 常驻+词触发</span>
+                                <span id="smt-wi-mode-btn" style="font-size:8px;font-weight:700;color:#55555E;cursor:pointer;border:1px solid #EAEAF0;padding:2px 7px;border-radius:99px;">模式: 常驻+词触发</span>
                                 <span id="smt-wi-clear-btn" style="font-size:8px;font-weight:700;color:#9A6868;cursor:pointer;">清空</span>
                             </div>
                         </div>
+                        <div id="smt-wi-entries-list" style="max-height:145px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
 
-                        <!-- 条目列表 -->
-                        <div id="smt-wi-entries-list" style="max-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
-
-                        <!-- 补充私聊背景小字条 -->
-                        <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #ECECF2;">
-                            <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:5px;">EXTRA NOTE · 当前微信私聊补充背景设定</div>
-                            <div id="lux-bgnote-slot"></div>
+                        <div style="margin-top:10px;padding-top:8px;border-top:1px solid #F4F4F8;">
+                            <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;">当前私聊补充背景便签</div>
+                            <div id="pw-bgnote-slot"></div>
                         </div>
                     </div>
 
-                    <!-- 🤍 卡片 4：底部快捷管理栏 (清空记录 / 恢复默认 / 管理员后台) -->
-                    <div class="lux-card" style="padding:12px 15px!important;margin-bottom:6px!important;">
+                    <!-- 模块 05：底部保存与管理 -->
+                    <div class="pw-card" style="padding:12px 15px!important;margin-bottom:6px!important;">
                         <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;">
-                            <span class="smt-pill-btn" id="lux-clear-wx-btn" style="flex:1;height:28px!important;border-radius:10px!important;color:#9A6868!important;border-color:#F0E0E0!important;background:#FFF9F9!important;">
-                                ${LUX_ICO.trash}<span>清空当前聊天记录</span>
+                            <span class="smt-pill-btn" id="pw-clear-wx-btn" style="flex:1;height:28px!important;border-radius:10px!important;color:#9A6868!important;">
+                                ${ICO.trash}<span>清空当前聊天记录</span>
                             </span>
-                            <span class="smt-pill-btn" id="lux-open-admin-btn" style="flex:1;height:28px!important;border-radius:10px!important;">
-                                ${LUX_ICO.shield}<span>管理员 / 锁屏后台</span>
+                            <span class="smt-pill-btn" id="pw-open-admin-btn" style="flex:1;height:28px!important;border-radius:10px!important;">
+                                ${ICO.shield}<span>管理员 / 锁屏后台</span>
                             </span>
                         </div>
                         <div style="display:flex;gap:8px;">
-                            <div id="lux-reset-slot" style="flex:0.8;display:flex;"></div>
-                            <div id="lux-save-slot" style="flex:1.4;display:flex;"></div>
+                            <div id="pw-reset-slot" style="flex:0.8;display:flex;"></div>
+                            <div id="pw-save-slot" style="flex:1.4;display:flex;"></div>
                         </div>
                     </div>
 
                 </div>
             </div>
         `;
-        wxSetPage.appendChild(hiddenCompatBox);
+        wxSetPage.appendChild(hiddenBox);
 
-        // ── 将原有 DOM 节点精准挂载进高定插槽中 ──
+        // 挂载原节点到纯白插槽
         if (elBackChat) {
             elBackChat.style.cssText = "height:28px!important;padding:0 12px!important;background:#FFFFFF!important;border:1px solid #E6E6EE!important;border-radius:999px!important;font-size:9.5px!important;font-weight:800!important;color:#2C2C32!important;";
-            topDoc.getElementById("lux-back-slot").appendChild(elBackChat);
+            topDoc.getElementById("pw-back-slot").appendChild(elBackChat);
         }
         if (elTimePill) {
             elTimePill.style.cssText = "height:26px!important;padding:0 10px!important;background:#FFFFFF!important;border:1px solid #ECECF2!important;border-radius:999px!important;font-size:8.5px!important;font-weight:700!important;color:#6E6E77!important;";
-            topDoc.getElementById("lux-time-slot").appendChild(elTimePill);
+            topDoc.getElementById("pw-time-slot").appendChild(elTimePill);
         }
-
         if (elMyAvaPrev) {
-            elMyAvaPrev.style.cssText = "width:58px!important;height:58px!important;border-radius:50%!important;object-fit:cover!important;border:2.5px solid #FFFFFF!important;box-shadow:0 4px 12px rgba(20,20,30,0.08)!important;display:block!important;";
-            topDoc.getElementById("lux-myava-img-slot").appendChild(elMyAvaPrev);
+            elMyAvaPrev.style.cssText = "width:56px!important;height:56px!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #EAEAF0!important;display:block!important;";
+            topDoc.getElementById("pw-myava-img-slot").appendChild(elMyAvaPrev);
         }
-        if (elMyAvaFile) topDoc.getElementById("lux-myava-file-slot").appendChild(elMyAvaFile);
-
+        if (elMyAvaFile) topDoc.getElementById("pw-myava-file-slot").appendChild(elMyAvaFile);
         if (elCharAvaPrev) {
-            elCharAvaPrev.style.cssText = "width:58px!important;height:58px!important;border-radius:50%!important;object-fit:cover!important;border:2.5px solid #FFFFFF!important;box-shadow:0 4px 12px rgba(20,20,30,0.08)!important;display:block!important;";
-            topDoc.getElementById("lux-charava-img-slot").appendChild(elCharAvaPrev);
+            elCharAvaPrev.style.cssText = "width:56px!important;height:56px!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #EAEAF0!important;display:block!important;";
+            topDoc.getElementById("pw-charava-img-slot").appendChild(elCharAvaPrev);
         }
-        if (elCharAvaFile) topDoc.getElementById("lux-charava-file-slot").appendChild(elCharAvaFile);
+        if (elCharAvaFile) topDoc.getElementById("pw-charava-file-slot").appendChild(elCharAvaFile);
 
-        if (elMyNick) topDoc.getElementById("lux-mynick-slot").appendChild(elMyNick);
-        if (elMyBio) topDoc.getElementById("lux-mybio-slot").appendChild(elMyBio);
-        if (elMyAvaUrl) topDoc.getElementById("lux-myavaurl-slot").appendChild(elMyAvaUrl);
-
-        if (elRemark) topDoc.getElementById("lux-remark-slot").appendChild(elRemark);
-        if (elCharBio) topDoc.getElementById("lux-charbio-slot").appendChild(elCharBio);
-        if (elCharAvaUrl) topDoc.getElementById("lux-charavaurl-slot").appendChild(elCharAvaUrl);
-        if (elAvaSize) topDoc.getElementById("lux-avasize-slot").appendChild(elAvaSize);
+        if (elMyNick) topDoc.getElementById("pw-mynick-slot").appendChild(elMyNick);
+        if (elMyBio) topDoc.getElementById("pw-mybio-slot").appendChild(elMyBio);
+        if (elMyAvaUrl) topDoc.getElementById("pw-myavaurl-slot").appendChild(elMyAvaUrl);
+        if (elRemark) topDoc.getElementById("pw-remark-slot").appendChild(elRemark);
+        if (elCharBio) topDoc.getElementById("pw-charbio-slot").appendChild(elCharBio);
+        if (elCharAvaUrl) topDoc.getElementById("pw-charavaurl-slot").appendChild(elCharAvaUrl);
+        if (elAvaSize) topDoc.getElementById("pw-avasize-slot").appendChild(elAvaSize);
 
         if (elBgNote) {
-            elBgNote.style.cssText = "width:100%!important;height:46px!important;background:#F8F8FA!important;border:1px solid #ECECF2!important;border-radius:11px!important;padding:7px 9px!important;font-size:9.8px!important;color:#3A3A40!important;box-sizing:border-box!important;resize:none!important;outline:none!important;";
-            topDoc.getElementById("lux-bgnote-slot").appendChild(elBgNote);
+            elBgNote.style.cssText = "width:100%!important;height:44px!important;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:10px!important;padding:6px 8px!important;font-size:9.8px!important;color:#2C2C32!important;box-sizing:border-box!important;resize:none!important;outline:none!important;";
+            topDoc.getElementById("pw-bgnote-slot").appendChild(elBgNote);
         }
-
         if (elResetBtn) {
-            elResetBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:9.5px!important;font-weight:700!important;";
-            topDoc.getElementById("lux-reset-slot").appendChild(elResetBtn);
+            elResetBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:9.5px!important;font-weight:700!important;background:#FFFFFF!important;";
+            topDoc.getElementById("pw-reset-slot").appendChild(elResetBtn);
         }
         if (elSaveBtn) {
             elSaveBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:10px!important;font-weight:800!important;background:#2C2C34!important;border-color:#2C2C34!important;";
-            elSaveBtn.innerHTML = `${LUX_ICO.check}<span>保存设置并返回聊天</span>`;
-            topDoc.getElementById("lux-save-slot").appendChild(elSaveBtn);
+            elSaveBtn.innerHTML = `${ICO.check}<span>保存全部设置并返回</span>`;
+            topDoc.getElementById("pw-save-slot").appendChild(elSaveBtn);
         }
 
-        const drawersHolder = topDoc.getElementById("lux-drawers-holder");
-        if (sumDrawer && drawersHolder) {
-            sumDrawer.style.cssText = "display:none;background:#F9F9FB!important;border:1px solid #EAEAF0!important;border-radius:14px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
-            drawersHolder.appendChild(sumDrawer);
+        const holder = topDoc.getElementById("pw-drawers-holder");
+        if (sumDrawer && holder) {
+            sumDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:13px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
+            holder.appendChild(sumDrawer);
         }
-        if (cssDrawer && drawersHolder) {
-            cssDrawer.style.cssText = "display:none;background:#F9F9FB!important;border:1px solid #EAEAF0!important;border-radius:14px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
-            drawersHolder.appendChild(cssDrawer);
+        if (cssDrawer && holder) {
+            cssDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:13px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
+            holder.appendChild(cssDrawer);
         }
 
-        // ── 绑定 2x2 高定控制中心交互 ──
-        function refreshToggleStates() {
+        // ── 同步与保存新增的 4 大微信玩法设置 ──
+        function syncExtraUI() {
+            const ex = loadExtra();
+            topDoc.getElementById("pw-inp-petname").value = ex.petNameForMe || "";
+            topDoc.getElementById("pw-inp-poke").value = ex.pokeSuffix || "";
+            topDoc.getElementById("pw-inp-pin").value = ex.pinNotice || "";
+            topDoc.getElementById("pw-wp-url").value = ex.wallpaperUrl?.startsWith("data:") ? "[已设置本地相册壁纸]" : (ex.wallpaperUrl || "");
+
+            topDoc.querySelectorAll("#pw-reply-cnt-group .pw-chip").forEach((c) => {
+                c.classList.toggle("selected", c.getAttribute("data-rcnt") === (ex.replyCount || "2~4"));
+            });
+            topDoc.querySelectorAll("#pw-style-tags-group .pw-chip").forEach((c) => {
+                c.classList.toggle("selected", (ex.styleTags || []).includes(c.getAttribute("data-stag")));
+            });
+            topDoc.querySelectorAll("#pw-wp-mask-group .pw-chip").forEach((c) => {
+                c.classList.toggle("selected", c.getAttribute("data-wpmask") === (ex.wallpaperMask || "light"));
+            });
+
             const isSync = localStorage.getItem("sumoul_v16_sync") === "true";
-            const swSync = topDoc.getElementById("lux-sw-sync");
-            const subSync = topDoc.getElementById("lux-sync-sub");
-            if (swSync) swSync.classList.toggle("on", isSync);
-            if (subSync) subSync.textContent = isSync ? "已开启 · 实时同步记忆" : "已关闭 · 独立私密聊天";
+            topDoc.getElementById("pw-sw-sync")?.classList.toggle("on", isSync);
+            topDoc.getElementById("pw-sync-sub").textContent = isSync ? "已开启同步" : "已关闭同步";
 
-            const isTimeOn = elTimeToggle ? elTimeToggle.classList.contains("dark") : true;
-            const swTime = topDoc.getElementById("lux-sw-time");
-            const subTime = topDoc.getElementById("lux-time-sub");
-            if (swTime) swTime.classList.toggle("on", isTimeOn);
-            if (subTime) subTime.textContent = isTimeOn ? "已开启 · 实时感知昼夜" : "已关闭时间感知";
+            const isTime = elTimeToggle ? elTimeToggle.classList.contains("dark") : true;
+            topDoc.getElementById("pw-sw-time")?.classList.toggle("on", isTime);
+            topDoc.getElementById("pw-time-sub").textContent = isTime ? "已开启感知" : "已关闭感知";
         }
 
-        topDoc.getElementById("lux-card-sync").onclick = () => {
-            topDoc.getElementById("smt-sync-toggle")?.click();
-            refreshToggleStates();
+        function saveCurrentExtraFromInputs() {
+            const ex = loadExtra();
+            ex.petNameForMe = topDoc.getElementById("pw-inp-petname").value.trim();
+            ex.pokeSuffix = topDoc.getElementById("pw-inp-poke").value.trim();
+            ex.pinNotice = topDoc.getElementById("pw-inp-pin").value.trim();
+            const rawWp = topDoc.getElementById("pw-wp-url").value.trim();
+            if (rawWp && rawWp !== "[已设置本地相册壁纸]") ex.wallpaperUrl = rawWp;
+            else if (!rawWp) ex.wallpaperUrl = "";
+            saveExtra(ex);
+            applyWallpaperAndPin();
+        }
+
+        ["pw-inp-petname", "pw-inp-poke", "pw-inp-pin", "pw-wp-url"].forEach((id) => {
+            topDoc.getElementById(id)?.addEventListener("change", saveCurrentExtraFromInputs);
+        });
+        elSaveBtn?.addEventListener("click", saveCurrentExtraFromInputs, true);
+
+        topDoc.querySelectorAll("#pw-reply-cnt-group .pw-chip").forEach((chip) => chip.onclick = () => {
+            const ex = loadExtra(); ex.replyCount = chip.getAttribute("data-rcnt"); saveExtra(ex); syncExtraUI();
+        });
+        topDoc.querySelectorAll("#pw-style-tags-group .pw-chip").forEach((chip) => chip.onclick = () => {
+            const ex = loadExtra(), tag = chip.getAttribute("data-stag");
+            ex.styleTags = ex.styleTags || [];
+            if (ex.styleTags.includes(tag)) ex.styleTags = ex.styleTags.filter((t) => t !== tag);
+            else ex.styleTags.push(tag);
+            saveExtra(ex); syncExtraUI();
+        });
+        topDoc.querySelectorAll("#pw-wp-mask-group .pw-chip").forEach((chip) => chip.onclick = () => {
+            const ex = loadExtra(); ex.wallpaperMask = chip.getAttribute("data-wpmask"); saveExtra(ex); syncExtraUI(); applyWallpaperAndPin();
+        });
+
+        topDoc.getElementById("pw-wp-file").onchange = async (e) => {
+            const f = e.target.files?.[0]; if (!f) return;
+            const dUrl = await compressImg(f, 720);
+            const ex = loadExtra(); ex.wallpaperUrl = dUrl; saveExtra(ex);
+            syncExtraUI(); applyWallpaperAndPin();
         };
-        topDoc.getElementById("lux-card-time").onclick = () => {
-            elTimeToggle?.click();
-            setTimeout(refreshToggleStates, 20);
+        topDoc.getElementById("pw-wp-clear").onclick = () => {
+            const ex = loadExtra(); ex.wallpaperUrl = ""; saveExtra(ex);
+            topDoc.getElementById("pw-wp-url").value = "";
+            applyWallpaperAndPin();
         };
-        topDoc.getElementById("lux-card-sum").onclick = (e) => {
-            const card = e.currentTarget;
+
+        // 增强微信「拍一拍」支持自定义后缀尾巴！
+        const pokeBtn = talkPage.querySelector('[data-wxact="poke"]');
+        if (pokeBtn) {
+            pokeBtn.addEventListener("click", (e) => {
+                const ex = loadExtra();
+                if (ex.pokeSuffix && ex.pokeSuffix.trim()) {
+                    setTimeout(() => {
+                        const sysNodes = talkPage.querySelectorAll(".smt-wx-sys");
+                        const lastSys = sysNodes[sysNodes.length - 1];
+                        if (lastSys && lastSys.textContent.includes("拍了拍") && !lastSys.textContent.includes(ex.pokeSuffix)) {
+                            lastSys.textContent += ` ${ex.pokeSuffix.trim()}`;
+                        }
+                    }, 30);
+                }
+            });
+        }
+
+        // 2x2 开关与抽屉
+        topDoc.getElementById("pw-cell-sync").onclick = () => { topDoc.getElementById("smt-sync-toggle")?.click(); syncExtraUI(); };
+        topDoc.getElementById("pw-cell-time").onclick = () => { elTimeToggle?.click(); setTimeout(syncExtraUI, 20); };
+        topDoc.getElementById("pw-cell-sum").onclick = (e) => {
             const show = sumDrawer.style.display !== "block";
             sumDrawer.style.display = show ? "block" : "none";
-            card.classList.toggle("active-tab", show);
+            e.currentTarget.classList.toggle("active-cell", show);
             if (cssDrawer) cssDrawer.style.display = "none";
-            topDoc.getElementById("lux-card-css")?.classList.remove("active-tab");
+            topDoc.getElementById("pw-cell-css")?.classList.remove("active-cell");
         };
-        topDoc.getElementById("lux-card-css").onclick = (e) => {
-            const card = e.currentTarget;
+        topDoc.getElementById("pw-cell-css").onclick = (e) => {
             const show = cssDrawer.style.display !== "block";
             cssDrawer.style.display = show ? "block" : "none";
-            card.classList.toggle("active-tab", show);
+            e.currentTarget.classList.toggle("active-cell", show);
             if (sumDrawer) sumDrawer.style.display = "none";
-            topDoc.getElementById("lux-card-sum")?.classList.remove("active-tab");
+            topDoc.getElementById("pw-cell-sum")?.classList.remove("active-cell");
             const ta = topDoc.getElementById("smt-wx-css-textarea");
             if (ta && !ta.value) topDoc.getElementById("smt-wx-css-btn")?.click();
         };
 
-        topDoc.getElementById("lux-clear-wx-btn").onclick = () => {
+        topDoc.getElementById("pw-clear-wx-btn").onclick = () => {
             if (confirm("确定要清空与当前角色的微信聊天记录吗？")) {
                 topDoc.getElementById("smt-wx-clear")?.click();
                 elBackChat?.click();
             }
         };
-        topDoc.getElementById("lux-open-admin-btn").onclick = () => {
-            topDoc.getElementById("smt-api-open-admin")?.click();
-        };
+        topDoc.getElementById("pw-open-admin-btn").onclick = () => topDoc.getElementById("smt-api-open-admin")?.click();
 
-        const cssUpload = topDoc.getElementById("smt-wx-css-upload");
-        if (cssUpload) {
-            cssUpload.onchange = async (ev) => {
-                const f = ev.target.files?.[0];
-                if (!f) return;
-                const txt = await f.text();
-                const ta = topDoc.getElementById("smt-wx-css-textarea");
-                if (ta) ta.value = txt;
-            };
-        }
+        // 世界书渲染与事件
+        function renderWiList() {
+            const wi = loadWi();
+            topDoc.getElementById("pw-sw-wi")?.classList.toggle("on", wi.enabled);
+            topDoc.getElementById("smt-wi-mode-btn").textContent = wi.mode === "all" ? "模式: 全部强注" : "模式: 常驻+词触发";
+            const enCnt = (wi.entries || []).filter((x) => x.enabled).length;
+            topDoc.getElementById("smt-wi-count-txt").textContent = `已启用 ${enCnt} / 共 ${wi.entries.length} 条设定`;
 
-        // ── 绑定高定世界书管理交互 ──
-        function renderLuxuryWiList() {
-            const wi = loadWorldInfo();
-            const swWi = topDoc.getElementById("lux-sw-wi");
-            const modeBtn = topDoc.getElementById("smt-wi-mode-btn");
-            const countTxt = topDoc.getElementById("smt-wi-count-txt");
             const listEl = topDoc.getElementById("smt-wi-entries-list");
-
-            if (swWi) swWi.classList.toggle("on", wi.enabled);
-            if (modeBtn) modeBtn.textContent = wi.mode === "all" ? "模式: 全部强注" : "模式: 常驻+词触发";
-
-            const enabledCnt = (wi.entries || []).filter((x) => x.enabled).length;
-            if (countTxt) countTxt.textContent = `ACTIVE LORE · 已启用 ${enabledCnt} / 共 ${wi.entries.length} 条设定`;
-
-            if (!wi.entries || wi.entries.length === 0) {
-                listEl.innerHTML = `<div style="text-align:center;padding:16px 12px;background:#F9F9FB;border:1px dashed #E2E2EA;border-radius:12px;font-size:9px;font-weight:600;color:#9A9AA5;">尚未挂载世界书 · 点击上方导入 .json 或读取酒馆设定</div>`;
+            if (!wi.entries?.length) {
+                listEl.innerHTML = `<div style="text-align:center;padding:14px;background:#FFFFFF;border:1px dashed #E2E2EA;border-radius:11px;font-size:9px;color:#9A9AA5;">尚未挂载世界书 · 点击上方导入 .json 或读取酒馆设定</div>`;
                 return;
             }
-
-            listEl.innerHTML = wi.entries.map((item, idx) => {
-                const isConst = wi.mode === "all" || item.constant || !item.keys?.length;
-                const tagHtml = isConst
-                    ? `<span style="background:#3A3A42;color:#FFF;padding:1.5px 6px;border-radius:99px;font-size:7.5px;font-weight:700;">常驻生效</span>`
-                    : `<span style="background:#EFEFF5;color:#55555E;padding:1.5px 6px;border-radius:99px;font-size:7.5px;font-weight:700;">触发词: ${item.keys.slice(0, 3).join(",")}</span>`;
-
+            listEl.innerHTML = wi.entries.map((it, idx) => {
+                const isConst = wi.mode === "all" || it.constant || !it.keys?.length;
+                const badge = isConst
+                    ? `<span style="background:#3A3A42;color:#FFF;padding:1px 6px;border-radius:99px;font-size:7.5px;">常驻</span>`
+                    : `<span style="border:1px solid #E2E2EA;color:#55555E;padding:1px 6px;border-radius:99px;font-size:7.5px;">词:${it.keys.slice(0, 3).join(",")}</span>`;
                 return `
-                    <div style="background:#F9F9FB;border:1px solid ${item.enabled ? "#E2E2EC" : "#F2F2F6"};border-radius:12px;padding:8px 10px;opacity:${item.enabled ? "1" : "0.5"};">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                            <label style="display:flex;align-items:center;gap:6px;font-size:9.8px;font-weight:800;color:#2C2C32;cursor:pointer;">
-                                <input type="checkbox" data-witoggle="${idx}" ${item.enabled ? "checked" : ""} style="accent-color:#3A3A42;" />
-                                <span>${item.title.replace(/</g, "&lt;")}</span>
-                                ${tagHtml}
+                    <div style="background:#FFFFFF;border:1px solid ${it.enabled ? "#E2E2EC" : "#F2F2F6"};border-radius:11px;padding:7px 10px;opacity:${it.enabled ? "1" : "0.5"};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                            <label style="display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:800;color:#2C2C32;cursor:pointer;">
+                                <input type="checkbox" data-witog="${idx}" ${it.enabled ? "checked" : ""} style="accent-color:#3A3A42;" />
+                                <span>${it.title.replace(/</g, "&lt;")}</span>${badge}
                             </label>
                             <div style="display:flex;gap:8px;align-items:center;">
-                                <span data-wiconst="${idx}" style="font-size:8px;font-weight:700;color:#7A7A85;cursor:pointer;">${item.constant ? "切为词触发" : "切为常驻"}</span>
+                                <span data-wicon="${idx}" style="font-size:8px;color:#7A7A85;cursor:pointer;">${it.constant ? "改词触发" : "设为常驻"}</span>
                                 <span data-widel="${idx}" style="font-size:9.5px;color:#9A6868;cursor:pointer;font-weight:700;">✕</span>
                             </div>
                         </div>
-                        <div style="font-size:8.8px;color:#6E6E77;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-left:18px;">
-                            ${item.content.replace(/</g, "&lt;")}
-                        </div>
+                        <div style="font-size:8.8px;color:#6E6E77;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-left:18px;">${it.content.replace(/</g, "&lt;")}</div>
                     </div>`;
             }).join("");
 
-            listEl.querySelectorAll("[data-witoggle]").forEach((cb) => cb.onchange = (e) => {
-                const i = Number(cb.getAttribute("data-witoggle")), d = loadWorldInfo();
-                if (d.entries[i]) { d.entries[i].enabled = e.target.checked; saveWorldInfo(d); renderLuxuryWiList(); }
-            });
-            listEl.querySelectorAll("[data-wiconst]").forEach((btn) => btn.onclick = () => {
-                const i = Number(btn.getAttribute("data-wiconst")), d = loadWorldInfo();
-                if (d.entries[i]) { d.entries[i].constant = !d.entries[i].constant; saveWorldInfo(d); renderLuxuryWiList(); }
-            });
-            listEl.querySelectorAll("[data-widel]").forEach((btn) => btn.onclick = () => {
-                const i = Number(btn.getAttribute("data-widel")), d = loadWorldInfo();
-                d.entries.splice(i, 1); saveWorldInfo(d); renderLuxuryWiList();
-            });
+            listEl.querySelectorAll("[data-witog]").forEach((cb) => cb.onchange = (e) => { const d = loadWi(); d.entries[Number(cb.getAttribute("data-witog"))].enabled = e.target.checked; saveWi(d); renderWiList(); });
+            listEl.querySelectorAll("[data-wicon]").forEach((b) => b.onclick = () => { const d = loadWi(), i = Number(b.getAttribute("data-wicon")); d.entries[i].constant = !d.entries[i].constant; saveWi(d); renderWiList(); });
+            listEl.querySelectorAll("[data-widel]").forEach((b) => b.onclick = () => { const d = loadWi(); d.entries.splice(Number(b.getAttribute("data-widel")), 1); saveWi(d); renderWiList(); });
         }
 
-        topDoc.getElementById("lux-sw-wi").onclick = () => {
-            const d = loadWorldInfo(); d.enabled = !d.enabled; saveWorldInfo(d); renderLuxuryWiList();
-        };
-        topDoc.getElementById("smt-wi-mode-btn").onclick = () => {
-            const d = loadWorldInfo(); d.mode = d.mode === "all" ? "smart" : "all"; saveWorldInfo(d); renderLuxuryWiList();
-        };
-        topDoc.getElementById("smt-wi-open-add-drawer").onclick = () => {
-            const dr = topDoc.getElementById("smt-wi-add-drawer");
-            dr.style.display = dr.style.display === "none" ? "block" : "none";
-        };
-        topDoc.getElementById("smt-wi-cancel-add").onclick = () => {
-            topDoc.getElementById("smt-wi-add-drawer").style.display = "none";
-        };
+        topDoc.getElementById("pw-sw-wi").onclick = () => { const d = loadWi(); d.enabled = !d.enabled; saveWi(d); renderWiList(); };
+        topDoc.getElementById("smt-wi-mode-btn").onclick = () => { const d = loadWi(); d.mode = d.mode === "all" ? "smart" : "all"; saveWi(d); renderWiList(); };
+        topDoc.getElementById("smt-wi-open-add-drawer").onclick = () => { const dr = topDoc.getElementById("smt-wi-add-drawer"); dr.style.display = dr.style.display === "none" ? "block" : "none"; };
+        topDoc.getElementById("smt-wi-cancel-add").onclick = () => { topDoc.getElementById("smt-wi-add-drawer").style.display = "none"; };
 
         topDoc.getElementById("smt-wi-file-inp").onchange = async (e) => {
-            const files = Array.from(e.target.files || []);
-            if (!files.length) return;
-            const d = loadWorldInfo();
-            let totalAdded = 0;
-            for (const f of files) {
-                const text = await f.text();
-                parseWorldBookJson(text, f.name).forEach((item) => { d.entries.unshift(item); totalAdded++; });
-            }
-            saveWorldInfo(d); e.target.value = ""; renderLuxuryWiList();
-            alert(`✓ 已导入 ${totalAdded} 条世界书设定！`);
+            const files = Array.from(e.target.files || []); if (!files.length) return;
+            const d = loadWi(); let cnt = 0;
+            for (const f of files) { const t = await f.text(); parseWorldBookJson(t, f.name).forEach((it) => { d.entries.unshift(it); cnt++; }); }
+            saveWi(d); e.target.value = ""; renderWiList(); alert(`✓ 成功导入 ${cnt} 条世界书设定！`);
         };
-
         topDoc.getElementById("smt-wi-sync-st-btn").onclick = async (e) => {
-            const btn = e.currentTarget;
-            const origHtml = btn.innerHTML;
-            btn.textContent = "读取中...";
-            const found = await extractTavernActiveLore();
-            btn.innerHTML = origHtml;
-            if (!found.length) return alert("未检测到内嵌世界书，请直接点击左侧「导入世界书」上传 .json 文件！");
-            const d = loadWorldInfo();
-            let added = 0;
-            found.forEach((item) => {
-                if (!d.entries.some((x) => x.title === item.title && x.content === item.content)) {
-                    d.entries.unshift(item); added++;
-                }
-            });
-            saveWorldInfo(d); renderLuxuryWiList();
-            alert(`✓ 已同步导入 ${added} 条世界书设定！`);
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "读取中...";
+            const found = await extractTavernLore(); btn.innerHTML = orig;
+            if (!found.length) return alert("未检测到内嵌世界书，请直接点击左侧「导入世界书」上传文件！");
+            const d = loadWi(); let cnt = 0;
+            found.forEach((it) => { if (!d.entries.some((x) => x.title === it.title && x.content === it.content)) { d.entries.unshift(it); cnt++; } });
+            saveWi(d); renderWiList(); alert(`✓ 已同步导入 ${cnt} 条世界书设定！`);
         };
-
         topDoc.getElementById("smt-wi-add-btn").onclick = () => {
-            const titleInp = topDoc.getElementById("smt-wi-new-title");
-            const keysInp = topDoc.getElementById("smt-wi-new-keys");
-            const contInp = topDoc.getElementById("smt-wi-new-content");
-            const content = contInp.value.trim();
-            if (!content) return alert("请填写世界书条目的具体设定内容！");
-            const keys = keysInp.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean);
-            const title = titleInp.value.trim() || keys[0] || `自定义设定 #${loadWorldInfo().entries.length + 1}`;
-            const d = loadWorldInfo();
-            d.entries.unshift({ id: Date.now(), title, keys, content, enabled: true, constant: keys.length === 0 });
-            saveWorldInfo(d);
-            titleInp.value = ""; keysInp.value = ""; contInp.value = "";
-            topDoc.getElementById("smt-wi-add-drawer").style.display = "none";
-            renderLuxuryWiList();
+            const tInp = topDoc.getElementById("smt-wi-new-title"), kInp = topDoc.getElementById("smt-wi-new-keys"), cInp = topDoc.getElementById("smt-wi-new-content");
+            const content = cInp.value.trim(); if (!content) return alert("请填写设定内容！");
+            const keys = kInp.value.split(/[,，]/).map((s) => s.trim()).filter(Boolean);
+            const title = tInp.value.trim() || keys[0] || `自定义设定 #${loadWi().entries.length + 1}`;
+            const d = loadWi(); d.entries.unshift({ id: Date.now(), title, keys, content, enabled: true, constant: keys.length === 0 });
+            saveWi(d); tInp.value = ""; kInp.value = ""; cInp.value = "";
+            topDoc.getElementById("smt-wi-add-drawer").style.display = "none"; renderWiList();
         };
-
-        topDoc.getElementById("smt-wi-clear-btn").onclick = () => {
-            if (!confirm("确定清空当前角色的所有世界书条目吗？")) return;
-            const d = loadWorldInfo(); d.entries = []; saveWorldInfo(d); renderLuxuryWiList();
-        };
+        topDoc.getElementById("smt-wi-clear-btn").onclick = () => { if (confirm("确定清空世界书条目吗？")) { const d = loadWi(); d.entries = []; saveWi(d); renderWiList(); } };
 
         topDoc.getElementById("smt-wx-cfg-btn")?.addEventListener("click", () => {
-            setTimeout(() => {
-                refreshToggleStates();
-                renderLuxuryWiList();
-            }, 30);
+            setTimeout(() => { syncExtraUI(); renderWiList(); }, 30);
         });
 
-        refreshToggleStates();
-        renderLuxuryWiList();
+        syncExtraUI();
+        renderWiList();
     }
 
-    mountLuxuryKoreanSettings();
+    mountPureWhiteSettings();
 })();
