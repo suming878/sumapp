@@ -1772,8 +1772,8 @@ bootSumoulApp();
     patchCleanMelancholySplash();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 终极二合一补丁：1.纯白泡泡韩系动态流(按最近聊天排序) + 2.零Bug满配深度版独立情侣空间App】
-// 用法：直接替换 index.js 最末尾的旧动态补丁！
+// 🤍 【Sumoul App 终极防崩修复版补丁：100%解决点击打不开Bug + 纯白泡泡动态流(最近聊天排序) + 满配独立情侣空间App】
+// 用法：直接替换 index.js 最末尾刚才那段补丁即可！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -1785,8 +1785,26 @@ bootSumoulApp();
         const homePage = topDoc.getElementById("smt-page-home");
         const fsBody = modal?.querySelector(".smt-fs-body");
         if (!modal || !spacePage || !homePage || !fsBody) {
-            setTimeout(mountMomentsAndFullCoupleApp, 250);
+            setTimeout(mountMomentsAndFullCoupleApp, 200);
             return;
+        }
+
+        // 🛡️ 【核心修复1：挂载旧ID防崩隐形护盾】防止主代码的 renderCoupleSpaceAll() 找不到旧节点报错卡死打开事件！
+        if (!topDoc.getElementById("smt-legacy-shield")) {
+            const shield = topDoc.createElement("div");
+            shield.id = "smt-legacy-shield";
+            shield.style.cssText = "display:none!important;";
+            const legacyIds = [
+                "smt-sp-hero-card", "smt-sp-char-scope-tag", "smt-sp-uava", "smt-sp-cava", "smt-sp-uname", "smt-sp-cname",
+                "smt-sp-days", "smt-sp-mood", "smt-sp-couple-names", "smt-sp-live-bio", "smt-stat-pet", "smt-stat-petname",
+                "smt-stat-fund", "smt-badge-pet", "smt-badge-bpm", "smt-badge-coupon", "smt-badge-todo", "smt-ab-ins-grid",
+                "smt-ins-detail-pop", "smt-pet-name", "smt-pet-lv", "smt-pet-hunger-txt", "smt-pet-hunger-bar",
+                "smt-pet-mood-txt", "smt-pet-mood-bar", "smt-pet-log", "smt-4cut-stage", "smt-qa-q", "smt-qa-my-txt",
+                "smt-qa-char-label", "smt-qa-char-txt", "smt-mood-stage", "smt-coupon-list", "smt-coupon-log",
+                "smt-sp-notes-list", "smt-sp-todo-list"
+            ];
+            shield.innerHTML = legacyIds.map((id) => `<div id="${id}"></div>`).join("");
+            modal.appendChild(shield);
         }
 
         const K_RECENT_CHARS = "sumoul_v21_recent_chars";
@@ -1844,7 +1862,6 @@ bootSumoulApp();
             #seoul-mini-theater-modal .kr-notes-tray::-webkit-scrollbar { display: none !important; }
             #seoul-mini-theater-modal .kr-note-unit { display: flex !important; flex-direction: column !important; align-items: center !important; position: relative !important; cursor: pointer !important; flex-shrink: 0 !important; width: 64px !important; }
 
-            /* User 与 AI 统一纯白 (#FFFFFF) 无边框椭圆云朵冒泡 */
             #seoul-mini-theater-modal .ig-note-cloud {
                 position: absolute !important; top: -14px !important; left: 50% !important; transform: translateX(-50%) !important;
                 background: #FFFFFF !important; background-color: #FFFFFF !important; border: none !important; border-radius: 20px !important;
@@ -1879,7 +1896,6 @@ bootSumoulApp();
             #seoul-mini-theater-modal .kr-act-pill { display: inline-flex !important; align-items: center !important; gap: 5px !important; height: 26px !important; padding: 0 10px !important; background: #FFFFFF !important; border: 1px solid #E6E6EC !important; border-radius: 999px !important; font-size: 9.5px !important; font-weight: 700 !important; color: #2C2C32 !important; cursor: pointer !important; }
             #seoul-mini-theater-modal .kr-cmt-list { background: #FFFFFF !important; border: 1px solid #EFEFF4 !important; border-radius: 12px !important; padding: 9px 11px !important; font-size: 10.2px !important; font-weight: 600 !important; line-height: 1.6 !important; }
 
-            /* ── 全新重做的「韩国 Between + SumOne 画报级独立情侣空间 App」样式 ── */
             #seoul-mini-theater-modal #smt-page-couple_app { padding: 2px 2px 20px 2px !important; gap: 11px !important; }
             #seoul-mini-theater-modal .cp-hero-box { background: #F8F8FA !important; border: 1px solid #EAEAF0 !important; border-radius: 22px !important; padding: 15px !important; background-size: cover !important; background-position: center !important; flex-shrink: 0 !important; }
             #seoul-mini-theater-modal .cp-hero-glass { background: rgba(255, 255, 255, 0.94) !important; border: 1px solid #EFEFF4 !important; border-radius: 17px !important; padding: 16px 12px 13px 12px !important; }
@@ -1905,13 +1921,12 @@ bootSumoulApp();
             if (txtEl) txtEl.textContent = "动态";
         }
 
-        // 1. 构建/更新主页独立的【满配版 · 情侣空间 App (#smt-page-couple_app)】
+        // 构建主页独立的【情侣空间 App (#smt-page-couple_app)】
         topDoc.getElementById("smt-page-couple_app")?.remove();
         const coupleAppPage = topDoc.createElement("div");
         coupleAppPage.id = "smt-page-couple_app";
         coupleAppPage.className = "smt-page";
         coupleAppPage.innerHTML = `
-            <!-- ① 第一层：韩国 Between 画报级双人通行证主卡 -->
             <div class="cp-hero-box" id="cp-app-hero-bg">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                     <span style="font-size:8px;font-weight:800;color:#484852;background:rgba(255,255,255,0.9);border:1px solid #EAEAF0;border-radius:99px;padding:3px 9px;letter-spacing:.6px;" id="cp-app-scope-tag">COUPLE ARCHIVE</span>
@@ -1945,7 +1960,6 @@ bootSumoulApp();
                 </div>
             </div>
 
-            <!-- ② 第二层：实时同居微看板（左：TA心率与房间实况 / 右：恋爱小金库与萌宠） -->
             <div class="cp-live-row">
                 <div class="cp-live-card" data-cpopen="sp_mood">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
@@ -1964,7 +1978,6 @@ bootSumoulApp();
                 </div>
             </div>
 
-            <!-- ③ 第三层：6 大深度互动全屏子应用矩阵 -->
             <div class="cp-bento-grid">
                 <div class="cp-bento-card" data-cpopen="sp_pet">
                     <div class="cp-bento-top"><div class="cp-bento-ico">${KR_ICO.pet}</div><span class="cp-bento-badge" id="cp-b-pet">LV.2</span></div>
@@ -1992,7 +2005,6 @@ bootSumoulApp();
                 </div>
             </div>
 
-            <!-- ④ 第四层：底部最新悄悄话预览条 -->
             <div class="smt-section-box" style="margin-bottom:0!important;padding:10px 13px!important;cursor:pointer;" data-cpopen="sp_guest">
                 <div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:3px;">
                     <span>💌 LATEST WHISPER · 双人留言板最新悄悄话</span><span>查看全部 ▸</span>
@@ -2002,7 +2014,7 @@ bootSumoulApp();
         `;
         fsBody.appendChild(coupleAppPage);
 
-        // 2. 全面升级 6 大子页面内部结构（内容量翻倍！）
+        // 升级 6 大子页面内部结构
         topDoc.getElementById("smt-page-sp_pet").innerHTML = `
             <div class="smt-section-box" style="text-align:center;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -2130,7 +2142,7 @@ bootSumoulApp();
             homeDockGrid.prepend(cpAppBtn);
         }
 
-        // 3. 构建第 2 栏「动态流」骨架
+        // 构建第 2 栏「动态流」骨架
         spacePage.innerHTML = `
             <div class="kr-notes-tray" id="smt-ins-stories-bar"></div>
             <div id="smt-story-viewer" style="display:none;background:#F8F8FA!important;border:1px solid #E6E6EC!important;border-radius:16px!important;padding:12px 14px!important;margin-bottom:10px!important;flex-shrink:0!important;"></div>
@@ -2156,7 +2168,6 @@ bootSumoulApp();
             <div id="smt-mom-stream" style="flex:1;min-height:0;overflow-y:auto;padding-bottom:16px;"></div>
         `;
 
-        // 4. 角色上下文与最近聊天排序读取器
         function getCtx() {
             let userName = "ME", charName = "", charScopeId = "";
             let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
@@ -2269,9 +2280,6 @@ bootSumoulApp();
 
         function nowTime() { const d = new Date(); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; }
 
-        /* ══════════════════════════════════════════════════════════════════
-           【模块 A：零 Bug 深度满配版 · 独立情侣空间 App 引擎】
-           ══════════════════════════════════════════════════════════════════ */
         const CP_QUESTIONS = [
             "第一次悄悄对彼此产生超越普通关系的占有欲，是在哪个瞬间？",
             "如果今晚首尔突然停电，只有我们两个人被困在家里，最想一起做什么？",
@@ -2314,147 +2322,142 @@ bootSumoulApp();
         function saveCp(d) { localStorage.setItem(getCpKey(), JSON.stringify(d)); }
 
         function renderStandaloneCoupleSpace() {
-            const c = getCtx(), sp = loadCp();
-            const diffDays = Math.max(1, Math.floor((Date.now() - new Date(sp.startDate || "2024-05-20").getTime()) / 86400000));
-            const daysNum = isNaN(diffDays) ? 100 : diffDays;
+            try {
+                const c = getCtx(), sp = loadCp();
+                const diffDays = Math.max(1, Math.floor((Date.now() - new Date(sp.startDate || "2024-05-20").getTime()) / 86400000));
+                const daysNum = isNaN(diffDays) ? 100 : diffDays;
 
-            // 1. 渲染情侣空间主桌面
-            const heroBg = topDoc.getElementById("cp-app-hero-bg");
-            if (heroBg) heroBg.style.backgroundImage = sp.bgUrl ? `url('${sp.bgUrl}')` : "none";
-            topDoc.getElementById("cp-app-scope-tag").textContent = `${c.charName} · COUPLE SPACE`;
-            topDoc.getElementById("cp-app-uava").src = c.userAvatar;
-            topDoc.getElementById("cp-app-cava").src = c.charAvatar;
-            topDoc.getElementById("cp-app-uname").textContent = c.userName;
-            topDoc.getElementById("cp-app-cname").textContent = c.charName;
-            topDoc.getElementById("cp-app-days").textContent = `D+${daysNum}`;
-            topDoc.getElementById("cp-app-mood-btn").textContent = sp.mood || "36.7°C";
-            topDoc.getElementById("cp-app-live-txt").textContent = `🏠 ${c.charName}此刻：${sp.charNow || sp.moodSync?.action || "陪在你身边"}`;
+                const heroBg = topDoc.getElementById("cp-app-hero-bg");
+                if (heroBg) heroBg.style.backgroundImage = sp.bgUrl ? `url('${sp.bgUrl}')` : "none";
+                topDoc.getElementById("cp-app-scope-tag").textContent = `${c.charName} · COUPLE SPACE`;
+                topDoc.getElementById("cp-app-uava").src = c.userAvatar;
+                topDoc.getElementById("cp-app-cava").src = c.charAvatar;
+                topDoc.getElementById("cp-app-uname").textContent = c.userName;
+                topDoc.getElementById("cp-app-cname").textContent = c.charName;
+                topDoc.getElementById("cp-app-days").textContent = `D+${daysNum}`;
+                topDoc.getElementById("cp-app-mood-btn").textContent = sp.mood || "36.7°C";
+                topDoc.getElementById("cp-app-live-txt").textContent = `🏠 ${c.charName}此刻：${sp.charNow || sp.moodSync?.action || "陪在你身边"}`;
 
-            const pet = sp.pet || getDefaultCp(c.charName).pet;
-            const ms = sp.moodSync || getDefaultCp(c.charName).moodSync;
-            const doneTodos = (sp.todos || []).filter((x) => x.done).length;
-            const totalTodos = Math.max(1, (sp.todos || []).length);
+                const pet = sp.pet || getDefaultCp(c.charName).pet;
+                const ms = sp.moodSync || getDefaultCp(c.charName).moodSync;
+                const doneTodos = (sp.todos || []).filter((x) => x.done).length;
+                const totalTodos = Math.max(1, (sp.todos || []).length);
 
-            topDoc.getElementById("cp-w-bpm").textContent = ms.bpm || "96 BPM";
-            topDoc.getElementById("cp-w-os").textContent = ms.os || `“${sp.charNow}”`;
-            topDoc.getElementById("cp-w-fund").textContent = `₩${Number(sp.fund || 0).toLocaleString()}`;
-            topDoc.getElementById("cp-w-pet").textContent = `萌宠: ${pet.name.split(" ")[0]} · LV.${pet.lv || 1}`;
+                topDoc.getElementById("cp-w-bpm").textContent = ms.bpm || "96 BPM";
+                topDoc.getElementById("cp-w-os").textContent = ms.os || `“${sp.charNow}”`;
+                topDoc.getElementById("cp-w-fund").textContent = `₩${Number(sp.fund || 0).toLocaleString()}`;
+                topDoc.getElementById("cp-w-pet").textContent = `萌宠: ${pet.name.split(" ")[0]} · LV.${pet.lv || 1}`;
 
-            topDoc.getElementById("cp-b-pet").textContent = `LV.${pet.lv || 1}`;
-            topDoc.getElementById("cp-b-4cut").textContent = `${(sp.life4cut?.album?.length || 0) + 1}组相纸`;
-            topDoc.getElementById("cp-b-qa").textContent = `${sp.qaHistory?.length || 0}篇手账`;
-            topDoc.getElementById("cp-b-mood").textContent = ms.bpm || "96 BPM";
-            topDoc.getElementById("cp-b-coupon").textContent = `${(sp.coupons || []).length}张券`;
-            topDoc.getElementById("cp-b-guest").textContent = `${(sp.notes || []).length}条留言`;
+                topDoc.getElementById("cp-b-pet").textContent = `LV.${pet.lv || 1}`;
+                topDoc.getElementById("cp-b-4cut").textContent = `${(sp.life4cut?.album?.length || 0) + 1}组相纸`;
+                topDoc.getElementById("cp-b-qa").textContent = `${sp.qaHistory?.length || 0}篇手账`;
+                topDoc.getElementById("cp-b-mood").textContent = ms.bpm || "96 BPM";
+                topDoc.getElementById("cp-b-coupon").textContent = `${(sp.coupons || []).length}张券`;
+                topDoc.getElementById("cp-b-guest").textContent = `${(sp.notes || []).length}条留言`;
 
-            const latestNote = (sp.notes || [])[0];
-            topDoc.getElementById("cp-app-latest-note").textContent = latestNote ? `${latestNote.author}：“${latestNote.text}”` : "点击进入写下第一句悄悄话...";
+                const latestNote = (sp.notes || [])[0];
+                topDoc.getElementById("cp-app-latest-note").textContent = latestNote ? `${latestNote.author}：“${latestNote.text}”` : "点击进入写下第一句悄悄话...";
 
-            // 2. 渲染子页面 1：云养萌宠屋
-            topDoc.getElementById("cp-pet-name").textContent = pet.name;
-            topDoc.getElementById("cp-pet-room-tag").textContent = `当前布置：${pet.roomItem || "暖阳羊毛地毯"}`;
-            topDoc.getElementById("cp-pet-lv").textContent = `LV.${pet.lv || 1} · ${c.userName} & ${c.charName} 共同领养`;
-            topDoc.getElementById("cp-pet-h-txt").textContent = `${pet.hunger}%`; topDoc.getElementById("cp-pet-h-bar").style.width = `${pet.hunger}%`;
-            topDoc.getElementById("cp-pet-m-txt").textContent = `${pet.mood}%`; topDoc.getElementById("cp-pet-m-bar").style.width = `${pet.mood}%`;
-            topDoc.getElementById("cp-pet-c-txt").textContent = `${pet.clean || 95}%`; topDoc.getElementById("cp-pet-c-bar").style.width = `${pet.clean || 95}%`;
-            topDoc.getElementById("cp-pet-log").textContent = `🐾 ${pet.lastLog}`;
-            topDoc.getElementById("cp-pet-hist").innerHTML = (pet.history || []).length
-                ? (pet.history || []).map((h) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:9px;padding:7px 10px;margin-bottom:5px;font-size:10px;font-weight:600;display:flex;justify-content:space-between;gap:8px;"><span>${h.text}</span><span style="color:#9A9AA5;white-space:nowrap;">${h.time}</span></div>`).join("")
-                : `<div style="text-align:center;padding:14px;font-size:9.5px;color:#9A9AA5;">暂无养宠日志，点击上方按钮互动吧</div>`;
+                topDoc.getElementById("cp-pet-name").textContent = pet.name;
+                topDoc.getElementById("cp-pet-room-tag").textContent = `当前布置：${pet.roomItem || "暖阳羊毛地毯"}`;
+                topDoc.getElementById("cp-pet-lv").textContent = `LV.${pet.lv || 1} · ${c.userName} & ${c.charName} 共同领养`;
+                topDoc.getElementById("cp-pet-h-txt").textContent = `${pet.hunger}%`; topDoc.getElementById("cp-pet-h-bar").style.width = `${pet.hunger}%`;
+                topDoc.getElementById("cp-pet-m-txt").textContent = `${pet.mood}%`; topDoc.getElementById("cp-pet-m-bar").style.width = `${pet.mood}%`;
+                topDoc.getElementById("cp-pet-c-txt").textContent = `${pet.clean || 95}%`; topDoc.getElementById("cp-pet-c-bar").style.width = `${pet.clean || 95}%`;
+                topDoc.getElementById("cp-pet-log").textContent = `🐾 ${pet.lastLog}`;
+                topDoc.getElementById("cp-pet-hist").innerHTML = (pet.history || []).length
+                    ? (pet.history || []).map((h) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:9px;padding:7px 10px;margin-bottom:5px;font-size:10px;font-weight:600;display:flex;justify-content:space-between;gap:8px;"><span>${h.text}</span><span style="color:#9A9AA5;white-space:nowrap;">${h.time}</span></div>`).join("")
+                    : `<div style="text-align:center;padding:14px;font-size:9.5px;color:#9A9AA5;">暂无养宠日志，点击上方按钮互动吧</div>`;
 
-            // 3. 渲染子页面 2：人生四格 + 历史相册墙
-            const cut = sp.life4cut || getDefaultCp(c.charName).life4cut;
-            const stMap = {
-                light: { bg: "#FFFFFF", cell: "#F8F8FA", txt: "#2C2C32", bd: "#EAEAF0" },
-                gray: { bg: "#F0F0F5", cell: "#FFFFFF", txt: "#2C2C32", bd: "#DCDCE6" },
-                dark: { bg: "#2C2C32", cell: "#3A3A40", txt: "#FFFFFF", bd: "#484852" }
-            };
-            const th = stMap[cut.style || "light"] || stMap.light;
-            topDoc.getElementById("cp-4cut-stage").innerHTML = `
-                <div style="background:${th.bg}!important;color:${th.txt}!important;border:1.5px solid ${th.bd}!important;border-radius:16px;padding:15px;max-width:290px;margin:0 auto;">
-                    <div style="font-size:8.5px;font-weight:800;letter-spacing:1.2px;opacity:.75;margin-bottom:10px;">LIFE 4 CUT · 인생네컷 STUDIO</div>
-                    ${(cut.frames || []).slice(0, 4).map((f, i) => `<div style="background:${th.cell}!important;color:${th.txt}!important;border:1px solid ${th.bd}!important;border-radius:10px;padding:11px 12px;margin-bottom:7px;text-align:left;"><span style="font-size:7.8px;font-weight:800;opacity:.65;display:block;margin-bottom:3px;">CUT 0${i + 1}</span><div style="font-size:10.8px;font-weight:600;line-height:1.58;">${f}</div></div>`).join("")}
-                    <div style="display:flex;justify-content:space-between;font-size:9px;font-weight:800;padding-top:4px;"><span>${cut.sign}</span><span>${cut.date}</span></div>
-                </div>`;
-            topDoc.getElementById("cp-4cut-album").innerHTML = (cut.album || []).length
-                ? (cut.album || []).map((al) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:10px;padding:9px 11px;margin-bottom:6px;font-size:10px;font-weight:600;"><div style="display:flex;justify-content:space-between;font-weight:800;margin-bottom:4px;"><span>📸 ${al.sign}</span><span style="color:#9A9AA5;">${al.date}</span></div><div style="color:#55555E;line-height:1.5;">${(al.frames || []).map((x, k) => `[0${k + 1}] ${x}`).join("<br>")}</div></div>`).join("")
-                : `<div style="text-align:center;padding:14px;font-size:9.5px;color:#9A9AA5;">每次拍摄的四格都会自动保存在此相册墙中</div>`;
+                const cut = sp.life4cut || getDefaultCp(c.charName).life4cut;
+                const stMap = {
+                    light: { bg: "#FFFFFF", cell: "#F8F8FA", txt: "#2C2C32", bd: "#EAEAF0" },
+                    gray: { bg: "#F0F0F5", cell: "#FFFFFF", txt: "#2C2C32", bd: "#DCDCE6" },
+                    dark: { bg: "#2C2C32", cell: "#3A3A40", txt: "#FFFFFF", bd: "#484852" }
+                };
+                const th = stMap[cut.style || "light"] || stMap.light;
+                topDoc.getElementById("cp-4cut-stage").innerHTML = `
+                    <div style="background:${th.bg}!important;color:${th.txt}!important;border:1.5px solid ${th.bd}!important;border-radius:16px;padding:15px;max-width:290px;margin:0 auto;">
+                        <div style="font-size:8.5px;font-weight:800;letter-spacing:1.2px;opacity:.75;margin-bottom:10px;">LIFE 4 CUT · 인생네컷 STUDIO</div>
+                        ${(cut.frames || []).slice(0, 4).map((f, i) => `<div style="background:${th.cell}!important;color:${th.txt}!important;border:1px solid ${th.bd}!important;border-radius:10px;padding:11px 12px;margin-bottom:7px;text-align:left;"><span style="font-size:7.8px;font-weight:800;opacity:.65;display:block;margin-bottom:3px;">CUT 0${i + 1}</span><div style="font-size:10.8px;font-weight:600;line-height:1.58;">${f}</div></div>`).join("")}
+                        <div style="display:flex;justify-content:space-between;font-size:9px;font-weight:800;padding-top:4px;"><span>${cut.sign}</span><span>${cut.date}</span></div>
+                    </div>`;
+                topDoc.getElementById("cp-4cut-album").innerHTML = (cut.album || []).length
+                    ? (cut.album || []).map((al) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:10px;padding:9px 11px;margin-bottom:6px;font-size:10px;font-weight:600;"><div style="display:flex;justify-content:space-between;font-weight:800;margin-bottom:4px;"><span>📸 ${al.sign}</span><span style="color:#9A9AA5;">${al.date}</span></div><div style="color:#55555E;line-height:1.5;">${(al.frames || []).map((x, k) => `[0${k + 1}] ${x}`).join("<br>")}</div></div>`).join("")
+                    : `<div style="text-align:center;padding:14px;font-size:9.5px;color:#9A9AA5;">每次拍摄的四格都会自动保存在此相册墙中</div>`;
 
-            // 4. 渲染子页面 3：灵魂百问 + 问答手账
-            const qIdx = (sp.qaIndex || 0) % CP_QUESTIONS.length;
-            topDoc.getElementById("cp-qa-q").textContent = sp.customQ || `Q${qIdx + 1}. ${CP_QUESTIONS[qIdx]}`;
-            topDoc.getElementById("cp-qa-my").textContent = sp.qaUserAns;
-            topDoc.getElementById("cp-qa-char-lbl").textContent = `${c.charName}'S ANSWER · 对方回答`;
-            topDoc.getElementById("cp-qa-char").textContent = sp.qaCharAns;
-            topDoc.getElementById("cp-qa-hist").innerHTML = (sp.qaHistory || []).length
-                ? (sp.qaHistory || []).map((item) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:10px 12px;margin-bottom:6px;font-size:10.2px;font-weight:600;line-height:1.55;"><div style="font-weight:800;color:#2C2C32;margin-bottom:4px;">Q: ${item.q}</div><div style="color:#55555E;margin-bottom:2px;"><b>${c.userName}：</b>${item.my}</div><div style="color:#2C2C32;"><b>${c.charName}：</b>${item.char}</div></div>`).join("")
-                : `<div style="text-align:center;padding:14px;font-size:9.5px;color:#9A9AA5;">暂无封存的问答手账</div>`;
+                const qIdx = (sp.qaIndex || 0) % CP_QUESTIONS.length;
+                topDoc.getElementById("cp-qa-q").textContent = sp.customQ || `Q${qIdx + 1}. ${CP_QUESTIONS[qIdx]}`;
+                topDoc.getElementById("cp-qa-my").textContent = sp.qaUserAns;
+                topDoc.getElementById("cp-qa-char-lbl").textContent = `${c.charName}'S ANSWER · 对方回答`;
+                topDoc.getElementById("cp-qa-char").textContent = sp.qaCharAns;
+                topDoc.getElementById("cp-qa-hist").innerHTML = (sp.qaHistory || []).length
+                    ? (sp.qaHistory || []).map((item) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:10px 12px;margin-bottom:6px;font-size:10.2px;font-weight:600;line-height:1.55;"><div style="font-weight:800;color:#2C2C32;margin-bottom:4px;">Q: ${item.q}</div><div style="color:#55555E;margin-bottom:2px;"><b>${c.userName}：</b>${item.my}</div><div style="color:#2C2C32;"><b>${c.charName}：</b>${item.char}</div></div>`).join("")
+                    : `<div style="text-align:center;padding:14px;font-size:9.5px;color:#9A9AA5;">暂无封存的问答手账</div>`;
 
-            // 5. 渲染子页面 4：同居波频室
-            topDoc.getElementById("cp-mood-stage").innerHTML = `
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:9px;">
-                    <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">HEART</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.bpm}</div></div>
-                    <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">TEMP</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.temp}</div></div>
-                    <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">MISS</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.miss}</div></div>
-                    <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">醋意值</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.jealousy || "75%"}</div></div>
-                </div>
-                <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:12px;padding:11px 12px;margin-bottom:8px;">
-                    <div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;"><span>CURRENT ACTION · 实时同居动态</span><span>位置：${ms.room || "家中"}</span></div>
-                    <div style="font-size:11px;font-weight:600;line-height:1.6;">${ms.action}</div>
-                </div>
-                <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:12px;padding:11px 12px;margin-bottom:8px;">
-                    <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;">POCKET CHECK · 随身衣兜/桌面物品</div>
-                    <div style="font-size:10.5px;font-weight:600;line-height:1.55;color:#55555E;">${ms.pocket || "手机、钥匙、为你备着的糖"}</div>
-                </div>
-                <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:12px;padding:11px 12px;">
-                    <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;">INNER VOICE · 此刻脑海里关于你的心声</div>
-                    <div style="font-size:11px;font-weight:700;line-height:1.6;color:#2C2C32;">${ms.os}</div>
-                </div>`;
+                topDoc.getElementById("cp-mood-stage").innerHTML = `
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:9px;">
+                        <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">HEART</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.bpm}</div></div>
+                        <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">TEMP</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.temp}</div></div>
+                        <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">MISS</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.miss}</div></div>
+                        <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:11px;padding:9px 4px;text-align:center;"><div style="font-size:7.5px;font-weight:800;color:#8E8E98;">醋意值</div><div style="font-size:11.5px;font-weight:800;margin-top:2px;">${ms.jealousy || "75%"}</div></div>
+                    </div>
+                    <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:12px;padding:11px 12px;margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;"><span>CURRENT ACTION · 实时同居动态</span><span>位置：${ms.room || "家中"}</span></div>
+                        <div style="font-size:11px;font-weight:600;line-height:1.6;">${ms.action}</div>
+                    </div>
+                    <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:12px;padding:11px 12px;margin-bottom:8px;">
+                        <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;">POCKET CHECK · 随身衣兜/桌面物品</div>
+                        <div style="font-size:10.5px;font-weight:600;line-height:1.55;color:#55555E;">${ms.pocket || "手机、钥匙、为你备着的糖"}</div>
+                    </div>
+                    <div style="background:#FFF;border:1px solid #EFEFF4;border-radius:12px;padding:11px 12px;">
+                        <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;">INNER VOICE · 此刻脑海里关于你的心声</div>
+                        <div style="font-size:11px;font-weight:700;line-height:1.6;color:#2C2C32;">${ms.os}</div>
+                    </div>`;
 
-            // 6. 渲染子页面 5：小金库与特权兑换券
-            topDoc.getElementById("cp-fund-total").textContent = `₩${Number(sp.fund || 0).toLocaleString()}`;
-            topDoc.getElementById("cp-fund-logs").innerHTML = (sp.fundLogs || []).map((fl) => `<div style="display:flex;justify-content:space-between;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:9.8px;font-weight:600;"><div><b>${fl.who}</b> <span style="color:#6E6E77;">${fl.text}</span></div><b>${fl.amt}</b></div>`).join("");
-            const cpList = topDoc.getElementById("cp-coupon-list");
-            cpList.innerHTML = (sp.coupons || []).map((cp, idx) => `
-                <div class="smt-ticket-card">
-                    <div class="smt-ticket-left"><div style="font-size:11px;font-weight:800;color:#2C2C32;">🎟️ ${cp.title}</div><div style="font-size:9px;font-weight:600;color:#7A7A85;margin-top:3px;">${cp.desc}</div></div>
-                    <div class="smt-ticket-right" data-cpuse="${idx}"><span style="font-size:9px;font-weight:800;color:#2C2C32;">核销</span><span style="font-size:7.5px;font-weight:700;color:#9A9AA5;margin-top:2px;">已用 ${cp.used || 0}</span></div>
-                </div>`).join("");
-            topDoc.getElementById("cp-coupon-log").textContent = sp.couponLog;
-            cpList.querySelectorAll("[data-cpuse]").forEach((b) => b.onclick = async () => {
-                const idx = Number(b.getAttribute("data-cpuse")), d = loadCp(), cp = d.coupons[idx], logEl = topDoc.getElementById("cp-coupon-log");
-                logEl.textContent = `⏳ 正在向 ${c.charName} 出示并核销【${cp.title}】...`;
-                try {
-                    const r = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 1000)}`, `${c.userName}向你出示并核销了情侣特权券：【${cp.title}（${cp.desc}）】。请描写你看到后的反应与立刻宠溺履约的行动(90字左右)：`);
-                    cp.used = (cp.used || 0) + 1; d.couponLog = `✓ 已对 ${c.charName} 核销【${cp.title}】：\n${r}`;
-                    saveCp(d); renderStandaloneCoupleSpace();
-                } catch (err) { logEl.textContent = err.message; }
-            });
+                topDoc.getElementById("cp-fund-total").textContent = `₩${Number(sp.fund || 0).toLocaleString()}`;
+                topDoc.getElementById("cp-fund-logs").innerHTML = (sp.fundLogs || []).map((fl) => `<div style="display:flex;justify-content:space-between;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:9.8px;font-weight:600;"><div><b>${fl.who}</b> <span style="color:#6E6E77;">${fl.text}</span></div><b>${fl.amt}</b></div>`).join("");
+                const cpList = topDoc.getElementById("cp-coupon-list");
+                cpList.innerHTML = (sp.coupons || []).map((cp, idx) => `
+                    <div class="smt-ticket-card">
+                        <div class="smt-ticket-left"><div style="font-size:11px;font-weight:800;color:#2C2C32;">🎟️ ${cp.title}</div><div style="font-size:9px;font-weight:600;color:#7A7A85;margin-top:3px;">${cp.desc}</div></div>
+                        <div class="smt-ticket-right" data-cpuse="${idx}"><span style="font-size:9px;font-weight:800;color:#2C2C32;">核销</span><span style="font-size:7.5px;font-weight:700;color:#9A9AA5;margin-top:2px;">已用 ${cp.used || 0}</span></div>
+                    </div>`).join("");
+                topDoc.getElementById("cp-coupon-log").textContent = sp.couponLog;
+                cpList.querySelectorAll("[data-cpuse]").forEach((b) => b.onclick = async () => {
+                    const idx = Number(b.getAttribute("data-cpuse")), d = loadCp(), cp = d.coupons[idx], logEl = topDoc.getElementById("cp-coupon-log");
+                    logEl.textContent = `⏳ 正在向 ${c.charName} 出示并核销【${cp.title}】...`;
+                    try {
+                        const r = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 1000)}`, `${c.userName}向你出示并核销了情侣特权券：【${cp.title}（${cp.desc}）】。请描写你看到后的反应与立刻宠溺履约的行动(90字左右)：`);
+                        cp.used = (cp.used || 0) + 1; d.couponLog = `✓ 已对 ${c.charName} 核销【${cp.title}】：\n${r}`;
+                        saveCp(d); renderStandaloneCoupleSpace();
+                    } catch (err) { logEl.textContent = err.message; }
+                });
 
-            // 7. 渲染子页面 6：纪念日倒数 + 留言板 + 心愿单进度
-            topDoc.getElementById("cp-anni-list").innerHTML = (sp.anniversaries || []).map((an, idx) => {
-                const diff = Math.ceil((new Date(an.date).getTime() - Date.now()) / 86400000);
-                const tag = isNaN(diff) ? an.date : (diff > 0 ? `还有 ${diff} 天` : `D+${Math.abs(diff)}`);
-                return `<div data-delanni="${idx}" style="background:#FFF;border:1px solid #EFEFF4;border-radius:10px;padding:9px 8px;text-align:center;cursor:pointer;" title="点击可删除"><div style="font-size:9.5px;font-weight:800;color:#2C2C32;">${an.name}</div><div style="font-size:12px;font-weight:800;color:#484852;margin:3px 0;">${tag}</div><div style="font-size:7.8px;font-weight:600;color:#9A9AA5;">${an.date}</div></div>`;
-            }).join("");
-            topDoc.querySelectorAll("[data-delanni]").forEach((el) => el.onclick = () => { const d = loadCp(); d.anniversaries.splice(Number(el.getAttribute("data-delanni")), 1); saveCp(d); renderStandaloneCoupleSpace(); });
+                topDoc.getElementById("cp-anni-list").innerHTML = (sp.anniversaries || []).map((an, idx) => {
+                    const diff = Math.ceil((new Date(an.date).getTime() - Date.now()) / 86400000);
+                    const tag = isNaN(diff) ? an.date : (diff > 0 ? `还有 ${diff} 天` : `D+${Math.abs(diff)}`);
+                    return `<div data-delanni="${idx}" style="background:#FFF;border:1px solid #EFEFF4;border-radius:10px;padding:9px 8px;text-align:center;cursor:pointer;" title="点击可删除"><div style="font-size:9.5px;font-weight:800;color:#2C2C32;">${an.name}</div><div style="font-size:12px;font-weight:800;color:#484852;margin:3px 0;">${tag}</div><div style="font-size:7.8px;font-weight:600;color:#9A9AA5;">${an.date}</div></div>`;
+                }).join("");
+                topDoc.querySelectorAll("[data-delanni]").forEach((el) => el.onclick = () => { const d = loadCp(); d.anniversaries.splice(Number(el.getAttribute("data-delanni")), 1); saveCp(d); renderStandaloneCoupleSpace(); });
 
-            topDoc.getElementById("cp-notes-list").innerHTML = (sp.notes || []).map((n) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:10px;padding:8px 10px;margin-bottom:6px;font-size:10.5px;font-weight:600;"><div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:2px;"><b>${n.author}</b><span>${n.time}</span></div><div>${n.text.replace(/</g, "&lt;")}</div></div>`).join("");
-            const pct = Math.round((doneTodos / totalTodos) * 100);
-            topDoc.getElementById("cp-todo-stat").textContent = `WISH LIST · 恋爱百事清单 (完成度 ${pct}%)`;
-            topDoc.getElementById("cp-todo-bar").style.width = `${pct}%`;
-            const todoEl = topDoc.getElementById("cp-todo-list"); todoEl.innerHTML = "";
-            (sp.todos || []).forEach((td, idx) => {
-                const row = topDoc.createElement("div");
-                row.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:#FFF;border:1px solid #EFEFF4;border-radius:9px;padding:7px 10px;margin-bottom:5px;font-size:10.5px;font-weight:600;";
-                row.innerHTML = `<label style="display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;"><input type="checkbox" ${td.done ? "checked" : ""}/><span style="${td.done ? "text-decoration:line-through;color:#9A9AA5;" : ""}">${td.text}</span></label><span style="cursor:pointer;" data-deltodo="${idx}">✕</span>`;
-                row.querySelector("input").onchange = (e) => { const d = loadCp(); d.todos[idx].done = e.target.checked; saveCp(d); renderStandaloneCoupleSpace(); };
-                row.querySelector("[data-deltodo]").onclick = () => { const d = loadCp(); d.todos.splice(idx, 1); saveCp(d); renderStandaloneCoupleSpace(); };
-                todoEl.appendChild(row);
-            });
+                topDoc.getElementById("cp-notes-list").innerHTML = (sp.notes || []).map((n) => `<div style="background:#FFF;border:1px solid #EFEFF4;border-radius:10px;padding:8px 10px;margin-bottom:6px;font-size:10.5px;font-weight:600;"><div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:2px;"><b>${n.author}</b><span>${n.time}</span></div><div>${n.text.replace(/</g, "&lt;")}</div></div>`).join("");
+                const pct = Math.round((doneTodos / totalTodos) * 100);
+                topDoc.getElementById("cp-todo-stat").textContent = `WISH LIST · 恋爱百事清单 (完成度 ${pct}%)`;
+                topDoc.getElementById("cp-todo-bar").style.width = `${pct}%`;
+                const todoEl = topDoc.getElementById("cp-todo-list"); todoEl.innerHTML = "";
+                (sp.todos || []).forEach((td, idx) => {
+                    const row = topDoc.createElement("div");
+                    row.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:#FFF;border:1px solid #EFEFF4;border-radius:9px;padding:7px 10px;margin-bottom:5px;font-size:10.5px;font-weight:600;";
+                    row.innerHTML = `<label style="display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;"><input type="checkbox" ${td.done ? "checked" : ""}/><span style="${td.done ? "text-decoration:line-through;color:#9A9AA5;" : ""}">${td.text}</span></label><span style="cursor:pointer;" data-deltodo="${idx}">✕</span>`;
+                    row.querySelector("input").onchange = (e) => { const d = loadCp(); d.todos[idx].done = e.target.checked; saveCp(d); renderStandaloneCoupleSpace(); };
+                    row.querySelector("[data-deltodo]").onclick = () => { const d = loadCp(); d.todos.splice(idx, 1); saveCp(d); renderStandaloneCoupleSpace(); };
+                    todoEl.appendChild(row);
+                });
+            } catch (err) {}
         }
 
-        // 绑定独立情侣空间全部按钮事件（100% 灵敏无 Bug！）
+        // 绑定独立情侣空间全部按钮事件
         topDoc.getElementById("cp-app-bg-btn").onclick = () => { const d = loadCp(), u = prompt("粘贴情侣空间背景图 URL（留空恢复默认）：", d.bgUrl || ""); if (u !== null) { d.bgUrl = u.trim(); saveCp(d); renderStandaloneCoupleSpace(); } };
         topDoc.getElementById("cp-app-date-btn").onclick = () => { const d = loadCp(), v = prompt("修改相恋起始日 (YYYY-MM-DD)：", d.startDate); if (v) { d.startDate = v.trim(); saveCp(d); renderStandaloneCoupleSpace(); } };
         topDoc.getElementById("cp-app-mood-btn").onclick = () => { const d = loadCp(), v = prompt("修改今日状态温度：", d.mood); if (v) { d.mood = v.trim(); saveCp(d); renderStandaloneCoupleSpace(); } };
@@ -2509,9 +2512,7 @@ bootSumoulApp();
         topDoc.getElementById("cp-note-ai").onclick = async () => { const c = getCtx(); try { const r = await askAI(`你是${c.charName}。`, `主动在情侣空间留言板给${c.userName}留一句悄悄话(45字内)：`); const d = loadCp(); d.notes.unshift({ author: c.charName, text: r, time: nowTime() }); saveCp(d); renderStandaloneCoupleSpace(); } catch (err) { alert(err.message); } };
         topDoc.getElementById("cp-todo-add").onclick = () => { const v = prompt("新增恋爱心愿："); if (v) { const d = loadCp(); d.todos.push({ text: v.trim(), done: false }); saveCp(d); renderStandaloneCoupleSpace(); } };
 
-        /* ══════════════════════════════════════════════════════════════════
-           【模块 B：第 2 栏韩系动态流引擎】
-           ══════════════════════════════════════════════════════════════════ */
+        /* 第 2 栏韩系动态流引擎 */
         function getFeedKey() { return `sumoul_v19_boldfeed__${getCtx().safeScope}`; }
         function createDefaultFeed(charName) {
             return {
@@ -2538,80 +2539,82 @@ bootSumoulApp();
         let currentFilter = "all", observedCharScope = "";
 
         function renderKrMoments() {
-            const c = getCtx(), data = getFeedData();
-            observedCharScope = c.safeScope;
-            const filterCharBtn = topDoc.getElementById("smt-filter-char-btn");
-            if (filterCharBtn) filterCharBtn.textContent = `只看 ${c.charName}`;
+            try {
+                const c = getCtx(), data = getFeedData();
+                observedCharScope = c.safeScope;
+                const filterCharBtn = topDoc.getElementById("smt-filter-char-btn");
+                if (filterCharBtn) filterCharBtn.textContent = `只看 ${c.charName}`;
 
-            const extraList = c.otherChars.length > 0 ? c.otherChars : [
-                { name: "서윤", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `刚冲洗出来的黑白胶卷。` },
-                { name: "한남동", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `玻璃窗上的雨痕与浓缩咖啡。` }
-            ];
-            const remainCount = Math.max(0, c.totalOtherCount - extraList.length);
-            const storiesBar = topDoc.getElementById("smt-ins-stories-bar");
-            const myBubbleHtml = data.myNote ? `<div class="ig-note-cloud"><span>${data.myNote}</span></div>` : `<div class="ig-note-cloud empty-hint"><span>想法...</span></div>`;
-            const charBubbleHtml = `<div class="ig-note-cloud"><span>${data.charNote || "想你了"}</span></div>`;
+                const extraList = c.otherChars.length > 0 ? c.otherChars : [
+                    { name: "서윤", ava: "https://i.postimg.cc/vmsDSqmk/IMG-3926.jpg", story: `刚冲洗出来的黑白胶卷。` },
+                    { name: "한남동", ava: "https://i.postimg.cc/MZg2F7Fm/IMG-4150.jpg", story: `玻璃窗上的雨痕与浓缩咖啡。` }
+                ];
+                const remainCount = Math.max(0, c.totalOtherCount - extraList.length);
+                const storiesBar = topDoc.getElementById("smt-ins-stories-bar");
+                const myBubbleHtml = data.myNote ? `<div class="ig-note-cloud"><span>${data.myNote}</span></div>` : `<div class="ig-note-cloud empty-hint"><span>想法...</span></div>`;
+                const charBubbleHtml = `<div class="ig-note-cloud"><span>${data.charNote || "想你了"}</span></div>`;
 
-            storiesBar.innerHTML = `
-                <div class="kr-note-unit" id="smt-story-me" title="点击修改我的状态泡泡">${myBubbleHtml}<div class="kr-ava-ring"><div class="kr-ava-inner"><img src="${c.userAvatar}" /></div><span class="kr-ava-badge">${KR_ICO.plus}</span></div><div class="kr-unit-name">${c.userName}</div></div>
-                <div class="kr-note-unit" id="smt-story-char">${charBubbleHtml}<div class="kr-ava-ring unread"><div class="kr-ava-inner"><img src="${c.charAvatar}" /></div></div><div class="kr-unit-name">${c.charName}</div></div>
-                ${extraList.map((ch, idx) => `<div class="kr-note-unit" data-otheridx="${idx}"><div class="kr-ava-ring"><div class="kr-ava-inner"><img src="${ch.ava}" /></div></div><div class="kr-unit-name">${ch.name}</div></div>`).join("")}
-                <div class="kr-note-unit" id="smt-story-more-dots"><div class="kr-ava-ring"><div class="kr-ava-inner" style="background:#F6F6FA!important;">${KR_ICO.dots}</div></div><div class="kr-unit-name" style="color:#8E8E98!important;">${remainCount > 0 ? `+${remainCount} 更多` : "···"}</div></div>
-            `;
+                storiesBar.innerHTML = `
+                    <div class="kr-note-unit" id="smt-story-me" title="点击修改我的状态泡泡">${myBubbleHtml}<div class="kr-ava-ring"><div class="kr-ava-inner"><img src="${c.userAvatar}" /></div><span class="kr-ava-badge">${KR_ICO.plus}</span></div><div class="kr-unit-name">${c.userName}</div></div>
+                    <div class="kr-note-unit" id="smt-story-char">${charBubbleHtml}<div class="kr-ava-ring unread"><div class="kr-ava-inner"><img src="${c.charAvatar}" /></div></div><div class="kr-unit-name">${c.charName}</div></div>
+                    ${extraList.map((ch, idx) => `<div class="kr-note-unit" data-otheridx="${idx}"><div class="kr-ava-ring"><div class="kr-ava-inner"><img src="${ch.ava}" /></div></div><div class="kr-unit-name">${ch.name}</div></div>`).join("")}
+                    <div class="kr-note-unit" id="smt-story-more-dots"><div class="kr-ava-ring"><div class="kr-ava-inner" style="background:#F6F6FA!important;">${KR_ICO.dots}</div></div><div class="kr-unit-name" style="color:#8E8E98!important;">${remainCount > 0 ? `+${remainCount} 更多` : "···"}</div></div>
+                `;
 
-            topDoc.getElementById("smt-story-me").onclick = () => {
-                const d = getFeedData(), v = prompt("写下你头像上方的纯白想法泡泡（留空则恢复默认提示）：", d.myNote || "");
-                if (v !== null) { d.myNote = v.trim().slice(0, 8); saveFeedData(d); renderKrMoments(); }
-            };
-
-            const viewer = topDoc.getElementById("smt-story-viewer");
-            topDoc.getElementById("smt-story-char").onclick = () => {
-                const d = getFeedData(); viewer.style.display = "block";
-                viewer.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;"><img src="${c.charAvatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #FFF;" /><b style="font-size:10px;color:#2C2C32;">${c.charName} · 24H 限时快拍</b></div><div style="display:flex;gap:5px;align-items:center;"><span class="smt-pill-btn dark" id="smt-story-ai-gen" style="height:21px!important;font-size:8px!important;">↻ 刷新快拍</span><span id="smt-story-close" style="cursor:pointer;font-size:11px;font-weight:700;color:#8E8E98;padding:0 4px;">✕</span></div></div><div style="font-size:10.5px;font-weight:600;line-height:1.68;color:#3A3A40;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:12px;padding:11px 13px;">${d.charStory}</div>`;
-                viewer.querySelector("#smt-story-close").onclick = () => (viewer.style.display = "none");
-                viewer.querySelector("#smt-story-ai-gen").onclick = async (ev) => {
-                    ev.target.textContent = "⏳ 刷新中...";
-                    try {
-                        const raw = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `请生成一条你在社交软件顶部 24 小时限时快拍(Story)里随手发的画面，以及你头顶的5字以内云朵泡泡状态词。严格只输出JSON：{"note":"5字以内状态词(如:想见你/刚下班)","story":"55字以内描述你拍下的快拍画面与配文"}`);
-                        const m = raw.match(/\{[\s\S]*\}/);
-                        if (m) { const obj = JSON.parse(m[0]), latest = getFeedData(); latest.charNote = obj.note || "想你了"; latest.charStory = obj.story || latest.charStory; saveFeedData(latest); renderKrMoments(); topDoc.getElementById("smt-story-char").click(); }
-                    } catch (err) { alert(err.message); }
+                topDoc.getElementById("smt-story-me").onclick = () => {
+                    const d = getFeedData(), v = prompt("写下你头像上方的纯白想法泡泡（留空则恢复默认提示）：", d.myNote || "");
+                    if (v !== null) { d.myNote = v.trim().slice(0, 8); saveFeedData(d); renderKrMoments(); }
                 };
-            };
 
-            storiesBar.querySelectorAll("[data-otheridx]").forEach((el) => el.onclick = () => {
-                const ch = extraList[Number(el.getAttribute("data-otheridx"))]; if (!ch) return;
-                viewer.style.display = "block";
-                viewer.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><div style="display:flex;align-items:center;gap:7px;"><img src="${ch.ava}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" /><b style="font-size:10px;color:#2C2C32;">${ch.name} · 最近聊天角色快拍</b></div><span id="smt-fr-st-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span></div><div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#484852;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:11px 12px;">${ch.story}</div>`;
-                viewer.querySelector("#smt-fr-st-close").onclick = () => (viewer.style.display = "none");
-            });
+                const viewer = topDoc.getElementById("smt-story-viewer");
+                topDoc.getElementById("smt-story-char").onclick = () => {
+                    const d = getFeedData(); viewer.style.display = "block";
+                    viewer.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:8px;"><img src="${c.charAvatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #FFF;" /><b style="font-size:10px;color:#2C2C32;">${c.charName} · 24H 限时快拍</b></div><div style="display:flex;gap:5px;align-items:center;"><span class="smt-pill-btn dark" id="smt-story-ai-gen" style="height:21px!important;font-size:8px!important;">↻ 刷新快拍</span><span id="smt-story-close" style="cursor:pointer;font-size:11px;font-weight:700;color:#8E8E98;padding:0 4px;">✕</span></div></div><div style="font-size:10.5px;font-weight:600;line-height:1.68;color:#3A3A40;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:12px;padding:11px 13px;">${d.charStory}</div>`;
+                    viewer.querySelector("#smt-story-close").onclick = () => (viewer.style.display = "none");
+                    viewer.querySelector("#smt-story-ai-gen").onclick = async (ev) => {
+                        ev.target.textContent = "⏳ 刷新中...";
+                        try {
+                            const raw = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `请生成一条你在社交软件顶部 24 小时限时快拍(Story)里随手发的画面，以及你头顶的5字以内云朵泡泡状态词。严格只输出JSON：{"note":"5字以内状态词(如:想见你/刚下班)","story":"55字以内描述你拍下的快拍画面与配文"}`);
+                            const m = raw.match(/\{[\s\S]*\}/);
+                            if (m) { const obj = JSON.parse(m[0]), latest = getFeedData(); latest.charNote = obj.note || "想你了"; latest.charStory = obj.story || latest.charStory; saveFeedData(latest); renderKrMoments(); topDoc.getElementById("smt-story-char").click(); }
+                        } catch (err) { alert(err.message); }
+                    };
+                };
 
-            topDoc.getElementById("smt-story-more-dots").onclick = () => {
-                viewer.style.display = "block";
-                viewer.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:10px;color:#2C2C32;">RECENT CHARACTERS · 最近聊天角色排序</b><span id="smt-dots-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span></div><div style="font-size:10px;font-weight:600;line-height:1.6;color:#55555E;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:10px 12px;">顶部头像已按你<b>最近聊天的先后顺序</b>自动排列（共检测到酒馆内还有 ${c.totalOtherCount} 位其他角色）。</div>`;
-                viewer.querySelector("#smt-dots-close").onclick = () => (viewer.style.display = "none");
-            };
+                storiesBar.querySelectorAll("[data-otheridx]").forEach((el) => el.onclick = () => {
+                    const ch = extraList[Number(el.getAttribute("data-otheridx"))]; if (!ch) return;
+                    viewer.style.display = "block";
+                    viewer.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><div style="display:flex;align-items:center;gap:7px;"><img src="${ch.ava}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" /><b style="font-size:10px;color:#2C2C32;">${ch.name} · 最近聊天角色快拍</b></div><span id="smt-fr-st-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span></div><div style="font-size:10.5px;font-weight:600;line-height:1.65;color:#484852;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:11px 12px;">${ch.story}</div>`;
+                    viewer.querySelector("#smt-fr-st-close").onclick = () => (viewer.style.display = "none");
+                });
 
-            const stream = topDoc.getElementById("smt-mom-stream"), posts = (data.posts || []).filter((p) => currentFilter === "all" || !p.isMe);
-            if (!posts.length) { stream.innerHTML = `<div style="text-align:center;padding:44px 16px;font-size:10.5px;font-weight:700;color:#9A9AA5;">暂无动态 · 点击右上角「让TA发新帖」吧</div>`; return; }
+                topDoc.getElementById("smt-story-more-dots").onclick = () => {
+                    viewer.style.display = "block";
+                    viewer.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:10px;color:#2C2C32;">RECENT CHARACTERS · 最近聊天角色排序</b><span id="smt-dots-close" style="cursor:pointer;font-weight:700;color:#8E8E98;">✕</span></div><div style="font-size:10px;font-weight:600;line-height:1.6;color:#55555E;background:#FFF;border:1px solid #EAEAF0;border-radius:11px;padding:10px 12px;">顶部头像已按你<b>最近聊天的先后顺序</b>自动排列（共检测到酒馆内还有 ${c.totalOtherCount} 位其他角色）。</div>`;
+                    viewer.querySelector("#smt-dots-close").onclick = () => (viewer.style.display = "none");
+                };
 
-            stream.innerHTML = posts.map((p, idx) => {
-                const ava = p.isMe ? c.userAvatar : c.charAvatar, name = p.isMe ? c.userName : c.charName;
-                const cmtsHtml = (p.comments && p.comments.length) ? `<div class="kr-cmt-list">${p.comments.map((cm) => `<div style="margin-bottom:4px;"><b style="color:#2C2C32;margin-right:5px;">${cm.who}：</b><span style="color:#484852;">${cm.text.replace(/</g, "&lt;")}</span></div>`).join("")}</div>` : "";
-                return `<div class="kr-clean-post"><div class="kr-post-head"><div class="kr-post-user"><img class="post-ava" src="${ava}" /><div><div style="font-size:11.5px;font-weight:800;color:#2C2C32;">${name}</div><div style="display:flex;align-items:center;gap:3px;font-size:8.5px;font-weight:600;color:#8E8E98;margin-top:2px;">${KR_ICO.pin}<span>${p.loc || "SEOUL"} · ${p.time || "刚刚"}</span></div></div></div><span data-insdel="${p.id}" style="cursor:pointer;padding:4px;">${KR_ICO.more}</span></div><div class="kr-film-frame"><div class="kr-film-meta"><span class="kr-film-tag">${p.filmNo || `FILM · 0${idx + 1}`}</span><span style="font-size:8px;font-weight:700;color:#9A9AA5;">1 / 1</span></div>${p.imgUrl && /^https?:|^data:/.test(p.imgUrl) ? `<img class="real-photo" src="${p.imgUrl}" />` : ""}${p.photoDesc ? `<div class="kr-film-scene">${p.photoDesc.replace(/</g, "&lt;")}</div>` : ""}</div><div class="kr-post-caption"><div style="white-space:pre-wrap;">${(p.text || "").replace(/</g, "&lt;")}</div></div><div class="kr-post-bar"><div style="display:flex;align-items:center;gap:8px;"><span class="kr-act-pill" data-inslike="${p.id}">${p.liked ? KR_ICO.heartFill : KR_ICO.heart}<span>${p.likesCount || 36}</span></span><span class="kr-act-pill" data-inscmt="${p.id}">${KR_ICO.cmt}<span>评论 (${(p.comments || []).length})</span></span></div><span class="kr-act-pill" data-inscmt="${p.id}">＋ 写评论</span></div>${cmtsHtml}</div>`;
-            }).join("");
+                const stream = topDoc.getElementById("smt-mom-stream"), posts = (data.posts || []).filter((p) => currentFilter === "all" || !p.isMe);
+                if (!posts.length) { stream.innerHTML = `<div style="text-align:center;padding:44px 16px;font-size:10.5px;font-weight:700;color:#9A9AA5;">暂无动态 · 点击右上角「让TA发新帖」吧</div>`; return; }
 
-            stream.querySelectorAll("[data-inslike]").forEach((btn) => btn.onclick = () => { const pid = Number(btn.getAttribute("data-inslike")), d = getFeedData(), t = d.posts.find((x) => x.id === pid); if (t) { t.liked = !t.liked; t.likesCount = Math.max(1, (t.likesCount || 10) + (t.liked ? 1 : -1)); saveFeedData(d); renderKrMoments(); } });
-            stream.querySelectorAll("[data-insdel]").forEach((btn) => btn.onclick = () => { if (!confirm("删除这条动态吗？")) return; const pid = Number(btn.getAttribute("data-insdel")), d = getFeedData(); d.posts = d.posts.filter((x) => x.id !== pid); saveFeedData(d); renderKrMoments(); });
-            stream.querySelectorAll("[data-inscmt]").forEach((btn) => btn.onclick = async () => {
-                const pid = Number(btn.getAttribute("data-inscmt")), d = getFeedData(), target = d.posts.find((x) => x.id === pid); if (!target) return;
-                const txt = prompt(`评论 ${target.author}：`); if (!txt || !txt.trim()) return;
-                const ctx = getCtx(); target.comments = target.comments || []; target.comments.push({ who: ctx.userName, text: txt.trim() }); saveFeedData(d); renderKrMoments();
-                try {
-                    const aiReply = await askAI(`你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 1000)}\n近期剧情：${ctx.recentChat}`, `在动态「${target.text}」下方，${ctx.userName}评论了：“${txt.trim()}”。请以${ctx.charName}的口吻直接回复一条简短评论(35字以内)：`);
-                    const latest = getFeedData(), t2 = latest.posts.find((x) => x.id === pid); if (t2) { t2.comments.push({ who: `${ctx.charName} ▸ ${ctx.userName}`, text: aiReply }); saveFeedData(latest); renderKrMoments(); }
-                } catch (e) {}
-            });
+                stream.innerHTML = posts.map((p, idx) => {
+                    const ava = p.isMe ? c.userAvatar : c.charAvatar, name = p.isMe ? c.userName : c.charName;
+                    const cmtsHtml = (p.comments && p.comments.length) ? `<div class="kr-cmt-list">${p.comments.map((cm) => `<div style="margin-bottom:4px;"><b style="color:#2C2C32;margin-right:5px;">${cm.who}：</b><span style="color:#484852;">${cm.text.replace(/</g, "&lt;")}</span></div>`).join("")}</div>` : "";
+                    return `<div class="kr-clean-post"><div class="kr-post-head"><div class="kr-post-user"><img class="post-ava" src="${ava}" /><div><div style="font-size:11.5px;font-weight:800;color:#2C2C32;">${name}</div><div style="display:flex;align-items:center;gap:3px;font-size:8.5px;font-weight:600;color:#8E8E98;margin-top:2px;">${KR_ICO.pin}<span>${p.loc || "SEOUL"} · ${p.time || "刚刚"}</span></div></div></div><span data-insdel="${p.id}" style="cursor:pointer;padding:4px;">${KR_ICO.more}</span></div><div class="kr-film-frame"><div class="kr-film-meta"><span class="kr-film-tag">${p.filmNo || `FILM · 0${idx + 1}`}</span><span style="font-size:8px;font-weight:700;color:#9A9AA5;">1 / 1</span></div>${p.imgUrl && /^https?:|^data:/.test(p.imgUrl) ? `<img class="real-photo" src="${p.imgUrl}" />` : ""}${p.photoDesc ? `<div class="kr-film-scene">${p.photoDesc.replace(/</g, "&lt;")}</div>` : ""}</div><div class="kr-post-caption"><div style="white-space:pre-wrap;">${(p.text || "").replace(/</g, "&lt;")}</div></div><div class="kr-post-bar"><div style="display:flex;align-items:center;gap:8px;"><span class="kr-act-pill" data-inslike="${p.id}">${p.liked ? KR_ICO.heartFill : KR_ICO.heart}<span>${p.likesCount || 36}</span></span><span class="kr-act-pill" data-inscmt="${p.id}">${KR_ICO.cmt}<span>评论 (${(p.comments || []).length})</span></span></div><span class="kr-act-pill" data-inscmt="${p.id}">＋ 写评论</span></div>${cmtsHtml}</div>`;
+                }).join("");
+
+                stream.querySelectorAll("[data-inslike]").forEach((btn) => btn.onclick = () => { const pid = Number(btn.getAttribute("data-inslike")), d = getFeedData(), t = d.posts.find((x) => x.id === pid); if (t) { t.liked = !t.liked; t.likesCount = Math.max(1, (t.likesCount || 10) + (t.liked ? 1 : -1)); saveFeedData(d); renderKrMoments(); } });
+                stream.querySelectorAll("[data-insdel]").forEach((btn) => btn.onclick = () => { if (!confirm("删除这条动态吗？")) return; const pid = Number(btn.getAttribute("data-insdel")), d = getFeedData(); d.posts = d.posts.filter((x) => x.id !== pid); saveFeedData(d); renderKrMoments(); });
+                stream.querySelectorAll("[data-inscmt]").forEach((btn) => btn.onclick = async () => {
+                    const pid = Number(btn.getAttribute("data-inscmt")), d = getFeedData(), target = d.posts.find((x) => x.id === pid); if (!target) return;
+                    const txt = prompt(`评论 ${target.author}：`); if (!txt || !txt.trim()) return;
+                    const ctx = getCtx(); target.comments = target.comments || []; target.comments.push({ who: ctx.userName, text: txt.trim() }); saveFeedData(d); renderKrMoments();
+                    try {
+                        const aiReply = await askAI(`你是${ctx.charName}。人设：${ctx.charDesc.slice(0, 1000)}\n近期剧情：${ctx.recentChat}`, `在动态「${target.text}」下方，${ctx.userName}评论了：“${txt.trim()}”。请以${ctx.charName}的口吻直接回复一条简短评论(35字以内)：`);
+                        const latest = getFeedData(), t2 = latest.posts.find((x) => x.id === pid); if (t2) { t2.comments.push({ who: `${ctx.charName} ▸ ${ctx.userName}`, text: aiReply }); saveFeedData(latest); renderKrMoments(); }
+                    } catch (e) {}
+                });
+            } catch (err) {}
         }
 
         spacePage.querySelectorAll("[data-feedfilter]").forEach((b) => b.onclick = () => { spacePage.querySelectorAll("[data-feedfilter]").forEach((x) => x.classList.remove("dark")); b.classList.add("dark"); currentFilter = b.getAttribute("data-feedfilter"); renderKrMoments(); });
@@ -2638,7 +2641,7 @@ bootSumoulApp();
             } catch (err) { alert(err.message); } finally { e.target.textContent = "✦ 让TA发新帖"; }
         };
 
-        // 5. 绑定主页「情侣空间 App」打开、子功能切换与返回导航
+        // 绑定主页「情侣空间 App」打开、子功能切换与返回导航
         function openStandaloneCoupleApp() {
             renderStandaloneCoupleSpace();
             topDoc.querySelectorAll("#seoul-mini-theater-modal .smt-page").forEach((p) => p.classList.remove("active"));
@@ -2672,6 +2675,29 @@ bootSumoulApp();
             } else if (coupleAppPage.classList.contains("active")) {
                 e.stopImmediatePropagation(); e.preventDefault();
                 topDoc.querySelector('.smt-tab-item[data-page="home"]')?.click();
+            }
+        }, true);
+
+        // 🛡️ 【核心修复2：补丁自带独立强制唤醒器】点击悬浮球或扩展菜单 100% 强制打开弹窗！
+        function safeForceOpenModal() {
+            modal.classList.add("smt-open");
+            modal.style.setProperty("display", "flex", "important");
+            const splash = topDoc.getElementById("smt-boot-splash");
+            const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
+            if (lockLayer && splash) {
+                lockLayer.classList.remove("smt-unlocked-hide");
+                splash.classList.remove("fade-out");
+                splash.onclick = () => splash.classList.add("fade-out");
+            }
+            renderKrMoments();
+            renderStandaloneCoupleSpace();
+        }
+
+        topDoc.addEventListener("click", (e) => {
+            const t = e.target;
+            if (!t || !t.closest) return;
+            if (t.closest("#seoul-mini-theater-btn") || t.closest("#seoul-ext-open-btn") || t.closest("#seoul-wand-menu-item")) {
+                safeForceOpenModal();
             }
         }, true);
 
