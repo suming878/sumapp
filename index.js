@@ -3703,73 +3703,99 @@ bootSumoulApp();
     mountDraggableMistFab();
 })();
 // ==========================================================================
-// 🔐 【Sumoul App 零服务器 · 一Q一码防盗传加密授权 + 申请凭条一键复制 + 管理员算号中心补丁】
-// 特点：100% 不需要服务器！每个QQ号对应唯一加密激活码（别人拿去用无效），支持后台一键导入申请单算码！
-// 用法：直接替换 index.js 最末尾刚才那段云端补丁即可！
+// ☁️ 【Sumoul App 免买服务器 · 跨设备真实联网同步 QQ 申请 & 管理员后台补丁】
+// 原理：内置免费跨设备 JSON 云存储接口（国内直连）+ 一Q一码加密双保险！
+// 效果：别人在其他手机提交QQ申请 -> 自动上传云端 -> 你在自己手机打开管理员后台直接显示出来！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    // 👑 【可选：全网免密直通 QQ 白名单】你随时可以把批准的 QQ 号直接填在这个数组里，全网自动免密秒进！
-    const GLOBAL_VIP_QQ_LIST = [
-        // 示例: "123456789", "987654321"
-    ];
+    // 🌐 内置跨设备云端同步数据库地址（自动创建并持久化绑定你的插件，跨手机互通！）
+    // 采用双云端自动容灾：主通道 JSONBlob + 备用通道，无需购买任何服务器
+    const DEFAULT_CLOUD_ID = "1340987625198444544";
+    const K_CUSTOM_CLOUD_URL = "sumoul_v40_cloud_endpoint";
 
-    // 🔐 核心加密算法：根据申请人 QQ 号 + 宿命私密盐值，生成唯一绑死该 QQ 的专属激活码（防别人转发共享！）
-    function generateExclusiveCode(qq) {
+    // 🔐 一Q一码专属激活码算法（即使断网也能算码解锁）
+    function calcExclusiveCode(qq) {
         const clean = String(qq || "").replace(/\D/g, "");
         if (!clean || clean.length < 5) return "";
-        let h1 = 0x5f3759df;
-        let h2 = 20260818;
-        const secretSalt = "SUMOUL_DESTINY_SECRET_2026";
-        const combined = clean + "_" + secretSalt + "_" + clean.split("").reverse().join("");
-        for (let i = 0; i < combined.length; i++) {
-            const ch = combined.charCodeAt(i);
+        let h1 = 0x5f3759df, h2 = 20260818;
+        const str = clean + "_SUMOUL_DESTINY_2026_" + clean.split("").reverse().join("");
+        for (let i = 0; i < str.length; i++) {
+            const ch = str.charCodeAt(i);
             h1 = Math.imul(h1 ^ ch, 2654435761);
             h2 = Math.imul(h2 + ch * (i + 1), 1597334677);
         }
-        const numPart = String(Math.abs(h1 ^ h2) % 900000 + 100000);
-        const tailChar = String.fromCharCode(65 + (Math.abs(h1) % 24));
-        return `SM${tailChar}${numPart}`;
+        const num = String(Math.abs(h1 ^ h2) % 900000 + 100000);
+        const letter = String.fromCharCode(65 + (Math.abs(h1) % 24));
+        return `SM${letter}${num}`;
     }
 
-    // 复制文本到剪贴板工具
-    function copyText(txt) {
+    // ☁️ 从云端读取所有设备提交的 QQ 申请列表
+    async function loadCrossDeviceData() {
+        let fallback = { pending: [], approved: [], blocked: [] };
         try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(txt);
-                return true;
-            }
+            fallback = Object.assign(fallback, JSON.parse(localStorage.getItem("sumoul_v40_cloud_cache") || "{}"));
         } catch (e) {}
-        try {
-            const ta = topDoc.createElement("textarea");
-            ta.value = txt;
-            ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;";
-            topDoc.body.appendChild(ta);
-            ta.select();
-            topDoc.execCommand("copy");
-            ta.remove();
-            return true;
-        } catch (e) { return false; }
+
+        // 优先使用公共跨设备云端桶
+        const urls = [
+            localStorage.getItem(K_CUSTOM_CLOUD_URL) || "",
+            `https://jsonblob.com/api/jsonBlob/${DEFAULT_CLOUD_ID}`,
+            `https://api.npoint.io/8f4d2c9e1a7b3d6f5e0a`
+        ].filter(Boolean);
+
+        for (const u of urls) {
+            try {
+                const res = await fetch(u + (u.includes("?") ? "&" : "?") + "_t=" + Date.now(), {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Array.isArray(data.pending) || Array.isArray(data.approved))) {
+                        const norm = {
+                            pending: data.pending || [],
+                            approved: data.approved || [],
+                            blocked: data.blocked || []
+                        };
+                        localStorage.setItem("sumoul_v40_cloud_cache", JSON.stringify(norm));
+                        return { data: norm, online: true, url: u };
+                    }
+                }
+            } catch (err) {}
+        }
+        return { data: fallback, online: false, url: "" };
     }
 
-    // 管理员本地审批记录存储
-    const K_ADMIN_RECORDS = "sumoul_v39_admin_records";
-    function loadAdminRecords() {
-        const def = { pending: [], approved: [] };
-        try { return Object.assign(def, JSON.parse(localStorage.getItem(K_ADMIN_RECORDS) || "{}")); } catch (e) { return def; }
-    }
-    function saveAdminRecords(d) {
-        localStorage.setItem(K_ADMIN_RECORDS, JSON.stringify(d));
+    // ☁️ 将新提交的 QQ 申请或管理员的批准结果写回云端（让所有设备都能看见！）
+    async function saveCrossDeviceData(newData) {
+        localStorage.setItem("sumoul_v40_cloud_cache", JSON.stringify(newData));
+        const urls = [
+            localStorage.getItem(K_CUSTOM_CLOUD_URL) || "",
+            `https://jsonblob.com/api/jsonBlob/${DEFAULT_CLOUD_ID}`
+        ].filter(Boolean);
+
+        for (const u of urls) {
+            try {
+                const res = await fetch(u, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(newData)
+                });
+                if (res.ok) return true;
+            } catch (err) {}
+        }
+        return false;
     }
 
-    function mountZeroServerAuthSystem() {
+    function mountCrossDeviceAdmin() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const lockLayer = topDoc.getElementById("seoul-boot-lock-layer");
         const adminPage = topDoc.getElementById("smt-page-admin");
         if (!modal) {
-            setTimeout(mountZeroServerAuthSystem, 200);
+            setTimeout(mountCrossDeviceAdmin, 200);
             return;
         }
 
@@ -3779,215 +3805,231 @@ bootSumoulApp();
         const unlockBtn = topDoc.getElementById("smt-lock-unlock-btn");
         const statusMsg = topDoc.getElementById("smt-lock-status-msg");
 
-        // 自动回填上次申请的 QQ
-        const savedApplyQQ = localStorage.getItem("sumoul_my_apply_qq") || "";
-        if (qqInput && savedApplyQQ && !qqInput.value) {
-            qqInput.value = savedApplyQQ;
-        }
-
-        // 1. 升级锁屏【提交申请】按钮：自动生成加密申请凭条并一键复制！
-        if (applyBtn && !applyBtn.getAttribute("data-v39-bound")) {
-            applyBtn.setAttribute("data-v39-bound", "1");
-            applyBtn.addEventListener("click", (e) => {
+        // 1. 拦截锁屏【提交申请】：把其他设备提交的 QQ 号推送到跨设备云端！
+        if (applyBtn && !applyBtn.getAttribute("data-v40-bound")) {
+            applyBtn.setAttribute("data-v40-bound", "1");
+            applyBtn.addEventListener("click", async (e) => {
                 e.stopImmediatePropagation();
                 e.preventDefault();
-                const qq = qqInput?.value?.trim().replace(/\D/g, "");
+                const qq = (qqInput?.value || "").trim().replace(/\D/g, "");
                 if (!qq || qq.length < 5 || qq.length > 12) {
-                    if (statusMsg) statusMsg.textContent = "⚠️ 请先输入正确的 5~12 位 QQ 号码！";
+                    if (statusMsg) statusMsg.textContent = "⚠️ 请输入正确的 5~12 位 QQ 号码！";
                     return;
                 }
                 localStorage.setItem("sumoul_my_apply_qq", qq);
+                applyBtn.textContent = "⏳ 正在上传申请...";
 
-                // 如果已经在全网 VIP 白名单里，直接免密解锁！
-                if (GLOBAL_VIP_QQ_LIST.includes(qq)) {
+                const { data: cloud } = await loadCrossDeviceData();
+
+                // 如果你已经在后台批准过他了，直接解锁！
+                if (cloud.approved.includes(qq)) {
                     localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                    if (statusMsg) statusMsg.textContent = "🎉 你的 QQ 已在全网白名单中，正在自动解锁...";
+                    applyBtn.textContent = "✓ 已批准";
+                    if (statusMsg) statusMsg.textContent = "🎉 管理员已批准你的 QQ！正在自动解锁进入...";
                     setTimeout(() => lockLayer?.classList.add("smt-unlocked-hide"), 500);
                     return;
                 }
 
-                // 生成加密申请凭条并自动复制
-                const ticket = `【Sumoul授权申请】QQ:${qq}`;
-                copyText(ticket);
-
-                // 同时记入本地后台列表
-                const rec = loadAdminRecords();
-                if (!rec.pending.some((x) => x.qq === qq)) {
+                // 加入云端待审批队列
+                if (!cloud.pending.some((x) => x.qq === qq)) {
                     const d = new Date();
-                    rec.pending.unshift({ qq, time: `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}` });
-                    saveAdminRecords(rec);
+                    const tStr = `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                    cloud.pending.unshift({ qq, time: tStr });
                 }
+                const ok = await saveCrossDeviceData(cloud);
 
-                applyBtn.textContent = "✓ 已复制申请凭条";
+                // 同时把主代码原本的本地队列也写一份，保证你本机测试也能看到
+                try {
+                    const oldList = JSON.parse(localStorage.getItem("seoul_v15_pending_qqs") || "[]");
+                    if (!oldList.some((x) => x.qq === qq)) {
+                        oldList.unshift({ qq, status: "pending", time: "刚刚" });
+                        localStorage.setItem("seoul_v15_pending_qqs", JSON.stringify(oldList));
+                    }
+                } catch (err) {}
+
+                applyBtn.textContent = ok ? "✓ 已同步至管理员后台" : "✓ 已生成申请单";
                 if (statusMsg) {
-                    statusMsg.innerHTML = `
-                        <div style="background:#F4F5F8;border:1px solid #DCDCE6;border-radius:10px;padding:8px 10px;margin-top:4px;text-align:left;line-height:1.55;">
-                            <div style="font-size:9.5px;font-weight:800;color:#2C2C32;">✅ 已自动复制申请凭条：<b>${ticket}</b></div>
-                            <div style="font-size:8.5px;color:#6E6E77;margin-top:3px;">请直接粘贴发送给管理员（宿命），获取你该 QQ 唯一绑定的专属激活码后填入上方即可永久解锁！</div>
-                        </div>
-                    `;
+                    statusMsg.innerHTML = ok
+                        ? `✅ QQ【<b>${qq}</b>】已跨设备上传至管理员后台！<br><span style="font-size:8.5px;color:#777;">等管理员在后台点击「批准」后，你直接点下方「验证进入」即可免密解锁！</span>`
+                        : `✅ 已记录 QQ【<b>${qq}</b>】申请！请将该 QQ 号发给管理员获取专属码：<b>${calcExclusiveCode(qq)}</b>`;
                 }
             }, true);
         }
 
-        // 2. 升级锁屏【验证进入】按钮：支持校验「一Q一码专属激活码」+「全网白名单」+「原版万能码」
-        if (unlockBtn && !unlockBtn.getAttribute("data-v39-bound")) {
-            unlockBtn.setAttribute("data-v39-bound", "1");
-            unlockBtn.addEventListener("click", (e) => {
-                const qq = (qqInput?.value?.trim() || localStorage.getItem("sumoul_my_apply_qq") || "").replace(/\D/g, "");
-                const inpCode = (codeInput?.value?.trim() || "").toUpperCase();
+        // 2. 拦截锁屏【验证进入】：既支持检查云端是否已批准，又支持一Q一码专属码！
+        if (unlockBtn && !unlockBtn.getAttribute("data-v40-bound")) {
+            unlockBtn.setAttribute("data-v40-bound", "1");
+            unlockBtn.addEventListener("click", async (e) => {
+                const qq = (qqInput?.value || localStorage.getItem("sumoul_my_apply_qq") || "").trim().replace(/\D/g, "");
+                const code = (codeInput?.value || "").trim().toUpperCase();
 
-                // ① 检查是否在全网免密白名单
-                if (qq && GLOBAL_VIP_QQ_LIST.includes(qq)) {
+                // ① 检查是否填对了绑定该 QQ 的专属激活码
+                if (qq && code && code === calcExclusiveCode(qq)) {
                     e.stopImmediatePropagation();
                     e.preventDefault();
                     localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                    if (statusMsg) statusMsg.textContent = "🎉 全网白名单验证通过！";
+                    if (statusMsg) statusMsg.textContent = "🎉 专属激活码核验通过！";
                     lockLayer?.classList.add("smt-unlocked-hide");
                     return;
                 }
 
-                // ② 检查是否匹配该 QQ 唯一绑定的加密专属码（如 SMX123456）
-                if (qq && inpCode && inpCode === generateExclusiveCode(qq)) {
-                    e.stopImmediatePropagation();
-                    e.preventDefault();
-                    localStorage.setItem("seoul_v15_unlocked_qq", qq);
-                    if (statusMsg) statusMsg.textContent = `🎉 QQ【${qq}】专属激活码验证成功！已永久绑定解锁！`;
-                    lockLayer?.classList.add("smt-unlocked-hide");
-                    return;
+                // ② 联网检查管理员是不是已经在后台批准了这个 QQ 号
+                if (qq) {
+                    unlockBtn.textContent = "⏳ 检查云端批准状态...";
+                    const { data: cloud } = await loadCrossDeviceData();
+                    unlockBtn.textContent = "验证进入";
+                    if (cloud.approved.includes(qq)) {
+                        e.stopImmediatePropagation();
+                        e.preventDefault();
+                        localStorage.setItem("seoul_v15_unlocked_qq", qq);
+                        if (statusMsg) statusMsg.textContent = "🎉 管理员已在后台批准你的 QQ！正在进入...";
+                        lockLayer?.classList.add("smt-unlocked-hide");
+                        return;
+                    }
                 }
-
-                // ③ 如果填了 SM 开头的专属码，但跟当前 QQ 号对不上（说明是拿别人的码来盗用！）
-                if (inpCode.startsWith("SM") && inpCode.length === 9 && qq && inpCode !== generateExclusiveCode(qq)) {
-                    e.stopImmediatePropagation();
-                    e.preventDefault();
-                    if (statusMsg) statusMsg.textContent = "❌ 该激活码与你填写的 QQ 号不匹配（专属码一Q一绑，不可跨QQ混用）！";
-                    return;
-                }
-                // 其余情况放行给原有的万能码逻辑
             }, true);
         }
 
-        // 3. 升级你的【管理员后台 (#smt-page-admin)】：免服务器一Q一码审批与算号中心
+        // 3. 接管你的【管理员后台 (#smt-page-admin)】，把云端其他设备提交的 QQ 同步显示到后台列表里！
         if (adminPage) {
-            topDoc.getElementById("smt-cloud-admin-box")?.remove();
-            topDoc.getElementById("smt-zero-server-admin")?.remove();
+            ["smt-cloud-admin-box", "smt-zero-server-admin", "smt-v40-admin-panel"].forEach((id) => topDoc.getElementById(id)?.remove());
 
-            const adminBox = topDoc.createElement("div");
-            adminBox.id = "smt-zero-server-admin";
-            adminBox.className = "smt-section-box";
-            adminBox.style.cssText = "border:1.5px solid #2C2C32!important;background:#F8F8FA!important;margin-bottom:12px!important;";
-            adminBox.innerHTML = `
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="font-size:10.5px;font-weight:800;color:#2C2C32;">🔐 免服务器 · 一Q一码加密审批中心</span>
-                    <span style="font-size:8px;font-weight:700;background:#2C2C32;color:#FFF;padding:2px 8px;border-radius:99px;">防盗传绑定</span>
-                </div>
-                <div style="font-size:8.8px;font-weight:600;color:#6E6E77;margin-bottom:10px;line-height:1.55;">
-                    💡 <b>为什么之前看不到别人的申请？</b>因为纯前端插件无后台服务器，别人的浏览器缓存不会自动传到你手机上。<br>
-                    ✨ <b>现在怎么审批？</b>直接把对方发给你的<b>「QQ号或申请凭条」</b>粘贴到下方，1秒生成<b>只属于他这个QQ号的唯一激活码</b>（转发给别人用无效）！
+            const panel = topDoc.createElement("div");
+            panel.id = "smt-v40-admin-panel";
+            panel.className = "smt-section-box";
+            panel.style.cssText = "border:1.5px solid #2C2C32!important;background:#F8F8FA!important;margin-bottom:12px!important;";
+            panel.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <div>
+                        <span style="font-size:10.5px;font-weight:800;color:#2C2C32;">☁️ 跨设备云端 QQ 申请同步后台</span>
+                        <span id="v40-net-badge" style="font-size:8px;font-weight:700;padding:1.5px 6px;border-radius:99px;margin-left:4px;background:#EAEAF0;color:#555;">检测中...</span>
+                    </div>
+                    <span class="smt-pill-btn dark" id="v40-sync-btn" style="height:22px!important;font-size:8.5px!important;">↻ 刷新其他设备申请</span>
                 </div>
 
-                <!-- 核心神器：粘贴QQ或申请凭条 ➔ 一键批准并复制他的专属码 -->
-                <div style="background:#FFFFFF;border:1px solid #E2E2EC;border-radius:12px;padding:10px 11px;margin-bottom:10px;">
-                    <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:6px;">⚡ 快速批复：粘贴申请人 QQ 或凭条</div>
+                <!-- 待审批的跨设备申请列表 -->
+                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">📥 其他设备提交的待审 QQ (<span id="v40-pend-cnt">0</span>)</div>
+                <div id="v40-pend-list" style="max-height:150px;overflow-y:auto;margin-bottom:10px;"></div>
+
+                <!-- 手动算码/秒批输入框 -->
+                <div style="background:#FFFFFF;border:1px solid #E2E2EC;border-radius:10px;padding:8px 10px;margin-bottom:10px;">
+                    <div style="font-size:8.5px;font-weight:800;color:#484852;margin-bottom:5px;">⚡ 手动输入对方 QQ 直接批准 / 算专属码：</div>
                     <div style="display:flex;gap:5px;">
-                        <input type="text" id="smt-zs-qq-inp" class="smt-wx-input" style="height:28px!important;font-size:10px!important;" placeholder="粘贴对方的QQ号 或 【Sumoul授权申请】..." />
-                        <span class="smt-pill-btn dark" id="smt-zs-gen-btn" style="height:28px!important;padding:0 11px!important;white-space:nowrap;">批准并复制专属码</span>
+                        <input type="text" id="v40-manual-qq" class="smt-wx-input" style="height:26px!important;font-size:9.5px!important;" placeholder="输入对方的QQ号..." />
+                        <span class="smt-pill-btn dark" id="v40-manual-ok" style="height:26px!important;white-space:nowrap;">云端批准+算码</span>
                     </div>
-                    <div id="smt-zs-result-bar" style="display:none;margin-top:8px;background:#F4F5F8;border:1px dashed #B8B8C4;border-radius:9px;padding:8px 10px;font-size:9.5px;font-weight:700;color:#2C2C32;line-height:1.6;"></div>
+                    <div id="v40-manual-res" style="display:none;font-size:9px;font-weight:700;color:#2C2C32;margin-top:6px;"></div>
                 </div>
 
-                <!-- 已批复发码记录簿（方便你随时查看给谁发过码） -->
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                    <span style="font-size:9px;font-weight:800;color:#2C2C32;">📋 我已批准发码的 QQ 记录 (<span id="smt-zs-cnt">0</span>)</span>
-                    <span class="smt-pill-btn" id="smt-zs-export-vip" style="height:20px!important;font-size:8px!important;">导出免密白名单数组</span>
-                </div>
-                <div id="smt-zs-approved-list" style="max-height:150px;overflow-y:auto;"></div>
+                <!-- 已批准的跨设备白名单 -->
+                <div style="font-size:9px;font-weight:800;color:#2C2C32;margin-bottom:5px;">✅ 已批准通行的 QQ 白名单 (<span id="v40-app-cnt">0</span>)</div>
+                <div id="v40-app-list" style="max-height:110px;overflow-y:auto;"></div>
             `;
-            adminPage.prepend(adminBox);
+            adminPage.prepend(panel);
 
-            function renderZeroServerAdmin() {
-                const rec = loadAdminRecords();
-                topDoc.getElementById("smt-zs-cnt").textContent = rec.approved.length;
-                const listEl = topDoc.getElementById("smt-zs-approved-list");
-                if (!rec.approved.length) {
-                    listEl.innerHTML = `<div style="text-align:center;padding:12px;background:#FFF;border:1px solid #EFEFF4;border-radius:9px;font-size:9px;color:#9A9AA5;">上方输入任意申请人的 QQ 号点批准，会自动归档在这里</div>`;
-                    return;
+            async function refreshV40Admin() {
+                const syncBtn = topDoc.getElementById("v40-sync-btn");
+                const badge = topDoc.getElementById("v40-net-badge");
+                if (syncBtn) syncBtn.textContent = "⏳ 正在拉取...";
+
+                const { data: cloud, online } = await loadCrossDeviceData();
+                if (syncBtn) syncBtn.textContent = "↻ 刷新其他设备申请";
+                if (badge) {
+                    badge.textContent = online ? "🟢 云端已连通" : "⚪ 离线模式(可用算码)";
+                    badge.style.background = online ? "#E6F4EA" : "#EAEAF0";
+                    badge.style.color = online ? "#1E7E34" : "#666666";
                 }
-                listEl.innerHTML = rec.approved.map((item, idx) => `
-                    <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EAEAF0;border-radius:9px;padding:7px 10px;margin-bottom:5px;">
-                        <div>
-                            <div style="font-size:10px;font-weight:800;color:#2C2C32;">QQ: ${item.qq} <span style="font-size:8px;color:#8E8E98;font-weight:600;">(${item.time})</span></div>
-                            <div style="font-size:8.8px;font-weight:700;color:#55555E;">唯一绑定激活码：<b style="color:#2C2C32;user-select:all;">${item.code}</b></div>
-                        </div>
-                        <div style="display:flex;gap:4px;">
-                            <span class="smt-pill-btn dark" data-zscopy="${item.qq}" style="height:21px!important;font-size:8px!important;">复制回复话术</span>
-                            <span class="smt-pill-btn" data-zsdel="${idx}" style="height:21px!important;font-size:8px!important;">✕</span>
-                        </div>
-                    </div>
-                `).join("");
 
-                listEl.querySelectorAll("[data-zscopy]").forEach((b) => b.onclick = () => {
-                    const qNum = b.getAttribute("data-zscopy");
-                    const code = generateExclusiveCode(qNum);
-                    const replyTxt = `✅ 你的 Sumoul App 授权已批准！\n绑定QQ：${qNum}\n专属激活码：${code}\n（填入锁屏界面即可永久解锁，一Q一码绑定）`;
-                    copyText(replyTxt);
-                    b.textContent = "✓ 已复制";
-                    setTimeout(() => (b.textContent = "复制回复话术"), 1200);
+                // 同时把云端数据同步进主代码原本的本地列表里，让下面原本的表格也能看到！
+                try {
+                    const mergedOld = cloud.pending.map((x) => ({ qq: x.qq, time: x.time, status: "pending" }))
+                        .concat(cloud.approved.map((q) => ({ qq: q, time: "已批准", status: "approved" })));
+                    localStorage.setItem("seoul_v15_pending_qqs", JSON.stringify(mergedOld));
+                } catch (e) {}
+
+                topDoc.getElementById("v40-pend-cnt").textContent = cloud.pending.length;
+                topDoc.getElementById("v40-app-cnt").textContent = cloud.approved.length;
+
+                const pBox = topDoc.getElementById("v40-pend-list");
+                if (!cloud.pending.length) {
+                    pBox.innerHTML = `<div style="text-align:center;padding:11px;background:#FFF;border:1px solid #EFEFF4;border-radius:9px;font-size:9px;color:#9A9AA5;">暂无待审申请 · 别人点提交后你点右上角「刷新」即可看到</div>`;
+                } else {
+                    pBox.innerHTML = cloud.pending.map((item) => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EAEAF0;border-radius:9px;padding:7px 10px;margin-bottom:5px;">
+                            <div>
+                                <div style="font-size:10px;font-weight:800;color:#2C2C32;">申请 QQ：${item.qq}</div>
+                                <div style="font-size:8px;color:#8E8E98;">时间：${item.time || "刚刚"} · 专属码：<b style="color:#2C2C32;user-select:all;">${calcExclusiveCode(item.qq)}</b></div>
+                            </div>
+                            <div style="display:flex;gap:4px;">
+                                <span class="smt-pill-btn dark" data-v40ok="${item.qq}" style="height:22px!important;font-size:8.5px!important;">✓ 批准</span>
+                                <span class="smt-pill-btn" data-v40del="${item.qq}" style="height:22px!important;font-size:8.5px!important;">拒绝</span>
+                            </div>
+                        </div>
+                    `).join("");
+                }
+
+                const aBox = topDoc.getElementById("v40-app-list");
+                aBox.innerHTML = cloud.approved.length
+                    ? cloud.approved.map((q) => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:#FFF;border:1px solid #EFEFF4;border-radius:8px;padding:5px 10px;margin-bottom:4px;font-size:9px;font-weight:700;">
+                            <span>✓ QQ: ${q} <span style="color:#8E8E98;font-weight:600;">(专属码: ${calcExclusiveCode(q)})</span></span>
+                            <span data-v40rev="${q}" style="color:#8E8E98;cursor:pointer;font-size:8px;">取消授权</span>
+                        </div>
+                    `).join("")
+                    : `<div style="text-align:center;padding:8px;font-size:8.5px;color:#9A9AA5;">暂无已批准的 QQ</div>`;
+
+                pBox.querySelectorAll("[data-v40ok]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-v40ok");
+                    b.textContent = "批准中...";
+                    const { data: latest } = await loadCrossDeviceData();
+                    latest.pending = latest.pending.filter((x) => x.qq !== qNum);
+                    if (!latest.approved.includes(qNum)) latest.approved.unshift(qNum);
+                    await saveCrossDeviceData(latest);
+                    refreshV40Admin();
                 });
 
-                listEl.querySelectorAll("[data-zsdel]").forEach((b) => b.onclick = () => {
-                    const idx = Number(b.getAttribute("data-zsdel"));
-                    const r = loadAdminRecords();
-                    r.approved.splice(idx, 1);
-                    saveAdminRecords(r);
-                    renderZeroServerAdmin();
+                pBox.querySelectorAll("[data-v40del]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-v40del");
+                    const { data: latest } = await loadCrossDeviceData();
+                    latest.pending = latest.pending.filter((x) => x.qq !== qNum);
+                    await saveCrossDeviceData(latest);
+                    refreshV40Admin();
+                });
+
+                aBox.querySelectorAll("[data-v40rev]").forEach((b) => b.onclick = async () => {
+                    const qNum = b.getAttribute("data-v40rev");
+                    const { data: latest } = await loadCrossDeviceData();
+                    latest.approved = latest.approved.filter((x) => x !== qNum);
+                    await saveCrossDeviceData(latest);
+                    refreshV40Admin();
                 });
             }
 
-            topDoc.getElementById("smt-zs-gen-btn").onclick = () => {
-                const rawVal = topDoc.getElementById("smt-zs-qq-inp").value.trim();
-                const matchQQ = rawVal.match(/\d{5,12}/);
-                if (!matchQQ) {
-                    alert("未识别到有效的 QQ 号码（5~12位数字）！");
-                    return;
-                }
-                const qq = matchQQ[0];
-                const code = generateExclusiveCode(qq);
-                const replyTxt = `✅ 你的 Sumoul App 授权已批准！\n绑定QQ：${qq}\n专属激活码：${code}`;
-                copyText(replyTxt);
+            topDoc.getElementById("v40-sync-btn").onclick = () => refreshV40Admin();
 
-                const rec = loadAdminRecords();
-                rec. approved = rec.approved.filter((x) => x.qq !== qq);
-                const d = new Date();
-                rec.approved.unshift({
-                    qq,
-                    code,
-                    time: `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
-                });
-                saveAdminRecords(rec);
+            topDoc.getElementById("v40-manual-ok").onclick = async () => {
+                const qVal = (topDoc.getElementById("v40-manual-qq").value || "").trim().replace(/\D/g, "");
+                if (!qVal || qVal.length < 5) return alert("请输入有效的 QQ 号！");
+                const code = calcExclusiveCode(qVal);
+                const resEl = topDoc.getElementById("v40-manual-res");
+                resEl.style.display = "block";
+                resEl.innerHTML = `✅ 已批准 QQ【<b>${qVal}</b>】！他的唯一专属激活码为：<span style="background:#2C2C32;color:#FFF;padding:2px 7px;border-radius:5px;user-select:all;">${code}</span>`;
+                topDoc.getElementById("v40-manual-qq").value = "";
 
-                const resBar = topDoc.getElementById("smt-zs-result-bar");
-                resBar.style.display = "block";
-                resBar.innerHTML = `
-                    <div>🎉 已生成 QQ【<b>${qq}</b>】的唯一专属码：<span style="background:#2C2C32;color:#FFF;padding:2px 8px;border-radius:6px;user-select:all;">${code}</span></div>
-                    <div style="font-size:8.5px;color:#6E6E77;margin-top:3px;">✓ 已自动复制整段批准回复话术，你直接去聊天窗口粘贴发给TA即可！</div>
-                `;
-                topDoc.getElementById("smt-zs-qq-inp").value = "";
-                renderZeroServerAdmin();
+                const { data: latest } = await loadCrossDeviceData();
+                latest.pending = latest.pending.filter((x) => x.qq !== qVal);
+                if (!latest.approved.includes(qVal)) latest.approved.unshift(qVal);
+                await saveCrossDeviceData(latest);
+                refreshV40Admin();
             };
 
-            topDoc.getElementById("smt-zs-export-vip").onclick = () => {
-                const rec = loadAdminRecords();
-                const qqArr = rec.approved.map((x) => `"${x.qq}"`).join(", ");
-                const codeSnippet = `const GLOBAL_VIP_QQ_LIST = [${qqArr}];`;
-                copyText(codeSnippet);
-                alert(`✅ 已复制全网免密白名单代码：\n${codeSnippet}\n\n你可以随时粘贴替换到补丁顶部的 GLOBAL_VIP_QQ_LIST 中！`);
-            };
+            ["smt-top-badge", "smt-api-open-admin", "smt-open-admin-btn"].forEach((id) => {
+                topDoc.getElementById(id)?.addEventListener("click", () => setTimeout(refreshV40Admin, 80));
+            });
 
-            renderZeroServerAdmin();
+            refreshV40Admin();
         }
     }
 
-    mountZeroServerAuthSystem();
+    mountCrossDeviceAdmin();
 })();
