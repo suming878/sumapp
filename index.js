@@ -4098,7 +4098,8 @@ bootSumoulApp();
     mountPrivateServerV46();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 微信全屏 + 100%纯白无灰底设置中心 + 4大新增微信玩法 + 世界书自动读取（完整无截断版）】
+// 🤍 【Sumoul App 微信全屏 + 零双边框 iOS/Kakao 纯白高定设置中心 + 8大丰富模块 + 世界书自动读取】
+// 修复：彻底剥离 .smt-wx-input 消除双边框！升级为纯白分组列表排版 + 新增AI主动发消息/关系羁绊/字号调节/记录备份！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -4110,7 +4111,7 @@ bootSumoulApp();
     const ICO = {
         sliders: svgLine(`<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>`, 14, "#3A3A40", "1.7"),
         user: svgLine(`<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`),
-        camera: svgLine(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 12, "#484852"),
+        camera: svgLine(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 11, "#3A3A40"),
         sync: svgLine(`<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>`),
         clock: svgLine(`<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>`),
         summary: svgLine(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/>`),
@@ -4118,7 +4119,9 @@ bootSumoulApp();
         image: svgLine(`<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`),
         feather: svgLine(`<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>`),
         book: svgLine(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`),
-        upload: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>`, 13, "#FFFFFF", "1.8"),
+        bell: svgLine(`<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`),
+        upload: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>`, 12, "#FFFFFF", "1.8"),
+        download: svgLine(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>`, 13, "#3A3A40"),
         plus: svgLine(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
         trash: svgLine(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 13, "#9A6868"),
         shield: svgLine(`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`, 13),
@@ -4143,7 +4146,18 @@ bootSumoulApp();
 
     function getExtraKey() { return `sumoul_v16_wxextra__${getCharScope()}`; }
     function loadExtra() {
-        const def = { petNameForMe: "", pokeSuffix: "的小脑袋", pinNotice: "", replyCount: "2~4", styleTags: ["日常自然短句"], wallpaperUrl: "", wallpaperMask: "light" };
+        const def = {
+            petNameForMe: "",
+            pokeSuffix: "的小脑袋",
+            pinNotice: "",
+            relationStage: "热恋同居",     // 关系阶段: 暧昧拉扯 | 热恋同居 | 新婚燕尔 | 冷战破冰 | 宿命羁绊
+            jealousyLv: "偏执占有",        // 醋意浓度: 克制隐忍 | 傲娇吃醋 | 偏执占有 | 温柔包容
+            replyCount: "2~4",
+            styleTags: ["日常自然短句"],
+            fontSize: "12px",              // 聊天字体大小: 11px | 12px | 13px
+            wallpaperUrl: "",
+            wallpaperMask: "light"
+        };
         try { return Object.assign(def, JSON.parse(localStorage.getItem(getExtraKey()) || "{}")); } catch (e) { return def; }
     }
     function saveExtra(d) { try { localStorage.setItem(getExtraKey(), JSON.stringify(d)); } catch (e) {} }
@@ -4174,15 +4188,16 @@ bootSumoulApp();
         });
     }
 
-    function applyWallpaperAndPin() {
+    function applyVisualsAndPin() {
         const ex = loadExtra();
         const stream = topDoc.getElementById("smt-wx-stream");
         const talkPage = topDoc.getElementById("smt-page-talk");
         if (!stream || !talkPage) return;
 
+        // 1. 壁纸
         if (ex.wallpaperUrl) {
             let ov = "";
-            if (ex.wallpaperMask === "light") ov = "linear-gradient(rgba(255,255,255,0.55),rgba(255,255,255,0.55)),";
+            if (ex.wallpaperMask === "light") ov = "linear-gradient(rgba(255,255,255,0.58),rgba(255,255,255,0.58)),";
             else if (ex.wallpaperMask === "mist") ov = "linear-gradient(rgba(255,255,255,0.82),rgba(255,255,255,0.82)),";
             stream.style.setProperty("background-image", `${ov}url('${ex.wallpaperUrl}')`, "important");
             stream.style.setProperty("background-size", "cover", "important");
@@ -4191,6 +4206,16 @@ bootSumoulApp();
             stream.style.removeProperty("background-image");
         }
 
+        // 2. 气泡字号动态控制
+        let fontCss = topDoc.getElementById("sumoul-wx-fontsize-dyn");
+        if (!fontCss) {
+            fontCss = topDoc.createElement("style");
+            fontCss.id = "sumoul-wx-fontsize-dyn";
+            topDoc.head.appendChild(fontCss);
+        }
+        fontCss.innerHTML = `#seoul-mini-theater-modal #smt-wx-stream .smt-wx-bubble { font-size: ${ex.fontSize || "12px"} !important; }`;
+
+        // 3. 置顶公告条
         let pinBar = topDoc.getElementById("smt-wx-pin-banner");
         if (!ex.pinNotice || !ex.pinNotice.trim()) {
             if (pinBar) pinBar.style.display = "none";
@@ -4248,7 +4273,7 @@ bootSumoulApp();
                 Object.values(topWin.world_info.entries).forEach((it, i) => {
                     const content = String(it?.content || "").trim();
                     if (!content) return;
-                    const keys = (Array.isArray(it.key) ? it.key : []).map(String).filter(Boolean);
+                    const keys = (Array.isArray(it.key) ? item.key : []).map(String).filter(Boolean);
                     found.push({ id: Date.now() + 500 + i, title: String(it.comment || keys[0] || `世界书 #${i + 1}`), keys, content, enabled: !it.disable, constant: Boolean(it.constant) || keys.length === 0 });
                 });
             }
@@ -4261,9 +4286,11 @@ bootSumoulApp();
         const ex = loadExtra();
         const rules = [];
         if (ex.petNameForMe) rules.push(`你在微信里对用户的专属亲密称呼是「${ex.petNameForMe}」，请自然使用该称呼`);
+        if (ex.relationStage) rules.push(`你们目前的关系阶段是「${ex.relationStage}」`);
+        if (ex.jealousyLv) rules.push(`你的情感占有欲与吃醋表现为「${ex.jealousyLv}」`);
         if (ex.replyCount) rules.push(`每次请分 ${ex.replyCount} 条短句气泡回复（换行分隔）`);
-        if (ex.styleTags?.length) rules.push(`你的线上打字风格偏好：${ex.styleTags.join("、")}`);
-        if (rules.length) block += `\n\n【微信私聊语感与称呼要求】：${rules.join("；")}。`;
+        if (ex.styleTags?.length) rules.push(`你的线上打字语感偏好：${ex.styleTags.join("、")}`);
+        if (rules.length) block += `\n\n【微信私聊语感与关系要求】：${rules.join("；")}。`;
 
         const wi = loadWi();
         if (wi.enabled && wi.entries?.length) {
@@ -4280,8 +4307,8 @@ bootSumoulApp();
     }
 
     function hookFetch() {
-        if (window.__sumoul_wi_hook_v3) return;
-        window.__sumoul_wi_hook_v3 = true;
+        if (window.__sumoul_wi_hook_v4) return;
+        window.__sumoul_wi_hook_v4 = true;
         const orig = window.fetch.bind(window);
         window.fetch = async function (input, init) {
             try {
@@ -4291,7 +4318,7 @@ bootSumoulApp();
                     if (Array.isArray(body?.messages) && body.messages.length) {
                         const allTxt = body.messages.map((m) => m.content || "").join("\n");
                         const extra = buildPromptInjection(allTxt);
-                        if (extra && !allTxt.includes("【微信私聊语感与称呼要求】") && !allTxt.includes("【角色必须遵守的世界书")) {
+                        if (extra && !allTxt.includes("【微信私聊语感与关系要求】") && !allTxt.includes("【角色必须遵守的世界书")) {
                             const sys = body.messages.find((m) => m.role === "system") || body.messages[0];
                             if (sys) { sys.content += extra; init.body = JSON.stringify(body); }
                         }
@@ -4302,24 +4329,25 @@ bootSumoulApp();
         };
     }
 
-    function mountPureWhiteSettings() {
+    function mountRefinedPureWhiteSettings() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const talkPage = topDoc.getElementById("smt-page-talk");
         const wxSetPage = topDoc.getElementById("smt-page-wx_settings");
         const topBadge = topDoc.getElementById("smt-top-badge");
         if (!modal || !talkPage || !wxSetPage || !topBadge) {
-            setTimeout(mountPureWhiteSettings, 200);
+            setTimeout(mountRefinedPureWhiteSettings, 200);
             return;
         }
 
         hookFetch();
-        applyWallpaperAndPin();
+        applyVisualsAndPin();
 
-        // 注入 100% 纯白无灰底 CSS
+        // 注入【零双边框 · iOS/Kakao 原生纯白分组列表】CSS
         topDoc.getElementById("sumoul-wx-fullscreen-css")?.remove();
         const st = topDoc.createElement("style");
         st.id = "sumoul-wx-fullscreen-css";
         st.innerHTML = `
+            /* 1. 微信聊天页全屏沉浸 */
             #seoul-mini-theater-modal #smt-page-talk .smt-wx-top-bar { display: none !important; }
             #seoul-mini-theater-modal .smt-fs-body:has(#smt-page-talk.active) { padding: 0 !important; max-width: 100% !important; }
             #seoul-mini-theater-modal #smt-page-talk { padding: 0 !important; background: #FFFFFF !important; }
@@ -4328,30 +4356,135 @@ bootSumoulApp();
             #seoul-mini-theater-modal #smt-page-talk .smt-wx-bar { margin: 0 10px 8px 10px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1px solid #EAEAF0 !important; }
             #seoul-mini-theater-modal #smt-wx-reply-preview, #seoul-mini-theater-modal #smt-wx-emoji-drawer { margin: 0 10px 6px 10px !important; background: #FFFFFF !important; }
 
-            /* 设置页 100% 纯白背景 + 纯白无灰底极细下划线输入框 */
-            #seoul-mini-theater-modal #smt-page-wx_settings { background: #FFFFFF !important; margin: 0 !important; padding: 4px 2px 24px 2px !important; }
-            #seoul-mini-theater-modal .pw-card { background: #FFFFFF !important; border: 1px solid #EAEAF0 !important; border-radius: 18px !important; padding: 14px 15px !important; margin-bottom: 11px !important; box-shadow: 0 2px 10px rgba(0,0,0,0.015) !important; flex-shrink: 0 !important; }
-            #seoul-mini-theater-modal .pw-card-head { display: flex !important; align-items: center !important; justify-content: space-between !important; margin-bottom: 10px !important; padding-bottom: 8px !important; border-bottom: 1px solid #F4F4F8 !important; }
-            #seoul-mini-theater-modal .pw-card-title { display: flex !important; align-items: center !important; gap: 7px !important; font-size: 10.5px !important; font-weight: 800 !important; color: #2C2C32 !important; }
-            #seoul-mini-theater-modal .pw-ico-circle { width: 27px !important; height: 27px !important; border-radius: 9px !important; background: #FFFFFF !important; border: 1px solid #E6E6EE !important; display: flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; }
+            /* 2. 设置页：100% 纯白底 + 精致分组标题 + 单层圆角列表容器 */
+            #seoul-mini-theater-modal #smt-page-wx_settings {
+                background: #FFFFFF !important;
+                margin: 0 !important;
+                padding: 2px 2px 28px 2px !important;
+            }
+            #seoul-mini-theater-modal .ios-sec-header {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 8px 6px 5px 6px !important;
+                font-size: 9px !important;
+                font-weight: 800 !important;
+                color: #8E8E98 !important;
+                letter-spacing: 0.8px !important;
+            }
+            #seoul-mini-theater-modal .ios-group-card {
+                background: #FFFFFF !important;
+                border: 1px solid #E8E8F0 !important;
+                border-radius: 16px !important;
+                padding: 0 14px !important;
+                margin-bottom: 8px !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.012) !important;
+                flex-shrink: 0 !important;
+            }
+            /* 每一行只有底部一根 1px 极细分割线，最后一行无分割线，彻底根除双边框！ */
+            #seoul-mini-theater-modal .ios-row {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                min-height: 40px !important;
+                padding: 4px 0 !important;
+                border-bottom: 1px solid #F2F2F7 !important;
+                gap: 10px !important;
+                box-sizing: border-box !important;
+            }
+            #seoul-mini-theater-modal .ios-row.last {
+                border-bottom: none !important;
+            }
+            #seoul-mini-theater-modal .ios-lbl {
+                font-size: 10.2px !important;
+                font-weight: 700 !important;
+                color: #2C2C32 !important;
+                flex-shrink: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 7px !important;
+            }
+            /* 🔥 核心：强制剥离所有输入框的边框与背景，100% 透明无框右对齐！绝不出现双层框！ */
+            #seoul-mini-theater-modal #smt-page-wx_settings input.ios-clean-inp {
+                flex: 1 !important;
+                border: none !important;
+                border-width: 0 !important;
+                box-shadow: none !important;
+                outline: none !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 30px !important;
+                font-size: 10.5px !important;
+                font-weight: 600 !important;
+                color: #3A3A42 !important;
+                text-align: right !important;
+                min-width: 0 !important;
+            }
+            #seoul-mini-theater-modal #smt-page-wx_settings input.ios-clean-inp::placeholder {
+                color: #B8B8C4 !important;
+                font-weight: 500 !important;
+            }
 
-            #seoul-mini-theater-modal .pw-line-row { display: flex !important; align-items: center !important; background: #FFFFFF !important; border: none !important; border-bottom: 1px solid #EFEFF5 !important; padding: 0 2px !important; height: 34px !important; margin-bottom: 2px !important; }
-            #seoul-mini-theater-modal .pw-line-row:focus-within { border-bottom-color: #3A3A42 !important; }
-            #seoul-mini-theater-modal .pw-line-lbl { font-size: 9.2px !important; font-weight: 700 !important; color: #7A7A85 !important; width: 68px !important; flex-shrink: 0 !important; text-align: left !important; }
-            #seoul-mini-theater-modal .pw-line-inp { flex: 1 !important; border: none !important; background: #FFFFFF !important; background-color: #FFFFFF !important; font-size: 10.5px !important; font-weight: 600 !important; color: #2C2C32 !important; outline: none !important; min-width: 0 !important; padding: 0 !important; height: 100% !important; }
-            #seoul-mini-theater-modal .pw-line-inp::placeholder { color: #B8B8C2 !important; font-weight: 500 !important; }
+            /* 丝滑胶囊开关 */
+            #seoul-mini-theater-modal .ios-switch {
+                position: relative !important;
+                width: 36px !important;
+                height: 20px !important;
+                border-radius: 999px !important;
+                background: #FFFFFF !important;
+                border: 1.2px solid #D5D5E0 !important;
+                cursor: pointer !important;
+                transition: all 0.22s ease !important;
+                flex-shrink: 0 !important;
+                box-sizing: border-box !important;
+            }
+            #seoul-mini-theater-modal .ios-switch::after {
+                content: "" !important;
+                position: absolute !important;
+                top: 2px !important;
+                left: 2px !important;
+                width: 13.5px !important;
+                height: 13.5px !important;
+                border-radius: 50% !important;
+                background: #9A9AA5 !important;
+                transition: all 0.22s cubic-bezier(0.22,1,0.36,1) !important;
+            }
+            #seoul-mini-theater-modal .ios-switch.on {
+                background: #2C2C34 !important;
+                border-color: #2C2C34 !important;
+            }
+            #seoul-mini-theater-modal .ios-switch.on::after {
+                background: #FFFFFF !important;
+                transform: translateX(16px) !important;
+            }
 
-            #seoul-mini-theater-modal .pw-switch { position: relative !important; width: 36px !important; height: 20px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1.2px solid #D5D5E0 !important; cursor: pointer !important; transition: all 0.22s ease !important; flex-shrink: 0 !important; box-sizing: border-box !important; }
-            #seoul-mini-theater-modal .pw-switch::after { content: "" !important; position: absolute !important; top: 2px !important; left: 2px !important; width: 13.5px !important; height: 13.5px !important; border-radius: 50% !important; background: #9A9AA5 !important; transition: all 0.22s cubic-bezier(0.22,1,0.36,1) !important; }
-            #seoul-mini-theater-modal .pw-switch.on { background: #3A3A42 !important; border-color: #3A3A42 !important; }
-            #seoul-mini-theater-modal .pw-switch.on::after { background: #FFFFFF !important; transform: translateX(16px) !important; }
-
-            #seoul-mini-theater-modal .pw-grid-2x2 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-            #seoul-mini-theater-modal .pw-grid-cell { background: #FFFFFF !important; border: 1px solid #EAEAF0 !important; border-radius: 13px !important; padding: 10px 11px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; cursor: pointer !important; }
-            #seoul-mini-theater-modal .pw-grid-cell.active-cell { border-color: #3A3A42 !important; }
-
-            #seoul-mini-theater-modal .pw-chip { display: inline-flex !important; align-items: center !important; justify-content: center !important; height: 24px !important; padding: 0 10px !important; border-radius: 999px !important; background: #FFFFFF !important; border: 1px solid #E4E4EC !important; font-size: 8.8px !important; font-weight: 600 !important; color: #6E6E77 !important; cursor: pointer !important; }
-            #seoul-mini-theater-modal .pw-chip.selected { background: #3A3A42 !important; border-color: #3A3A42 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important; }
+            /* 高定胶囊芯片 */
+            #seoul-mini-theater-modal .ios-chip {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 24px !important;
+                padding: 0 10px !important;
+                border-radius: 999px !important;
+                background: #FFFFFF !important;
+                border: 1px solid #E4E4EE !important;
+                font-size: 8.8px !important;
+                font-weight: 600 !important;
+                color: #666670 !important;
+                cursor: pointer !important;
+                transition: all 0.15s ease !important;
+                white-space: nowrap !important;
+            }
+            #seoul-mini-theater-modal .ios-chip.selected {
+                background: #2C2C34 !important;
+                border-color: #2C2C34 !important;
+                color: #FFFFFF !important;
+                -webkit-text-fill-color: #FFFFFF !important;
+                font-weight: 700 !important;
+            }
         `;
         topDoc.head.appendChild(st);
 
@@ -4388,12 +4521,13 @@ bootSumoulApp();
         const elResetBtn = topDoc.getElementById("smt-cfg-reset-btn");
         const elSaveBtn = topDoc.getElementById("smt-cfg-save-btn");
 
-        if (!elMyNick || topDoc.getElementById("pw-wxset-root")) return;
+        if (!elMyNick) return;
 
+        // 🔥 关键修复：彻底移除旧 input 上的 .smt-wx-input 类名，换成 .ios-clean-inp，100% 消除双重边框！
         [elMyNick, elMyBio, elMyAvaUrl, elRemark, elCharBio, elCharAvaUrl, elAvaSize].forEach((inp) => {
             if (inp) {
-                inp.className = "pw-line-inp";
-                inp.style.cssText = "background:#FFFFFF!important;border:none!important;border-radius:0!important;padding:0!important;margin:0!important;height:100%!important;width:100%!important;font-size:10.5px!important;color:#2C2C32!important;outline:none!important;";
+                inp.className = "ios-clean-inp";
+                inp.removeAttribute("style");
             }
         });
 
@@ -4401,131 +4535,197 @@ bootSumoulApp();
         hiddenBox.style.cssText = "display:none!important;";
         [elTimeTitle, elTimeToggle, elClockBig].forEach((el) => el && hiddenBox.appendChild(el));
 
+        // 重构整个设置页为 8 大模块 iOS/Kakao 原生纯白分组列表
         wxSetPage.innerHTML = `
-            <div id="pw-wxset-root" style="display:flex;flex-direction:column;height:100%;background:#FFFFFF!important;overflow:hidden;">
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 10px 2px;background:#FFFFFF!important;flex-shrink:0;">
-                    <div id="pw-back-slot"></div>
-                    <div id="pw-time-slot"></div>
+            <div id="ios-wxset-root" style="display:flex;flex-direction:column;height:100%;background:#FFFFFF!important;overflow:hidden;">
+                <!-- 顶部固定导航 -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 10px 2px;background:#FFFFFF!important;border-bottom:1px solid #F4F4F8;flex-shrink:0;">
+                    <div id="ios-back-slot"></div>
+                    <div id="ios-time-slot"></div>
                 </div>
 
-                <div style="flex:1;min-height:0;overflow-y:auto;background:#FFFFFF!important;padding-right:2px;">
+                <!-- 纯白分组滚动列表 -->
+                <div style="flex:1;min-height:0;overflow-y:auto;background:#FFFFFF!important;padding:4px 2px 20px 2px;">
 
-                    <!-- 模块 01：双人纯白头像与名片 -->
-                    <div class="pw-card">
-                        <div class="pw-card-head">
-                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.user}</div><span>01 · 双人头像与微信名片</span></div>
-                            <span style="font-size:8px;color:#9A9AA5;font-weight:600;">点击圆形头像直接换图</span>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;text-align:center;background:#FFFFFF;border:1px solid #EFEFF5;border-radius:15px;padding:13px 8px;margin-bottom:10px;">
+                    <!-- 🤍 01. 双人头像展示台 -->
+                    <div class="ios-sec-header"><span>01 · COUPLE PROFILE · 双人头像与名片</span><span>点击头像换图</span></div>
+                    <div class="ios-group-card" style="padding:14px!important;">
+                        <div style="display:grid;grid-template-columns:1fr 44px 1fr;align-items:center;text-align:center;padding-bottom:12px;border-bottom:1px solid #F2F2F7;margin-bottom:4px;">
                             <div style="display:flex;flex-direction:column;align-items:center;">
                                 <label style="position:relative;cursor:pointer;display:inline-block;">
-                                    <div id="pw-myava-img-slot"></div>
+                                    <div id="ios-myava-img-slot"></div>
                                     <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;">${ICO.camera}</span>
-                                    <div id="pw-myava-file-slot" style="display:none;"></div>
+                                    <div id="ios-myava-file-slot" style="display:none;"></div>
                                 </label>
-                                <span style="font-size:8.5px;font-weight:800;color:#484852;margin-top:5px;">ME · 我</span>
+                                <span style="font-size:8.5px;font-weight:800;color:#3A3A42;margin-top:6px;">ME · 我的头像</span>
                             </div>
-                            <div style="display:flex;flex-direction:column;align-items:center;">${ICO.heart}<div style="width:20px;height:1px;background:#EAEAF0;margin-top:4px;"></div></div>
+                            <div style="display:flex;flex-direction:column;align-items:center;">${ICO.heart}<div style="width:22px;height:1px;background:#EAEAF0;margin-top:4px;"></div></div>
                             <div style="display:flex;flex-direction:column;align-items:center;">
                                 <label style="position:relative;cursor:pointer;display:inline-block;">
-                                    <div id="pw-charava-img-slot"></div>
+                                    <div id="ios-charava-img-slot"></div>
                                     <span style="position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;border:1px solid #E2E2EA;display:flex;align-items:center;justify-content:center;">${ICO.camera}</span>
-                                    <div id="pw-charava-file-slot" style="display:none;"></div>
+                                    <div id="ios-charava-file-slot" style="display:none;"></div>
                                 </label>
-                                <span style="font-size:8.5px;font-weight:800;color:#484852;margin-top:5px;">PARTNER · TA</span>
+                                <span style="font-size:8.5px;font-weight:800;color:#3A3A42;margin-top:6px;">PARTNER · 对方</span>
                             </div>
                         </div>
-                        <div class="pw-line-row"><span class="pw-line-lbl">我的昵称</span><div id="pw-mynick-slot" style="flex:1;height:100%;"></div></div>
-                        <div class="pw-line-row"><span class="pw-line-lbl">我的签名</span><div id="pw-mybio-slot" style="flex:1;height:100%;"></div></div>
-                        <div class="pw-line-row"><span class="pw-line-lbl">我的头像URL</span><div id="pw-myavaurl-slot" style="flex:1;height:100%;"></div></div>
-                        <div class="pw-line-row"><span class="pw-line-lbl">TA的备注名</span><div id="pw-remark-slot" style="flex:1;height:100%;"></div></div>
-                        <div class="pw-line-row"><span class="pw-line-lbl">TA顶栏状态</span><div id="pw-charbio-slot" style="flex:1;height:100%;"></div></div>
-                        <div style="display:grid;grid-template-columns:1fr 110px;gap:10px;">
-                            <div class="pw-line-row" style="border-bottom:none!important;"><span class="pw-line-lbl">TA头像URL</span><div id="pw-charavaurl-slot" style="flex:1;height:100%;"></div></div>
-                            <div class="pw-line-row" style="border-bottom:none!important;"><span class="pw-line-lbl" style="width:52px!important;">头像尺寸</span><div id="pw-avasize-slot" style="flex:1;height:100%;"></div></div>
+
+                        <div class="ios-row"><span class="ios-lbl">我的微信昵称</span><div id="ios-mynick-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="ios-row"><span class="ios-lbl">我的状态签名</span><div id="ios-mybio-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="ios-row"><span class="ios-lbl">我的头像链接</span><div id="ios-myavaurl-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="ios-row"><span class="ios-lbl">TA 的专属备注</span><div id="ios-remark-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="ios-row"><span class="ios-lbl">TA 的顶栏状态</span><div id="ios-charbio-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="ios-row"><span class="ios-lbl">TA 的头像链接</span><div id="ios-charavaurl-slot" style="flex:1;display:flex;"></div></div>
+                        <div class="ios-row last"><span class="ios-lbl">聊天气泡头像尺寸 (px)</span><div id="ios-avasize-slot" style="width:70px;display:flex;"></div></div>
+                    </div>
+
+                    <!-- 🤍 02. 新增亮点：让 TA 现在主动发微信找我 (PROACTIVE MESSAGE) -->
+                    <div class="ios-sec-header"><span>02 · PROACTIVE CHAT · 让 TA 主动发消息找你</span><span>点击立即触发</span></div>
+                    <div class="ios-group-card" style="padding:12px 14px!important;">
+                        <div style="font-size:8.8px;color:#7A7A85;margin-bottom:8px;">ไม่ต้อง先开口，点击下方任意情境，TA 会立刻在微信里主动连发消息找你：</div>
+                        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+                            <span class="ios-chip" data-proact="突然想你了，主动发微信问你在干嘛">✦ 日常想你</span>
+                            <span class="ios-chip" data-proact="深夜睡不着，主动发微信查岗撒娇">✦ 深夜查岗</span>
+                            <span class="ios-chip" data-proact="看到你没回消息有点吃醋，主动发消息试探">✦ 吃醋试探</span>
+                            <span class="ios-chip" data-proact="在首尔街头看到好吃的或有趣的事，主动拍给你看并转账给你买吃的">✦ 报备转账</span>
                         </div>
                     </div>
 
-                    <!-- 模块 02：亲密互动与 TA 的打字语感 -->
-                    <div class="pw-card">
-                        <div class="pw-card-head">
-                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.feather}</div><span>02 · 专属亲密称呼与 TA 的打字语感</span></div>
-                            <span style="font-size:8px;color:#9A9AA5;font-weight:600;">AI 实时感知</span>
+                    <!-- 🤍 03. 亲密称呼、拍一拍尾巴与置顶备忘 -->
+                    <div class="ios-sec-header"><span>03 · INTIMACY &amp; POKE · 专属亲密互动设置</span><span>实时生效</span></div>
+                    <div class="ios-group-card">
+                        <div class="ios-row">
+                            <span class="ios-lbl">TA 对我的专属称呼</span>
+                            <input type="text" id="ios-inp-petname" class="ios-clean-inp" placeholder="如：姐姐 / 宝宝 / 小笨蛋" />
                         </div>
-                        <div class="pw-line-row"><span class="pw-line-lbl">TA叫我什么</span><input type="text" id="pw-inp-petname" class="pw-line-inp" placeholder="如：姐姐 / 宝宝 / 小笨蛋 (TA会在微信这样叫你)" /></div>
-                        <div class="pw-line-row"><span class="pw-line-lbl">拍一拍尾巴</span><input type="text" id="pw-inp-poke" class="pw-line-inp" placeholder="如：的小脑袋说今天也很想你" /></div>
-                        <div class="pw-line-row" style="margin-bottom:10px!important;"><span class="pw-line-lbl">置顶小横幅</span><input type="text" id="pw-inp-pin" class="pw-line-inp" placeholder="显示在聊天框最顶部的纪念句子 (留空隐藏)" /></div>
-
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
-                            <span style="font-size:9px;font-weight:700;color:#55555E;">单次连发气泡数</span>
-                            <div style="display:flex;gap:5px;" id="pw-reply-cnt-group">
-                                <span class="pw-chip" data-rcnt="1~2">1~2条 (克制)</span>
-                                <span class="pw-chip selected" data-rcnt="2~4">2~4条 (自然)</span>
-                                <span class="pw-chip" data-rcnt="4~6">4~6条 (话痨)</span>
-                            </div>
+                        <div class="ios-row">
+                            <span class="ios-lbl">拍一拍自定义后缀</span>
+                            <input type="text" id="ios-inp-poke" class="ios-clean-inp" placeholder="如：的小脑袋说今天也很想你" />
                         </div>
-                        <div style="font-size:9px;font-weight:700;color:#55555E;margin-bottom:6px;">TA 的线上打字风格偏好（可多选）</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;" id="pw-style-tags-group">
-                            <span class="pw-chip" data-stag="日常自然短句">日常自然短句</span>
-                            <span class="pw-chip" data-stag="清冷克制少话">清冷克制少话</span>
-                            <span class="pw-chip" data-stag="高粘人秒回撒娇">高粘人秒回撒娇</span>
-                            <span class="pw-chip" data-stag="句末爱带语气词">句末爱带语气词</span>
-                            <span class="pw-chip" data-stag="偶尔夹杂韩文短句">偶尔夹杂韩文</span>
-                            <span class="pw-chip" data-stag="带括号描写微表情动作">带括号神态动作</span>
+                        <div class="ios-row last">
+                            <span class="ios-lbl">聊天框顶部置顶公告</span>
+                            <input type="text" id="ios-inp-pin" class="ios-clean-inp" placeholder="输入纪念日或置顶句子 (留空隐藏)" />
                         </div>
                     </div>
 
-                    <!-- 模块 03：聊天背景壁纸 + 顶栏4大功能总控 -->
-                    <div class="pw-card">
-                        <div class="pw-card-head">
-                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.image}</div><span>03 · 聊天背景壁纸与控制工作台</span></div>
-                        </div>
-                        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
-                            <label class="smt-pill-btn dark" style="height:26px!important;cursor:pointer;flex-shrink:0;">
-                                ${ICO.upload}<span>相册选壁纸</span>
-                                <input type="file" id="pw-wp-file" accept="image/*" style="display:none;" />
-                            </label>
-                            <div class="pw-line-row" style="flex:1;height:26px!important;margin:0!important;">
-                                <input type="text" id="pw-wp-url" class="pw-line-inp" placeholder="或粘贴聊天背景图 URL..." />
-                            </div>
-                            <span class="smt-pill-btn" id="pw-wp-clear" style="height:26px!important;">清除</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #F4F4F8;">
-                            <span style="font-size:8.5px;color:#8E8E98;font-weight:600;">壁纸白雾柔化度</span>
-                            <div style="display:flex;gap:5px;" id="pw-wp-mask-group">
-                                <span class="pw-chip" data-wpmask="none">原图清晰</span>
-                                <span class="pw-chip selected" data-wpmask="light">55% 柔白雾</span>
-                                <span class="pw-chip" data-wpmask="mist">82% 纯白雾</span>
+                    <!-- 🤍 04. 恋爱羁绊阶段、醋意浓度与打字语感矩阵 -->
+                    <div class="ios-sec-header"><span>04 · PERSONA &amp; RHYTHM · 关系阶段与打字语感</span><span>AI 深度感知</span></div>
+                    <div class="ios-group-card" style="padding:10px 14px!important;">
+                        <div class="ios-row" style="flex-direction:column;align-items:flex-start!important;padding:6px 0 10px 0!important;">
+                            <span class="ios-lbl" style="margin-bottom:6px;">我们当前的关系阶段</span>
+                            <div style="display:flex;flex-wrap:wrap;gap:5px;" id="ios-rel-group">
+                                <span class="ios-chip" data-rel="暧昧拉扯期">暧昧拉扯期</span>
+                                <span class="ios-chip selected" data-rel="热恋同居期">热恋同居期</span>
+                                <span class="ios-chip" data-rel="新婚蜜月期">新婚蜜月期</span>
+                                <span class="ios-chip" data-rel="冷战破冰期">冷战破冰期</span>
+                                <span class="ios-chip" data-rel="宿命羁绊伴侣">宿命羁绊伴侣</span>
                             </div>
                         </div>
 
-                        <div class="pw-grid-2x2">
-                            <div class="pw-grid-cell" id="pw-cell-sync">
-                                <div style="display:flex;align-items:center;gap:7px;">${ICO.sync}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">主线记忆互通</div><div style="font-size:7.8px;color:#9A9AA5;" id="pw-sync-sub">同步至酒馆</div></div></div>
-                                <div class="pw-switch" id="pw-sw-sync"></div>
-                            </div>
-                            <div class="pw-grid-cell" id="pw-cell-time">
-                                <div style="display:flex;align-items:center;gap:7px;">${ICO.clock}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">真实时间感知</div><div style="font-size:7.8px;color:#9A9AA5;" id="pw-time-sub">感知现实昼夜</div></div></div>
-                                <div class="pw-switch on" id="pw-sw-time"></div>
-                            </div>
-                            <div class="pw-grid-cell" id="pw-cell-sum">
-                                <div style="display:flex;align-items:center;gap:7px;">${ICO.summary}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">微信区间总结</div><div style="font-size:7.8px;color:#9A9AA5;">提炼核心记忆</div></div></div>
-                                <span style="font-size:10px;color:#9A9AA5;">▾</span>
-                            </div>
-                            <div class="pw-grid-cell" id="pw-cell-css">
-                                <div style="display:flex;align-items:center;gap:7px;">${ICO.palette}<div style="text-align:left;"><div style="font-size:9.8px;font-weight:800;color:#2C2C32;">气泡 CSS 美化</div><div style="font-size:7.8px;color:#9A9AA5;">气泡与双尾巴</div></div></div>
-                                <span style="font-size:10px;color:#9A9AA5;">▾</span>
+                        <div class="ios-row" style="flex-direction:column;align-items:flex-start!important;padding:8px 0 10px 0!important;">
+                            <span class="ios-lbl" style="margin-bottom:6px;">TA 的占有欲与吃醋浓度</span>
+                            <div style="display:flex;flex-wrap:wrap;gap:5px;" id="ios-jeal-group">
+                                <span class="ios-chip" data-jeal="克制隐忍">克制隐忍</span>
+                                <span class="ios-chip" data-jeal="傲娇口是心非">傲娇口是心非</span>
+                                <span class="ios-chip selected" data-jeal="偏执强占有欲">偏执强占有欲</span>
+                                <span class="ios-chip" data-jeal="温柔宠溺包容">温柔宠溺包容</span>
                             </div>
                         </div>
-                        <div id="pw-drawers-holder" style="margin-top:8px;"></div>
+
+                        <div class="ios-row" style="padding:8px 0!important;">
+                            <span class="ios-lbl">TA 单次连发气泡数</span>
+                            <div style="display:flex;gap:5px;" id="ios-rcnt-group">
+                                <span class="ios-chip" data-rcnt="1~2">1~2条</span>
+                                <span class="ios-chip selected" data-rcnt="2~4">2~4条</span>
+                                <span class="ios-chip" data-rcnt="4~6">4~6条</span>
+                            </div>
+                        </div>
+
+                        <div class="ios-row last" style="flex-direction:column;align-items:flex-start!important;padding:8px 0 4px 0!important;">
+                            <span class="ios-lbl" style="margin-bottom:6px;">TA 的线上打字语感偏好（可多选）</span>
+                            <div style="display:flex;flex-wrap:wrap;gap:5px;" id="ios-stag-group">
+                                <span class="ios-chip" data-stag="日常自然短句">日常自然短句</span>
+                                <span class="ios-chip" data-stag="清冷克制少话">清冷克制少话</span>
+                                <span class="ios-chip" data-stag="高粘人秒回撒娇">高粘人秒回撒娇</span>
+                                <span class="ios-chip" data-stag="句末爱带语气词">句末爱带语气词</span>
+                                <span class="ios-chip" data-stag="偶尔夹杂韩文短句">偶尔夹杂韩文</span>
+                                <span class="ios-chip" data-stag="带括号描写神态动作">带括号神态动作</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 模块 04：世界书导入与自动读取 -->
-                    <div class="pw-card">
-                        <div class="pw-card-head">
-                            <div class="pw-card-title"><div class="pw-ico-circle">${ICO.book}</div><span>04 · 世界书 (World Info) 导入与自动读取</span></div>
-                            <div class="pw-switch on" id="pw-sw-wi"></div>
+                    <!-- 🤍 05. 视觉外观：壁纸、遮罩、字号与 CSS 气泡美化 -->
+                    <div class="ios-sec-header"><span>05 · APPEARANCE · 聊天壁纸、字号与气泡美化</span></div>
+                    <div class="ios-group-card">
+                        <div class="ios-row">
+                            <span class="ios-lbl">${ICO.image}<span>聊天背景壁纸</span></span>
+                            <div style="display:flex;align-items:center;gap:5px;flex:1;justify-content:flex-end;">
+                                <input type="text" id="ios-wp-url" class="ios-clean-inp" placeholder="粘贴图片URL 或右侧选图..." />
+                                <label class="ios-chip selected" style="cursor:pointer;padding:0 8px!important;">
+                                    <span>相册选图</span>
+                                    <input type="file" id="ios-wp-file" accept="image/*" style="display:none;" />
+                                </label>
+                                <span class="ios-chip" id="ios-wp-clear" style="padding:0 7px!important;">清除</span>
+                            </div>
                         </div>
+                        <div class="ios-row">
+                            <span class="ios-lbl">壁纸白雾柔焦浓度</span>
+                            <div style="display:flex;gap:5px;" id="ios-wpmask-group">
+                                <span class="ios-chip" data-wpmask="none">原图</span>
+                                <span class="ios-chip selected" data-wpmask="light">58% 柔雾</span>
+                                <span class="ios-chip" data-wpmask="mist">82% 纯白雾</span>
+                            </div>
+                        </div>
+                        <div class="ios-row">
+                            <span class="ios-lbl">聊天气泡字体大小</span>
+                            <div style="display:flex;gap:5px;" id="ios-fsize-group">
+                                <span class="ios-chip" data-fsize="11px">11px 精致</span>
+                                <span class="ios-chip selected" data-fsize="12px">12px 标准</span>
+                                <span class="ios-chip" data-fsize="13px">13px 清晰</span>
+                            </div>
+                        </div>
+                        <div class="ios-row last" id="ios-open-css-row" style="cursor:pointer;">
+                            <span class="ios-lbl">${ICO.palette}<span>自定义气泡与双尾巴 CSS 美化工作台</span></span>
+                            <span style="font-size:10px;color:#8E8E98;font-weight:700;">展开代码 ▾</span>
+                        </div>
+                        <div id="ios-css-slot"></div>
+                    </div>
+
+                    <!-- 🤍 06. 记忆与时间引擎控制 (MEMORY & TIME ENGINE) -->
+                    <div class="ios-sec-header"><span>06 · MEMORY &amp; TIME · 记忆同步与区间总结</span></div>
+                    <div class="ios-group-card">
+                        <div class="ios-row" id="ios-row-sync" style="cursor:pointer;">
+                            <div>
+                                <div class="ios-lbl">${ICO.sync}<span>微信记忆实时同步至酒馆主线</span></div>
+                                <div style="font-size:8px;color:#9A9AA5;margin-left:22px;" id="ios-sync-sub">开启后主线剧情将自动感知微信聊天内容</div>
+                            </div>
+                            <div class="ios-switch" id="ios-sw-sync"></div>
+                        </div>
+                        <div class="ios-row" id="ios-row-time" style="cursor:pointer;">
+                            <div>
+                                <div class="ios-lbl">${ICO.clock}<span>真实现实时间与昼夜感知</span></div>
+                                <div style="font-size:8px;color:#9A9AA5;margin-left:22px;" id="ios-time-sub">开启后 TA 会感知你手机当前的真实时间</div>
+                            </div>
+                            <div class="ios-switch on" id="ios-sw-time"></div>
+                        </div>
+                        <div class="ios-row last" id="ios-open-sum-row" style="cursor:pointer;">
+                            <span class="ios-lbl">${ICO.summary}<span>生成微信区间记忆摘要 / 注入主线</span></span>
+                            <span style="font-size:10px;color:#8E8E98;font-weight:700;">展开工具 ▾</span>
+                        </div>
+                        <div id="ios-sum-slot"></div>
+                    </div>
+
+                    <!-- 🤍 07. 世界书导入与角色自动读取 (WORLD INFO ARCHIVE) -->
+                    <div class="ios-sec-header"><span>07 · WORLD INFO · 世界书导入与角色自动读取</span></div>
+                    <div class="ios-group-card" style="padding:12px 14px!important;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #F2F2F7;margin-bottom:10px;">
+                            <div>
+                                <div class="ios-lbl">${ICO.book}<span>启用角色世界书自动读取</span></div>
+                                <div style="font-size:8px;color:#9A9AA5;margin-left:22px;">在微信聊天与全应用中自动注入世界观设定</div>
+                            </div>
+                            <div class="ios-switch on" id="ios-sw-wi"></div>
+                        </div>
+
                         <div style="display:flex;gap:6px;margin-bottom:9px;">
                             <label class="smt-pill-btn dark" style="flex:1.15;height:28px!important;cursor:pointer;border-radius:10px!important;">
                                 ${ICO.upload}<span>导入世界书 (.json/.txt)</span>
@@ -4539,9 +4739,9 @@ bootSumoulApp();
                             </span>
                         </div>
 
-                        <div id="smt-wi-add-drawer" style="display:none;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:13px;padding:10px;margin-bottom:9px;">
-                            <div class="pw-line-row"><span class="pw-line-lbl">设定标题</span><input type="text" id="smt-wi-new-title" class="pw-line-inp" placeholder="如：两人的初遇设定" /></div>
-                            <div class="pw-line-row"><span class="pw-line-lbl">触发关键词</span><input type="text" id="smt-wi-new-keys" class="pw-line-inp" placeholder="逗号隔开 (留空则常驻生效)" /></div>
+                        <div id="smt-wi-add-drawer" style="display:none;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:12px;padding:8px 12px;margin-bottom:9px;">
+                            <div class="ios-row"><span class="ios-lbl">设定标题</span><input type="text" id="smt-wi-new-title" class="ios-clean-inp" placeholder="如：两人的初遇设定" /></div>
+                            <div class="ios-row"><span class="ios-lbl">触发关键词</span><input type="text" id="smt-wi-new-keys" class="ios-clean-inp" placeholder="逗号隔开 (留空则常驻生效)" /></div>
                             <textarea id="smt-wi-new-content" style="width:100%;height:48px;background:#FFFFFF;border:1px solid #EAEAF0;border-radius:9px;padding:6px 8px;font-size:9.8px;color:#2C2C32;box-sizing:border-box;resize:none;outline:none;margin:6px 0;" placeholder="写下该条世界书的具体设定内容..."></textarea>
                             <div style="display:flex;justify-content:flex-end;gap:5px;">
                                 <span class="smt-pill-btn" id="smt-wi-cancel-add" style="height:24px!important;">收起</span>
@@ -4560,23 +4760,33 @@ bootSumoulApp();
 
                         <div style="margin-top:10px;padding-top:8px;border-top:1px solid #F4F4F8;">
                             <div style="font-size:8.5px;font-weight:800;color:#8E8E98;margin-bottom:4px;">当前私聊补充背景便签</div>
-                            <div id="pw-bgnote-slot"></div>
+                            <div id="ios-bgnote-slot"></div>
                         </div>
                     </div>
 
-                    <!-- 模块 05：底部保存与管理 -->
-                    <div class="pw-card" style="padding:12px 15px!important;margin-bottom:6px!important;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px;">
-                            <span class="smt-pill-btn" id="pw-clear-wx-btn" style="flex:1;height:28px!important;border-radius:10px!important;color:#9A6868!important;">
+                    <!-- 🤍 08. 聊天记录备份导出/导入 & 系统管理 -->
+                    <div class="ios-sec-header"><span>08 · DATA &amp; SYSTEM · 聊天记录备份与管理</span></div>
+                    <div class="ios-group-card" style="padding:12px 14px!important;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+                            <span class="smt-pill-btn" id="ios-export-chat-btn" style="height:28px!important;border-radius:10px!important;">
+                                ${ICO.download}<span>导出聊天备份 (.json)</span>
+                            </span>
+                            <label class="smt-pill-btn" style="height:28px!important;border-radius:10px!important;cursor:pointer;">
+                                ${ICO.sync}<span>导入恢复聊天记录</span>
+                                <input type="file" id="ios-import-chat-inp" accept=".json" style="display:none;" />
+                            </label>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+                            <span class="smt-pill-btn" id="ios-clear-wx-btn" style="height:28px!important;border-radius:10px!important;color:#9A6868!important;">
                                 ${ICO.trash}<span>清空当前聊天记录</span>
                             </span>
-                            <span class="smt-pill-btn" id="pw-open-admin-btn" style="flex:1;height:28px!important;border-radius:10px!important;">
+                            <span class="smt-pill-btn" id="ios-open-admin-btn" style="height:28px!important;border-radius:10px!important;">
                                 ${ICO.shield}<span>管理员 / 锁屏后台</span>
                             </span>
                         </div>
                         <div style="display:flex;gap:8px;">
-                            <div id="pw-reset-slot" style="flex:0.8;display:flex;"></div>
-                            <div id="pw-save-slot" style="flex:1.4;display:flex;"></div>
+                            <div id="ios-reset-slot" style="flex:0.8;display:flex;"></div>
+                            <div id="ios-save-slot" style="flex:1.4;display:flex;"></div>
                         </div>
                     </div>
 
@@ -4585,134 +4795,153 @@ bootSumoulApp();
         `;
         wxSetPage.appendChild(hiddenBox);
 
-        // 挂载原节点到纯白插槽
+        // 挂载节点
         if (elBackChat) {
             elBackChat.style.cssText = "height:28px!important;padding:0 12px!important;background:#FFFFFF!important;border:1px solid #E6E6EE!important;border-radius:999px!important;font-size:9.5px!important;font-weight:800!important;color:#2C2C32!important;";
-            topDoc.getElementById("pw-back-slot").appendChild(elBackChat);
+            topDoc.getElementById("ios-back-slot").appendChild(elBackChat);
         }
         if (elTimePill) {
             elTimePill.style.cssText = "height:26px!important;padding:0 10px!important;background:#FFFFFF!important;border:1px solid #ECECF2!important;border-radius:999px!important;font-size:8.5px!important;font-weight:700!important;color:#6E6E77!important;";
-            topDoc.getElementById("pw-time-slot").appendChild(elTimePill);
+            topDoc.getElementById("ios-time-slot").appendChild(elTimePill);
         }
         if (elMyAvaPrev) {
             elMyAvaPrev.style.cssText = "width:56px!important;height:56px!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #EAEAF0!important;display:block!important;";
-            topDoc.getElementById("pw-myava-img-slot").appendChild(elMyAvaPrev);
+            topDoc.getElementById("ios-myava-img-slot").appendChild(elMyAvaPrev);
         }
-        if (elMyAvaFile) topDoc.getElementById("pw-myava-file-slot").appendChild(elMyAvaFile);
+        if (elMyAvaFile) topDoc.getElementById("ios-myava-file-slot").appendChild(elMyAvaFile);
         if (elCharAvaPrev) {
             elCharAvaPrev.style.cssText = "width:56px!important;height:56px!important;border-radius:50%!important;object-fit:cover!important;border:1.5px solid #EAEAF0!important;display:block!important;";
-            topDoc.getElementById("pw-charava-img-slot").appendChild(elCharAvaPrev);
+            topDoc.getElementById("ios-charava-img-slot").appendChild(elCharAvaPrev);
         }
-        if (elCharAvaFile) topDoc.getElementById("pw-charava-file-slot").appendChild(elCharAvaFile);
+        if (elCharAvaFile) topDoc.getElementById("ios-charava-file-slot").appendChild(elCharAvaFile);
 
-        if (elMyNick) topDoc.getElementById("pw-mynick-slot").appendChild(elMyNick);
-        if (elMyBio) topDoc.getElementById("pw-mybio-slot").appendChild(elMyBio);
-        if (elMyAvaUrl) topDoc.getElementById("pw-myavaurl-slot").appendChild(elMyAvaUrl);
-        if (elRemark) topDoc.getElementById("pw-remark-slot").appendChild(elRemark);
-        if (elCharBio) topDoc.getElementById("pw-charbio-slot").appendChild(elCharBio);
-        if (elCharAvaUrl) topDoc.getElementById("pw-charavaurl-slot").appendChild(elCharAvaUrl);
-        if (elAvaSize) topDoc.getElementById("pw-avasize-slot").appendChild(elAvaSize);
+        if (elMyNick) topDoc.getElementById("ios-mynick-slot").appendChild(elMyNick);
+        if (elMyBio) topDoc.getElementById("ios-mybio-slot").appendChild(elMyBio);
+        if (elMyAvaUrl) topDoc.getElementById("ios-myavaurl-slot").appendChild(elMyAvaUrl);
+        if (elRemark) topDoc.getElementById("ios-remark-slot").appendChild(elRemark);
+        if (elCharBio) topDoc.getElementById("ios-charbio-slot").appendChild(elCharBio);
+        if (elCharAvaUrl) topDoc.getElementById("ios-charavaurl-slot").appendChild(elCharAvaUrl);
+        if (elAvaSize) topDoc.getElementById("ios-avasize-slot").appendChild(elAvaSize);
 
         if (elBgNote) {
             elBgNote.style.cssText = "width:100%!important;height:44px!important;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:10px!important;padding:6px 8px!important;font-size:9.8px!important;color:#2C2C32!important;box-sizing:border-box!important;resize:none!important;outline:none!important;";
-            topDoc.getElementById("pw-bgnote-slot").appendChild(elBgNote);
+            topDoc.getElementById("ios-bgnote-slot").appendChild(elBgNote);
         }
         if (elResetBtn) {
             elResetBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:9.5px!important;font-weight:700!important;background:#FFFFFF!important;";
-            topDoc.getElementById("pw-reset-slot").appendChild(elResetBtn);
+            topDoc.getElementById("ios-reset-slot").appendChild(elResetBtn);
         }
         if (elSaveBtn) {
             elSaveBtn.style.cssText = "width:100%!important;height:32px!important;border-radius:11px!important;font-size:10px!important;font-weight:800!important;background:#2C2C34!important;border-color:#2C2C34!important;";
             elSaveBtn.innerHTML = `${ICO.check}<span>保存全部设置并返回</span>`;
-            topDoc.getElementById("pw-save-slot").appendChild(elSaveBtn);
+            topDoc.getElementById("ios-save-slot").appendChild(elSaveBtn);
         }
 
-        const holder = topDoc.getElementById("pw-drawers-holder");
-        if (sumDrawer && holder) {
-            sumDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:13px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
-            holder.appendChild(sumDrawer);
+        if (sumDrawer) {
+            sumDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:12px!important;padding:10px!important;margin:4px 0 10px 0!important;";
+            topDoc.getElementById("ios-sum-slot").appendChild(sumDrawer);
         }
-        if (cssDrawer && holder) {
-            cssDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:13px!important;padding:11px!important;margin-top:4px!important;margin-bottom:0!important;";
-            holder.appendChild(cssDrawer);
+        if (cssDrawer) {
+            cssDrawer.style.cssText = "display:none;background:#FFFFFF!important;border:1px solid #EAEAF0!important;border-radius:12px!important;padding:10px!important;margin:4px 0 10px 0!important;";
+            topDoc.getElementById("ios-css-slot").appendChild(cssDrawer);
         }
 
-        // ── 同步与保存新增的 4 大微信玩法设置 ──
-        function syncExtraUI() {
+        // ── 同步与保存设置状态 ──
+        function syncAllUI() {
             const ex = loadExtra();
-            topDoc.getElementById("pw-inp-petname").value = ex.petNameForMe || "";
-            topDoc.getElementById("pw-inp-poke").value = ex.pokeSuffix || "";
-            topDoc.getElementById("pw-inp-pin").value = ex.pinNotice || "";
-            topDoc.getElementById("pw-wp-url").value = ex.wallpaperUrl?.startsWith("data:") ? "[已设置本地相册壁纸]" : (ex.wallpaperUrl || "");
+            topDoc.getElementById("ios-inp-petname").value = ex.petNameForMe || "";
+            topDoc.getElementById("ios-inp-poke").value = ex.pokeSuffix || "";
+            topDoc.getElementById("ios-inp-pin").value = ex.pinNotice || "";
+            topDoc.getElementById("ios-wp-url").value = ex.wallpaperUrl?.startsWith("data:") ? "[已设置本地壁纸]" : (ex.wallpaperUrl || "");
 
-            topDoc.querySelectorAll("#pw-reply-cnt-group .pw-chip").forEach((c) => {
-                c.classList.toggle("selected", c.getAttribute("data-rcnt") === (ex.replyCount || "2~4"));
-            });
-            topDoc.querySelectorAll("#pw-style-tags-group .pw-chip").forEach((c) => {
-                c.classList.toggle("selected", (ex.styleTags || []).includes(c.getAttribute("data-stag")));
-            });
-            topDoc.querySelectorAll("#pw-wp-mask-group .pw-chip").forEach((c) => {
-                c.classList.toggle("selected", c.getAttribute("data-wpmask") === (ex.wallpaperMask || "light"));
-            });
+            topDoc.querySelectorAll("#ios-rel-group .ios-chip").forEach((c) => c.classList.toggle("selected", c.getAttribute("data-rel") === (ex.relationStage || "热恋同居期")));
+            topDoc.querySelectorAll("#ios-jeal-group .ios-chip").forEach((c) => c.classList.toggle("selected", c.getAttribute("data-jeal") === (ex.jealousyLv || "偏执强占有欲")));
+            topDoc.querySelectorAll("#ios-rcnt-group .ios-chip").forEach((c) => c.classList.toggle("selected", c.getAttribute("data-rcnt") === (ex.replyCount || "2~4")));
+            topDoc.querySelectorAll("#ios-stag-group .ios-chip").forEach((c) => c.classList.toggle("selected", (ex.styleTags || []).includes(c.getAttribute("data-stag"))));
+            topDoc.querySelectorAll("#ios-wpmask-group .ios-chip").forEach((c) => c.classList.toggle("selected", c.getAttribute("data-wpmask") === (ex.wallpaperMask || "light")));
+            topDoc.querySelectorAll("#ios-fsize-group .ios-chip").forEach((c) => c.classList.toggle("selected", c.getAttribute("data-fsize") === (ex.fontSize || "12px")));
 
             const isSync = localStorage.getItem("sumoul_v16_sync") === "true";
-            topDoc.getElementById("pw-sw-sync")?.classList.toggle("on", isSync);
-            topDoc.getElementById("pw-sync-sub").textContent = isSync ? "已开启同步" : "已关闭同步";
+            topDoc.getElementById("ios-sw-sync")?.classList.toggle("on", isSync);
+            topDoc.getElementById("ios-sync-sub").textContent = isSync ? "已开启 · 微信对话实时同步至酒馆上下文" : "已关闭 · 纯独立私密微信聊天";
 
             const isTime = elTimeToggle ? elTimeToggle.classList.contains("dark") : true;
-            topDoc.getElementById("pw-sw-time")?.classList.toggle("on", isTime);
-            topDoc.getElementById("pw-time-sub").textContent = isTime ? "已开启感知" : "已关闭感知";
+            topDoc.getElementById("ios-sw-time")?.classList.toggle("on", isTime);
+            topDoc.getElementById("ios-time-sub").textContent = isTime ? "已开启 · TA 会实时感知你当前的真实时间" : "已关闭真实时间感知";
         }
 
-        function saveCurrentExtraFromInputs() {
+        function saveFromInputs() {
             const ex = loadExtra();
-            ex.petNameForMe = topDoc.getElementById("pw-inp-petname").value.trim();
-            ex.pokeSuffix = topDoc.getElementById("pw-inp-poke").value.trim();
-            ex.pinNotice = topDoc.getElementById("pw-inp-pin").value.trim();
-            const rawWp = topDoc.getElementById("pw-wp-url").value.trim();
-            if (rawWp && rawWp !== "[已设置本地相册壁纸]") ex.wallpaperUrl = rawWp;
+            ex.petNameForMe = topDoc.getElementById("ios-inp-petname").value.trim();
+            ex.pokeSuffix = topDoc.getElementById("ios-inp-poke").value.trim();
+            ex.pinNotice = topDoc.getElementById("ios-inp-pin").value.trim();
+            const rawWp = topDoc.getElementById("ios-wp-url").value.trim();
+            if (rawWp && rawWp !== "[已设置本地壁纸]") ex.wallpaperUrl = rawWp;
             else if (!rawWp) ex.wallpaperUrl = "";
             saveExtra(ex);
-            applyWallpaperAndPin();
+            applyVisualsAndPin();
         }
 
-        ["pw-inp-petname", "pw-inp-poke", "pw-inp-pin", "pw-wp-url"].forEach((id) => {
-            topDoc.getElementById(id)?.addEventListener("change", saveCurrentExtraFromInputs);
+        ["ios-inp-petname", "ios-inp-poke", "ios-inp-pin", "ios-wp-url"].forEach((id) => {
+            topDoc.getElementById(id)?.addEventListener("change", saveFromInputs);
         });
-        elSaveBtn?.addEventListener("click", saveCurrentExtraFromInputs, true);
+        elSaveBtn?.addEventListener("click", saveFromInputs, true);
 
-        topDoc.querySelectorAll("#pw-reply-cnt-group .pw-chip").forEach((chip) => chip.onclick = () => {
-            const ex = loadExtra(); ex.replyCount = chip.getAttribute("data-rcnt"); saveExtra(ex); syncExtraUI();
-        });
-        topDoc.querySelectorAll("#pw-style-tags-group .pw-chip").forEach((chip) => chip.onclick = () => {
+        // 单选与多选芯片绑定
+        const bindSingleChip = (groupSel, attr, key, afterFn) => {
+            topDoc.querySelectorAll(`${groupSel} .ios-chip`).forEach((chip) => chip.onclick = () => {
+                const ex = loadExtra(); ex[key] = chip.getAttribute(attr); saveExtra(ex); syncAllUI(); if (afterFn) afterFn();
+            });
+        };
+        bindSingleChip("#ios-rel-group", "data-rel", "relationStage");
+        bindSingleChip("#ios-jeal-group", "data-jeal", "jealousyLv");
+        bindSingleChip("#ios-rcnt-group", "data-rcnt", "replyCount");
+        bindSingleChip("#ios-wpmask-group", "data-wpmask", "wallpaperMask", applyVisualsAndPin);
+        bindSingleChip("#ios-fsize-group", "data-fsize", "fontSize", applyVisualsAndPin);
+
+        topDoc.querySelectorAll("#ios-stag-group .ios-chip").forEach((chip) => chip.onclick = () => {
             const ex = loadExtra(), tag = chip.getAttribute("data-stag");
             ex.styleTags = ex.styleTags || [];
             if (ex.styleTags.includes(tag)) ex.styleTags = ex.styleTags.filter((t) => t !== tag);
             else ex.styleTags.push(tag);
-            saveExtra(ex); syncExtraUI();
-        });
-        topDoc.querySelectorAll("#pw-wp-mask-group .pw-chip").forEach((chip) => chip.onclick = () => {
-            const ex = loadExtra(); ex.wallpaperMask = chip.getAttribute("data-wpmask"); saveExtra(ex); syncExtraUI(); applyWallpaperAndPin();
+            saveExtra(ex); syncAllUI();
         });
 
-        topDoc.getElementById("pw-wp-file").onchange = async (e) => {
+        // 让 TA 现在主动发微信找你！
+        topDoc.querySelectorAll("[data-proact]").forEach((btn) => btn.onclick = () => {
+            const promptScene = btn.getAttribute("data-proact");
+            saveFromInputs();
+            elBackChat?.click();
+            setTimeout(() => {
+                const chatKey = `sumoul_v16_wx__${getCharScope()}`;
+                let list = [];
+                try { list = JSON.parse(localStorage.getItem(chatKey) || "[]"); } catch (e) {}
+                const d = new Date();
+                const tStr = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                list.push({ role: "sys", text: `✦ 触发情境：TA ${promptScene}`, time: tStr });
+                localStorage.setItem(chatKey, JSON.stringify(list));
+                topDoc.getElementById("smt-wx-reply-btn")?.click();
+            }, 120);
+        });
+
+        // 壁纸与拍一拍后缀
+        topDoc.getElementById("ios-wp-file").onchange = async (e) => {
             const f = e.target.files?.[0]; if (!f) return;
             const dUrl = await compressImg(f, 720);
             const ex = loadExtra(); ex.wallpaperUrl = dUrl; saveExtra(ex);
-            syncExtraUI(); applyWallpaperAndPin();
+            syncAllUI(); applyVisualsAndPin();
         };
-        topDoc.getElementById("pw-wp-clear").onclick = () => {
+        topDoc.getElementById("ios-wp-clear").onclick = () => {
             const ex = loadExtra(); ex.wallpaperUrl = ""; saveExtra(ex);
-            topDoc.getElementById("pw-wp-url").value = "";
-            applyWallpaperAndPin();
+            topDoc.getElementById("ios-wp-url").value = "";
+            applyVisualsAndPin();
         };
 
-        // 增强微信「拍一拍」支持自定义后缀尾巴！
         const pokeBtn = talkPage.querySelector('[data-wxact="poke"]');
         if (pokeBtn) {
-            pokeBtn.addEventListener("click", (e) => {
+            pokeBtn.addEventListener("click", () => {
                 const ex = loadExtra();
-                if (ex.pokeSuffix && ex.pokeSuffix.trim()) {
+                if (ex.pokeSuffix?.trim()) {
                     setTimeout(() => {
                         const sysNodes = talkPage.querySelectorAll(".smt-wx-sys");
                         const lastSys = sysNodes[sysNodes.length - 1];
@@ -4724,57 +4953,75 @@ bootSumoulApp();
             });
         }
 
-        // 2x2 开关与抽屉
-        topDoc.getElementById("pw-cell-sync").onclick = () => { topDoc.getElementById("smt-sync-toggle")?.click(); syncExtraUI(); };
-        topDoc.getElementById("pw-cell-time").onclick = () => { elTimeToggle?.click(); setTimeout(syncExtraUI, 20); };
-        topDoc.getElementById("pw-cell-sum").onclick = (e) => {
-            const show = sumDrawer.style.display !== "block";
-            sumDrawer.style.display = show ? "block" : "none";
-            e.currentTarget.classList.toggle("active-cell", show);
-            if (cssDrawer) cssDrawer.style.display = "none";
-            topDoc.getElementById("pw-cell-css")?.classList.remove("active-cell");
+        // 记忆、时间、总结、CSS抽屉
+        topDoc.getElementById("ios-row-sync").onclick = () => { topDoc.getElementById("smt-sync-toggle")?.click(); syncAllUI(); };
+        topDoc.getElementById("ios-row-time").onclick = () => { elTimeToggle?.click(); setTimeout(syncAllUI, 20); };
+        topDoc.getElementById("ios-open-sum-row").onclick = () => {
+            if (sumDrawer) sumDrawer.style.display = sumDrawer.style.display === "block" ? "none" : "block";
         };
-        topDoc.getElementById("pw-cell-css").onclick = (e) => {
-            const show = cssDrawer.style.display !== "block";
-            cssDrawer.style.display = show ? "block" : "none";
-            e.currentTarget.classList.toggle("active-cell", show);
-            if (sumDrawer) sumDrawer.style.display = "none";
-            topDoc.getElementById("pw-cell-sum")?.classList.remove("active-cell");
-            const ta = topDoc.getElementById("smt-wx-css-textarea");
-            if (ta && !ta.value) topDoc.getElementById("smt-wx-css-btn")?.click();
+        topDoc.getElementById("ios-open-css-row").onclick = () => {
+            if (cssDrawer) {
+                const show = cssDrawer.style.display !== "block";
+                cssDrawer.style.display = show ? "block" : "none";
+                const ta = topDoc.getElementById("smt-wx-css-textarea");
+                if (ta && !ta.value) topDoc.getElementById("smt-wx-css-btn")?.click();
+            }
         };
 
-        topDoc.getElementById("pw-clear-wx-btn").onclick = () => {
+        // 聊天记录导出与导入备份
+        topDoc.getElementById("ios-export-chat-btn").onclick = () => {
+            const chatKey = `sumoul_v16_wx__${getCharScope()}`;
+            const raw = localStorage.getItem(chatKey) || "[]";
+            const blob = new Blob([raw], { type: "application/json" });
+            const a = topDoc.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `Sumoul_WeChat_${getCharScope()}.json`;
+            a.click();
+        };
+        topDoc.getElementById("ios-import-chat-inp").onchange = async (e) => {
+            const f = e.target.files?.[0]; if (!f) return;
+            try {
+                const txt = await f.text();
+                const arr = JSON.parse(txt);
+                if (Array.isArray(arr)) {
+                    localStorage.setItem(`sumoul_v16_wx__${getCharScope()}`, JSON.stringify(arr));
+                    alert(`✓ 成功恢复 ${arr.length} 条微信聊天记录！`);
+                    elBackChat?.click();
+                }
+            } catch (err) { alert("备份文件格式有误！"); }
+        };
+
+        topDoc.getElementById("ios-clear-wx-btn").onclick = () => {
             if (confirm("确定要清空与当前角色的微信聊天记录吗？")) {
                 topDoc.getElementById("smt-wx-clear")?.click();
                 elBackChat?.click();
             }
         };
-        topDoc.getElementById("pw-open-admin-btn").onclick = () => topDoc.getElementById("smt-api-open-admin")?.click();
+        topDoc.getElementById("ios-open-admin-btn").onclick = () => topDoc.getElementById("smt-api-open-admin")?.click();
 
-        // 世界书渲染与事件
+        // 世界书列表渲染
         function renderWiList() {
             const wi = loadWi();
-            topDoc.getElementById("pw-sw-wi")?.classList.toggle("on", wi.enabled);
+            topDoc.getElementById("ios-sw-wi")?.classList.toggle("on", wi.enabled);
             topDoc.getElementById("smt-wi-mode-btn").textContent = wi.mode === "all" ? "模式: 全部强注" : "模式: 常驻+词触发";
             const enCnt = (wi.entries || []).filter((x) => x.enabled).length;
             topDoc.getElementById("smt-wi-count-txt").textContent = `已启用 ${enCnt} / 共 ${wi.entries.length} 条设定`;
 
             const listEl = topDoc.getElementById("smt-wi-entries-list");
             if (!wi.entries?.length) {
-                listEl.innerHTML = `<div style="text-align:center;padding:14px;background:#FFFFFF;border:1px dashed #E2E2EA;border-radius:11px;font-size:9px;color:#9A9AA5;">尚未挂载世界书 · 点击上方导入 .json 或读取酒馆设定</div>`;
+                listEl.innerHTML = `<div style="text-align:center;padding:12px;background:#FFFFFF;border:1px dashed #E2E2EA;border-radius:11px;font-size:9px;color:#9A9AA5;">尚未挂载世界书 · 点击上方导入 .json 或读取酒馆设定</div>`;
                 return;
             }
             listEl.innerHTML = wi.entries.map((it, idx) => {
                 const isConst = wi.mode === "all" || it.constant || !it.keys?.length;
                 const badge = isConst
-                    ? `<span style="background:#3A3A42;color:#FFF;padding:1px 6px;border-radius:99px;font-size:7.5px;">常驻</span>`
+                    ? `<span style="background:#2C2C34;color:#FFF;padding:1px 6px;border-radius:99px;font-size:7.5px;">常驻</span>`
                     : `<span style="border:1px solid #E2E2EA;color:#55555E;padding:1px 6px;border-radius:99px;font-size:7.5px;">词:${it.keys.slice(0, 3).join(",")}</span>`;
                 return `
                     <div style="background:#FFFFFF;border:1px solid ${it.enabled ? "#E2E2EC" : "#F2F2F6"};border-radius:11px;padding:7px 10px;opacity:${it.enabled ? "1" : "0.5"};">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
                             <label style="display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:800;color:#2C2C32;cursor:pointer;">
-                                <input type="checkbox" data-witog="${idx}" ${it.enabled ? "checked" : ""} style="accent-color:#3A3A42;" />
+                                <input type="checkbox" data-witog="${idx}" ${it.enabled ? "checked" : ""} style="accent-color:#2C2C34;" />
                                 <span>${it.title.replace(/</g, "&lt;")}</span>${badge}
                             </label>
                             <div style="display:flex;gap:8px;align-items:center;">
@@ -4791,7 +5038,7 @@ bootSumoulApp();
             listEl.querySelectorAll("[data-widel]").forEach((b) => b.onclick = () => { const d = loadWi(); d.entries.splice(Number(b.getAttribute("data-widel")), 1); saveWi(d); renderWiList(); });
         }
 
-        topDoc.getElementById("pw-sw-wi").onclick = () => { const d = loadWi(); d.enabled = !d.enabled; saveWi(d); renderWiList(); };
+        topDoc.getElementById("ios-sw-wi").onclick = () => { const d = loadWi(); d.enabled = !d.enabled; saveWi(d); renderWiList(); };
         topDoc.getElementById("smt-wi-mode-btn").onclick = () => { const d = loadWi(); d.mode = d.mode === "all" ? "smart" : "all"; saveWi(d); renderWiList(); };
         topDoc.getElementById("smt-wi-open-add-drawer").onclick = () => { const dr = topDoc.getElementById("smt-wi-add-drawer"); dr.style.display = dr.style.display === "none" ? "block" : "none"; };
         topDoc.getElementById("smt-wi-cancel-add").onclick = () => { topDoc.getElementById("smt-wi-add-drawer").style.display = "none"; };
@@ -4822,12 +5069,12 @@ bootSumoulApp();
         topDoc.getElementById("smt-wi-clear-btn").onclick = () => { if (confirm("确定清空世界书条目吗？")) { const d = loadWi(); d.entries = []; saveWi(d); renderWiList(); } };
 
         topDoc.getElementById("smt-wx-cfg-btn")?.addEventListener("click", () => {
-            setTimeout(() => { syncExtraUI(); renderWiList(); }, 30);
+            setTimeout(() => { syncAllUI(); renderWiList(); }, 30);
         });
 
-        syncExtraUI();
+        syncAllUI();
         renderWiList();
     }
 
-    mountPureWhiteSettings();
+    mountRefinedPureWhiteSettings();
 })();
