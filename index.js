@@ -6840,8 +6840,8 @@ bootSumoulApp();
     mountDualMemorySeaApp();
 })();
 // ==========================================================================
-// 🤍 【结识海 · 终极增强补丁：1.总结/星图/记忆编年三位一体全自动同步 + 2.未总结看板/依次总结/自定义字数/表格文字双视图 + 3.韩系清冷初雨开屏动画】
-// 用法：直接替换 index.js 最末尾刚才那段 mountEnhancedSummaryCenter 补丁代码！
+// 🤍 【结识海 · 终极完全体补丁：1.高定双环星轨开屏动画 + 2.关键人物(NPC)&关键物品(ITEMS)图鉴与自动提取 + 3.第5栏全功能中枢设置(含主题色定制/动效/注入策略/备份)】
+// 用法：直接替换 index.js 最末尾刚才那段 mountSplashAndUnifiedSummary 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -6850,8 +6850,19 @@ bootSumoulApp();
     const CH_KEY = "sumoul_v16_mem_active_channel";
     const getCh = () => (localStorage.getItem(CH_KEY) === "wx" ? "wx" : "st");
 
+    // 6 款韩系高定清冷主题色预设
+    const THEME_PRESETS = [
+        { id: "obsidian", name: "曜石玄黑", hex: "#1E2028", soft: "#F2F4F8" },
+        { id: "seoulblue", name: "首尔雾蓝", hex: "#3A4E68", soft: "#EDF2F8" },
+        { id: "pinesnow", name: "冷松霜绿", hex: "#384E48", soft: "#EDF4F2" },
+        { id: "ashpurple", name: "暮霭灰紫", hex: "#4A4258", soft: "#F2EFF6" },
+        { id: "titanium", name: "冷月钛银", hex: "#525866", soft: "#F0F2F6" },
+        { id: "warmwood", name: "枯木冷棕", hex: "#544842", soft: "#F5F1EE" }
+    ];
+
     function getCtx() {
         let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "";
+        let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
         let stChatArr = [];
         try {
             const st = topWin.SillyTavern?.getContext?.();
@@ -6861,6 +6872,7 @@ bootSumoulApp();
                     const c = st.characters[st.characterId];
                     charName = c.name || st.name2 || charName;
                     scope = c.avatar || c.name || String(st.characterId);
+                    if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
                     charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
                 } else if (st.name2) {
                     charName = st.name2; scope = st.name2;
@@ -6873,47 +6885,148 @@ bootSumoulApp();
             const wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || "{}");
             if (wCfg.myNick) userName = wCfg.myNick;
             if (wCfg.remark) charName = wCfg.remark;
+            if (wCfg.myAva) userAvatar = wCfg.myAva;
+            if (wCfg.charAva) charAvatar = wCfg.charAva;
         } catch (e) {}
         let wxChatArr = [];
         try {
             wxChatArr = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${safeScope}`) || "[]");
         } catch (e) {}
-        return { userName, charName, safeScope, charDesc, stChatArr, wxChatArr };
+        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, stChatArr, wxChatArr };
     }
 
     function getStoreKey(ch = getCh()) {
         return `sumoul_v16_dualmem_${ch}__${getCtx().safeScope}`;
     }
 
+    function ensureDefaults(d, ch) {
+        const c = getCtx();
+        d.autoCfg = Object.assign({
+            enabled: false,
+            everyN: 15,
+            lastFloor: 0,
+            wordLimit: 160,
+            viewMode: "table",
+            logSubTab: "timeline", // 'timeline' | 'npcs' | 'items'
+            injectEnabled: true,
+            injectDepth: 2,
+            maxSumInject: 12,
+            injectNpcItem: true,
+            themeColor: "#1E2028",
+            themeSoft: "#F2F4F8",
+            showSplash: true
+        }, d.autoCfg || {});
+
+        if (!Array.isArray(d.npcs) || d.npcs.length === 0) {
+            d.npcs = ch === "st" ? [
+                { id: 301, name: "关键关联人", role: "剧情重要关系人", attitude: "中立观察", desc: `在主线剧情中与 ${c.charName} 或 ${c.userName} 存在交集的知情者。` }
+            ] : [
+                { id: 302, name: "共同好友", role: "微信朋友圈熟人", attitude: "友善助攻", desc: `经常在朋友圈互动或群聊中出现的共同熟人。` }
+            ];
+        }
+        if (!Array.isArray(d.items) || d.items.length === 0) {
+            d.items = ch === "st" ? [
+                { id: 401, name: `${c.charName}的随身大衣`, owner: `${c.charName} 随身之物`, status: "常伴身边", desc: `带有 ${c.charName} 标志性冷冽气息的外套，右口袋习惯留给 ${c.userName}。` },
+                { id: 402, name: "初遇信物", owner: "两人共同持有", status: "完好珍藏", desc: `见证两人主线关系破冰的重要纪念物品，具有特殊情感分量。` }
+            ] : [
+                { id: 403, name: "置顶聊天与特别提示音", owner: "双方手机设置", status: "长期生效", desc: `只为彼此单独开启的消息提醒与唯一置顶权限。` }
+            ];
+        }
+        return d;
+    }
+
     function loadMem(ch = getCh()) {
         try {
-            return JSON.parse(localStorage.getItem(getStoreKey(ch)) || "{}");
-        } catch (e) { return {}; }
+            const raw = JSON.parse(localStorage.getItem(getStoreKey(ch)) || "{}");
+            return ensureDefaults(raw, ch);
+        } catch (e) { return ensureDefaults({}, ch); }
     }
 
     function saveMem(data, ch = getCh()) {
         try {
+            ensureDefaults(data, ch);
             localStorage.setItem(getStoreKey(ch), JSON.stringify(data));
+            applyThemeVariables(data.autoCfg.themeColor, data.autoCfg.themeSoft);
+            syncFullPromptInjection();
+        } catch (e) {}
+    }
+
+    // 应用自定义主题色至整个结识海界面
+    function applyThemeVariables(hex = "#1E2028", soft = "#F2F4F8") {
+        let dyn = topDoc.getElementById("ks-theme-dyn-style");
+        if (!dyn) {
+            dyn = topDoc.createElement("style");
+            dyn.id = "ks-theme-dyn-style";
+            topDoc.head.appendChild(dyn);
+        }
+        dyn.innerHTML = `
+            #seoul-mini-theater-modal #smt-ksea-overlay {
+                --ks-accent: ${hex};
+                --ks-soft: ${soft};
+            }
+            #seoul-mini-theater-modal #smt-ksea-overlay .ks-pill.dark,
+            #seoul-mini-theater-modal #smt-ksea-overlay .ks-flt.on,
+            #seoul-mini-theater-modal #smt-ksea-overlay .ks-dual-opt.active,
+            #seoul-mini-theater-modal #smt-ksea-overlay .ks-stat-box.highlight,
+            #seoul-mini-theater-modal #smt-ksea-overlay .ks-range-badge {
+                background: ${hex} !important;
+                border-color: ${hex} !important;
+                color: #FFFFFF !important;
+                -webkit-text-fill-color: #FFFFFF !important;
+            }
+            #seoul-mini-theater-modal #smt-ksea-overlay .ks-dock-item.active {
+                color: ${hex} !important;
+            }
+        `;
+    }
+
+    // 组装包含【总结 + 编年 + 关键人物NPC + 关键物品ITEMS + 星图节点】的完整防失忆提示词并注入底层
+    function buildFullChannelPrompt(ch) {
+        const d = loadMem(ch);
+        if (!d.isBound || d.autoCfg?.injectEnabled === false) return "";
+
+        const maxSum = Math.max(1, Number(d.autoCfg?.maxSumInject) || 12);
+        const chTitle = ch === "st"
+            ? "【SillyTavern 酒馆主线长期防失忆档案（严禁遗忘或与线上微信串戏）】"
+            : "【微信线上日常专属防失忆档案（严禁与酒馆主线剧情混淆）】";
+
+        const sumLines = (d.summaries || []).slice(0, maxSum).map((s) => `• [${s.range}] 《${s.title}》：${s.content}${s.keyFacts ? `（铁律：${s.keyFacts}）` : ""}`).join("\n");
+        const npcLines = d.autoCfg?.injectNpcItem !== false
+            ? (d.npcs || []).map((n) => `• [人物·${n.name} (${n.role} / 态度:${n.attitude})]：${n.desc}`).join("\n")
+            : "";
+        const itemLines = d.autoCfg?.injectNpcItem !== false
+            ? (d.items || []).map((it) => `• [物品·${it.name} (${it.owner} / 状态:${it.status})]：${it.desc}`).join("\n")
+            : "";
+        const nodeLines = (d.nodes || []).slice(0, 14).map((n) => `• [${n.title}]：${n.content}`).join("\n");
+
+        return [
+            chTitle,
+            `▸ 关系定调：${d.pact?.stage || "深度羁绊"}`,
+            `▸ 核心铁律锚点：${d.pact?.coreAnchor || ""}`,
+            sumLines ? `▸ 历次楼层阶段总结：\n${sumLines}` : "",
+            npcLines ? `▸ 登场关键人物(NPC)档案：\n${npcLines}` : "",
+            itemLines ? `▸ 关键物品与信物(ITEMS)档案：\n${itemLines}` : "",
+            nodeLines ? `▸ 星图核心节点：\n${nodeLines}` : ""
+        ].filter(Boolean).join("\n");
+    }
+
+    function syncFullPromptInjection() {
+        try {
+            const stText = buildFullChannelPrompt("st");
+            const wxText = buildFullChannelPrompt("wx");
+            const stData = loadMem("st");
+            topWin.__SUMOUL_ST_MEMORY_PROMPT__ = stText;
+            topWin.__SUMOUL_WX_MEMORY_PROMPT__ = wxText;
+
             const stCtx = topWin.SillyTavern?.getContext?.();
-            if (ch === "st" && stCtx && typeof stCtx.setExtensionPrompt === "function" && data.isBound && data.autoCfg?.injectEnabled !== false) {
-                const sumLines = (data.summaries || []).slice(0, 15).map((s) => `• [${s.range}] 《${s.title}》：${s.content}${s.keyFacts ? `（核心事实：${s.keyFacts}）` : ""}`).join("\n");
-                const tlLines = (data.timeline || []).slice(0, 10).map((t) => `• [${t.chapter}] 《${t.title}》：${t.content}`).join("\n");
-                const nodeLines = (data.nodes || []).slice(0, 15).map((n) => `• [${n.title}]：${n.content}`).join("\n");
-                const promptText = [
-                    "【SillyTavern 酒馆主线长期记忆库（严禁遗忘或与线上微信串戏）】",
-                    `▸ 当前关系阶段：${data.pact?.stage || "深度羁绊"}`,
-                    `▸ 核心锚点：${data.pact?.coreAnchor || ""}`,
-                    sumLines ? `▸ 历次楼层阶段总结：\n${sumLines}` : "",
-                    tlLines ? `▸ 记忆编年史关键篇章：\n${tlLines}` : "",
-                    nodeLines ? `▸ 星图记忆节点：\n${nodeLines}` : ""
-                ].filter(Boolean).join("\n");
-                topWin.__SUMOUL_ST_MEMORY_PROMPT__ = promptText;
-                stCtx.setExtensionPrompt("SUMOUL_TAVERN_MEMORY_SEA", promptText, 1, Number(data.autoCfg?.injectDepth) ?? 2);
+            if (stCtx && typeof stCtx.setExtensionPrompt === "function") {
+                const depth = Math.max(0, Math.min(10, Number(stData.autoCfg?.injectDepth) ?? 2));
+                stCtx.setExtensionPrompt("SUMOUL_TAVERN_MEMORY_SEA", stText, 1, depth);
             }
         } catch (e) {}
     }
 
-    async function askSumAI(sys, usr) {
+    async function askAI(sys, usr) {
         const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
         const k = topDoc.getElementById("smt-api-key")?.value?.trim();
         const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
@@ -6933,9 +7046,9 @@ bootSumoulApp();
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // 🧠 核心升级：一次总结同时写入【1.楼层总结 + 2.星图节点 + 3.记忆编年史】三位一体全同步！
+    // 🧠 四位一体全自动总结引擎：一次总结同时更新【1.楼层总结 + 2.星图节点 + 3.记忆编年 + 4.关键人物NPC与关键物品ITEMS】！
     // ══════════════════════════════════════════════════════════════════════════
-    async function executeUnifiedSummary(ch, sFloor, eFloor, wordCount = 160, modeTag = "自动同步") {
+    async function executeMasterSummary(ch, sFloor, eFloor, wordCount = 160, modeTag = "自动同步") {
         const c = getCtx();
         const rawArr = ch === "st" ? c.stChatArr : c.wxChatArr;
         const chName = ch === "st" ? "酒馆主线" : "微信聊天";
@@ -6957,9 +7070,9 @@ bootSumoulApp();
             }
         }).join("\n");
 
-        const rawJson = await askSumAI(
-            `你是高精度防失忆档案官与编年史作家。当前轨道：【${chName}】（严禁与另一轨道串戏）。角色：${c.charName}，用户：${c.userName}。`,
-            `请将以下【${chName} 第 #${sIdx} 层 ~ 第 #${eIdx} 层】的聊天记录提炼为防失忆总结，并同步生成星图节点与记忆编年史章节。\n要求：正文总结 (summary) 字数控制在 **${targetWords} 字左右**，细节扎实。\n\n${sliceText.slice(-4200)}\n\n严格只输出JSON格式：\n{"sumTitle":"12字内阶段标题","summary":"约${targetWords}字的高密度剧情与情感递进总结","keyFacts":"35字内不可遗忘的核心事实铁律","nodeType":"memory","nodeTitle":"6字内星图节点名","edgeLabel":"2~4字连线词","nodeWhisper":"28字内${c.charName}的清冷内心批注","tlTheme":"2~4字章节主题词(如:破冰/升温/暗涌)","tlTitle":"12字内极具文学感的编年史章节名","tlContent":"65字内极具画面感的编年史叙事总结"}`
+        const rawJson = await askAI(
+            `你是高精度防失忆档案官。当前轨道：【${chName}】。主角：${c.charName} 与 ${c.userName}。`,
+            `请将以下【${chName} 第 #${sIdx} 层 ~ 第 #${eIdx} 层】记录提炼为防失忆总结，并同步提取星图节点、编年章节，以及本段中出现的重要配角(NPC)和关键物品(Item)。\n要求：summary 正文字数控制在 **${targetWords} 字左右**。\n\n${sliceText.slice(-4200)}\n\n严格只输出JSON格式：\n{"sumTitle":"12字内阶段标题","summary":"约${targetWords}字的高密度剧情与情感总结","keyFacts":"35字内不可遗忘的核心事实","nodeType":"memory","nodeTitle":"6字内星图节点名","edgeLabel":"2~4字连线词","nodeWhisper":"28字内${c.charName}的内心批注","tlTheme":"2~4字主题","tlTitle":"12字内编年章节名","tlContent":"60字内编年叙事","newNpc":{"name":"若本段有重要他人/NPC请填名字，无则填空字符串","role":"身份关系","attitude":"对主角态度","desc":"30字内人物关键信息"},"newItem":{"name":"若本段有重要物品/地点/信物请填名称，无则填空字符串","owner":"持有者或归属","status":"当前状态","desc":"30字内物品剧情意义"}}`
         );
 
         const match = rawJson.match(/\{[\s\S]*\}/);
@@ -6972,21 +7085,15 @@ bootSumoulApp();
         const rangeLabel = `${ch === "st" ? "酒馆" : "微信"} #${sIdx} ~ #${eIdx}`;
         const baseId = Date.now() + Math.floor(Math.random() * 1000);
 
-        // ① 写入【楼层总结】
+        // ① 写入楼层总结
         d.summaries = d.summaries || [];
         d.summaries.unshift({
-            id: baseId,
-            range: rangeLabel,
-            sFloor: sIdx,
-            eFloor: eIdx,
-            wordTarget: targetWords,
-            title: o.sumTitle || `${rangeLabel} 纪要`,
-            content: o.summary || "",
-            keyFacts: o.keyFacts || "",
+            id: baseId, range: rangeLabel, sFloor: sIdx, eFloor: eIdx, wordTarget: targetWords,
+            title: o.sumTitle || `${rangeLabel} 纪要`, content: o.summary || "", keyFacts: o.keyFacts || "",
             time: `${modeTag} · ${timeStr}`
         });
 
-        // ② 同步写入【星图脉络节点】
+        // ② 写入星图节点
         d.nodes = d.nodes || [];
         d.edges = d.edges || [];
         const nid = baseId + 1;
@@ -6994,152 +7101,157 @@ bootSumoulApp();
         const xPct = Math.max(14, Math.min(86, Math.round(50 + Math.cos(cnt * 2.3) * (18 + (cnt % 4) * 6))));
         const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(cnt * 2.3) * (14 + (cnt % 4) * 5))));
         const anchorId = d.activeNodeId || d.nodes[0]?.id || 1;
-
         d.nodes.push({
-            id: nid,
-            type: ["memory", "relation", "knot"].includes(o.nodeType) ? o.nodeType : "memory",
-            title: o.nodeTitle || `#${sIdx}-${eIdx}`,
-            xPct, yPct,
+            id: nid, type: ["memory", "relation", "knot"].includes(o.nodeType) ? o.nodeType : "memory",
+            title: o.nodeTitle || `#${sIdx}-${eIdx}`, xPct, yPct,
             content: `[${rangeLabel}] ${o.summary || ""}`,
             whisper: `“ ${(o.nodeWhisper || "这段记忆已锁入心底。").replace(/^[“"]|[”"]$/g, "")} ”`
         });
         d.edges.push({ from: anchorId, to: nid, label: o.edgeLabel || "刻痕" });
         d.activeNodeId = nid;
 
-        // ③ 同步写入【记忆编年史 (timeline)】！（彻底解决编年史不同步的问题！）
+        // ③ 写入记忆编年史
         d.timeline = d.timeline || [];
         const chapNum = String(d.timeline.length + 1).padStart(2, "0");
-        const prefix = ch === "st" ? "CHAPTER" : "WECHAT";
         d.timeline.unshift({
-            id: baseId + 2,
-            range: rangeLabel,
-            chapter: `${prefix} ${chapNum} · ${o.tlTheme || "共鸣"} (${rangeLabel})`,
-            title: o.tlTitle || o.sumTitle || `${rangeLabel} 记忆篇章`,
+            id: baseId + 2, range: rangeLabel,
+            chapter: `${ch === "st" ? "CHAPTER" : "WECHAT"} ${chapNum} · ${o.tlTheme || "共鸣"} (${rangeLabel})`,
+            title: o.tlTitle || o.sumTitle || `${rangeLabel} 篇章`,
             content: o.tlContent || o.summary || "",
             note: `“ ${(o.nodeWhisper || "已随楼层总结自动同步归档。").replace(/^[“"]|[”"]$/g, "")} ”`
         });
 
-        // ④ 更新最新已总结楼层水位线
-        d.autoCfg = d.autoCfg || {};
+        // ④ 自动归档提取到的【关键人物 NPC】与【关键物品 ITEM】
+        if (o.newNpc && o.newNpc.name && o.newNpc.name.trim() && o.newNpc.name !== "无") {
+            d.npcs = d.npcs || [];
+            const existNpc = d.npcs.find((x) => x.name === o.newNpc.name.trim());
+            if (existNpc) {
+                existNpc.role = o.newNpc.role || existNpc.role;
+                existNpc.attitude = o.newNpc.attitude || existNpc.attitude;
+                existNpc.desc = o.newNpc.desc || existNpc.desc;
+            } else {
+                d.npcs.unshift({
+                    id: baseId + 3, name: o.newNpc.name.trim(),
+                    role: o.newNpc.role || "登场人物", attitude: o.newNpc.attitude || "未知",
+                    desc: o.newNpc.desc || `于 ${rangeLabel} 登场的关键人物`
+                });
+            }
+        }
+        if (o.newItem && o.newItem.name && o.newItem.name.trim() && o.newItem.name !== "无") {
+            d.items = d.items || [];
+            const existItem = d.items.find((x) => x.name === o.newItem.name.trim());
+            if (existItem) {
+                existItem.status = o.newItem.status || existItem.status;
+                existItem.desc = o.newItem.desc || existItem.desc;
+            } else {
+                d.items.unshift({
+                    id: baseId + 4, name: o.newItem.name.trim(),
+                    owner: o.newItem.owner || "剧情信物", status: o.newItem.status || "已出现",
+                    desc: o.newItem.desc || `于 ${rangeLabel} 出现的关键物品`
+                });
+            }
+        }
+
         if (eIdx + 1 > (Number(d.autoCfg.lastFloor) || 0)) {
             d.autoCfg.lastFloor = eIdx + 1;
         }
-
         saveMem(d, ch);
     }
 
-    function mountSplashAndUnifiedSummary() {
+    function mountUltimateMemorySeaPatch() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
         const vp = topDoc.getElementById("ks-main-viewport");
         if (!overlay || !vp) {
-            setTimeout(mountSplashAndUnifiedSummary, 220);
+            setTimeout(mountUltimateMemorySeaPatch, 220);
             return;
         }
 
-        // 注入开屏动画 + 表格/文字双视图 + 编年史同步 UI 样式
+        // 将底部第 5 栏标题改为【中枢设置 (설정 · SET)】
+        const pactTabEl = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="pact"]');
+        if (pactTabEl) {
+            const zhEl = pactTabEl.querySelector(".ks-dock-zh");
+            const krEl = pactTabEl.querySelector(".ks-dock-kr");
+            if (zhEl) zhEl.textContent = "中枢设置";
+            if (krEl) krEl.textContent = "설정 · SET";
+        }
+        const timeTabEl = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="timeline"]');
+        if (timeTabEl) {
+            const zhEl = timeTabEl.querySelector(".ks-dock-zh");
+            const krEl = timeTabEl.querySelector(".ks-dock-kr");
+            if (zhEl) zhEl.textContent = "编年图鉴";
+            if (krEl) krEl.textContent = "도감 · LOG";
+        }
+
         topDoc.getElementById("ks-sum-pro-css")?.remove();
         const st = topDoc.createElement("style");
         st.id = "ks-sum-pro-css";
         st.innerHTML = `
-            /* ── 第5应用专属：韩系清冷初雨开屏动画 (Splash Screen) ── */
-            @keyframes ksSplashDrop {
-                0%   { top: 18%; height: 0px; opacity: 0; }
-                30%  { height: 42px; opacity: 0.85; }
-                65%  { top: 47%; height: 10px; opacity: 0.9; }
-                100% { top: 48%; height: 0px; opacity: 0; }
+            /* ── 高定韩系「双环精密星轨 · 落雨共鸣」开屏动画 (Astrolabe Splash) ── */
+            @keyframes ksOrbitCW { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+            @keyframes ksOrbitCCW { from { transform: translate(-50%, -50%) rotate(360deg); } to { transform: translate(-50%, -50%) rotate(0deg); } }
+            @keyframes ksRainLineFall {
+                0%   { transform: translateY(-90px) scaleY(0.2); opacity: 0; }
+                40%  { transform: translateY(0px) scaleY(1.2); opacity: 0.85; }
+                100% { transform: translateY(55px) scaleY(0.1); opacity: 0; }
             }
-            @keyframes ksSplashDotPop {
-                0%, 58% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-                75%     { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
-                100%    { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            @keyframes ksWaveRingOut {
+                0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0.8; }
+                100% { transform: translate(-50%, -50%) scale(2.1); opacity: 0; }
             }
-            @keyframes ksSplashRipple {
-                0%, 60% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
-                70%     { opacity: 0.65; }
-                100%    { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
-            }
-            @keyframes ksSplashTextReveal {
-                0%, 45% { opacity: 0; transform: translateY(8px); letter-spacing: 8px; }
-                100%    { opacity: 1; transform: translateY(0); letter-spacing: 4px; }
+            @keyframes ksFadeUp {
+                from { opacity: 0; transform: translateY(10px); }
+                to   { opacity: 1; transform: translateY(0); }
             }
 
             #seoul-mini-theater-modal #ks-splash-screen {
                 position: absolute !important; inset: 0 !important; z-index: 9999 !important;
-                background: #FFFFFF !important;
+                background: radial-gradient(circle at 50% 42%, #FFFFFF 0%, #F7F9FC 65%, #EEF2F8 100%) !important;
                 display: none; flex-direction: column !important; align-items: center !important; justify-content: center !important;
-                transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1) !important;
-                user-select: none !important; cursor: pointer !important;
+                transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
+                user-select: none !important; cursor: pointer !important; overflow: hidden !important;
             }
-            #seoul-mini-theater-modal #ks-splash-screen.show {
-                display: flex !important; opacity: 1 !important;
-            }
-            #seoul-mini-theater-modal #ks-splash-screen.fade-out {
-                opacity: 0 !important; pointer-events: none !important;
-            }
+            #seoul-mini-theater-modal #ks-splash-screen.show { display: flex !important; opacity: 1 !important; }
+            #seoul-mini-theater-modal #ks-splash-screen.fade-out { opacity: 0 !important; pointer-events: none !important; }
 
-            /* ── 未总结楼层 3 格仪表盘 ── */
-            #seoul-mini-theater-modal .ks-stat-grid {
-                display: grid !important; grid-template-columns: repeat(3, 1fr) !important;
-                gap: 7px !important; margin-bottom: 10px !important;
-            }
-            #seoul-mini-theater-modal .ks-stat-box {
-                background: #F8F9FC !important; border: 1px solid #ECEEF4 !important;
-                border-radius: 12px !important; padding: 8px 10px !important; text-align: center !important;
-            }
-            #seoul-mini-theater-modal .ks-stat-box.highlight {
-                background: #1E2028 !important; border-color: #1E2028 !important; color: #FFFFFF !important;
-            }
-            #seoul-mini-theater-modal .ks-stat-num {
-                font-size: 12px !important; font-weight: 900 !important; font-family: monospace !important;
-                letter-spacing: 0.3px !important; margin-top: 2px !important;
-            }
+            /* ── 统计看板与表格/文字视图 ── */
+            #seoul-mini-theater-modal .ks-stat-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 7px !important; margin-bottom: 10px !important; }
+            #seoul-mini-theater-modal .ks-stat-box { background: #F8F9FC !important; border: 1px solid #ECEEF4 !important; border-radius: 12px !important; padding: 8px 10px !important; text-align: center !important; }
+            #seoul-mini-theater-modal .ks-stat-box.highlight { background: var(--ks-accent, #1E2028) !important; border-color: var(--ks-accent, #1E2028) !important; color: #FFFFFF !important; }
+            #seoul-mini-theater-modal .ks-stat-num { font-size: 12px !important; font-weight: 900 !important; font-family: monospace !important; margin-top: 2px !important; }
 
-            /* ── 表格样式 (Table View) ── */
-            #seoul-mini-theater-modal .ks-sum-table-wrap {
-                width: 100% !important; overflow-x: auto !important;
-                background: #FFFFFF !important; border: 1px solid #E6E9F2 !important;
-                border-radius: 14px !important; box-shadow: 0 4px 18px rgba(0,0,0,0.02) !important;
-            }
-            #seoul-mini-theater-modal .ks-sum-table {
-                width: 100% !important; border-collapse: collapse !important;
-                font-size: 9.2px !important; text-align: left !important;
-            }
-            #seoul-mini-theater-modal .ks-sum-table th {
-                background: #F6F8FC !important; color: #6E7688 !important;
-                font-size: 8px !important; font-weight: 800 !important; letter-spacing: 0.6px !important;
-                padding: 8px 10px !important; border-bottom: 1px solid #E6E9F2 !important;
-                white-space: nowrap !important;
-            }
-            #seoul-mini-theater-modal .ks-sum-table td {
-                padding: 9px 10px !important; border-bottom: 1px solid #F0F2F7 !important;
-                color: #2C303C !important; vertical-align: top !important; line-height: 1.55 !important;
-            }
+            #seoul-mini-theater-modal .ks-sum-table-wrap { width: 100% !important; overflow-x: auto !important; background: #FFFFFF !important; border: 1px solid #E6E9F2 !important; border-radius: 14px !important; box-shadow: 0 4px 18px rgba(0,0,0,0.02) !important; }
+            #seoul-mini-theater-modal .ks-sum-table { width: 100% !important; border-collapse: collapse !important; font-size: 9.2px !important; text-align: left !important; }
+            #seoul-mini-theater-modal .ks-sum-table th { background: #F6F8FC !important; color: #6E7688 !important; font-size: 8px !important; font-weight: 800 !important; padding: 8px 10px !important; border-bottom: 1px solid #E6E9F2 !important; white-space: nowrap !important; }
+            #seoul-mini-theater-modal .ks-sum-table td { padding: 9px 10px !important; border-bottom: 1px solid #F0F2F7 !important; color: #2C303C !important; vertical-align: top !important; line-height: 1.55 !important; }
             #seoul-mini-theater-modal .ks-sum-table tr:last-child td { border-bottom: none !important; }
-            #seoul-mini-theater-modal .ks-range-badge {
-                display: inline-block !important; padding: 2px 6px !important;
-                background: #1E2028 !important; color: #FFFFFF !important;
-                border-radius: 6px !important; font-size: 7.8px !important; font-weight: 800 !important;
-                font-family: monospace !important; white-space: nowrap !important;
-            }
+            #seoul-mini-theater-modal .ks-range-badge { display: inline-block !important; padding: 2px 6px !important; background: var(--ks-accent, #1E2028) !important; color: #FFFFFF !important; border-radius: 6px !important; font-size: 7.8px !important; font-weight: 800 !important; font-family: monospace !important; white-space: nowrap !important; }
 
-            /* ── 文字样式 (Editorial Text View) ── */
-            #seoul-mini-theater-modal .ks-editorial-doc {
-                background: #FFFFFF !important; border: 1px solid #E6E9F2 !important;
-                border-radius: 16px !important; padding: 16px 16px !important;
-                box-shadow: 0 6px 24px rgba(0,0,0,0.025) !important;
+            #seoul-mini-theater-modal .ks-editorial-doc { background: #FFFFFF !important; border: 1px solid #E6E9F2 !important; border-radius: 16px !important; padding: 15px 16px !important; box-shadow: 0 6px 24px rgba(0,0,0,0.025) !important; }
+            #seoul-mini-theater-modal .ks-ed-entry { padding-bottom: 14px !important; margin-bottom: 14px !important; border-bottom: 1px dashed #E4E8F0 !important; }
+            #seoul-mini-theater-modal .ks-ed-entry:last-child { padding-bottom: 0 !important; margin-bottom: 0 !important; border-bottom: none !important; }
+
+            /* ── NPC 与物品高定图鉴卡片网格 ── */
+            #seoul-mini-theater-modal .ks-dex-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+            #seoul-mini-theater-modal .ks-dex-card { background: #FFFFFF !important; border: 1px solid #E8ECF4 !important; border-radius: 14px !important; padding: 11px 12px !important; box-shadow: 0 4px 14px rgba(20,24,35,0.025) !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
+
+            /* ── 主题色圆点选择器 ── */
+            #seoul-mini-theater-modal .ks-color-swatch {
+                width: 24px !important; height: 24px !important; border-radius: 50% !important;
+                cursor: pointer !important; border: 2px solid #FFFFFF !important;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important; transition: transform 0.18s ease !important;
             }
-            #seoul-mini-theater-modal .ks-ed-entry {
-                padding-bottom: 14px !important; margin-bottom: 14px !important;
-                border-bottom: 1px dashed #E4E8F0 !important;
-            }
-            #seoul-mini-theater-modal .ks-ed-entry:last-child {
-                padding-bottom: 0 !important; margin-bottom: 0 !important; border-bottom: none !important;
+            #seoul-mini-theater-modal .ks-color-swatch.active {
+                transform: scale(1.22) !important; outline: 1.5px solid var(--ks-accent, #1E2028) !important; outline-offset: 2px !important;
             }
         `;
         topDoc.head.appendChild(st);
 
+        // 初始化当前主题色
+        const curInit = loadMem(getCh());
+        applyThemeVariables(curInit.autoCfg?.themeColor, curInit.autoCfg?.themeSoft);
+
         // ══════════════════════════════════════════════════════════════════════════
-        // 🎬 1. 挂载第 5 应用「韩系纯白初雨开屏动画」层
+        // 🎬 1. 全新重做：韩系高定「双环精密星盘 · 落雨共鸣」开屏动画
         // ══════════════════════════════════════════════════════════════════════════
         topDoc.getElementById("ks-splash-screen")?.remove();
         const splashEl = topDoc.createElement("div");
@@ -7147,62 +7259,116 @@ bootSumoulApp();
         overlay.appendChild(splashEl);
 
         let splashTimer = null;
-        function playSplashScreen() {
-            const c = getCtx();
+        let pctInterval = null;
+
+        function playAstrolabeSplash() {
             const ch = getCh();
+            const d = loadMem(ch);
+            if (d.autoCfg?.showSplash === false) return;
+
+            const c = getCtx();
+            const accent = d.autoCfg?.themeColor || "#1E2028";
+            const nodeCnt = (d.nodes?.length || 0) + (d.summaries?.length || 0);
+
             splashEl.classList.remove("fade-out");
             splashEl.classList.add("show");
             splashEl.innerHTML = `
-                <!-- 中心落雨凝点动画舞台 -->
-                <div style="position:relative;width:160px;height:160px;margin-bottom:12px;">
-                    <!-- 垂直坠落的清冷银丝雨滴 -->
-                    <div style="position:absolute;left:50%;transform:translateX(-50%);width:1px;background:linear-gradient(180deg,transparent,#1E2028);animation:ksSplashDrop 0.85s cubic-bezier(0.4,0,0.2,1) forwards;"></div>
-                    <!-- 触水荡开的三层同心水波环 -->
-                    <div style="position:absolute;left:50%;top:48%;width:38px;height:38px;border-radius:50%;border:0.8px solid rgba(30,32,40,0.55);animation:ksSplashRipple 1.35s ease-out forwards;"></div>
-                    <div style="position:absolute;left:50%;top:48%;width:38px;height:38px;border-radius:50%;border:0.6px solid rgba(130,138,156,0.45);animation:ksSplashRipple 1.35s ease-out 0.14s forwards;"></div>
-                    <div style="position:absolute;left:50%;top:48%;width:38px;height:38px;border-radius:50%;border:0.5px solid rgba(160,168,184,0.3);animation:ksSplashRipple 1.35s ease-out 0.28s forwards;"></div>
-                    <!-- 中心凝结的 5px 极简核心微点 -->
-                    <div style="position:absolute;left:50%;top:48%;width:5.5px;height:5.5px;border-radius:50%;background:#1E2028;box-shadow:0 0 0 4px #FFFFFF,0 0 0 4.8px rgba(30,32,40,0.35);animation:ksSplashDotPop 1.1s cubic-bezier(0.22,1,0.36,1) forwards;"></div>
+                <!-- 顶部微距档案编码 -->
+                <div style="position:absolute;top:max(24px,env(safe-area-inset-top,24px));left:24px;right:24px;display:flex;justify-content:space-between;font-size:7.5px;font-weight:700;color:#98A0B2;font-family:monospace;letter-spacing:1.5px;">
+                    <span>ARCHIVE // ${ch === "st" ? "TAVERN_MAIN" : "WECHAT_DAILY"}</span>
+                    <span>NODES · ${String(nodeCnt).padStart(2, "0")}</span>
                 </div>
 
-                <!-- 韩系杂志级留白呼吸标题 -->
-                <div style="text-align:center;animation:ksSplashTextReveal 1.1s cubic-bezier(0.22,1,0.36,1) forwards;">
-                    <div style="font-size:8px;font-weight:700;color:#98A0B2;letter-spacing:3.5px;margin-bottom:6px;">인연의 바다 · MEMORY SEA</div>
-                    <div style="font-size:17px;font-weight:800;color:#1E2028;letter-spacing:5px;padding-left:5px;">结 识 海</div>
-                    <div style="width:18px;height:1px;background:#DCDFE8;margin:10px auto;"></div>
-                    <div style="font-size:8.5px;font-weight:600;color:#6E7688;letter-spacing:1.2px;">
-                        ${c.userName} × ${c.charName} · ${ch === "st" ? "酒馆主线记忆轨" : "微信线上记忆轨"}
+                <!-- 中央：双环逆向旋转精密星盘 + 3道错落银丝雨 + 双人共鸣头像 -->
+                <div style="position:relative;width:210px;height:210px;margin-bottom:20px;">
+                    <!-- 3道错落滑落的极细冷银雨丝 -->
+                    <div style="position:absolute;left:32%;top:22%;width:0.8px;height:40px;background:linear-gradient(180deg,transparent,${accent});animation:ksRainLineFall 1.1s ease-in infinite;"></div>
+                    <div style="position:absolute;left:50%;top:12%;width:1px;height:52px;background:linear-gradient(180deg,transparent,${accent});animation:ksRainLineFall 1.2s ease-in 0.2s infinite;"></div>
+                    <div style="position:absolute;left:68%;top:26%;width:0.8px;height:36px;background:linear-gradient(180deg,transparent,${accent});animation:ksRainLineFall 1.0s ease-in 0.45s infinite;"></div>
+
+                    <!-- 外层顺时针旋转虚线星轨环 -->
+                    <svg viewBox="0 0 200 200" width="196" height="196" style="position:absolute;left:50%;top:50%;animation:ksOrbitCW 18s linear infinite;">
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="#DCE2EE" stroke-width="0.8" stroke-dasharray="3 5" />
+                        <circle cx="100" cy="10" r="2.8" fill="${accent}" />
+                        <circle cx="100" cy="190" r="2.2" fill="#98A0B2" />
+                        <line x1="100" y1="2" x2="100" y2="14" stroke="${accent}" stroke-width="0.8" />
+                    </svg>
+
+                    <!-- 内层逆时针旋转几何细环 + 坐标十字 -->
+                    <svg viewBox="0 0 160 160" width="148" height="148" style="position:absolute;left:50%;top:50%;animation:ksOrbitCCW 12s linear infinite;">
+                        <circle cx="80" cy="80" r="68" fill="none" stroke="#CFD6E6" stroke-width="0.7" />
+                        <circle cx="12" cy="80" r="2.2" fill="${accent}" />
+                        <circle cx="148" cy="80" r="2.2" fill="${accent}" />
+                    </svg>
+
+                    <!-- 中心扩散水波环 -->
+                    <div style="position:absolute;left:50%;top:50%;width:76px;height:76px;border-radius:50%;border:0.8px solid ${accent};animation:ksWaveRingOut 1.6s ease-out infinite;"></div>
+                    <div style="position:absolute;left:50%;top:50%;width:76px;height:76px;border-radius:50%;border:0.6px solid #98A0B2;animation:ksWaveRingOut 1.6s ease-out 0.5s infinite;"></div>
+
+                    <!-- 中心双人交叠微距头像 -->
+                    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;">
+                        <img src="${c.userAvatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2.5px solid #FFFFFF;box-shadow:0 4px 14px rgba(20,24,35,0.1);margin-right:-10px;z-index:2;" />
+                        <img src="${c.charAvatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2.5px solid #FFFFFF;box-shadow:0 4px 14px rgba(20,24,35,0.1);z-index:3;" />
+                    </div>
+                </div>
+
+                <!-- 杂志级字距排版 + 实时脉冲同步读条 -->
+                <div style="text-align:center;animation:ksFadeUp 0.6s ease forwards;">
+                    <div style="font-size:8px;font-weight:700;color:#8E96A8;letter-spacing:4px;margin-bottom:6px;">SOUL MEMORY CONSTELLATION</div>
+                    <div style="font-size:18px;font-weight:800;color:${accent};letter-spacing:6px;padding-left:6px;">结 识 海</div>
+                    <div style="font-size:9px;font-weight:600;color:#5C6478;letter-spacing:1.5px;margin-top:6px;">
+                        ${c.userName} × ${c.charName} · ${ch === "st" ? "酒馆主线记忆库" : "微信线上记忆库"}
+                    </div>
+
+                    <!-- 极细流光同步进度线 -->
+                    <div style="width:120px;height:1.5px;background:#ECEEF4;margin:16px auto 6px auto;border-radius:99px;overflow:hidden;">
+                        <div id="ks-splash-bar" style="width:15%;height:100%;background:${accent};transition:width 1.2s cubic-bezier(0.22,1,0.36,1);"></div>
+                    </div>
+                    <div id="ks-splash-pct" style="font-size:7.5px;font-weight:800;color:#98A0B2;font-family:monospace;letter-spacing:1.5px;">
+                        SYNCING MEMORY · 12%
                     </div>
                 </div>
             `;
 
+            requestAnimationFrame(() => {
+                const bar = topDoc.getElementById("ks-splash-bar");
+                if (bar) bar.style.width = "100%";
+            });
+
+            let p = 18;
+            if (pctInterval) clearInterval(pctInterval);
+            pctInterval = setInterval(() => {
+                p = Math.min(100, p + Math.floor(Math.random() * 24) + 12);
+                const pctEl = topDoc.getElementById("ks-splash-pct");
+                if (pctEl) pctEl.textContent = `SYNCING MEMORY · ${p}%`;
+                if (p >= 100) clearInterval(pctInterval);
+            }, 220);
+
             if (splashTimer) clearTimeout(splashTimer);
             splashTimer = setTimeout(() => {
+                if (pctInterval) clearInterval(pctInterval);
                 splashEl.classList.add("fade-out");
-                setTimeout(() => splashEl.classList.remove("show", "fade-out"), 450);
-            }, 1450);
+                setTimeout(() => splashEl.classList.remove("show", "fade-out"), 480);
+            }, 1650);
         }
 
-        // 点击开屏画面可立即跳过
         splashEl.onclick = () => {
             if (splashTimer) clearTimeout(splashTimer);
+            if (pctInterval) clearInterval(pctInterval);
             splashEl.classList.add("fade-out");
             setTimeout(() => splashEl.classList.remove("show", "fade-out"), 300);
         };
 
-        // 每次从个人主页点击打开【结识海】时，自动播放开屏动画
         let wasOpen = overlay.classList.contains("open");
         const openObs = new MutationObserver(() => {
             const isOpen = overlay.classList.contains("open");
-            if (isOpen && !wasOpen) {
-                playSplashScreen();
-            }
+            if (isOpen && !wasOpen) playAstrolabeSplash();
             wasOpen = isOpen;
         });
         openObs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 📊 2. 增强版【楼层总结 (summary)】页面渲染
+        // 📊 2. 渲染【楼层总结 (summary)】页面
         // ══════════════════════════════════════════════════════════════════════════
         let isRenderingUI = false;
         let isSequentialRunning = false;
@@ -7218,7 +7384,6 @@ bootSumoulApp();
             const totalLen = ch === "st" ? c.stChatArr.length : c.wxChatArr.length;
             const maxFloor = Math.max(0, totalLen - 1);
 
-            d.autoCfg = d.autoCfg || {};
             const lastF = Math.min(totalLen, Math.max(0, Number(d.autoCfg.lastFloor) || 0));
             const unsumCount = Math.max(0, totalLen - lastF);
             const unsumRangeTxt = unsumCount > 0 ? `#${lastF} ~ #${maxFloor}` : "全部已结清";
@@ -7234,11 +7399,11 @@ bootSumoulApp();
                     <table class="ks-sum-table">
                         <thead>
                             <tr>
-                                <th style="width:78px;">楼层区间</th>
-                                <th style="width:88px;">阶段标题</th>
-                                <th>剧情与关系进展总结 (已同步编年&amp;星图)</th>
-                                <th style="width:96px;">防失忆铁律要点</th>
-                                <th style="width:28px;text-align:center;">删</th>
+                                <th style="width:76px;">楼层区间</th>
+                                <th style="width:86px;">阶段标题</th>
+                                <th>剧情与关系总结 (同步星图/编年/人物物品)</th>
+                                <th style="width:94px;">防失忆铁律要点</th>
+                                <th style="width:26px;text-align:center;">删</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -7275,17 +7440,9 @@ bootSumoulApp();
                                     <span data-delsum="${s.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
                                 </div>
                             </div>
-                            <div style="font-size:11.5px;font-weight:800;color:#1E2028;margin-bottom:5px;letter-spacing:0.3px;">
-                                《${(s.title || "").replace(/</g, "&lt;")}》
-                            </div>
-                            <div style="font-size:9.8px;font-weight:600;color:#343844;line-height:1.72;text-align:justify;">
-                                ${(s.content || "").replace(/</g, "&lt;")}
-                            </div>
-                            ${s.keyFacts ? `
-                                <div style="margin-top:7px;padding:6px 10px;background:#F6F8FC;border-left:2px solid #1E2028;border-radius:0 7px 7px 0;font-size:8.6px;font-weight:700;color:#484E5E;">
-                                    防失忆核心锚点：${s.keyFacts.replace(/</g, "&lt;")}
-                                </div>
-                            ` : ""}
+                            <div style="font-size:11.5px;font-weight:800;color:#1E2028;margin-bottom:5px;">《${(s.title || "").replace(/</g, "&lt;")}》</div>
+                            <div style="font-size:9.8px;font-weight:600;color:#343844;line-height:1.72;">${(s.content || "").replace(/</g, "&lt;")}</div>
+                            ${s.keyFacts ? `<div style="margin-top:7px;padding:6px 10px;background:#F6F8FC;border-left:2px solid var(--ks-accent,#1E2028);border-radius:0 7px 7px 0;font-size:8.6px;font-weight:700;color:#484E5E;">防失忆核心锚点：${s.keyFacts.replace(/</g, "&lt;")}</div>` : ""}
                         </div>
                     `).join("")}
                 </div>`;
@@ -7299,22 +7456,22 @@ bootSumoulApp();
                             <div style="font-size:6.8px;color:#98A0B2;">#0 ~ #${maxFloor}</div>
                         </div>
                         <div class="ks-stat-box">
-                            <div style="font-size:7.5px;font-weight:700;color:#8E94A4;">已总结至水位</div>
+                            <div style="font-size:7.5px;font-weight:700;color:#8E94A4;">已总结水位</div>
                             <div class="ks-stat-num" style="color:#1E2028;">#${Math.max(0, lastF - 1)} 层</div>
-                            <div style="font-size:6.8px;color:#98A0B2;">同步星图&amp;编年</div>
+                            <div style="font-size:6.8px;color:#98A0B2;">四位一体同步</div>
                         </div>
                         <div class="ks-stat-box highlight">
-                            <div style="font-size:7.5px;font-weight:700;color:rgba(255,255,255,0.75);">当前未总结楼层</div>
+                            <div style="font-size:7.5px;font-weight:700;color:rgba(255,255,255,0.78);">未总结楼层</div>
                             <div class="ks-stat-num" style="color:#FFFFFF;">${unsumCount} 层</div>
-                            <div style="font-size:6.8px;color:rgba(255,255,255,0.8);">${unsumRangeTxt}</div>
+                            <div style="font-size:6.8px;color:rgba(255,255,255,0.82);">${unsumRangeTxt}</div>
                         </div>
                     </div>
 
                     <div class="ks-card" style="margin-bottom:10px;padding:12px 14px!important;">
                         <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F0F2F7;">
                             <div>
-                                <div style="font-size:10.5px;font-weight:800;color:#1E2028;">每次总结字数 &amp; 自动同步设置</div>
-                                <div style="font-size:7.5px;color:#7E8494;">每次总结将自动同步生成【星图节点】与【记忆编年】</div>
+                                <div style="font-size:10.5px;font-weight:800;color:#1E2028;">每次总结字数 &amp; 四位一体同步</div>
+                                <div style="font-size:7.5px;color:#7E8494;">自动同步至：星图微点 + 编年史 + 关键人物NPC + 关键物品</div>
                             </div>
                             <div style="display:flex;align-items:center;gap:5px;">
                                 <span style="font-size:8.5px;font-weight:700;color:#525868;">每次字数</span>
@@ -7329,20 +7486,18 @@ bootSumoulApp();
                                 <input type="number" id="ks-pro-step-inp" class="ks-num-inp" min="3" max="200" value="${stepN}" />
                                 <span style="font-size:8.8px;font-weight:700;color:#2C303C;">层一段 · 依次总结 (${unsumRangeTxt})</span>
                             </div>
-                            <span class="ks-pill dark" id="ks-pro-seq-btn" style="flex-shrink:0;">
-                                <span>依次总结 (${unsumCount}层)</span>
-                            </span>
+                            <span class="ks-pill dark" id="ks-pro-seq-btn" style="flex-shrink:0;">依次总结 (${unsumCount}层)</span>
                         </div>
 
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
                             <div style="display:flex;align-items:center;gap:5px;">
-                                <span style="font-size:8.2px;font-weight:700;color:#6E7688;">重置未总结起点为 #</span>
+                                <span style="font-size:8.2px;font-weight:700;color:#6E7688;">重置起点 #</span>
                                 <input type="number" id="ks-pro-cursor-inp" class="ks-num-inp" min="0" max="${totalLen}" value="${lastF}" style="width:44px!important;height:22px!important;" />
                                 <span class="ks-flt" id="ks-pro-cursor-set" style="padding:2px 7px!important;">设置</span>
                             </div>
                             <div style="display:flex;align-items:center;gap:5px;">
-                                <span style="font-size:8.2px;font-weight:700;color:#525868;">满${stepN}层自动同步总结：</span>
-                                <span class="ks-flt ${d.autoCfg?.enabled ? "on" : ""}" id="ks-pro-auto-tog">${d.autoCfg?.enabled ? "自动开启中✓" : "已关闭"}</span>
+                                <span style="font-size:8.2px;font-weight:700;color:#525868;">满${stepN}层自动总结：</span>
+                                <span class="ks-flt ${d.autoCfg?.enabled ? "on" : ""}" id="ks-pro-auto-tog">${d.autoCfg?.enabled ? "开启中✓" : "已关闭"}</span>
                             </div>
                         </div>
 
@@ -7358,14 +7513,12 @@ bootSumoulApp();
                                 <input type="number" id="ks-pro-e" class="ks-num-inp" min="0" max="${maxFloor}" value="${maxFloor}" />
                                 <span style="font-size:8.8px;font-weight:700;color:#525868;">层</span>
                             </div>
-                            <span class="ks-pill" id="ks-pro-manual-btn">单独提炼并同步</span>
+                            <span class="ks-pill" id="ks-pro-manual-btn">单独提炼此区间</span>
                         </div>
                     </div>
 
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 2px;">
-                        <span style="font-size:9px;font-weight:800;color:#7E8494;letter-spacing:0.6px;">
-                            SUMMARY ARCHIVE · 已归档总结 (${sums.length}篇)
-                        </span>
+                        <span style="font-size:9px;font-weight:800;color:#7E8494;letter-spacing:0.6px;">SUMMARY ARCHIVE · 已归档总结 (${sums.length}篇)</span>
                         <div class="ks-dual-switch">
                             <span class="ks-dual-opt ${viewMode === "table" ? "active" : ""}" data-vmode="table" style="padding:2.5px 9px!important;font-size:8px!important;">表格样式</span>
                             <span class="ks-dual-opt ${viewMode === "text" ? "active" : ""}" data-vmode="text" style="padding:2.5px 9px!important;font-size:8px!important;">文字样式</span>
@@ -7378,7 +7531,6 @@ bootSumoulApp();
 
             const saveCfgField = (field, val) => {
                 const latest = loadMem(ch);
-                latest.autoCfg = latest.autoCfg || {};
                 latest.autoCfg[field] = val;
                 saveMem(latest, ch);
             };
@@ -7397,21 +7549,16 @@ bootSumoulApp();
             };
             topDoc.getElementById("ks-pro-auto-tog").onclick = () => {
                 const latest = loadMem(ch);
-                latest.autoCfg = latest.autoCfg || {};
                 latest.autoCfg.enabled = !latest.autoCfg.enabled;
-                latest.autoCfg.everyN = Math.max(3, Number(topDoc.getElementById("ks-pro-step-inp").value) || 15);
-                latest.autoCfg.wordLimit = Math.max(40, Number(topDoc.getElementById("ks-pro-word-inp").value) || 160);
                 saveMem(latest, ch);
                 isRenderingUI = false; renderProSummaryUI();
             };
-
             vp.querySelectorAll("[data-vmode]").forEach((btn) => {
                 btn.onclick = () => {
                     saveCfgField("viewMode", btn.getAttribute("data-vmode"));
                     isRenderingUI = false; renderProSummaryUI();
                 };
             });
-
             vp.querySelectorAll("[data-delsum]").forEach((btn) => {
                 btn.onclick = () => {
                     const latest = loadMem(ch);
@@ -7426,20 +7573,16 @@ bootSumoulApp();
                 const sVal = Number(topDoc.getElementById("ks-pro-s").value) || 0;
                 const eVal = Number(topDoc.getElementById("ks-pro-e").value) || maxFloor;
                 const wVal = Number(topDoc.getElementById("ks-pro-word-inp").value) || 160;
-                btn.textContent = "同步提炼中...";
+                btn.textContent = "提炼中...";
                 try {
-                    await executeUnifiedSummary(ch, sVal, eVal, wVal, "手动同步");
+                    await executeMasterSummary(ch, sVal, eVal, wVal, "手动同步");
                     isRenderingUI = false; renderProSummaryUI();
-                } catch (err) {
-                    alert(err.message);
-                    btn.textContent = orig;
-                }
+                } catch (err) { alert(err.message); btn.textContent = orig; }
             };
 
             topDoc.getElementById("ks-pro-seq-btn").onclick = async () => {
                 if (isSequentialRunning) return;
                 if (totalLen === 0) return alert(`当前【${chLabel}】还没有聊天消息！`);
-
                 const step = Math.max(3, Math.min(200, Number(topDoc.getElementById("ks-pro-step-inp").value) || 15));
                 const wVal = Math.max(40, Math.min(800, Number(topDoc.getElementById("ks-pro-word-inp").value) || 160));
                 saveCfgField("everyN", step);
@@ -7449,9 +7592,7 @@ bootSumoulApp();
                 if (curStart >= totalLen) curStart = Math.max(0, totalLen - step);
 
                 const batches = [];
-                for (let s = curStart; s <= maxFloor; s += step) {
-                    batches.push([s, Math.min(maxFloor, s + step - 1)]);
-                }
+                for (let s = curStart; s <= maxFloor; s += step) batches.push([s, Math.min(maxFloor, s + step - 1)]);
                 if (batches.length === 0) return alert("当前没有未总结的楼层！");
 
                 isSequentialRunning = true;
@@ -7463,19 +7604,13 @@ bootSumoulApp();
                     for (let i = 0; i < batches.length; i++) {
                         const [bStart, bEnd] = batches[i];
                         if (seqBtn) seqBtn.textContent = `依次同步中 (${i + 1}/${batches.length})...`;
-                        if (progBar) {
-                            progBar.textContent = `正在依次总结并同步至编年史 (${i + 1}/${batches.length})：楼层 #${bStart} ~ #${bEnd}...`;
-                        }
-                        await executeUnifiedSummary(ch, bStart, bEnd, wVal, `依次总结(${i + 1}/${batches.length})`);
+                        if (progBar) progBar.textContent = `正在依次总结并提取编年/NPC/物品 (${i + 1}/${batches.length})：#${bStart} ~ #${bEnd}...`;
+                        await executeMasterSummary(ch, bStart, bEnd, wVal, `依次总结(${i + 1}/${batches.length})`);
                     }
-                    isSequentialRunning = false;
-                    isRenderingUI = false;
-                    renderProSummaryUI();
+                    isSequentialRunning = false; isRenderingUI = false; renderProSummaryUI();
                 } catch (err) {
                     alert(`依次总结中断：${err.message}`);
-                    isSequentialRunning = false;
-                    isRenderingUI = false;
-                    renderProSummaryUI();
+                    isSequentialRunning = false; isRenderingUI = false; renderProSummaryUI();
                 }
             };
 
@@ -7483,9 +7618,9 @@ bootSumoulApp();
         }
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 📖 3. 增强版【记忆编年 (timeline)】页面：支持与总结实时同步 + 一键AI自动提炼编年
+        // 📖 3. 渲染【编年图鉴 (timeline + 关键人物NPC + 关键物品ITEMS)】页面
         // ══════════════════════════════════════════════════════════════════════════
-        function renderProTimelineUI() {
+        function renderProTimelineAndDexUI() {
             const ch = getCh();
             const d = loadMem(ch);
             if (!d || !d.isBound || d.activeTab !== "timeline" || isRenderingUI) return;
@@ -7493,131 +7628,416 @@ bootSumoulApp();
             isRenderingUI = true;
             const c = getCtx();
             const chLabel = ch === "st" ? "酒馆主线" : "微信线上";
-            const totalLen = ch === "st" ? c.stChatArr.length : c.wxChatArr.length;
-            const maxFloor = Math.max(0, totalLen - 1);
-            const lastF = Math.min(totalLen, Math.max(0, Number(d.autoCfg?.lastFloor) || 0));
+            const subTab = d.autoCfg?.logSubTab || "timeline"; // 'timeline' | 'npcs' | 'items'
 
-            const listHtml = (d.timeline || []).map((it) => `
-                <div style="position:relative;padding-left:16px;padding-bottom:12px;border-left:1px solid #E4E8F0;">
-                    <span style="position:absolute;left:-4px;top:4px;width:7px;height:7px;border-radius:50%;background:#FFFFFF;border:1.5px solid #1E2028;"></span>
-                    <div class="ks-card" style="padding:12px 14px!important;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                            <span style="font-size:7.5px;font-weight:800;color:#8E94A4;font-family:monospace;">${(it.chapter || "CHAPTER").replace(/</g, "&lt;")}</span>
-                            <span data-deltl="${it.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
+            let bodyContentHtml = "";
+
+            if (subTab === "timeline") {
+                const listHtml = (d.timeline || []).map((it) => `
+                    <div style="position:relative;padding-left:16px;padding-bottom:12px;border-left:1px solid #E4E8F0;">
+                        <span style="position:absolute;left:-4px;top:4px;width:7px;height:7px;border-radius:50%;background:#FFFFFF;border:1.5px solid var(--ks-accent,#1E2028);"></span>
+                        <div class="ks-card" style="padding:12px 14px!important;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                <span style="font-size:7.5px;font-weight:800;color:#8E94A4;font-family:monospace;">${(it.chapter || "CHAPTER").replace(/</g, "&lt;")}</span>
+                                <span data-deltl="${it.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
+                            </div>
+                            <div style="font-size:11.2px;font-weight:800;color:#1E2028;margin-bottom:4px;">${(it.title || "").replace(/</g, "&lt;")}</div>
+                            <div style="font-size:9.8px;font-weight:600;color:#3A3E4C;line-height:1.65;">${(it.content || "").replace(/</g, "&lt;")}</div>
+                            ${it.note ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #ECEEF4;font-size:8.8px;font-weight:600;color:#6E7688;">${it.note.replace(/</g, "&lt;")}</div>` : ""}
                         </div>
-                        <div style="font-size:11.2px;font-weight:800;color:#1E2028;margin-bottom:4px;">${(it.title || "").replace(/</g, "&lt;")}</div>
-                        <div style="font-size:9.8px;font-weight:600;color:#3A3E4C;line-height:1.65;">${(it.content || "").replace(/</g, "&lt;")}</div>
-                        ${it.note ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #ECEEF4;font-size:8.8px;font-weight:600;color:#6E7688;">${it.note.replace(/</g, "&lt;")}</div>` : ""}
                     </div>
-                </div>
-            `).join("");
+                `).join("");
+
+                bodyContentHtml = `
+                    <div style="display:flex;gap:6px;margin-bottom:10px;">
+                        <span class="ks-pill" id="ks-tl-add-open" style="flex:1;">+ 手写篇章</span>
+                        <span class="ks-pill" id="ks-tl-sync-sum" style="flex:1;">从总结补齐编年</span>
+                    </div>
+                    <div id="ks-tl-drawer" class="ks-card" style="display:none;margin-bottom:10px;">
+                        <input type="text" id="ks-tl-ti" placeholder="篇章标题..." style="width:100%;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.8px;font-weight:700;color:#1E2028;box-sizing:border-box;outline:none;margin-bottom:6px;" />
+                        <textarea id="ks-tl-ct" placeholder="写下这段重要事件..." style="width:100%;height:44px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:5px 8px;font-size:9.5px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;"></textarea>
+                        <div style="display:flex;justify-content:flex-end;"><span class="ks-pill dark" id="ks-tl-save">保存篇章</span></div>
+                    </div>
+                    <div style="padding-left:6px;">${listHtml || `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:24px;">暂无编年篇章</div>`}</div>
+                `;
+            } else if (subTab === "npcs") {
+                const npcCards = (d.npcs || []).map((n) => `
+                    <div class="ks-dex-card">
+                        <div>
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;">
+                                <span style="font-size:11px;font-weight:800;color:#1E2028;">${(n.name || "").replace(/</g, "&lt;")}</span>
+                                <span data-delnpc="${n.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
+                            </div>
+                            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                                <span style="font-size:7.2px;font-weight:700;color:#525868;background:#F0F2F7;padding:1.5px 6px;border-radius:5px;">${(n.role || "人物").replace(/</g, "&lt;")}</span>
+                                <span style="font-size:7.2px;font-weight:700;color:#FFFFFF;background:var(--ks-accent,#1E2028);padding:1.5px 6px;border-radius:5px;">态度: ${(n.attitude || "中立").replace(/</g, "&lt;")}</span>
+                            </div>
+                            <div style="font-size:9.2px;font-weight:600;color:#484E5E;line-height:1.55;">${(n.desc || "").replace(/</g, "&lt;")}</div>
+                        </div>
+                    </div>
+                `).join("");
+
+                bodyContentHtml = `
+                    <div style="display:flex;gap:6px;margin-bottom:10px;">
+                        <span class="ks-pill" id="ks-npc-add-open" style="flex:1;">+ 手动录入人物(NPC)</span>
+                        <span class="ks-pill dark" id="ks-dex-ai-scan" style="flex:1.3;">AI 从近期聊天提取人物&amp;物品</span>
+                    </div>
+                    <div id="ks-npc-drawer" class="ks-card" style="display:none;margin-bottom:10px;">
+                        <div style="display:flex;gap:5px;margin-bottom:6px;">
+                            <input type="text" id="ks-npc-name" placeholder="人物姓名..." style="flex:1;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;font-weight:700;color:#1E2028;outline:none;" />
+                            <input type="text" id="ks-npc-role" placeholder="身份关系(如:发小/情敌)" style="flex:1;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;color:#1E2028;outline:none;" />
+                            <input type="text" id="ks-npc-att" placeholder="态度(如:友善/敌意)" style="width:76px;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 6px;font-size:9px;color:#1E2028;outline:none;" />
+                        </div>
+                        <textarea id="ks-npc-desc" placeholder="填写该NPC的设定、经历或防失忆要点..." style="width:100%;height:42px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:5px 8px;font-size:9.2px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;"></textarea>
+                        <div style="display:flex;justify-content:flex-end;"><span class="ks-pill dark" id="ks-npc-save">存入人物图鉴</span></div>
+                    </div>
+                    <div class="ks-dex-grid">${npcCards}</div>
+                `;
+            } else {
+                const itemCards = (d.items || []).map((it) => `
+                    <div class="ks-dex-card">
+                        <div>
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;">
+                                <span style="font-size:11px;font-weight:800;color:#1E2028;">${(it.name || "").replace(/</g, "&lt;")}</span>
+                                <span data-delitem="${it.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
+                            </div>
+                            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                                <span style="font-size:7.2px;font-weight:700;color:#525868;background:#F0F2F7;padding:1.5px 6px;border-radius:5px;">归属: ${(it.owner || "未知").replace(/</g, "&lt;")}</span>
+                                <span style="font-size:7.2px;font-weight:700;color:#FFFFFF;background:var(--ks-accent,#1E2028);padding:1.5px 6px;border-radius:5px;">${(it.status || "持有中").replace(/</g, "&lt;")}</span>
+                            </div>
+                            <div style="font-size:9.2px;font-weight:600;color:#484E5E;line-height:1.55;">${(it.desc || "").replace(/</g, "&lt;")}</div>
+                        </div>
+                    </div>
+                `).join("");
+
+                bodyContentHtml = `
+                    <div style="display:flex;gap:6px;margin-bottom:10px;">
+                        <span class="ks-pill" id="ks-item-add-open" style="flex:1;">+ 手动录入关键物品</span>
+                        <span class="ks-pill dark" id="ks-dex-ai-scan" style="flex:1.3;">AI 从近期聊天提取人物&amp;物品</span>
+                    </div>
+                    <div id="ks-item-drawer" class="ks-card" style="display:none;margin-bottom:10px;">
+                        <div style="display:flex;gap:5px;margin-bottom:6px;">
+                            <input type="text" id="ks-item-name" placeholder="物品/地点名称..." style="flex:1;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;font-weight:700;color:#1E2028;outline:none;" />
+                            <input type="text" id="ks-item-owner" placeholder="持有者/归属" style="flex:1;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;color:#1E2028;outline:none;" />
+                            <input type="text" id="ks-item-st" placeholder="状态(如:随身携带)" style="width:82px;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 6px;font-size:9px;color:#1E2028;outline:none;" />
+                        </div>
+                        <textarea id="ks-item-desc" placeholder="填写该物品的来历、伏笔意义或防失忆细节..." style="width:100%;height:42px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:5px 8px;font-size:9.2px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;"></textarea>
+                        <div style="display:flex;justify-content:flex-end;"><span class="ks-pill dark" id="ks-item-save">存入物品图鉴</span></div>
+                    </div>
+                    <div class="ks-dex-grid">${itemCards}</div>
+                `;
+            }
 
             vp.innerHTML = `
                 <div id="ks-pro-tl-container" style="flex:1;overflow-y:auto;padding:12px 14px 18px 14px;pointer-events:auto;">
-                    <!-- 顶部：编年史自动同步说明 + 一键操作栏 -->
-                    <div class="ks-card" style="margin-bottom:12px;padding:11px 14px!important;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                            <div>
-                                <div style="font-size:11.5px;font-weight:800;color:#1E2028;">【${chLabel}】记忆编年史 · 自动同步已开启✓</div>
-                                <div style="font-size:7.5px;color:#7E8494;margin-top:2px;">每次自动/手动楼层总结时，会自动在此生成对应编年篇章</div>
-                            </div>
-                            <span class="ks-flt" id="ks-tl-sync-from-sum" title="将所有已归档的楼层总结一键补齐到编年史">从总结补齐编年</span>
-                        </div>
-                        <div style="display:flex;gap:6px;">
-                            <span class="ks-pill" id="ks-tl-manual-open" style="flex:1;">+ 手写新篇章</span>
-                            <span class="ks-pill dark" id="ks-tl-ai-auto" style="flex:1.4;">AI 提炼最新楼层并同步编年</span>
+                    <!-- 顶部三栏切换：编年时间轴 / 关键人物(NPC) / 关键物品(ITEMS) -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <div class="ks-dual-switch" style="width:100%;display:grid!important;grid-template-columns:1fr 1fr 1fr;text-align:center;">
+                            <span class="ks-dual-opt ${subTab === "timeline" ? "active" : ""}" data-lsub="timeline">记忆编年 (${d.timeline?.length || 0})</span>
+                            <span class="ks-dual-opt ${subTab === "npcs" ? "active" : ""}" data-lsub="npcs">关键人物 NPC (${d.npcs?.length || 0})</span>
+                            <span class="ks-dual-opt ${subTab === "items" ? "active" : ""}" data-lsub="items">关键物品 (${d.items?.length || 0})</span>
                         </div>
                     </div>
-
-                    <div id="ks-tl-box" class="ks-card" style="display:none;margin-bottom:12px;">
-                        <input type="text" id="ks-tl-ti" placeholder="篇章标题 (如：初雪夜的越界拥抱)..." style="width:100%;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.8px;font-weight:700;color:#1E2028;box-sizing:border-box;outline:none;margin-bottom:6px;" />
-                        <textarea id="ks-tl-ct" placeholder="写下这段重要编年事件..." style="width:100%;height:44px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:5px 8px;font-size:9.5px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;"></textarea>
-                        <div style="display:flex;justify-content:flex-end;"><span class="ks-pill dark" id="ks-tl-save">保存篇章</span></div>
-                    </div>
-
-                    <div style="padding-left:6px;">${listHtml || `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:24px;">暂无编年篇章</div>`}</div>
+                    ${bodyContentHtml}
                 </div>
             `;
 
-            const tlBox = topDoc.getElementById("ks-tl-box");
-            topDoc.getElementById("ks-tl-manual-open").onclick = () => {
-                tlBox.style.display = tlBox.style.display === "none" ? "block" : "none";
-            };
-            topDoc.getElementById("ks-tl-save").onclick = () => {
+            vp.querySelectorAll("[data-lsub]").forEach((b) => {
+                b.onclick = () => {
+                    const latest = loadMem(ch);
+                    latest.autoCfg.logSubTab = b.getAttribute("data-lsub");
+                    saveMem(latest, ch);
+                    isRenderingUI = false; renderProTimelineAndDexUI();
+                };
+            });
+
+            // 编年页事件
+            topDoc.getElementById("ks-tl-add-open")?.addEventListener("click", () => {
+                const dr = topDoc.getElementById("ks-tl-drawer");
+                if (dr) dr.style.display = dr.style.display === "none" ? "block" : "none";
+            });
+            topDoc.getElementById("ks-tl-save")?.addEventListener("click", () => {
                 const ti = topDoc.getElementById("ks-tl-ti").value.trim() || "新篇章";
                 const ct = topDoc.getElementById("ks-tl-ct").value.trim();
                 if (!ct) return;
                 const latest = loadMem(ch);
-                latest.timeline = latest.timeline || [];
-                latest.timeline.unshift({
-                    id: Date.now(),
-                    chapter: `CHAPTER ${String(latest.timeline.length + 1).padStart(2, "0")} · 手记`,
-                    title: ti, content: ct,
-                    note: `“ 归档于${chLabel}记忆海 ”`
-                });
-                saveMem(latest, ch);
-                isRenderingUI = false; renderProTimelineUI();
-            };
-
-            // 一键将已有的【楼层总结】补齐同步到【记忆编年】
-            topDoc.getElementById("ks-tl-sync-from-sum").onclick = () => {
+                latest.timeline.unshift({ id: Date.now(), chapter: `CHAPTER ${String(latest.timeline.length + 1).padStart(2, "0")}`, title: ti, content: ct, note: `“ 手动归档于${chLabel} ”` });
+                saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+            });
+            topDoc.getElementById("ks-tl-sync-sum")?.addEventListener("click", () => {
                 const latest = loadMem(ch);
-                latest.timeline = latest.timeline || [];
-                const existingRanges = new Set(latest.timeline.map((t) => t.range).filter(Boolean));
+                const existing = new Set((latest.timeline || []).map((t) => t.range).filter(Boolean));
                 let added = 0;
                 (latest.summaries || []).forEach((s, idx) => {
-                    if (s.range && !existingRanges.has(s.range)) {
-                        latest.timeline.unshift({
-                            id: Date.now() + idx,
-                            range: s.range,
-                            chapter: `ARCHIVE · ${s.range}`,
-                            title: s.title || `${s.range} 纪要`,
-                            content: s.content || "",
-                            note: s.keyFacts ? `“ 核心要点：${s.keyFacts} ”` : `“ 同步自${s.range}楼层总结 ”`
-                        });
-                        existingRanges.add(s.range);
-                        added++;
+                    if (s.range && !existing.has(s.range)) {
+                        latest.timeline.unshift({ id: Date.now() + idx, range: s.range, chapter: `ARCHIVE · ${s.range}`, title: s.title, content: s.content, note: s.keyFacts ? `“ 要点：${s.keyFacts} ”` : "" });
+                        existing.add(s.range); added++;
                     }
                 });
-                saveMem(latest, ch);
-                isRenderingUI = false; renderProTimelineUI();
-                alert(added > 0 ? `已成功将 ${added} 篇楼层总结同步至记忆编年史！` : "当前所有楼层总结均已在编年史中，无需重复补齐。");
-            };
-
-            // 在编年页直接调用 AI 提炼最新未总结楼层（同时写入总结、星图与编年）
-            topDoc.getElementById("ks-tl-ai-auto").onclick = async (e) => {
-                const btn = e.currentTarget, orig = btn.textContent;
-                if (totalLen === 0) return alert(`当前【${chLabel}】暂无聊天记录！`);
-                const sVal = lastF < totalLen ? lastF : Math.max(0, totalLen - 15);
-                const wVal = Number(d.autoCfg?.wordLimit) || 160;
-                btn.textContent = "提炼并同步中...";
-                try {
-                    await executeUnifiedSummary(ch, sVal, maxFloor, wVal, "编年同步");
-                    isRenderingUI = false; renderProTimelineUI();
-                } catch (err) {
-                    alert(err.message);
-                    btn.textContent = orig;
-                }
-            };
-
+                saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+                alert(added > 0 ? `已补齐 ${added} 篇编年章节！` : "所有总结均已同步在编年中！");
+            });
             vp.querySelectorAll("[data-deltl]").forEach((b) => b.onclick = () => {
                 const latest = loadMem(ch);
-                latest.timeline = (latest.timeline || []).filter((x) => Number(x.id) !== Number(b.getAttribute("data-deltl")));
-                saveMem(latest, ch);
-                isRenderingUI = false; renderProTimelineUI();
+                latest.timeline = latest.timeline.filter((x) => Number(x.id) !== Number(b.getAttribute("data-deltl")));
+                saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+            });
+
+            // 人物 NPC 事件
+            topDoc.getElementById("ks-npc-add-open")?.addEventListener("click", () => {
+                const dr = topDoc.getElementById("ks-npc-drawer");
+                if (dr) dr.style.display = dr.style.display === "none" ? "block" : "none";
+            });
+            topDoc.getElementById("ks-npc-save")?.addEventListener("click", () => {
+                const nm = topDoc.getElementById("ks-npc-name").value.trim();
+                const rl = topDoc.getElementById("ks-npc-role").value.trim() || "相关人物";
+                const at = topDoc.getElementById("ks-npc-att").value.trim() || "中立";
+                const ds = topDoc.getElementById("ks-npc-desc").value.trim();
+                if (!nm || !ds) return alert("请填写人物姓名与描述！");
+                const latest = loadMem(ch);
+                latest.npcs.unshift({ id: Date.now(), name: nm, role: rl, attitude: at, desc: ds });
+                saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+            });
+            vp.querySelectorAll("[data-delnpc]").forEach((b) => b.onclick = () => {
+                const latest = loadMem(ch);
+                latest.npcs = latest.npcs.filter((x) => Number(x.id) !== Number(b.getAttribute("data-delnpc")));
+                saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+            });
+
+            // 物品 ITEM 事件
+            topDoc.getElementById("ks-item-add-open")?.addEventListener("click", () => {
+                const dr = topDoc.getElementById("ks-item-drawer");
+                if (dr) dr.style.display = dr.style.display === "none" ? "block" : "none";
+            });
+            topDoc.getElementById("ks-item-save")?.addEventListener("click", () => {
+                const nm = topDoc.getElementById("ks-item-name").value.trim();
+                const ow = topDoc.getElementById("ks-item-owner").value.trim() || "专属信物";
+                const stVal = topDoc.getElementById("ks-item-st").value.trim() || "持有中";
+                const ds = topDoc.getElementById("ks-item-desc").value.trim();
+                if (!nm || !ds) return alert("请填写物品名称与描述！");
+                const latest = loadMem(ch);
+                latest.items.unshift({ id: Date.now(), name: nm, owner: ow, status: stVal, desc: ds });
+                saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+            });
+            vp.querySelectorAll("[data-delitem]").forEach((b) => b.onclick = () => {
+                const latest = loadMem(ch);
+                latest.items = latest.items.filter((x) => Number(x.id) !== Number(b.getAttribute("data-delitem")));
+                saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+            });
+
+            // AI 一键扫描近期聊天提取关键人物与关键物品
+            topDoc.getElementById("ks-dex-ai-scan")?.addEventListener("click", async (e) => {
+                const btn = e.currentTarget, orig = btn.textContent;
+                const rawArr = ch === "st" ? c.stChatArr : c.wxChatArr;
+                if (!rawArr.length) return alert("当前轨道暂无聊天记录可扫描！");
+                const recentTxt = rawArr.slice(-20).map((m) => ch === "st" ? `${m.is_user ? c.userName : c.charName}: ${m.mes}` : `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n");
+                btn.textContent = "AI扫描提取中...";
+                try {
+                    const raw = await askAI(`你是剧情设定提取官。主角：${c.charName}与${c.userName}。`, `请从以下近期对话中提取1~2个提及的重要人物(NPC/配角/关系人)和1~2个关键物品(信物/礼物/道具/重要地点)。\n${recentTxt.slice(-2800)}\n严格只输出JSON：{"npcs":[{"name":"姓名","role":"身份关系","attitude":"态度","desc":"30字内描述"}],"items":[{"name":"物品名","owner":"持有者","status":"状态","desc":"30字内意义"}]}`);
+                    const m = raw.match(/\{[\s\S]*\}/);
+                    if (m) {
+                        const o = JSON.parse(m[0]), latest = loadMem(ch);
+                        (o.npcs || []).forEach((n, idx) => {
+                            if (n.name) latest.npcs.unshift({ id: Date.now() + idx, name: n.name, role: n.role || "登场人物", attitude: n.attitude || "未知", desc: n.desc || "" });
+                        });
+                        (o.items || []).forEach((it, idx) => {
+                            if (it.name) latest.items.unshift({ id: Date.now() + 10 + idx, name: it.name, owner: it.owner || "剧情物品", status: it.status || "已出现", desc: it.desc || "" });
+                        });
+                        saveMem(latest, ch); isRenderingUI = false; renderProTimelineAndDexUI();
+                    }
+                } catch (err) { alert(err.message); btn.textContent = orig; }
             });
 
             setTimeout(() => { isRenderingUI = false; }, 60);
         }
 
-        // 监听视图容器切换：当进入【楼层总结】或【记忆编年】时自动挂载增强版视图
+        // ══════════════════════════════════════════════════════════════════════════
+        // ⚙️ 4. 渲染第 5 栏：【中枢设置 (pact -> 主题颜色定制 + 契约锚点 + 注入策略 + 备份恢复)】
+        // ══════════════════════════════════════════════════════════════════════════
+        function renderProSettingsUI() {
+            const ch = getCh();
+            const d = loadMem(ch);
+            if (!d || !d.isBound || d.activeTab !== "pact" || isRenderingUI) return;
+
+            isRenderingUI = true;
+            const c = getCtx();
+            const chLabel = ch === "st" ? "酒馆主线" : "微信线上";
+            const curHex = d.autoCfg?.themeColor || "#1E2028";
+
+            const swatchesHtml = THEME_PRESETS.map((tp) => `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;" data-pickhex="${tp.hex}" data-picksoft="${tp.soft}">
+                    <div class="ks-color-swatch ${curHex.toLowerCase() === tp.hex.toLowerCase() ? "active" : ""}" style="background:${tp.hex};"></div>
+                    <span style="font-size:7.2px;font-weight:700;color:#6E7688;">${tp.name}</span>
+                </div>
+            `).join("");
+
+            vp.innerHTML = `
+                <div id="ks-pro-set-container" style="flex:1;overflow-y:auto;padding:12px 14px 20px 14px;pointer-events:auto;">
+                    <!-- 模块1：结识海主题颜色与视觉设置 -->
+                    <div class="ks-card" style="margin-bottom:10px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <div>
+                                <div style="font-size:11px;font-weight:800;color:#1E2028;">主题颜色定制 · THEME PALETTE</div>
+                                <div style="font-size:7.5px;color:#7E8494;">切换结识海的强调色、徽章色与星盘主色调</div>
+                            </div>
+                            <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;background:#F6F8FC;padding:3px 8px;border-radius:99px;border:1px solid #E4E8F0;">
+                                <input type="color" id="ks-custom-color-inp" value="${curHex}" style="width:16px;height:16px;border:none;padding:0;background:transparent;cursor:pointer;" />
+                                <span style="font-size:8px;font-weight:700;color:#2C303C;">自由取色</span>
+                            </label>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 4px 10px 4px;border-bottom:1px solid #F0F2F7;">
+                            ${swatchesHtml}
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:9px;">
+                            <span style="font-size:9px;font-weight:700;color:#3A3E4C;">每次打开播放「双环星轨开屏动画」</span>
+                            <span class="ks-flt ${d.autoCfg?.showSplash !== false ? "on" : ""}" id="ks-tog-splash">${d.autoCfg?.showSplash !== false ? "已开启✓" : "已关闭"}</span>
+                        </div>
+                    </div>
+
+                    <!-- 模块2：防失忆底层注入策略设置 -->
+                    <div class="ks-card" style="margin-bottom:10px;">
+                        <div style="font-size:11px;font-weight:800;color:#1E2028;margin-bottom:8px;">防失忆底层注入策略 · MEMORY ENGINE</div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F0F2F7;">
+                            <div>
+                                <div style="font-size:9.2px;font-weight:700;color:#2C303C;">同步注入【关键人物 NPC &amp; 关键物品】</div>
+                                <div style="font-size:7.5px;color:#8E94A4;">防止 AI 遗忘出场过的配角关系与重要信物道具</div>
+                            </div>
+                            <span class="ks-flt ${d.autoCfg?.injectNpcItem !== false ? "on" : ""}" id="ks-tog-npc-inj">${d.autoCfg?.injectNpcItem !== false ? "注入中✓" : "不注入"}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:9px;font-weight:700;color:#2C303C;">最多携带最近多少篇楼层总结</span>
+                            <div style="display:flex;align-items:center;gap:5px;">
+                                <input type="number" id="ks-max-sum-inp" class="ks-num-inp" min="3" max="50" value="${d.autoCfg?.maxSumInject || 12}" />
+                                <span style="font-size:8.5px;font-weight:700;color:#525868;">篇</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 模块3：当前轨道契约与核心防失忆铁律 -->
+                    <div class="ks-card" style="margin-bottom:10px;">
+                        <div style="font-size:11px;font-weight:800;color:#1E2028;margin-bottom:8px;">【${chLabel}】契约与核心人设锚点</div>
+                        <div style="display:flex;gap:6px;margin-bottom:6px;">
+                            <input type="text" id="ks-set-title" value="${(d.pact?.title || "").replace(/"/g, "&quot;")}" placeholder="档案名称" style="flex:1;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;font-weight:700;color:#1E2028;outline:none;" />
+                            <input type="text" id="ks-set-stage" value="${(d.pact?.stage || "").replace(/"/g, "&quot;")}" placeholder="当前关系阶段" style="flex:1;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;color:#1E2028;outline:none;" />
+                        </div>
+                        <textarea id="ks-set-anchor" placeholder="写下绝对不允许AI遗忘或吃书的核心设定铁律..." style="width:100%;height:48px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:6px 8px;font-size:9.2px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;">${(d.pact?.coreAnchor || "").replace(/</g, "&lt;")}</textarea>
+                        <div style="display:flex;justify-content:flex-end;">
+                            <span class="ks-pill dark" id="ks-save-pact-btn">保存契约与核心铁律</span>
+                        </div>
+                    </div>
+
+                    <!-- 模块4：数据备份、导入与重置 -->
+                    <div class="ks-card">
+                        <div style="font-size:11px;font-weight:800;color:#1E2028;margin-bottom:8px;">记忆档案备份与管理 · BACKUP</div>
+                        <div style="display:flex;gap:6px;">
+                            <span class="ks-pill" id="ks-export-json" style="flex:1;">导出备份(JSON)</span>
+                            <label class="ks-pill" style="flex:1;cursor:pointer;">
+                                <span>导入恢复</span>
+                                <input type="file" id="ks-import-json" accept=".json,application/json" style="display:none;" />
+                            </label>
+                            <span class="ks-pill" id="ks-reset-ch" style="color:#9A6868!important;">重置本轨</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            vp.querySelectorAll("[data-pickhex]").forEach((el) => {
+                el.onclick = () => {
+                    const hex = el.getAttribute("data-pickhex");
+                    const soft = el.getAttribute("data-picksoft");
+                    const latest = loadMem(ch);
+                    latest.autoCfg.themeColor = hex;
+                    latest.autoCfg.themeSoft = soft;
+                    saveMem(latest, ch);
+                    isRenderingUI = false; renderProSettingsUI();
+                };
+            });
+
+            topDoc.getElementById("ks-custom-color-inp").onchange = (e) => {
+                const hex = e.target.value;
+                const latest = loadMem(ch);
+                latest.autoCfg.themeColor = hex;
+                saveMem(latest, ch);
+                isRenderingUI = false; renderProSettingsUI();
+            };
+
+            topDoc.getElementById("ks-tog-splash").onclick = () => {
+                const latest = loadMem(ch);
+                latest.autoCfg.showSplash = !(latest.autoCfg.showSplash !== false);
+                saveMem(latest, ch);
+                isRenderingUI = false; renderProSettingsUI();
+            };
+
+            topDoc.getElementById("ks-tog-npc-inj").onclick = () => {
+                const latest = loadMem(ch);
+                latest.autoCfg.injectNpcItem = !(latest.autoCfg.injectNpcItem !== false);
+                saveMem(latest, ch);
+                isRenderingUI = false; renderProSettingsUI();
+            };
+
+            topDoc.getElementById("ks-max-sum-inp").onchange = (e) => {
+                const latest = loadMem(ch);
+                latest.autoCfg.maxSumInject = Math.max(3, Math.min(50, Number(e.target.value) || 12));
+                saveMem(latest, ch);
+            };
+
+            topDoc.getElementById("ks-save-pact-btn").onclick = () => {
+                const latest = loadMem(ch);
+                latest.pact = latest.pact || {};
+                latest.pact.title = topDoc.getElementById("ks-set-title").value.trim();
+                latest.pact.stage = topDoc.getElementById("ks-set-stage").value.trim();
+                latest.pact.coreAnchor = topDoc.getElementById("ks-set-anchor").value.trim();
+                saveMem(latest, ch);
+                alert("已保存并实时更新到底层防失忆注入库！");
+            };
+
+            topDoc.getElementById("ks-export-json").onclick = () => {
+                const latest = loadMem(ch);
+                const blob = new Blob([JSON.stringify(latest, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = topDoc.createElement("a");
+                a.href = url;
+                a.download = `sumoul_memory_${ch}_${c.safeScope}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            topDoc.getElementById("ks-import-json").onchange = (e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                const r = new FileReader();
+                r.onload = (ev) => {
+                    try {
+                        const parsed = JSON.parse(String(ev.target?.result || "{}"));
+                        saveMem(parsed, ch);
+                        alert("记忆档案导入恢复成功！");
+                        isRenderingUI = false; renderProSettingsUI();
+                    } catch (err) { alert("JSON 文件格式有误，无法导入"); }
+                };
+                r.readAsText(f);
+            };
+
+            topDoc.getElementById("ks-reset-ch").onclick = () => {
+                if (!confirm(`确定清空重置当前【${chLabel}】的所有记忆吗？（另一轨道不受影响）`)) return;
+                localStorage.removeItem(getStoreKey(ch));
+                const mapTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="map"]');
+                if (mapTab) mapTab.click();
+            };
+
+            setTimeout(() => { isRenderingUI = false; }, 60);
+        }
+
+        // 监听视图容器变化，按当前激活的 Tab 挂载对应增强页面
         const obs = new MutationObserver(() => {
             const d = loadMem(getCh());
             if (!d || !d.isBound) return;
+            applyThemeVariables(d.autoCfg?.themeColor, d.autoCfg?.themeSoft);
             if (d.activeTab === "summary" && !topDoc.getElementById("ks-pro-sum-container")) {
                 renderProSummaryUI();
             } else if (d.activeTab === "timeline" && !topDoc.getElementById("ks-pro-tl-container")) {
-                renderProTimelineUI();
+                renderProTimelineAndDexUI();
+            } else if (d.activeTab === "pact" && !topDoc.getElementById("ks-pro-set-container")) {
+                renderProSettingsUI();
             }
         });
         obs.observe(vp, { childList: true });
@@ -7625,9 +8045,11 @@ bootSumoulApp();
         const initD = loadMem(getCh());
         if (initD && initD.isBound) {
             if (initD.activeTab === "summary") renderProSummaryUI();
-            else if (initD.activeTab === "timeline") renderProTimelineUI();
+            else if (initD.activeTab === "timeline") renderProTimelineAndDexUI();
+            else if (initD.activeTab === "pact") renderProSettingsUI();
         }
+        syncFullPromptInjection();
     }
 
-    mountSplashAndUnifiedSummary();
+    mountUltimateMemorySeaPatch();
 })();
