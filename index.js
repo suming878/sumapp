@@ -5561,7 +5561,7 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// 🌿 【Sumoul App 有情树 · 纯代码物理生长级千年真树（木质纤维束扭结主干 + 叶随枝生真实顶光体积树冠 + 自由拖拽灵叶）】
+// ❄️ 【Sumoul App 有情树 · 基于用户原版定向精修：唯一独木粗壮真树干 + 浓密雾凇繁叶 + 移除年月日与遮挡文字终极版】
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
@@ -5571,7 +5571,7 @@ bootSumoulApp();
 
     const MT_ICO = {
         appIcon: svgIco(`<path d="M12 22v-7l-2-2"/><path d="M17 8v.8A6 6 0 0 1 13.8 20v0H10v0A6.5 6.5 0 0 1 7 8h0a5 5 0 0 1 10 0Z"/><path d="m14 14-2 2"/>`, 22, "#3A3A40"),
-        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2E38", "1.8"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#3A3A42", "1.8"),
         plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
         spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
         leaf: svgIco(`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`, 13),
@@ -5606,18 +5606,18 @@ bootSumoulApp();
         return { userName, charName, safeScope, charDesc, recentChat };
     }
 
-    function getTreeKey() { return `sumoul_v16_procedural_tree__${getCtx().safeScope}`; }
+    function getTreeKey() { return `sumoul_v16_millennium_tree__${getCtx().safeScope}`; }
 
     function createDefaultTree(charName, userName) {
         return {
             activeId: 101,
             leaves: [
-                { id: 101, title: "初雪揣进口袋的指尖", date: "12.04", author: charName, joy: 96, xPct: 24, yPct: 18, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
-                { id: 102, title: "凌晨三点的秒回", date: "11.28", author: userName, joy: 88, xPct: 45, yPct: 15, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
-                { id: 103, title: "耳机分你一半的午后", date: "11.20", author: charName, joy: 78, xPct: 64, yPct: 22, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
-                { id: 104, title: "微雨夜屋檐下的对视", date: "11.15", author: charName, joy: 62, xPct: 33, yPct: 28, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
-                { id: 105, title: "吃醋时别扭的沉默", date: "11.09", author: userName, joy: 42, xPct: 54, yPct: 30, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
-                { id: 106, title: "短暂分别时的酸涩", date: "11.02", author: charName, joy: 18, xPct: 16, yPct: 33, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
+                { id: 101, title: "初雪揣进口袋的指尖", author: charName, joy: 96, xPct: 26, yPct: 20, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
+                { id: 102, title: "凌晨三点的秒回", author: userName, joy: 90, xPct: 48, yPct: 16, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
+                { id: 103, title: "耳机分你一半的午后", author: charName, joy: 82, xPct: 18, yPct: 33, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
+                { id: 104, title: "微雨夜屋檐下的对视", author: charName, joy: 66, xPct: 38, yPct: 29, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
+                { id: 105, title: "吃醋时别扭的沉默", author: userName, joy: 45, xPct: 58, yPct: 24, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
+                { id: 106, title: "短暂分别时的酸涩", author: charName, joy: 18, xPct: 30, yPct: 40, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
             ]
         };
     }
@@ -5632,24 +5632,43 @@ bootSumoulApp();
     }
     function saveTree(d) { try { localStorage.setItem(getTreeKey(), JSON.stringify(d)); } catch (e) {} }
 
+    // ❄️ 清冷霜雪色阶：开心度决定叶片从「冰透纯白」到「清冷雾银」再到「深邃冷炭」
     function getLeafStyleByJoy(joy = 85) {
         const j = Math.max(0, Math.min(100, Number(joy) || 85));
-        const light = Math.round(22 + (j / 100) * 78);
-        const fill = `hsl(220, 14%, ${light}%)`;
-        const stroke = j >= 60 ? "#687082" : "#1E202A";
-        const vein = j >= 60 ? "#A4ACBE" : "#686E7E";
-        const label = j >= 85 ? `极开心 ${j}%` : (j >= 60 ? `愉悦 ${j}%` : (j >= 35 ? `微涩 ${j}%` : `思念 ${j}%`));
-        return { fill, stroke, vein, label };
+        if (j >= 85) {
+            return { grad1: "#FFFFFF", grad2: "#F4F6FA", stroke: "#949AA8", vein: "#BDC3D2", glow: "drop-shadow(0 0 12px #FFFFFF) drop-shadow(0 3px 8px rgba(80,86,102,0.16))", label: `极开心 ${j}% · 冰魄霜白叶` };
+        } else if (j >= 65) {
+            return { grad1: "#EEF0F6", grad2: "#D8DDE8", stroke: "#7C8292", vein: "#A2A8B8", glow: "drop-shadow(0 0 8px rgba(255,255,255,0.85)) drop-shadow(0 3px 8px rgba(80,86,102,0.16))", label: `愉悦 ${j}% · 雾凇浅银叶` };
+        } else if (j >= 40) {
+            return { grad1: "#B8BECB", grad2: "#9298A8", stroke: "#585E6E", vein: "#787E8E", glow: "drop-shadow(0 4px 10px rgba(80,85,100,0.28))", label: `微涩 ${j}% · 冷月烟灰叶` };
+        } else {
+            return { grad1: "#545866", grad2: "#343742", stroke: "#22242C", vein: "#7E8494", glow: "drop-shadow(0 6px 14px rgba(25,27,35,0.42))", label: `思念 ${j}% · 寒夜深炭叶` };
+        }
     }
 
-    function renderUnifiedLeafSvg(joy, isSel) {
+    // 绘制高定清冷银杏扇叶 / 滴水菩提叶标本 SVG
+    function renderRealisticLeafSvg(id, joy, isSel, idx) {
         const st = getLeafStyleByJoy(joy);
-        const sz = isSel ? 34 : 25;
-        return `<svg viewBox="0 0 40 54" width="${sz}" height="${Math.round(sz * 1.35)}" fill="none" style="display:block;filter:drop-shadow(0 4px 10px rgba(20,24,36,0.28));overflow:visible;">
-            <path d="M20 2 L20 9" stroke="${st.stroke}" stroke-width="1.3" stroke-linecap="round"/>
-            <path d="M20 8 C7 17, 4 34, 20 50 C36 34, 33 17, 20 8 Z" fill="${st.fill}" stroke="${isSel ? "#14161E" : st.stroke}" stroke-width="${isSel ? "2.2" : "1.2"}" stroke-linejoin="round"/>
-            <path d="M20 10 L20 46 M20 19 L12 25 M20 26 L28 32 M20 33 L13 39" stroke="${st.vein}" stroke-width="0.85" stroke-linecap="round" opacity="0.9"/>
-            <circle cx="20" cy="2" r="${isSel ? "2.4" : "1.5"}" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.9"/>
+        const isGinkgo = idx % 2 === 0;
+        const w = isSel ? 44 : 34, h = isSel ? 52 : 40, gid = `lg_${id}`;
+        if (isGinkgo) {
+            return `<svg viewBox="0 0 60 70" width="${w}" height="${h}" fill="none" style="display:block;filter:${st.glow};overflow:visible;">
+                <defs><linearGradient id="${gid}" x1="10" y1="10" x2="50" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${st.grad1}"/><stop offset="100%" stop-color="${st.grad2}"/></linearGradient></defs>
+                <line x1="30" y1="-10" x2="30" y2="6" stroke="${st.stroke}" stroke-width="0.75" stroke-dasharray="1.5 1.5" opacity="0.65"/>
+                <circle cx="30" cy="-10" r="1.6" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.75"/>
+                <path d="M30 6 C29 14, 30 20, 30 24" stroke="${st.stroke}" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M30 23 C20 26, 7 36, 6 47 C5 53, 12 57, 19 56 C24 55, 28 50, 30 46 C32 50, 36 55, 41 56 C48 57, 55 53, 54 47 C53 36, 40 26, 30 23 Z" fill="url(#${gid})" stroke="${isSel ? "#2C2E38" : st.stroke}" stroke-width="${isSel ? "1.8" : "1.0"}" stroke-linejoin="round"/>
+                <g stroke="${st.vein}" stroke-width="0.6" stroke-linecap="round" opacity="0.85"><path d="M30 25 C24 34, 16 42, 11 49"/><path d="M30 25 C26 35, 21 44, 18 52"/><path d="M30 25 C28 34, 26 42, 25 49"/><path d="M30 25 C32 34, 34 42, 35 49"/><path d="M30 25 C34 35, 39 44, 42 52"/><path d="M30 25 C36 34, 44 42, 49 49"/></g>
+            </svg>`;
+        }
+        return `<svg viewBox="0 0 56 72" width="${w}" height="${h}" fill="none" style="display:block;filter:${st.glow};overflow:visible;">
+            <defs><linearGradient id="${gid}" x1="12" y1="8" x2="44" y2="64" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${st.grad1}"/><stop offset="100%" stop-color="${st.grad2}"/></linearGradient></defs>
+            <line x1="28" y1="-10" x2="28" y2="5" stroke="${st.stroke}" stroke-width="0.75" stroke-dasharray="1.5 1.5" opacity="0.65"/>
+            <circle cx="28" cy="-10" r="1.6" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.75"/>
+            <path d="M28 5 L28 14" stroke="${st.stroke}" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M28 13 C14 18, 9 34, 15 47 C19 55, 27 60, 29 66 C29 59, 37 54, 41 47 C47 34, 42 18, 28 13 Z" fill="url(#${gid})" stroke="${isSel ? "#2C2E38" : st.stroke}" stroke-width="${isSel ? "1.8" : "1.0"}" stroke-linejoin="round"/>
+            <g stroke="${st.vein}" stroke-width="0.65" stroke-linecap="round" opacity="0.85"><path d="M28 14 C28 32, 28 48, 29 63" stroke-width="0.85"/><path d="M28 24 C23 27, 19 31, 16 35"/><path d="M28 28 C33 31, 37 35, 39 39"/><path d="M28 35 C23 38, 19 42, 18 46"/><path d="M28 39 C33 42, 36 46, 37 49"/></g>
+            <circle cx="29" cy="68" r="${isSel ? "2.2" : "1.5"}" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.8"/>
         </svg>`;
     }
 
@@ -5674,10 +5693,10 @@ bootSumoulApp();
         };
     }
 
-    function mountRealisticProceduralTree() {
+    function mountColdSilverSacredTree() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountRealisticProceduralTree, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountColdSilverSacredTree, 200); return; }
 
         topDoc.getElementById("smt-page-memory_tree")?.remove();
         topDoc.getElementById("smt-real-tree-overlay")?.remove();
@@ -5686,23 +5705,22 @@ bootSumoulApp();
         const st = topDoc.createElement("style");
         st.id = "sumoul-memory-tree-css";
         st.innerHTML = `
-            @keyframes mtLeafBreath { 0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); } 50% { transform: translate(-50%, -50%) rotate(2.5deg); } }
+            @keyframes mtLeafGentleSway { 0%, 100% { transform: translate(-50%, 0) rotate(-2.5deg); } 50% { transform: translate(-50%, 0) rotate(3deg); } }
             #seoul-mini-theater-modal #smt-real-tree-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: linear-gradient(180deg, #DCE2EE 0%, #EAEEF6 52%, #F7F9FC 100%) !important;
+                background: linear-gradient(170deg, #E8ECF5 0%, #F3F5FA 52%, #FFFFFF 100%) !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
             #seoul-mini-theater-modal #smt-real-tree-overlay.open { display: flex !important; }
             #seoul-mini-theater-modal #mt-ancient-canvas { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; display: block !important; pointer-events: none !important; z-index: 1 !important; }
             #seoul-mini-theater-modal #mt-leaves-stage { position: absolute !important; inset: 0 !important; z-index: 6 !important; overflow: hidden !important; pointer-events: none !important; }
-            #seoul-mini-theater-modal .mt-hanging-leaf { position: absolute !important; display: flex !important; flex-direction: column !important; align-items: center !important; cursor: grab !important; touch-action: none !important; pointer-events: auto !important; z-index: 12 !important; animation: mtLeafBreath 4.5s ease-in-out infinite !important; }
-            #seoul-mini-theater-modal .mt-hanging-leaf.dragging { cursor: grabbing !important; animation: none !important; transform: translate(-50%, -50%) scale(1.2) !important; z-index: 60 !important; }
+            #seoul-mini-theater-modal .mt-hanging-leaf { position: absolute !important; transform-origin: top center !important; display: flex !important; flex-direction: column !important; align-items: center !important; cursor: grab !important; touch-action: none !important; pointer-events: auto !important; z-index: 12 !important; animation: mtLeafGentleSway 4.8s ease-in-out infinite !important; }
+            #seoul-mini-theater-modal .mt-hanging-leaf.dragging { cursor: grabbing !important; animation: none !important; transform: translate(-50%, 0) scale(1.18) !important; z-index: 60 !important; }
             #seoul-mini-theater-modal .mt-hanging-leaf.selected-leaf { z-index: 45 !important; }
-            #seoul-mini-theater-modal .mt-leaf-label { margin-top: 2px !important; padding: 1.5px 6px !important; border-radius: 99px !important; font-size: 7.5px !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(20,22,30,0.16) !important; white-space: nowrap !important; pointer-events: none !important; }
-            #seoul-mini-theater-modal .mt-glass-pill { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; height: 28px !important; padding: 0 11px !important; border-radius: 999px !important; background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important; border: 1px solid #E2E5EE !important; font-size: 9.2px !important; font-weight: 700 !important; color: #3A3D46 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 20, 30, 0.04) !important; }
+            #seoul-mini-theater-modal .mt-glass-pill { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; height: 28px !important; padding: 0 11px !important; border-radius: 999px !important; background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important; border: 1px solid rgba(226, 228, 236, 0.95) !important; font-size: 9.2px !important; font-weight: 700 !important; color: #3A3D46 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 20, 30, 0.04) !important; }
             #seoul-mini-theater-modal .mt-glass-pill.dark { background: #3A3D46 !important; border-color: #3A3D46 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
-            #seoul-mini-theater-modal .mt-float-card { background: rgba(255, 255, 255, 0.94) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important; border: 1px solid #E2E5EE !important; border-radius: 18px !important; padding: 12px 14px !important; box-shadow: 0 12px 36px rgba(20, 20, 35, 0.08) !important; }
+            #seoul-mini-theater-modal .mt-float-card { background: rgba(255, 255, 255, 0.94) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border: 1px solid #E6E8F0 !important; border-radius: 18px !important; padding: 13px 15px !important; box-shadow: 0 12px 36px rgba(20, 20, 35, 0.08) !important; }
         `;
         topDoc.head.appendChild(st);
 
@@ -5721,7 +5739,8 @@ bootSumoulApp();
             <canvas id="mt-ancient-canvas"></canvas>
             <div id="mt-leaves-stage"></div>
 
-            <div style="position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top,14px)) 14px 0 14px;pointer-events:none;">
+            <!-- 顶部极简导航条（已彻底去掉右侧会被挡住的说明文字与年月日！） -->
+            <div style="position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:max(16px,env(safe-area-inset-top,16px)) 16px 0 16px;pointer-events:none;">
                 <span class="mt-glass-pill" id="mt-close-btn" style="pointer-events:auto;">${MT_ICO.back}<span>返回主页</span></span>
                 <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
                     <span class="mt-glass-pill" style="pointer-events:none;">${MT_ICO.leaf}<span id="mt-count-txt">6 片记忆叶</span></span>
@@ -5729,12 +5748,12 @@ bootSumoulApp();
                 </div>
             </div>
 
-            <div style="position:relative;z-index:35;margin-top:auto;padding:0 14px max(18px,env(safe-area-inset-bottom,18px)) 14px;display:flex;flex-direction:column;gap:8px;pointer-events:none;">
+            <div style="position:relative;z-index:35;margin-top:auto;padding:0 16px max(20px,env(safe-area-inset-bottom,20px)) 16px;display:flex;flex-direction:column;gap:9px;pointer-events:none;">
                 <div id="mt-leaf-card-wrap" style="pointer-events:auto;"></div>
 
                 <div id="mt-add-modal" class="mt-float-card" style="display:none;pointer-events:auto;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#3A3D46;">挂上一片新记忆叶（挂后可自由拖到树冠任意位置）</span>
+                        <span style="font-size:10px;font-weight:800;color:#3A3D46;">亲手挂上一片新记忆叶（无上限 · 挂后可自由拖拽）</span>
                         <span id="mt-add-close" style="cursor:pointer;color:#8E8E98;">${MT_ICO.close}</span>
                     </div>
                     <input type="text" id="mt-new-title" placeholder="回忆标题 (如：初雪揣进口袋的手)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E6E8F0;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#3A3D46;box-sizing:border-box;outline:none;margin-bottom:6px;" />
@@ -5742,14 +5761,14 @@ bootSumoulApp();
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
                         <span style="font-size:9px;font-weight:700;color:#585C6A;">开心程度(决定叶色深浅)：</span>
                         <input type="range" id="mt-new-joy" min="5" max="100" value="92" style="flex:1;accent-color:#484C58;" />
-                        <span id="mt-new-joy-lbl" style="font-size:8.5px;font-weight:800;color:#3A3D46;min-width:85px;text-align:right;">极开心 92%</span>
+                        <span id="mt-new-joy-lbl" style="font-size:8.5px;font-weight:800;color:#3A3D46;min-width:105px;text-align:right;">极开心 92% · 冰魄霜白叶</span>
                     </div>
                     <div style="display:flex;justify-content:flex-end;">
-                        <span class="mt-glass-pill dark" id="mt-add-submit" style="height:28px!important;">挂上枝头并让TA批注</span>
+                        <span class="mt-glass-pill dark" id="mt-add-submit" style="height:28px!important;">挂上霜枝并让TA批注</span>
                     </div>
                 </div>
 
-                <div id="mt-all-list-modal" class="mt-float-card" style="display:none;max-height:220px;overflow-y:auto;pointer-events:auto;">
+                <div id="mt-all-list-modal" class="mt-float-card" style="display:none;max-height:240px;overflow-y:auto;pointer-events:auto;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #EFEFF5;">
                         <span style="font-size:10px;font-weight:800;color:#3A3D46;">全部记忆叶名录（点击定位查看）</span>
                         <span id="mt-list-close" style="cursor:pointer;color:#8E8E98;">${MT_ICO.close}</span>
@@ -5767,190 +5786,83 @@ bootSumoulApp();
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 🌳 核心真树生成算法：步进式3D圆管体积树干（带木质纤维扭纹）+ 叶随枝生真实顶光体积树冠
+        // ❄️ 精准修正你发来的渲染器：
+        // 1. 严格只保留「唯一一根」独木粗壮主干（底宽 96px ~ 115px，加盘根底座），删掉多余的第二根副干！
+        // 2. 在主干和各级霜枝上加上写实的纵向树皮明暗裂纹，让粗树干极具真实古木质感！
+        // 3. 把原本稀疏的小叶子升级为 2800 片大号饱满雾凇叶片（尺寸 9~16px），树冠浓密丰满！
         // ══════════════════════════════════════════════════════════════════════════
         const canvas = topDoc.getElementById("mt-ancient-canvas");
         const ctx2d = canvas.getContext("2d");
-        let animId = null, W = 390, H = 780, bakedCanvas = null, fallingPetals = [];
+        let animId = null, W = 390, H = 780, treeDataCache = null;
 
-        // 用密集微步进圆环堆叠画出 100% 自然的苍劲古木枝干（带真实树瘤起伏、左侧背光深炭、右侧受光银白、纵向树皮裂纹）
-        function drawOrganicBarkBranch(c, x0, y0, x1, y1, cx, cy, r0, r1, rng) {
-            const dist = Math.hypot(x1 - x0, y1 - y0);
-            const steps = Math.max(12, Math.floor(dist / 2.2));
-            for (let i = 0; i <= steps; i++) {
-                const t = i / steps;
-                const mt = 1 - t;
-                const x = mt * mt * x0 + 2 * mt * t * cx + t * t * x1;
-                const y = mt * mt * y0 + 2 * mt * t * cy + t * t * y1;
-                // 树干粗细随生长自然收尖，并加入微小的古木树瘤起伏
-                const gnarl = 1 + Math.sin(t * 12 + x0 * 0.1) * 0.05;
-                const r = (r0 * mt + r1 * t) * gnarl;
+        function buildColdSilverTree(w, h) {
+            const rng = mulberry32(20260401);
+            const branches = [];
+            const frostMist = [];
+            const backLeaves = [];
+            const frontLeaves = [];
+            const iceThreads = [];
 
-                // 计算当前步进切线法向量，赋予真实3D圆柱体受光体积感
-                const tx = 2 * mt * (cx - x0) + 2 * t * (x1 - cx);
-                const ty = 2 * mt * (cy - y0) + 2 * t * (y1 - cy);
-                const tl = Math.hypot(tx, ty) || 1;
-                const nx = -ty / tl, ny = tx / tl;
+            function growSlenderBranch(x1, y1, len, ang, w1, depth) {
+                // 保持主干向主枝平滑过渡，粗壮有力不突兀
+                const w2 = Math.max(1.2, w1 * (depth === 7 ? 0.68 : (depth >= 5 ? 0.66 : 0.64)));
+                const curve = (rng() - 0.46) * 0.16;
+                const cx = x1 + Math.cos(ang + curve) * (len * 0.52);
+                const cy = y1 + Math.sin(ang + curve) * (len * 0.52);
+                const x2 = x1 + Math.cos(ang) * len;
+                const y2 = y1 + Math.sin(ang) * len;
 
-                const grd = c.createLinearGradient(x - nx * r, y - ny * r, x + nx * r, y + ny * r);
-                grd.addColorStop(0, "#2E323E");
-                grd.addColorStop(0.38, "#4E5568");
-                grd.addColorStop(0.76, "#8890A4");
-                grd.addColorStop(1, "#DCE2EE");
+                branches.push({ x1, y1, cx, cy, x2, y2, w1, w2, depth });
 
-                c.beginPath();
-                c.arc(x, y, Math.max(0.6, r), 0, Math.PI * 2);
-                c.fillStyle = grd;
-                c.fill();
-
-                // 粗枝干表面雕刻真实树皮肌理颗粒
-                if (r > 6 && i % 2 === 0) {
-                    const barkOffset = (rng() - 0.5) * r * 1.3;
-                    c.beginPath();
-                    c.arc(x + nx * barkOffset, y + ny * barkOffset, Math.max(0.8, r * 0.12), 0, Math.PI * 2);
-                    c.fillStyle = barkOffset < 0 ? "rgba(30, 34, 44, 0.35)" : "rgba(255, 255, 255, 0.32)";
-                    c.fill();
-                }
-            }
-        }
-
-        function drawTrueLeaf(c, x, y, sz, ang, fill, stroke) {
-            c.save();
-            c.translate(x, y);
-            c.rotate(ang);
-            c.beginPath();
-            c.moveTo(0, 0);
-            c.bezierCurveTo(sz * 0.35, -sz * 0.38, sz * 0.78, -sz * 0.25, sz, 0);
-            c.bezierCurveTo(sz * 0.78, sz * 0.25, sz * 0.35, sz * 0.38, 0, 0);
-            c.closePath();
-            c.fillStyle = fill;
-            c.fill();
-            if (stroke) {
-                c.strokeStyle = stroke;
-                c.lineWidth = 0.45;
-                c.stroke();
-            }
-            c.restore();
-        }
-
-        function generateRealisticTreeScene(w, h) {
-            const rng = mulberry32(20261024);
-            const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            bakedCanvas = topDoc.createElement("canvas");
-            bakedCanvas.width = w * dpr; bakedCanvas.height = h * dpr;
-            const c = bakedCanvas.getContext("2d");
-            c.scale(dpr, dpr);
-
-            const branchSegments = [];
-            const foliageNodes = [];
-
-            // 递归生成 7 级真实树木骨架：主干粗壮苍劲，分枝曲折蜿蜒，末梢细密如网
-            function growTreeSkeleton(x0, y0, len, ang, r0, depth) {
-                const r1 = depth === 7 ? r0 * 0.72 : r0 * (0.64 + rng() * 0.08);
-                // 真实的弯曲控制点：既有向上向光性，又有侧枝重力微垂感
-                const curve = (rng() - 0.48) * 0.28;
-                const cx = x0 + Math.cos(ang + curve) * (len * 0.52);
-                const cy = y0 + Math.sin(ang + curve) * (len * 0.52);
-                const x1 = x0 + Math.cos(ang) * len;
-                const y1 = y0 + Math.sin(ang) * len;
-
-                branchSegments.push({ x0, y0, cx, cy, x1, y1, r0, r1, depth });
-
-                // 所有第 1~4 级细枝都作为真实的叶片着生点（叶随枝生，绝不悬空乱画！）
-                if (depth <= 4) {
-                    foliageNodes.push({ x: x1, y: y1, r: 16 + depth * 9, depth });
+                // 从第 5 层开始沿着树枝密集簇生丰满的雾凇叶片（不再只有末端几片！）
+                if (depth <= 5) {
                     if (depth <= 3) {
-                        foliageNodes.push({ x: (x0 + x1) * 0.5, y: (y0 + y1) * 0.5, r: 14 + depth * 7, depth });
+                        frostMist.push({ x: x2, y: y2, r: 44 + rng() * 42 });
+                    }
+                    const leafCnt = depth === 1 ? 32 : (depth === 2 ? 26 : 16);
+                    const spreadRad = 18 + depth * 12;
+                    for (let i = 0; i < leafCnt; i++) {
+                        const a = rng() * Math.PI * 2;
+                        const d = Math.pow(rng(), 0.65) * spreadRad;
+                        const lx = x2 + Math.cos(a) * d;
+                        const ly = y2 + Math.sin(a) * (d * 0.75);
+                        const sz = 8.5 + rng() * 6.5;
+                        const rot = (rng() - 0.5) * 2.4;
+                        const s = rng();
+                        if (s < 0.35) {
+                            backLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(150, 158, 176, 0.68)", phase: rng() * 6.28 });
+                        } else if (s < 0.68) {
+                            frontLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(224, 229, 240, 0.88)", phase: rng() * 6.28 });
+                        } else {
+                            frontLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(255, 255, 255, 0.96)", phase: rng() * 6.28 });
+                        }
+                    }
+                    if (depth === 2 && rng() > 0.4) {
+                        iceThreads.push({ x: x2, y: y2, len: 45 + rng() * 70, phase: rng() * 6.28 });
                     }
                 }
 
                 if (depth <= 1) return;
 
-                // 自然分叉：粗干分 3 股巨枝，细枝分 2~3 股，并产生侧生小短枝
-                const subCount = (depth === 7 || depth === 5 || depth === 3) ? 3 : 2;
-                for (let i = 0; i < subCount; i++) {
-                    const spread = subCount === 2 ? (i === 0 ? -0.42 : 0.38) : (i - 1) * 0.44;
-                    // 让大树从左下角自然向整个上空与右上方舒展（左树右白经典构图）
-                    const skyPull = x1 < w * 0.48 ? 0.09 : -0.03;
-                    const nextAng = ang + spread + skyPull + (rng() - 0.5) * 0.16;
-                    const nextLen = len * (0.74 + rng() * 0.14);
-                    growTreeSkeleton(x1, y1, nextLen, nextAng, r1, depth - 1);
+                const subCnt = (depth === 7 || depth === 5 || depth === 3) ? 3 : 2;
+                for (let i = 0; i < subCnt; i++) {
+                    const spread = subCnt === 2 ? (i === 0 ? -0.36 : 0.32) : (i - 1) * 0.36;
+                    const pullRight = x2 < w * 0.48 ? 0.09 : -0.02;
+                    const nextAng = ang + spread + pullRight + (rng() - 0.5) * 0.13;
+                    const nextLen = len * (0.76 + rng() * 0.11);
+                    growSlenderBranch(x2, y2, nextLen, nextAng, w2, depth - 1);
                 }
             }
 
-            // 1. 生成盘虬卧龙的粗壮树根 + 合抱级苍劲主干（底宽半径 44px 即直径 88px，加 5 条抓地粗根后底座宽达 165px！）
-            const baseX = w * 0.18, baseY = h * 0.92, trunkRadius = Math.max(40, w * 0.11);
-            // 5条抓地盘根
-            const roots = [
-                { x1: baseX - trunkRadius * 2.2, y1: baseY + 32, cx: baseX - trunkRadius * 0.8, cy: baseY + 5, r0: trunkRadius * 0.55 },
-                { x1: baseX - trunkRadius * 1.2, y1: baseY + 38, cx: baseX - trunkRadius * 0.4, cy: baseY + 12, r0: trunkRadius * 0.65 },
-                { x1: baseX + trunkRadius * 0.3, y1: baseY + 40, cx: baseX + trunkRadius * 0.1, cy: baseY + 15, r0: trunkRadius * 0.70 },
-                { x1: baseX + trunkRadius * 1.6, y1: baseY + 36, cx: baseX + trunkRadius * 0.7, cy: baseY + 10, r0: trunkRadius * 0.65 },
-                { x1: baseX + trunkRadius * 2.8, y1: baseY + 30, cx: baseX + trunkRadius * 1.2, cy: baseY + 4, r0: trunkRadius * 0.50 }
-            ];
+            // 🔥 核心修复：严格只画「唯一一根」粗壮的独木主干！（底宽直接拉到 92px~110px，彻底删掉之前多余的第二根副干！）
+            const singleTrunkW = Math.max(88, w * 0.24);
+            growSlenderBranch(w * 0.16, h * 0.95, h * 0.25, -Math.PI * 0.45, singleTrunkW, 7);
 
-            // 主干向上生长 7 层，同时在主干中段分出两条向左右天际横展的苍劲大巨枝！
-            growTreeSkeleton(baseX, baseY, h * 0.22, -Math.PI * 0.45, trunkRadius, 7);
-            growTreeSkeleton(baseX + trunkRadius * 0.25, baseY - h * 0.17, h * 0.20, -Math.PI * 0.22, trunkRadius * 0.58, 6);
-            growTreeSkeleton(baseX - trunkRadius * 0.20, baseY - h * 0.19, h * 0.17, -Math.PI * 0.64, trunkRadius * 0.48, 5);
-
-            // ── 渲染第 1 层：树冠深处背光暗部叶群（顺着真实细枝节点生长，形成浓密立体底荫） ──
-            foliageNodes.forEach((fn) => {
-                const cnt = fn.depth === 1 ? 16 : 10;
-                for (let k = 0; k < cnt; k++) {
-                    const a = rng() * Math.PI * 2, d = Math.pow(rng(), 0.65) * fn.r * 1.15;
-                    const lx = fn.x + Math.cos(a) * d, ly = fn.y + Math.sin(a) * d * 0.8 + 5;
-                    const sz = 9 + rng() * 6;
-                    drawTrueLeaf(c, lx, ly, sz, a + (rng() - 0.5), "rgba(86, 94, 112, 0.82)", "rgba(62, 68, 84, 0.4)");
-                }
-            });
-
-            // ── 渲染第 2 层：粗壮盘根、苍劲主干与前5级主副枝干（树干实打实长在树冠中间！） ──
-            roots.forEach((rt) => drawOrganicBarkBranch(c, baseX, baseY - 10, rt.x1, rt.y1, rt.cx, rt.cy, rt.r0, 3, rng));
-            branchSegments.filter((b) => b.depth >= 3).forEach((b) => {
-                drawOrganicBarkBranch(c, b.x0, b.y0, b.x1, b.y1, b.cx, b.cy, b.r0, b.r1, rng);
-            });
-
-            // ── 渲染第 3 层：树冠中层凝霜冷银叶群 + 末梢细枝穿插 ──
-            foliageNodes.forEach((fn) => {
-                const cnt = fn.depth === 1 ? 18 : 12;
-                for (let k = 0; k < cnt; k++) {
-                    const a = rng() * Math.PI * 2, d = Math.pow(rng(), 0.65) * fn.r;
-                    const lx = fn.x + Math.cos(a) * d, ly = fn.y + Math.sin(a) * d * 0.78;
-                    const sz = 8.5 + rng() * 6;
-                    const col = rng() > 0.4 ? "rgba(176, 184, 204, 0.90)" : "rgba(142, 150, 170, 0.86)";
-                    drawTrueLeaf(c, lx, ly, sz, a + (rng() - 0.5), col, "rgba(115, 122, 140, 0.4)");
-                }
-            });
-
-            branchSegments.filter((b) => b.depth < 3).forEach((b) => {
-                drawOrganicBarkBranch(c, b.x0, b.y0, b.x1, b.y1, b.cx, b.cy, b.r0, b.r1, rng);
-            });
-
-            // ── 渲染第 4 层：树冠表层受光纯白/浅霜雪高光叶群（模拟阳光从上方洒落在每一簇枝头！） ──
-            foliageNodes.forEach((fn) => {
-                const cnt = fn.depth === 1 ? 20 : 12;
-                for (let k = 0; k < cnt; k++) {
-                    const a = rng() * Math.PI * 2, d = Math.pow(rng(), 0.7) * fn.r * 0.9;
-                    const lx = fn.x + Math.cos(a) * d, ly = fn.y + Math.sin(a) * d * 0.75 - 4;
-                    const sz = 8 + rng() * 5.5;
-                    const col = rng() > 0.3 ? "rgba(255, 255, 255, 0.96)" : "rgba(228, 234, 246, 0.92)";
-                    drawTrueLeaf(c, lx, ly, sz, a + (rng() - 0.5), col, "rgba(160, 168, 186, 0.5)");
-                }
-            });
-
-            // ── 渲染第 5 层：树根底部仙气晨雾消融层 ──
-            const mist = c.createLinearGradient(0, h * 0.84, 0, h);
-            mist.addColorStop(0, "rgba(234, 238, 246, 0)");
-            mist.addColorStop(0.65, "rgba(242, 245, 251, 0.85)");
-            mist.addColorStop(1, "#F7F9FC");
-            c.fillStyle = mist;
-            c.fillRect(0, h * 0.84, w, h * 0.16);
-
-            fallingPetals = Array.from({ length: 16 }, (_, i) => ({
-                x: w * (0.08 + rng() * 0.84), y: h * (0.12 + rng() * 0.65),
-                sz: 9 + rng() * 4, spX: 6 + rng() * 8, spY: 10 + rng() * 12, rot: rng() * 3, ph: i
+            const snowMotes = Array.from({ length: 22 }, (_, i) => ({
+                x: w * (0.1 + rng() * 0.85), y: h * rng(), r: 1.0 + rng() * 1.6, spY: 8 + rng() * 10, phase: i
             }));
+
+            return { branches, frostMist, backLeaves, frontLeaves, iceThreads, snowMotes };
         }
 
         function resizeCanvas() {
@@ -5958,34 +5870,141 @@ bootSumoulApp();
             W = rect.width || topWin.innerWidth || 390;
             H = rect.height || topWin.innerHeight || 780;
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            canvas.width = W * dpr; canvas.height = H * dpr;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
             ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-            generateRealisticTreeScene(W, H);
+            treeDataCache = buildColdSilverTree(W, H);
+        }
+
+        // 绘制真实感粗壮冷银树干与分枝（含圆滑分叉关节 + 写实纵向树皮裂纹沟壑）
+        function drawFrostSilverBranch(b, wind) {
+            const dx = b.x2 - b.x1, dy = b.y2 - b.y1, len = Math.hypot(dx, dy) || 1;
+            const nx = -dy / len, ny = dx / len;
+            // 底部唯一主干稳如泰山不乱晃，上方细枝随风轻摆
+            const sw1 = b.depth === 7 ? 0 : wind * (7 - b.depth) * 0.22;
+            const sw2 = wind * (8 - b.depth) * 0.35;
+            const swc = (sw1 + sw2) * 0.5;
+
+            const x1 = b.x1 + sw1, y1 = b.y1, x2 = b.x2 + sw2, y2 = b.y2, cx = b.cx + swc, cy = b.cy;
+
+            // 如果是唯一主干（depth === 7），底部向外自然扩出稳固的古树盘根弧度
+            const baseExpand = b.depth === 7 ? 1.38 : 1.0;
+
+            ctx2d.beginPath();
+            ctx2d.moveTo(x1 + nx * b.w1 * 0.5 * baseExpand, y1 + ny * b.w1 * 0.5);
+            ctx2d.quadraticCurveTo(cx + nx * (b.w1 + b.w2) * 0.25, cy + ny * (b.w1 + b.w2) * 0.25, x2 + nx * b.w2 * 0.5, y2 + ny * b.w2 * 0.5);
+            ctx2d.arc(x2, y2, b.w2 * 0.5, Math.atan2(ny, nx), Math.atan2(-ny, -nx));
+            ctx2d.quadraticCurveTo(cx - nx * (b.w1 + b.w2) * 0.25, cy - ny * (b.w1 + b.w2) * 0.25, x1 - nx * b.w1 * 0.5 * baseExpand, y1 - ny * b.w1 * 0.5);
+            ctx2d.closePath();
+
+            // 立体圆柱冷银树皮受光渐变
+            const grd = ctx2d.createLinearGradient(x1 - b.w1 * 0.5, y1, x1 + b.w1 * 0.5, y1);
+            grd.addColorStop(0, "#687082");
+            grd.addColorStop(0.38, "#949CAE");
+            grd.addColorStop(0.78, "#D4DAE6");
+            grd.addColorStop(1, "#FFFFFF");
+            ctx2d.fillStyle = grd;
+            ctx2d.fill();
+
+            // 在粗树干和主枝表面刻画写实的纵向树皮纹理沟壑（让树干真实有肌理，不再像塑料管！）
+            if (b.w1 > 10) {
+                const lines = b.depth === 7 ? 7 : 3;
+                for (let k = 1; k <= lines; k++) {
+                    const ratio = (k / (lines + 1)) - 0.5;
+                    ctx2d.beginPath();
+                    ctx2d.moveTo(x1 + nx * b.w1 * ratio * baseExpand, y1 + ny * b.w1 * ratio);
+                    ctx2d.quadraticCurveTo(cx + nx * (b.w1 + b.w2) * 0.5 * ratio, cy + ny * (b.w1 + b.w2) * 0.5 * ratio, x2 + nx * b.w2 * ratio, y2 + ny * b.w2 * ratio);
+                    ctx2d.strokeStyle = k % 2 === 0 ? "rgba(72, 78, 94, 0.36)" : "rgba(255, 255, 255, 0.55)";
+                    ctx2d.lineWidth = b.depth === 7 ? 1.6 : 0.9;
+                    ctx2d.lineCap = "round";
+                    ctx2d.stroke();
+                }
+            }
+        }
+
+        function drawLeafBatch(list, t) {
+            list.forEach((lf) => {
+                const sw = Math.sin(t * 1.4 + lf.phase) * 2.2;
+                ctx2d.save();
+                ctx2d.translate(lf.x + sw, lf.y);
+                ctx2d.rotate(lf.rot + sw * 0.03);
+                ctx2d.beginPath();
+                ctx2d.moveTo(0, 0);
+                ctx2d.bezierCurveTo(-lf.sz * 0.5, -lf.sz * 0.32, -lf.sz * 0.42, -lf.sz, 0, -lf.sz * 1.42);
+                ctx2d.bezierCurveTo(lf.sz * 0.42, -lf.sz, lf.sz * 0.5, -lf.sz * 0.32, 0, 0);
+                ctx2d.fillStyle = lf.fill;
+                ctx2d.fill();
+                ctx2d.restore();
+            });
         }
 
         function renderCanvasLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
-            if (!bakedCanvas) resizeCanvas();
-            const t = ts * 0.001, sway = Math.sin(t * 0.85) * 1.5;
+            if (!treeDataCache) resizeCanvas();
+            const t = ts * 0.001, wind = Math.sin(t * 1.0) * 2.2;
 
             ctx2d.clearRect(0, 0, W, H);
-            ctx2d.drawImage(bakedCanvas, sway, 0, W, H);
+            const { branches, frostMist, backLeaves, frontLeaves, iceThreads, snowMotes } = treeDataCache;
 
-            fallingPetals.forEach((fp) => {
-                const px = (fp.x + t * fp.spX) % W;
-                const py = ((fp.y + t * fp.spY) % (H * 0.78)) + H * 0.08;
-                drawTrueLeaf(ctx2d, px, py, fp.sz, fp.rot + t * 0.9, "rgba(255,255,255,0.92)", "rgba(140,148,168,0.5)");
+            // 1. 树冠底层清冷纯白冰雾柔光云团
+            frostMist.forEach((fm) => {
+                const g = ctx2d.createRadialGradient(fm.x + wind * 0.5, fm.y, 4, fm.x + wind * 0.5, fm.y, fm.r);
+                g.addColorStop(0, "rgba(255, 255, 255, 0.88)");
+                g.addColorStop(0.6, "rgba(232, 236, 246, 0.45)");
+                g.addColorStop(1, "rgba(255, 255, 255, 0)");
+                ctx2d.fillStyle = g;
+                ctx2d.beginPath();
+                ctx2d.arc(fm.x + wind * 0.5, fm.y, fm.r, 0, Math.PI * 2);
+                ctx2d.fill();
+            });
+
+            // 2. 树冠远景冷灰衬底繁叶
+            drawLeafBatch(backLeaves, t);
+
+            // 3. 垂落的银白冰丝气根
+            iceThreads.forEach((it) => {
+                const sw = Math.sin(t * 1.5 + it.phase) * 5.5 + wind;
+                const g = ctx2d.createLinearGradient(it.x, it.y, it.x, it.y + it.len);
+                g.addColorStop(0, "rgba(165, 172, 188, 0.6)");
+                g.addColorStop(1, "rgba(255, 255, 255, 0)");
+                ctx2d.beginPath();
+                ctx2d.moveTo(it.x, it.y);
+                ctx2d.quadraticCurveTo(it.x + sw * 0.4, it.y + it.len * 0.5, it.x + sw, it.y + it.len);
+                ctx2d.strokeStyle = g;
+                ctx2d.lineWidth = 0.9;
+                ctx2d.stroke();
+            });
+
+            // 4. 唯一一根粗壮独木主干与各级伸展霜枝
+            branches.forEach((b) => drawFrostSilverBranch(b, wind));
+
+            // 5. 树冠前景受光纯白/雾银浓密繁叶（半掩树枝，饱满茂密！）
+            drawLeafBatch(frontLeaves, t);
+
+            // 6. 树根底部仙气白雾消融层
+            const mistGrd = ctx2d.createLinearGradient(0, H * 0.80, 0, H);
+            mistGrd.addColorStop(0, "rgba(238, 241, 247, 0)");
+            mistGrd.addColorStop(0.58, "rgba(244, 246, 251, 0.86)");
+            mistGrd.addColorStop(1, "#FFFFFF");
+            ctx2d.fillStyle = mistGrd;
+            ctx2d.fillRect(0, H * 0.80, W, H * 0.20);
+
+            // 7. 飘浮的微雪冰尘
+            snowMotes.forEach((sm) => {
+                const py = (sm.y + t * sm.spY) % H;
+                const px = sm.x + Math.sin(t + sm.phase) * 8;
+                ctx2d.beginPath();
+                ctx2d.arc(px, py, sm.r, 0, Math.PI * 2);
+                ctx2d.fillStyle = "rgba(255, 255, 255, 0.9)";
+                ctx2d.fill();
             });
 
             animId = requestAnimationFrame(renderCanvasLoop);
         }
 
         function getAutoPos(idx) {
-            const g = idx * 2.39996, r = 8 + (idx % 6) * 4.2;
-            return {
-                xPct: Math.max(12, Math.min(76, Math.round(40 + Math.cos(g) * r * 1.4))),
-                yPct: Math.max(12, Math.min(36, Math.round(23 + Math.sin(g) * r * 0.72)))
-            };
+            const g = idx * 2.39996, r = 9 + (idx % 7) * 4.2;
+            return { xPct: Math.max(12, Math.min(72, Math.round(36 + Math.cos(g) * r * 1.35))), yPct: Math.max(12, Math.min(44, Math.round(25 + Math.sin(g) * r * 0.8))) };
         }
 
         function renderLeavesAndUI() {
@@ -5994,14 +6013,14 @@ bootSumoulApp();
             if (homeBadge) homeBadge.textContent = `${data.leaves.length}叶`;
             topDoc.getElementById("mt-count-txt").textContent = `${data.leaves.length} 片记忆叶`;
 
+            // 树上只挂纯净的写实银杏/菩提叶片标本，不挂任何年月日或文字标签，100% 绝不遮挡！
             const stage = topDoc.getElementById("mt-leaves-stage");
             stage.innerHTML = (data.leaves || []).map((lf, idx) => {
                 const pos = (lf.xPct && lf.yPct) ? { xPct: lf.xPct, yPct: lf.yPct } : getAutoPos(idx);
                 const isSel = Number(lf.id) === Number(data.activeId);
                 const delay = ((idx * 0.41) % 3.6).toFixed(2);
                 return `<div class="mt-hanging-leaf ${isSel ? "selected-leaf" : ""}" data-lid="${lf.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;">
-                    ${renderUnifiedLeafSvg(lf.joy, isSel)}
-                    ${isSel ? `<div class="mt-leaf-label" style="background:#2C2E38;color:#FFFFFF;">${lf.title.slice(0, 8).replace(/</g, "&lt;")}</div>` : ""}
+                    ${renderRealisticLeafSvg(lf.id, lf.joy, isSel, idx)}
                 </div>`;
             }).join("");
 
@@ -6014,8 +6033,8 @@ bootSumoulApp();
                     if (Math.hypot(cx - sx, cy - sy) > 6) {
                         moved = true;
                         const rect = stage.getBoundingClientRect();
-                        node.style.left = `${Math.max(8, Math.min(90, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
-                        node.style.top = `${Math.max(10, Math.min(55, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
+                        node.style.left = `${Math.max(6, Math.min(92, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
+                        node.style.top = `${Math.max(8, Math.min(68, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
                     }
                 };
                 const onEnd = () => {
@@ -6036,6 +6055,7 @@ bootSumoulApp();
                 node.addEventListener("touchend", onEnd);
             });
 
+            // 底部卡片与名录也全部去掉了年月日显示，干净清爽！
             const cur = data.leaves.find((x) => Number(x.id) === Number(data.activeId));
             const wrap = topDoc.getElementById("mt-leaf-card-wrap");
             if (!cur) {
@@ -6043,13 +6063,12 @@ bootSumoulApp();
             } else {
                 const stInfo = getLeafStyleByJoy(cur.joy);
                 wrap.innerHTML = `<div class="mt-float-card">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                        <div style="display:flex;align-items:center;gap:6px;min-width:0;"><span style="width:9px;height:9px;border-radius:50%;background:${stInfo.fill};border:1.2px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:11.5px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <div style="display:flex;align-items:center;gap:6px;min-width:0;"><span style="width:9px;height:9px;border-radius:50%;background:${stInfo.grad1};border:1.2px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:11.5px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span></div>
                         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><span style="font-size:7.8px;font-weight:700;color:#585C6A;background:#F2F4F8;padding:2px 7px;border-radius:99px;">${stInfo.label}</span><span id="mt-del-leaf" style="cursor:pointer;display:inline-flex;">${MT_ICO.trash}</span><span id="mt-hide-card" style="cursor:pointer;color:#8E8E98;display:inline-flex;">${MT_ICO.close}</span></div>
                     </div>
-                    <div style="font-size:8px;color:#7E8494;font-weight:700;margin-bottom:4px;">挂叶人：${cur.author} · 结叶日期：${cur.date}</div>
-                    <div style="font-size:10.5px;font-weight:600;color:#3A3D46;line-height:1.6;">${cur.content.replace(/</g, "&lt;")}</div>
-                    <div style="margin-top:7px;padding:7px 10px;background:#F6F7FA;border-left:2px solid #585C6A;border-radius:0 8px 8px 0;font-size:9.8px;font-weight:600;color:#3A3D46;line-height:1.5;"><span style="font-size:7.5px;color:#989EAE;display:block;margin-bottom:2px;">${c.charName} 的叶背批注</span>${(cur.whisper || "“ 这片叶子我替你收好了。”").replace(/</g, "&lt;")}</div>
+                    <div style="font-size:10.8px;font-weight:600;color:#3A3D46;line-height:1.65;">${cur.content.replace(/</g, "&lt;")}</div>
+                    <div style="margin-top:8px;padding:8px 10px;background:#F6F7FA;border-left:2px solid #585C6A;border-radius:0 8px 8px 0;font-size:10px;font-weight:600;color:#3A3D46;line-height:1.55;"><span style="font-size:7.8px;color:#989EAE;display:block;margin-bottom:2px;">${c.charName} 的叶背批注</span>${(cur.whisper || "“ 这片叶子我替你收好了。”").replace(/</g, "&lt;")}</div>
                 </div>`;
                 topDoc.getElementById("mt-hide-card").onclick = () => { const d = loadTree(); d.activeId = 0; saveTree(d); renderLeavesAndUI(); };
                 topDoc.getElementById("mt-del-leaf").onclick = () => {
@@ -6061,7 +6080,7 @@ bootSumoulApp();
             const listBody = topDoc.getElementById("mt-all-list-body");
             listBody.innerHTML = data.leaves.map((lf) => {
                 const stInfo = getLeafStyleByJoy(lf.joy);
-                return `<div data-pickid="${lf.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(lf.id) === Number(data.activeId) ? "#484C58" : "#EFEFF5"};background:#FFFFFF;cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;min-width:0;"><span style="width:8px;height:8px;border-radius:50%;background:${stInfo.fill};border:1px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:10px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lf.title.replace(/</g, "&lt;")}</span></div><span style="font-size:8px;color:#8E8E98;flex-shrink:0;margin-left:8px;">开心${lf.joy ?? 85}% · ${lf.date}</span></div>`;
+                return `<div data-pickid="${lf.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(lf.id) === Number(data.activeId) ? "#484C58" : "#EFEFF5"};background:#FFFFFF;cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;min-width:0;"><span style="width:8px;height:8px;border-radius:50%;background:${stInfo.grad1};border:1px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:10px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lf.title.replace(/</g, "&lt;")}</span></div><span style="font-size:8px;color:#8E8E98;flex-shrink:0;margin-left:8px;">${stInfo.label}</span></div>`;
             }).join("");
             listBody.querySelectorAll("[data-pickid]").forEach((row) => row.onclick = () => {
                 const d = loadTree(); d.activeId = Number(row.getAttribute("data-pickid")); saveTree(d);
@@ -6088,8 +6107,8 @@ bootSumoulApp();
         topDoc.getElementById("mt-add-submit").onclick = async () => {
             const title = topDoc.getElementById("mt-new-title").value.trim() || "独家回忆", content = topDoc.getElementById("mt-new-content").value.trim();
             if (!content) return alert("请写下你想封存的回忆内容！");
-            const joy = Number(joySlider.value) || 92, c = getCtx(), dt = new Date(), newId = Date.now(), d = loadTree(), pos = getAutoPos(d.leaves.length + 1);
-            d.leaves.unshift({ id: newId, title, date: `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`, author: c.userName, joy, xPct: pos.xPct, yPct: pos.yPct, content, whisper: `（${c.charName} 正在叶背写下批注...）` });
+            const joy = Number(joySlider.value) || 92, c = getCtx(), newId = Date.now(), d = loadTree(), pos = getAutoPos(d.leaves.length + 1);
+            d.leaves.unshift({ id: newId, title, author: c.userName, joy, xPct: pos.xPct, yPct: pos.yPct, content, whisper: `（${c.charName} 正在叶背写下批注...）` });
             d.activeId = newId; saveTree(d);
             topDoc.getElementById("mt-new-title").value = ""; topDoc.getElementById("mt-new-content").value = "";
             addModal.style.display = "none"; renderLeavesAndUI();
@@ -6107,8 +6126,8 @@ bootSumoulApp();
                 const raw = await askTreeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`, `请在有情树上挂一片你的独家回忆叶，并根据这段回忆的情绪打分(joy: 10~100)。严格只输出JSON：{"title":"8字内标题","joy":88,"content":"50字内回忆描写","whisper":"35字内叶背情话"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), dt = new Date(), d = loadTree(), nid = Date.now(), pos = getAutoPos(d.leaves.length + 2);
-                    d.leaves.unshift({ id: nid, title: o.title || "心动瞬间", date: `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`, author: c.charName, joy: Number(o.joy) || 88, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    const o = JSON.parse(m[0]), d = loadTree(), nid = Date.now(), pos = getAutoPos(d.leaves.length + 2);
+                    d.leaves.unshift({ id: nid, title: o.title || "心动瞬间", author: c.charName, joy: Number(o.joy) || 88, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
                     d.activeId = nid; saveTree(d); renderLeavesAndUI();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
@@ -6124,13 +6143,13 @@ bootSumoulApp();
                 const raw = await askTreeAI(`你是${c.charName}。`, `根据以下近期聊天提炼一段最值得铭记的回忆结成有情树叶片，并给出情绪开心度(joy: 10~100)。\n${src.slice(-1100)}\n严格只输出JSON：{"title":"8字内标题","joy":92,"content":"50字内回忆浓缩","whisper":"35字内叶背批注"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), dt = new Date(), d = loadTree(), nid = Date.now(), pos = getAutoPos(d.leaves.length + 3);
-                    d.leaves.unshift({ id: nid, title: o.title || "聊天记忆", date: `${dt.getMonth() + 1}.${String(dt.getDate()).padStart(2, "0")}`, author: `${c.userName} & ${c.charName}`, joy: Number(o.joy) || 90, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    const o = JSON.parse(m[0]), d = loadTree(), nid = Date.now(), pos = getAutoPos(d.leaves.length + 3);
+                    d.leaves.unshift({ id: nid, title: o.title || "聊天记忆", author: `${c.userName} & ${c.charName}`, joy: Number(o.joy) || 90, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
                     d.activeId = nid; saveTree(d); renderLeavesAndUI();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
     }
 
-    mountRealisticProceduralTree();
+    mountColdSilverSacredTree();
 })();
