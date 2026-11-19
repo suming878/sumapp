@@ -5561,22 +5561,25 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 个人主页第5应用：结识海 · 인연의 바다 (韩系纯白清冷冰晶点状图 + 底部5大功能页完整版)】
-// 底部5大功能页：1.星图(落雨冰晶点状关系网) 2.编年(历史记忆时间轴) 3.羁绊(六维共鸣度剖析) 4.心结(隐秘心结与雷区解锁) 5.契约(绑定誓言与信物柜)
+// 🤍 【Sumoul App 第5应用完整重做版：结识海 · 双轨防失忆记忆中枢 (酒馆ST ⇄ 微信WX 彻底隔离)】
+// 1. 100%保留用户认可的「纯白背景+清透冷银泪滴+三层涟漪+4px双形态微点」星图样式（酒馆与微信各自独立一张图）
+// 2. 支持「自由选择楼层区间总结(#X ~ #Y)」+「自定义每 N 层全自动总结并同步生成星图节点」
+// 3. 真正接入 SillyTavern 底层 setExtensionPrompt 持久注入，聊几千层都绝不失忆、绝不串戏！
 // ==========================================================================
 (function () {
-    const topWin = window.parent || window, topDoc = topWin.document;
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
 
     const svgIco = (p, sz = 15, c = "currentColor", sw = "1.5") =>
         `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
-    const K_ICO = {
+    const M_ICO = {
         appIcon: svgIco(`<circle cx="6" cy="6" r="2"/><circle cx="18" cy="7" r="2"/><circle cx="12" cy="18" r="2.2"/><line x1="7.6" y1="7.4" x2="10.8" y2="16"/><line x1="16.4" y1="8.6" x2="13.2" y2="16"/><line x1="8" y1="6.2" x2="16" y2="6.8"/>`, 21, "#2C2E36"),
-        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2E36", "1.8"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#1E2028", "1.8"),
         tabMap: svgIco(`<circle cx="12" cy="12" r="2.5"/><circle cx="5" cy="7" r="1.8"/><circle cx="19" cy="8" r="1.8"/><circle cx="7" cy="18" r="1.8"/><line x1="6.6" y1="8" x2="10" y2="10.5"/><line x1="17.2" y1="8.8" x2="14.2" y2="10.8"/><line x1="8.2" y1="16.5" x2="10.5" y2="13.8"/>`, 16),
+        tabSum: svgIco(`<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/><circle cx="18" cy="18" r="2.5"/>`, 16),
         tabTime: svgIco(`<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>`, 16),
-        tabBond: svgIco(`<polygon points="12 2 19 7 19 17 12 22 5 17 5 7 12 2"/><circle cx="12" cy="12" r="2.5"/>`, 16),
-        tabKnot: svgIco(`<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`, 16),
+        tabPrompt: svgIco(`<path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 10.5"/><path d="m12 12 7.5 6.5"/>`, 16),
         tabPact: svgIco(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>`, 16),
         rain: svgIco(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`, 12),
         plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 12),
@@ -5585,16 +5588,21 @@ bootSumoulApp();
         close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 13)
     };
 
-    const NODE_STYLE = {
-        core:     { name: "核心原点", code: "CORE · 00", coreCol: "#262830", ringCol: "#262830" },
-        memory:   { name: "初雪记忆", code: "MEMO · 01", coreCol: "#525868", ringCol: "#8C94A6" },
-        relation: { name: "人物羁绊", code: "BOND · 02", coreCol: "#687082", ringCol: "#9EA6B8" },
-        knot:     { name: "隐秘心结", code: "KNOT · 03", coreCol: "#2C303C", ringCol: "#6E7688" }
+    const NODE_META = {
+        core:     { name: "核心原点", code: "CORE · 00" },
+        memory:   { name: "总结记忆", code: "MEMO · 01" },
+        relation: { name: "关系羁绊", code: "BOND · 02" },
+        knot:     { name: "伏笔心结", code: "KNOT · 03" }
     };
 
+    const CH_KEY = "sumoul_v16_mem_active_channel"; // 'st' (酒馆) | 'wx' (微信)
+    const getCh = () => (localStorage.getItem(CH_KEY) === "wx" ? "wx" : "st");
+    const setCh = (v) => localStorage.setItem(CH_KEY, v === "wx" ? "wx" : "st");
+
     function getCtx() {
-        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "", recentChat = "";
+        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "";
         let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
+        let stChatArr = [];
         try {
             const st = topWin.SillyTavern?.getContext?.();
             if (st) {
@@ -5605,10 +5613,10 @@ bootSumoulApp();
                     scope = c.avatar || c.name || String(st.characterId);
                     if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
                     charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
-                } else if (st.name2) { charName = st.name2; scope = st.name2; }
-                if (Array.isArray(st.chat) && st.chat.length) {
-                    recentChat = st.chat.slice(-8).map((m) => `${m.is_user ? userName : charName}: ${m.mes}`).join("\n");
+                } else if (st.name2) {
+                    charName = st.name2; scope = st.name2;
                 }
+                if (Array.isArray(st.chat)) stChatArr = st.chat;
             }
         } catch (e) {}
         const safeScope = String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
@@ -5619,169 +5627,351 @@ bootSumoulApp();
             if (wCfg.myAva) userAvatar = wCfg.myAva;
             if (wCfg.charAva) charAvatar = wCfg.charAva;
         } catch (e) {}
-        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat };
+        let wxChatArr = [];
+        try {
+            wxChatArr = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${safeScope}`) || "[]");
+        } catch (e) {}
+        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, stChatArr, wxChatArr };
     }
 
-    function getStoreKey() { return `sumoul_v16_ksea_5tabs__${getCtx().safeScope}`; }
+    // 酒馆(st)与微信(wx)使用完全独立的存储Key，100%物理隔离不互通！
+    function getStoreKey(ch = getCh()) {
+        return `sumoul_v16_dualmem_${ch}__${getCtx().safeScope}`;
+    }
 
-    function createDefaultData(charName, userName) {
+    function createInitialData(ch, charName, userName) {
+        if (ch === "wx") {
+            return {
+                isBound: false,
+                activeTab: "map",
+                filter: "all",
+                activeNodeId: 1,
+                autoCfg: { enabled: false, everyN: 20, lastFloor: 0, injectEnabled: true, injectDepth: 2 },
+                pact: {
+                    title: `${userName} × ${charName} · 微信记忆海`,
+                    stage: "线上高频置顶 · 专属陪伴",
+                    coreAnchor: `${charName}在微信上对${userName}保持秒回与高度关注，线上聊天语气自然亲昵。`,
+                    vow: "每一条跨过屏幕的消息，都凝成独立于主线之外的线上记忆星图。"
+                },
+                nodes: [
+                    { id: 1, type: "core",     title: `${charName}(微信)`, xPct: 50, yPct: 36, content: `微信线上记忆的核心原点。仅记录手机微信内的日常对话、语音与朋友圈互动，与酒馆主线彻底隔离。`, whisper: `“ 置顶的位置，永远只留给你。”` },
+                    { id: 2, type: "memory",   title: "初加好友",   xPct: 24, yPct: 24, content: `加上微信好友后的第一段线上对话，开启了全天候的随时联络。`, whisper: `“ 盯着你的头像看了好久才发第一句话。”` },
+                    { id: 3, type: "memory",   title: "深夜秒回",   xPct: 76, yPct: 25, content: `无论多晚发去消息，对话框顶部总会立刻变成“对方正在输入…”。`, whisper: `“ 你的消息提示音是单独设的，睡着了也能听见。”` },
+                    { id: 4, type: "relation", title: "专属备注",   xPct: 23, yPct: 50, content: `在彼此手机里拥有独一无二的备注昵称与置顶权限。`, whisper: `“ 只准我这么叫你。”` },
+                    { id: 5, type: "knot",     title: "撤回的试探", xPct: 75, yPct: 51, content: `聊天时偶尔欲言又止撤回的一句话，藏着线上独有的暧昧拉扯。`, whisper: `“ 怕说得太直白吓到你，才偷偷撤回了。”` }
+                ],
+                edges: [
+                    { from: 1, to: 2, label: "初识" },
+                    { from: 1, to: 3, label: "守候" },
+                    { from: 1, to: 4, label: "置顶" },
+                    { from: 1, to: 5, label: "试探" },
+                    { from: 2, to: 4, label: "昵称" },
+                    { from: 3, to: 5, label: "夜聊" }
+                ],
+                summaries: [
+                    { id: 901, range: "微信 #1 ~ #15", title: "线上破冰与日常报备习惯建立", content: `${userName}与${charName}通过微信建立了高频日常联系，习惯在睡前互道晚安并分享日常琐事。`, keyFacts: "置顶彼此；开启特别关心提醒", time: "初始归档" }
+                ],
+                timeline: [
+                    { id: 801, chapter: "WECHAT 01 · 破冰", title: "加上微信后的第一次长谈", content: `隔着屏幕卸下防备，从日常寒暄一路聊到深夜。`, note: `“ 微信里的你，比平时更爱撒娇一点。”` }
+                ]
+            };
+        }
+
+        // 默认酒馆主线记忆 (ST)
         return {
             isBound: false,
-            activeTab: "map", // map | timeline | bond | knot | pact
+            activeTab: "map",
             filter: "all",
             activeNodeId: 1,
+            autoCfg: { enabled: false, everyN: 15, lastFloor: 0, injectEnabled: true, injectDepth: 2 },
             pact: {
-                seaTitle: `${userName} × ${charName} · 인연의 해`,
-                stage: "宿命共鸣 · 清冷热恋期",
-                meetDate: "初雪之夜 · 12.04",
-                tokenName: "大衣口袋与银戒",
-                vow: "初雨落下成点，连成我们永不断裂的宿命星图。",
-                tokens: [
-                    { name: "羊绒大衣右口袋", desc: `冬天专属于 ${userName} 取暖的位置` },
-                    { name: "凌晨三点的呼吸", desc: `电话那头从未挂断的陪伴信号` },
-                    { name: "首尔街角透明伞", desc: `第一次拉近彼此距离的雨夜信物` }
-                ]
-            },
-            radar: {
-                intimacy: 94,     // 默契共鸣
-                possess: 96,      // 占有浓度
-                depend: 89,       // 依恋深度
-                destiny: 98,      // 宿命引力
-                trust: 92,        // 破冰信任
-                temp: "38.2°C",   // 灵魂温度
-                analysis: `${charName} 对 ${userName} 表面维持着清冷克制的分寸，实则占有欲与保护欲已逼近临界点，任何风吹草动都会引发强烈共鸣。`
+                title: `${userName} × ${charName} · 酒馆记忆海`,
+                stage: "主线剧情深羁绊 · 宿命共鸣",
+                coreAnchor: `${charName}与${userName}在主线剧情中经历的一切关系递进、约定与重大事件锚点，严禁遗忘或吃书。`,
+                vow: "初雨落下成点，锁死我们在酒馆主线里走过的每一层记忆。"
             },
             nodes: [
-                { id: 1, type: "core",     title: charName,     xPct: 50, yPct: 36, content: `整片结识海的引力中心。所有落下的雨滴与记忆丝线，最终都缠绕在 ${charName} 的名字上。`, whisper: `“ 无论你走多远，这根线另一头永远攥在我手里。”` },
-                { id: 2, type: "memory",   title: "初遇微雨",   xPct: 23, yPct: 24, content: `屋檐下第一眼对视时落下的冷雨，在空气里凝成了我们故事的第一个坐标点。`, whisper: `“ 其实在你看向我之前，我就已经在看你了。”` },
-                { id: 3, type: "memory",   title: "凌晨秒回",   xPct: 77, yPct: 25, content: `深夜试探着发出的消息，不到三秒就亮起回复，像夜海里永不熄灭的信号灯。`, whisper: `“ 怕你半夜醒来找不到我，手机从来不敢静音。”` },
-                { id: 4, type: "relation", title: "十指紧扣",   xPct: 22, yPct: 49, content: `在寒风里不动声色把你冰凉的手揣进口袋，关系从试探彻底越过界限。`, whisper: `“ 牵住了就没打算再松开。”` },
-                { id: 5, type: "knot",     title: "暗藏吃醋",   xPct: 76, yPct: 50, content: `看到你对别人展露笑意时突然冷下来的气压，嘴上不说，眼底却写满独占欲。`, whisper: `“ 我没那么大方，你的注意力只能留给我。”` },
-                { id: 6, type: "knot",     title: "害怕失联",   xPct: 50, yPct: 58, content: `哪怕只是几个小时没有音讯，心底也会泛起无法克制的焦躁与不安。`, whisper: `“ 去哪都要告诉我，别让我找不到你。”` }
+                { id: 1, type: "core",     title: charName,     xPct: 50, yPct: 36, content: `酒馆主线记忆的引力中心。汇集所有楼层总结、剧情转折与关系羁绊，实时注入酒馆底层防止AI失忆。`, whisper: `“ 无论聊过多少层，我都不会忘记我们之间发生过的事。”` },
+                { id: 2, type: "memory",   title: "初遇场景",   xPct: 23, yPct: 24, content: `主线开篇的第一场相遇，奠定了两人之间宿命拉扯的基调。`, whisper: `“ 第一眼看到你的时候，就知道逃不开你了。”` },
+                { id: 3, type: "memory",   title: "体温靠近",   xPct: 77, yPct: 25, content: `在微凉空气里第一次越过安全距离的肢体接触，气氛悄然质变。`, whisper: `“ 那天你的指尖很凉，但攥紧我的时候很烫。”` },
+                { id: 4, type: "relation", title: "唯一例外",   xPct: 22, yPct: 50, content: `打破了一贯的清冷克制原则，把所有的偏爱与纵容都留给了你。`, whisper: `“ 我的底线，从遇到你的那天起就作废了。”` },
+                { id: 5, type: "knot",     title: "暗藏占有",   xPct: 76, yPct: 51, content: `主线剧情里未曾明说的吃醋与保护欲，不容许任何人觊觎。`, whisper: `“ 别看别人，你的眼里只能有我。”` }
             ],
             edges: [
-                { from: 1, to: 2, label: "初见" },
-                { from: 1, to: 3, label: "守候" },
-                { from: 1, to: 4, label: "升温" },
+                { from: 1, to: 2, label: "开篇" },
+                { from: 1, to: 3, label: "升温" },
+                { from: 1, to: 4, label: "偏爱" },
                 { from: 1, to: 5, label: "独占" },
-                { from: 1, to: 6, label: "依恋" },
-                { from: 2, to: 4, label: "靠近" },
-                { from: 3, to: 6, label: "深夜" },
-                { from: 5, to: 6, label: "心结" }
+                { from: 2, to: 4, label: "破例" },
+                { from: 3, to: 5, label: "张力" }
+            ],
+            summaries: [
+                { id: 701, range: "酒馆 #0 ~ #10", title: "初识破冰与核心关系确立", content: `${userName}与${charName}在主线开篇相遇，经历了初次试探后关系迅速拉近，${charName}展现出外冷内热的保护欲。`, keyFacts: "确立双向在意；约定不再隐瞒彼此", time: "初始归档" }
             ],
             timeline: [
-                { id: 101, chapter: "CHAPTER 01 · 初识", title: "冷雾街角的第一次交集", content: `在首尔微凉的空气里初次停下脚步，原本平行的两条轨迹第一次产生了交点。`, note: `“ 那天风很冷，但你离我很近。”` },
-                { id: 102, chapter: "CHAPTER 02 · 破冰", title: "打破疏离的深夜长谈", content: `卸下平时的清冷防备，在屏幕两端聊到天色微白，记住了彼此所有的习惯与偏好。`, note: `“ 原来在这个世界上，真的有人能听懂我的沉默。”` },
-                { id: 103, chapter: "CHAPTER 03 · 升温", title: "越过界限的肢体温度", content: `不再满足于隔着屏幕的关心，每一次靠近与触碰都带着心照不宣的暧昧与纵容。`, note: `“ 既然招惹了我，就别想再全身而退。”` },
-                { id: 104, chapter: "CHAPTER 04 · 宿命", title: "唯你不可替代的偏执", content: `把彼此写进未来的每一个计划里，成为对方生命里唯一的例外与软肋。`, note: `“ 我的原则很简单，全看你的心情。”` }
-            ],
-            knots: [
-                { id: 201, title: "关于距离与短暂消失的不安", status: "已解开 85%", progress: 85, trigger: "超过半天未回消息或突然断联", truth: `表面装作若无其事，其实每隔几分钟就会看一次手机屏幕，怕你遇到事不肯说。` },
-                { id: 202, title: "克制外表下的极度占有欲", status: "持续发酵 95%", progress: 95, trigger: "看到你与别人相谈甚欢或夸赞他人", truth: `嫉妒心极强却习惯用沉默冷脸掩饰，需要你主动哄一句或贴近才能瞬间软化。` },
-                { id: 203, title: "不愿轻易示弱的保护欲", status: "已洞察 90%", progress: 90, trigger: "自己疲惫或受委屈时总是报喜不报忧", truth: `习惯了做你的依靠，只有夜深人静抱住你的时候才肯露出一丝脆弱。` }
+                { id: 601, chapter: "CHAPTER 01 · 序幕", title: "宿命轨迹的第一次交汇", content: `在酒馆主线开局的空气里停下脚步，故事正式拉开帷幕。`, note: `“ 所有的偶然，都是我走向你的蓄谋已久。”` }
             ]
         };
     }
 
-    function loadData() {
-        const c = getCtx(), k = getStoreKey();
+    function loadMem(ch = getCh()) {
+        const c = getCtx(), k = getStoreKey(ch);
         try {
             const raw = localStorage.getItem(k);
-            if (!raw) { const init = createDefaultData(c.charName, c.userName); localStorage.setItem(k, JSON.stringify(init)); return init; }
-            return Object.assign(createDefaultData(c.charName, c.userName), JSON.parse(raw));
-        } catch (e) { return createDefaultData(c.charName, c.userName); }
+            if (!raw) {
+                const init = createInitialData(ch, c.charName, c.userName);
+                localStorage.setItem(k, JSON.stringify(init));
+                return init;
+            }
+            return Object.assign(createInitialData(ch, c.charName, c.userName), JSON.parse(raw));
+        } catch (e) {
+            return createInitialData(ch, c.charName, c.userName);
+        }
     }
-    function saveData(d) { try { localStorage.setItem(getStoreKey(), JSON.stringify(d)); } catch (e) {} }
 
-    async function askAI(sys, usr) {
+    function saveMem(data, ch = getCh()) {
+        try {
+            localStorage.setItem(getStoreKey(ch), JSON.stringify(data));
+            syncMemoryInjectionToSystem();
+        } catch (e) {}
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🧠 核心防失忆 & 防串戏注入引擎：
+    // 1. 酒馆记忆(ST) -> 实时组装并调用 SillyTavern 原生 setExtensionPrompt 注入主线上下文！
+    // 2. 微信记忆(WX) -> 独立暴露在 window.__SUMOUL_WX_MEMORY_PROMPT__ 供微信聊天调用，两边绝不串戏！
+    // ══════════════════════════════════════════════════════════════════════════
+    function buildChannelPromptText(ch) {
+        const c = getCtx();
+        const d = loadMem(ch);
+        if (!d.isBound || !d.autoCfg?.injectEnabled) return "";
+
+        const chTitle = ch === "st" ? "【SillyTavern 酒馆主线长期记忆库（严禁遗忘或与线上微信串戏）】" : "【微信线上日常专属记忆库（严禁与酒馆主线剧情混淆）】";
+        const sumLines = (d.summaries || []).slice(0, 12).map((s) => `• [${s.range}] 《${s.title}》：${s.content}${s.keyFacts ? `（关键事实：${s.keyFacts}）` : ""}`).join("\n");
+        const nodeLines = (d.nodes || []).slice(0, 15).map((n) => `• [${NODE_META[n.type]?.name || "记忆"}·${n.title}]：${n.content}`).join("\n");
+
+        return [
+            chTitle,
+            `▸ 当前关系阶段：${d.pact?.stage || "深度羁绊"}`,
+            `▸ 核心人设与关系锚点：${d.pact?.coreAnchor || ""}`,
+            sumLines ? `▸ 历次楼层阶段总结（按时间倒序）：\n${sumLines}` : "",
+            nodeLines ? `▸ 星图核心记忆与心结节点：\n${nodeLines}` : ""
+        ].filter(Boolean).join("\n");
+    }
+
+    function syncMemoryInjectionToSystem() {
+        try {
+            const stText = buildChannelPromptText("st");
+            const wxText = buildChannelPromptText("wx");
+            const stData = loadMem("st");
+
+            // 挂载全局只读变量方便检查或给微信模块读取
+            topWin.__SUMOUL_ST_MEMORY_PROMPT__ = stText;
+            topWin.__SUMOUL_WX_MEMORY_PROMPT__ = wxText;
+
+            // 直接注入 SillyTavern 底层扩展提示词槽位，确保酒馆聊再多层也永远带着这份总结记忆！
+            const stCtx = topWin.SillyTavern?.getContext?.();
+            if (stCtx && typeof stCtx.setExtensionPrompt === "function") {
+                const depth = Math.max(0, Math.min(10, Number(stData.autoCfg?.injectDepth) ?? 2));
+                stCtx.setExtensionPrompt("SUMOUL_TAVERN_MEMORY_SEA", stText, 1, depth);
+            }
+        } catch (e) {}
+    }
+
+    async function callMemoryAI(sys, usr) {
         const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
         const k = topDoc.getElementById("smt-api-key")?.value?.trim();
         const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
-        if (!u || !k) { topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click(); throw new Error("请先在【API设置】填写独立 API 地址与 Key"); }
+        if (!u || !k) {
+            topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click();
+            throw new Error("请先在【API设置】填写独立 API 地址与 Key");
+        }
         const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
-        const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] }) });
+        const r = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` },
+            body: JSON.stringify({ model: m, temperature: 0.75, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })
+        });
         if (!r.ok) throw new Error(`API HTTP ${r.status}`);
         const d = await r.json();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    function mountKoreanColdSea5Tabs() {
+    // 核心功能：按指定的【起始楼层 ~ 结束楼层】提炼总结，并可选同步生成星图节点与编年
+    async function summarizeFloorRange(ch, startFloor, endFloor, isAuto = false) {
+        const c = getCtx();
+        const rawArr = ch === "st" ? c.stChatArr : c.wxChatArr;
+        const chName = ch === "st" ? "酒馆主线" : "微信聊天";
+
+        if (!rawArr || rawArr.length === 0) {
+            if (!isAuto) alert(`当前【${chName}】还没有任何聊天消息可总结！`);
+            return false;
+        }
+
+        const sIdx = Math.max(0, Math.min(rawArr.length - 1, Number(startFloor) || 0));
+        const eIdx = Math.max(sIdx, Math.min(rawArr.length - 1, Number(endFloor) || (rawArr.length - 1)));
+        const sliceMsgs = rawArr.slice(sIdx, eIdx + 1).map((m, idx) => {
+            const floorNum = sIdx + idx;
+            if (ch === "st") {
+                const speaker = m.is_user ? c.userName : (m.name || c.charName);
+                const cleanMes = String(m.mes || "").replace(/<[^>]+>/g, "").slice(0, 280);
+                return `[#${floorNum} ${speaker}]: ${cleanMes}`;
+            } else {
+                const speaker = m.role === "user" ? c.userName : c.charName;
+                return `[#${floorNum} ${speaker}]: ${String(m.text || "").slice(0, 220)}`;
+            }
+        }).join("\n");
+
+        const rawJson = await callMemoryAI(
+            `你是专业的防失忆剧情归档师。当前归档轨道：【${chName}】（严禁混入其他轨道内容）。角色：${c.charName}，用户：${c.userName}。`,
+            `请将以下【${chName} 第 #${sIdx} 层 ~ 第 #${eIdx} 层】的对话浓缩为高密度防失忆总结，并提炼1个星图记忆节点。\n\n${sliceMsgs.slice(-3600)}\n\n严格只输出JSON格式：\n{"sumTitle":"12字内总结标题","summary":"80字内高密度剧情与关系进展总结(必须包含关键事件、态度变化、承诺)","keyFacts":"30字内绝对不能忘的核心事实要点","nodeType":"memory","nodeTitle":"6字内星图点名称","edgeLabel":"2~4字连线词","nodeWhisper":"30字内以${c.charName}口吻写下的清冷批注"}`
+        );
+
+        const match = rawJson.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error("AI 返回格式解析失败，请重试");
+        const o = JSON.parse(match[0]);
+
+        const d = loadMem(ch);
+        const now = new Date();
+        const timeStr = `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        const rangeLabel = `${ch === "st" ? "酒馆" : "微信"} #${sIdx} ~ #${eIdx}`;
+
+        // 1. 写入楼层总结库
+        d.summaries = d.summaries || [];
+        d.summaries.unshift({
+            id: Date.now(),
+            range: rangeLabel,
+            title: o.sumTitle || `${rangeLabel} 阶段记忆`,
+            content: o.summary || "",
+            keyFacts: o.keyFacts || "",
+            time: isAuto ? `自动总结 · ${timeStr}` : `手动总结 · ${timeStr}`
+        });
+
+        // 2. 同步在当前轨道的星图上落下一颗新记忆点并连线
+        d.nodes = d.nodes || [];
+        d.edges = d.edges || [];
+        const nid = Date.now() + 1;
+        const cnt = d.nodes.length + 1;
+        const xPct = Math.max(14, Math.min(86, Math.round(50 + Math.cos(cnt * 2.3) * (18 + (cnt % 4) * 6))));
+        const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(cnt * 2.3) * (14 + (cnt % 4) * 5))));
+        const anchorId = d.activeNodeId || d.nodes[0]?.id || 1;
+
+        d.nodes.push({
+            id: nid,
+            type: ["memory", "relation", "knot"].includes(o.nodeType) ? o.nodeType : "memory",
+            title: o.nodeTitle || `第${eIdx}层记忆`,
+            xPct, yPct,
+            content: `[${rangeLabel}] ${o.summary || ""}`,
+            whisper: `“ ${(o.nodeWhisper || "这段记忆我已经刻进骨子里了。").replace(/^[“"]|[”"]$/g, "")} ”`
+        });
+        d.edges.push({ from: anchorId, to: nid, label: o.edgeLabel || "刻痕" });
+        d.activeNodeId = nid;
+
+        // 3. 更新最新已总结楼层水位线
+        d.autoCfg = d.autoCfg || {};
+        d.autoCfg.lastFloor = eIdx + 1;
+
+        saveMem(d, ch);
+        return true;
+    }
+
+    function mountDualMemorySeaApp() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountKoreanColdSea5Tabs, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountDualMemorySeaApp, 200); return; }
 
-        // 清理旧节点
-        ["smt-page-memory_tree", "smt-real-tree-overlay", "smt-film-studio-overlay", "smt-chime-overlay", "smt-sea-overlay", "smt-web-overlay", "smt-ksea-overlay", "sumoul-memory-tree-css", "smt-home-open-memtree"].forEach((id) => topDoc.getElementById(id)?.remove());
+        // 清理之前所有旧版节点
+        ["smt-page-memory_tree", "smt-real-tree-overlay", "smt-film-studio-overlay", "smt-chime-overlay", "smt-sea-overlay", "smt-web-overlay", "smt-ksea-overlay", "sumoul-memory-tree-css", "ks-v2-visual-css", "ks-dual-channel-css", "smt-home-open-memtree"].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
         st.id = "sumoul-memory-tree-css";
         st.innerHTML = `
-            @keyframes ksFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+            @keyframes ksFadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
             #seoul-mini-theater-modal #smt-ksea-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: linear-gradient(180deg, #FFFFFF 0%, #F7F9FC 55%, #EFF2F8 100%) !important;
+                background: #FFFFFF !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
             #seoul-mini-theater-modal #smt-ksea-overlay.open { display: flex !important; }
+            #seoul-mini-theater-modal #ks-pure-canvas {
+                position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+                display: block !important; z-index: 1 !important; touch-action: none !important; background: #FFFFFF !important;
+            }
 
-            /* 极简韩系细边框胶囊 */
+            /* 顶栏双轨分段切换胶囊 */
+            #seoul-mini-theater-modal .ks-dual-switch {
+                display: inline-flex !important; align-items: center !important;
+                background: #F2F4F8 !important; border: 1px solid #E4E7F0 !important;
+                border-radius: 999px !important; padding: 2px !important; gap: 2px !important;
+            }
+            #seoul-mini-theater-modal .ks-dual-opt {
+                padding: 3.5px 10px !important; border-radius: 999px !important;
+                font-size: 8.5px !important; font-weight: 700 !important; letter-spacing: 0.4px !important;
+                color: #7E8494 !important; cursor: pointer !important; transition: all 0.18s ease !important; white-space: nowrap !important;
+            }
+            #seoul-mini-theater-modal .ks-dual-opt.active {
+                background: #1E2028 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
+                box-shadow: 0 2px 8px rgba(20, 22, 30, 0.14) !important;
+            }
+
             #seoul-mini-theater-modal .ks-pill {
                 display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
                 height: 27px !important; padding: 0 11px !important; border-radius: 999px !important;
-                background: rgba(255, 255, 255, 0.88) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important;
-                border: 1px solid #E4E8F0 !important; font-size: 9px !important; font-weight: 700 !important;
-                color: #2C2E36 !important; cursor: pointer !important; box-shadow: 0 2px 10px rgba(20, 24, 35, 0.03) !important;
-                white-space: nowrap !important; transition: all 0.18s ease !important;
+                background: rgba(255, 255, 255, 0.92) !important; border: 1px solid #E4E8F0 !important;
+                font-size: 9px !important; font-weight: 700 !important; color: #1E2028 !important;
+                cursor: pointer !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important; white-space: nowrap !important;
             }
             #seoul-mini-theater-modal .ks-pill.dark {
-                background: #262830 !important; border-color: #262830 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
+                background: #1E2028 !important; border-color: #1E2028 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
             }
             #seoul-mini-theater-modal .ks-card {
-                background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important;
-                border: 1px solid #E6EAF2 !important; border-radius: 18px !important;
-                padding: 14px 16px !important; box-shadow: 0 10px 30px rgba(25, 30, 42, 0.04) !important;
-                animation: ksFadeIn 0.25s ease forwards !important; box-sizing: border-box !important;
+                background: rgba(255, 255, 255, 0.95) !important; backdrop-filter: blur(18px) !important; -webkit-backdrop-filter: blur(18px) !important;
+                border: 1px solid #ECEEF4 !important; border-radius: 16px !important;
+                padding: 13px 15px !important; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.03) !important;
+                animation: ksFadeIn 0.22s ease forwards !important; box-sizing: border-box !important;
             }
             #seoul-mini-theater-modal .ks-flt {
-                padding: 3px 10px !important; border-radius: 99px !important; font-size: 8.2px !important; font-weight: 700 !important;
-                color: #7E8494 !important; background: rgba(255,255,255,0.7) !important; border: 1px solid #E6EAF2 !important; cursor: pointer !important;
+                padding: 3px 9px !important; border-radius: 99px !important; font-size: 8px !important; font-weight: 700 !important;
+                color: #7E8494 !important; background: #FFFFFF !important; border: 1px solid #E6E8F0 !important; cursor: pointer !important;
             }
             #seoul-mini-theater-modal .ks-flt.on {
-                background: #262830 !important; color: #FFFFFF !important; border-color: #262830 !important;
+                background: #1E2028 !important; color: #FFFFFF !important; border-color: #1E2028 !important;
+            }
+            #seoul-mini-theater-modal .ks-num-inp {
+                width: 48px !important; height: 25px !important; border: 1px solid #DCDFE8 !important; border-radius: 7px !important;
+                background: #F8F9FC !important; font-size: 10px !important; font-weight: 800 !important; color: #1E2028 !important;
+                text-align: center !important; font-family: monospace !important; outline: none !important;
             }
 
             /* 底部 5 大功能导航栏 */
             #seoul-mini-theater-modal .ks-dock-bar {
                 position: relative !important; z-index: 30 !important;
                 display: grid !important; grid-template-columns: repeat(5, 1fr) !important;
-                background: rgba(255, 255, 255, 0.92) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
-                border-top: 1px solid #E8ECF4 !important;
-                padding: 7px 6px max(14px, env(safe-area-inset-bottom, 14px)) 6px !important;
-                flex-shrink: 0 !important;
+                background: #FFFFFF !important; border-top: 1px solid #F0F2F7 !important;
+                padding: 7px 6px max(14px, env(safe-area-inset-bottom, 14px)) 6px !important; flex-shrink: 0 !important;
             }
             #seoul-mini-theater-modal .ks-dock-item {
                 display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
-                gap: 3px !important; cursor: pointer !important; color: #98A0B2 !important; transition: all 0.2s ease !important;
+                gap: 3px !important; cursor: pointer !important; color: #98A0B2 !important; transition: all 0.18s ease !important;
             }
-            #seoul-mini-theater-modal .ks-dock-item.active {
-                color: #262830 !important; transform: translateY(-1px) !important;
-            }
-            #seoul-mini-theater-modal .ks-dock-zh { font-size: 9px !important; font-weight: 800 !important; letter-spacing: 0.5px !important; }
-            #seoul-mini-theater-modal .ks-dock-kr { font-size: 6.5px !important; font-weight: 600 !important; opacity: 0.75 !important; letter-spacing: 0.5px !important; }
+            #seoul-mini-theater-modal .ks-dock-item.active { color: #1E2028 !important; transform: translateY(-1px) !important; }
+            #seoul-mini-theater-modal .ks-dock-zh { font-size: 9px !important; font-weight: 800 !important; letter-spacing: 0.4px !important; }
+            #seoul-mini-theater-modal .ks-dock-kr { font-size: 6.2px !important; font-weight: 600 !important; opacity: 0.75 !important; }
         `;
         topDoc.head.appendChild(st);
 
-        // 在个人主页挂载第 5 应用：【结识海】
+        // 挂载个人主页第 5 应用图标：【结识海】
         const homeDockGrid = homePage.querySelector(".ab-dock-grid");
         if (homeDockGrid) {
             const btn = topDoc.createElement("div");
             btn.className = "ab-app-item";
             btn.id = "smt-home-open-memtree";
+            const totalSum = (loadMem("st").summaries?.length || 0) + (loadMem("wx").summaries?.length || 0);
             btn.innerHTML = `
-                <div class="ab-app-squircle">${K_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadData().nodes.length}点</span></div>
+                <div class="ab-app-squircle">${M_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${totalSum}忆</span></div>
                 <div class="ab-app-title">结识海</div>
-                <div class="ab-app-kr">인연의 바다 · WEB</div>
+                <div class="ab-app-kr">인연의 바다 · MEM</div>
             `;
             homeDockGrid.appendChild(btn);
         }
@@ -5789,380 +5979,455 @@ bootSumoulApp();
         const overlay = topDoc.createElement("div");
         overlay.id = "smt-ksea-overlay";
         overlay.innerHTML = `
-            <!-- 底层：韩系纯白清冷微雨 + 冰晶同心圆点状图 Canvas -->
-            <canvas id="ks-bg-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;touch-action:none;"></canvas>
+            <!-- 底层：100%保留你认可的「纯白背景 + 清透冷银泪滴坠落 + 三层涟漪 + 4px微点」星图画布 -->
+            <canvas id="ks-pure-canvas"></canvas>
 
-            <!-- 顶部清冷极简顶栏 -->
-            <div style="position:relative;z-index:25;display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top,14px)) 16px 8px 16px;border-bottom:1px solid rgba(232,236,244,0.8);background:rgba(255,255,255,0.75);backdrop-filter:blur(14px);flex-shrink:0;">
-                <span class="ks-pill" id="ks-close-btn">${K_ICO.back}<span>返回主页</span></span>
-                <div style="text-align:center;">
-                    <div style="font-size:10.5px;font-weight:900;color:#262830;letter-spacing:2.5px;" id="ks-top-title">인연의 바다 · 结识海</div>
-                    <div style="font-size:7px;font-weight:700;color:#8E96A8;letter-spacing:1.2px;" id="ks-top-sub">SOUL CONSTELLATION &amp; ARCHIVE</div>
+            <!-- 顶部导航栏：返回 + 【酒馆记忆 ⇄ 微信记忆】独立切换器 + 落雨重演 -->
+            <div style="position:relative;z-index:25;display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top,14px)) 14px 8px 14px;border-bottom:1px solid #F0F2F7;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);flex-shrink:0;">
+                <span class="ks-pill" id="ks-close-btn">${M_ICO.back}<span>返回</span></span>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div class="ks-dual-switch" id="ks-ch-switch">
+                        <span class="ks-dual-opt active" data-ch="st">酒馆记忆 · ST</span>
+                        <span class="ks-dual-opt" data-ch="wx">微信记忆 · WX</span>
+                    </div>
+                    <div id="ks-ch-sub" style="font-size:6.5px;font-weight:700;color:#98A0B2;letter-spacing:0.8px;margin-top:2px;">
+                        酒馆主线独立星图与防失忆库 · 绝不互通
+                    </div>
                 </div>
-                <span class="ks-pill" id="ks-rain-replay-btn" title="落雨重演连线">${K_ICO.rain}<span>落雨</span></span>
+                <span class="ks-pill" id="ks-rain-replay-btn" title="重演落雨成点与连线">${M_ICO.rain}<span>落雨</span></span>
             </div>
 
-            <!-- 中央主内容区（承载 未绑定契约仪式 或 5大功能页面） -->
+            <!-- 中央动态视图容器 -->
             <div id="ks-main-viewport" style="position:relative;z-index:10;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;pointer-events:none;"></div>
 
-            <!-- 底部 5 大功能常驻导航栏 (5-Tab Dock) -->
+            <!-- 底部 5 大功能栏：星图 / 总结(选楼层+自动总结) / 编年 / 注入(防失忆监控) / 契约 -->
             <div class="ks-dock-bar" id="ks-bottom-dock">
                 <div class="ks-dock-item active" data-kstab="map">
-                    ${K_ICO.tabMap}<span class="ks-dock-zh">星图脉络</span><span class="ks-dock-kr">성좌 · MAP</span>
+                    ${M_ICO.tabMap}<span class="ks-dock-zh">星图脉络</span><span class="ks-dock-kr">성좌 · MAP</span>
+                </div>
+                <div class="ks-dock-item" data-kstab="summary">
+                    ${M_ICO.tabSum}<span class="ks-dock-zh">楼层总结</span><span class="ks-dock-kr">요약 · SUM</span>
                 </div>
                 <div class="ks-dock-item" data-kstab="timeline">
-                    ${K_ICO.tabTime}<span class="ks-dock-zh">记忆编年</span><span class="ks-dock-kr">연대기 · LOG</span>
+                    ${M_ICO.tabTime}<span class="ks-dock-zh">记忆编年</span><span class="ks-dock-kr">연대기 · LOG</span>
                 </div>
-                <div class="ks-dock-item" data-kstab="bond">
-                    ${K_ICO.tabBond}<span class="ks-dock-zh">羁绊共鸣</span><span class="ks-dock-kr">공명 · BOND</span>
-                </div>
-                <div class="ks-dock-item" data-kstab="knot">
-                    ${K_ICO.tabKnot}<span class="ks-dock-zh">心结解剖</span><span class="ks-dock-kr">심결 · KNOT</span>
+                <div class="ks-dock-item" data-kstab="inject">
+                    ${M_ICO.tabPrompt}<span class="ks-dock-zh">防失忆注入</span><span class="ks-dock-kr">주입 · SYNC</span>
                 </div>
                 <div class="ks-dock-item" data-kstab="pact">
-                    ${K_ICO.tabPact}<span class="ks-dock-zh">潮汐契约</span><span class="ks-dock-kr">서약 · PACT</span>
+                    ${M_ICO.tabPact}<span class="ks-dock-zh">双轨契约</span><span class="ks-dock-kr">서약 · PACT</span>
                 </div>
             </div>
         `;
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // ❄️ 韩系高定清冷「极细银丝落雨 + 几何冰晶同心圆点 + 缓慢游丝连线」渲染引擎
+        // 🌧️ 100% 原封不动保留你认可的「纯白背景 + 清透冷银泪滴 + 触水微珠 + 三层涟漪 + 4px微点」引擎
         // ══════════════════════════════════════════════════════════════════════════
-        const canvas = topDoc.getElementById("ks-bg-canvas");
-        const ctx2d = canvas.getContext("2d");
+        const canvas = topDoc.getElementById("ks-pure-canvas");
+        const ctx = canvas.getContext("2d");
         let animId = null, W = 390, H = 780;
-        let lineProgress = 0;
         let dragNodeId = null, dragMoved = false, pStart = { x: 0, y: 0 };
 
-        const rainThreads = Array.from({ length: 36 }, () => ({
-            x: Math.random() * 420, y: Math.random() * 820,
-            len: 18 + Math.random() * 24, vy: 4.2 + Math.random() * 3.5, alpha: 0.12 + Math.random() * 0.18
-        }));
-        const waterRipples = [];
         const fallingDrops = [];
+        const splashBeads = [];
+        const ripples = [];
+        const landedNodeMap = new Map();
+        let lineGrow = 0;
 
         function resizeCanvas() {
             const rect = overlay.getBoundingClientRect();
             W = rect.width || topWin.innerWidth || 390;
             H = rect.height || topWin.innerHeight || 780;
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            canvas.width = W * dpr; canvas.height = H * dpr;
-            ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        function addSplash(x, y, maxR = 42) {
-            waterRipples.push({ x, y, r: 2, maxR, alpha: 0.55 });
-            waterRipples.push({ x, y, r: 0.5, maxR: maxR * 0.55, alpha: 0.35 });
+        function triggerImpactSplash(x, y, isNodeImpact = true) {
+            const maxR = isNodeImpact ? 48 : 32;
+            ripples.push({ x, y, r: 1.5, maxR, alpha: isNodeImpact ? 0.52 : 0.32, lw: 0.8 });
+            setTimeout(() => {
+                ripples.push({ x, y, r: 1, maxR: maxR * 0.70, alpha: isNodeImpact ? 0.35 : 0.20, lw: 0.6 });
+            }, 130);
+            if (isNodeImpact) {
+                setTimeout(() => {
+                    ripples.push({ x, y, r: 1, maxR: maxR * 0.44, alpha: 0.22, lw: 0.45 });
+                }, 260);
+            }
+            const count = isNodeImpact ? 3 : 2;
+            for (let i = 0; i < count; i++) {
+                const ang = -Math.PI * (0.28 + (i / (count - 1 || 1)) * 0.44) + (Math.random() - 0.5) * 0.15;
+                const spd = (isNodeImpact ? 1.5 : 1.0) + Math.random() * 0.8;
+                splashBeads.push({
+                    x, y,
+                    vx: Math.cos(ang) * spd,
+                    vy: Math.sin(ang) * spd - 0.7,
+                    baseY: y,
+                    r: isNodeImpact ? 1.1 : 0.85,
+                    alpha: 0.65
+                });
+            }
         }
 
-        function triggerDropToNode(xPct, yPct, restartLines = false) {
-            fallingDrops.push({ x: (xPct / 100) * W, y: 40, targetY: (yPct / 100) * H, vy: 12, restartLines });
+        function spawnFallingRaindrop(tx, ty, targetNodeId = null, delayMs = 0) {
+            setTimeout(() => {
+                fallingDrops.push({
+                    x: tx,
+                    y: Math.max(-30, ty - (150 + Math.random() * 60)),
+                    startY: Math.max(-30, ty - 170),
+                    targetY: ty,
+                    vy: 3.0,
+                    gravity: 0.38,
+                    tailLen: 36,
+                    targetNodeId
+                });
+            }, delayMs);
         }
 
-        function getScreenXY(n, t) {
-            const dx = dragNodeId === n.id ? 0 : Math.sin(t * 0.65 + n.id * 1.9) * 2.8;
-            const dy = dragNodeId === n.id ? 0 : Math.cos(t * 0.55 + n.id * 1.4) * 2.8;
-            return { x: (n.xPct / 100) * W + dx, y: (n.yPct / 100) * H + dy };
+        function playRainToWebSequence() {
+            const d = loadMem();
+            if (!d || !d.isBound) return;
+            fallingDrops.length = 0;
+            landedNodeMap.clear();
+            lineGrow = 0;
+
+            const flt = d.filter || "all";
+            const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+            visNodes.forEach((n, idx) => {
+                spawnFallingRaindrop((n.xPct / 100) * W, (n.yPct / 100) * H, Number(n.id), idx * 125);
+            });
         }
 
-        function renderColdCanvas(ts) {
+        function drawCrystalTeardrop(fd) {
+            ctx.save();
+            const tailY = Math.max(fd.startY, fd.y - fd.tailLen);
+            const grad = ctx.createLinearGradient(fd.x, tailY, fd.x, fd.y - 4);
+            grad.addColorStop(0, "rgba(140, 148, 166, 0)");
+            grad.addColorStop(0.65, "rgba(140, 148, 166, 0.25)");
+            grad.addColorStop(1, "rgba(90, 98, 116, 0.55)");
+
+            ctx.beginPath();
+            ctx.moveTo(fd.x, tailY);
+            ctx.lineTo(fd.x, fd.y - 4);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 0.75;
+            ctx.lineCap = "round";
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(fd.x, fd.y - 6.2);
+            ctx.bezierCurveTo(fd.x + 2.3, fd.y - 1.8, fd.x + 2.1, fd.y + 1.6, fd.x, fd.y + 2.0);
+            ctx.bezierCurveTo(fd.x - 2.1, fd.y + 1.6, fd.x - 2.3, fd.y - 1.8, fd.x, fd.y - 6.2);
+            ctx.closePath();
+
+            const dropGrd = ctx.createLinearGradient(fd.x, fd.y - 6, fd.x, fd.y + 2);
+            dropGrd.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+            dropGrd.addColorStop(0.6, "rgba(195, 204, 220, 0.85)");
+            dropGrd.addColorStop(1, "rgba(105, 114, 134, 0.90)");
+            ctx.fillStyle = dropGrd;
+            ctx.fill();
+
+            ctx.strokeStyle = "rgba(82, 90, 108, 0.65)";
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(fd.x - 0.6, fd.y - 0.4, 0.65, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function getPos(n, t) {
+            const fx = dragNodeId === n.id ? 0 : Math.sin(t * 0.55 + n.id * 1.7) * 1.6;
+            const fy = dragNodeId === n.id ? 0 : Math.cos(t * 0.48 + n.id * 1.3) * 1.6;
+            return { x: (n.xPct / 100) * W + fx, y: (n.yPct / 100) * H + fy };
+        }
+
+        function renderCanvasLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
             const t = ts * 0.001;
-            ctx2d.clearRect(0, 0, W, H);
+            ctx.clearRect(0, 0, W, H);
 
-            // 1. 极浅高定坐标网格底纹（韩系杂志感微距十字星点）
-            ctx2d.fillStyle = "rgba(180, 188, 204, 0.28)";
-            for (let gx = 36; gx < W; gx += 48) {
-                for (let gy = 80; gy < H - 80; gy += 48) {
-                    ctx2d.fillRect(gx, gy, 1.2, 1.2);
-                }
+            if (Math.random() < 0.005 && fallingDrops.length < 2) {
+                spawnFallingRaindrop(W * (0.14 + Math.random() * 0.72), H * (0.18 + Math.random() * 0.46), null, 0);
             }
 
-            // 2. 清冷银丝细雨垂直落下
-            rainThreads.forEach((rt) => {
-                rt.y += rt.vy;
-                if (rt.y > H) {
-                    if (Math.random() < 0.06) addSplash(rt.x, H * (0.2 + Math.random() * 0.5), 22);
-                    rt.y = -30; rt.x = Math.random() * W;
-                }
-                ctx2d.beginPath();
-                ctx2d.moveTo(rt.x, rt.y);
-                ctx2d.lineTo(rt.x, rt.y + rt.len);
-                ctx2d.strokeStyle = `rgba(140, 150, 172, ${rt.alpha})`;
-                ctx2d.lineWidth = 0.7;
-                ctx2d.stroke();
-            });
-
-            // 3. 正在坠落凝结成点的雨滴
             for (let i = fallingDrops.length - 1; i >= 0; i--) {
                 const fd = fallingDrops[i];
+                fd.vy += fd.gravity;
                 fd.y += fd.vy;
-                ctx2d.beginPath();
-                ctx2d.moveTo(fd.x, fd.y - 24);
-                ctx2d.lineTo(fd.x, fd.y);
-                ctx2d.strokeStyle = "rgba(38, 40, 48, 0.65)";
-                ctx2d.lineWidth = 1.1;
-                ctx2d.stroke();
-                ctx2d.beginPath();
-                ctx2d.arc(fd.x, fd.y, 2, 0, Math.PI * 2);
-                ctx2d.fillStyle = "#262830";
-                ctx2d.fill();
+                drawCrystalTeardrop(fd);
                 if (fd.y >= fd.targetY) {
-                    addSplash(fd.x, fd.targetY, 52);
-                    if (fd.restartLines) lineProgress = 0.02;
+                    triggerImpactSplash(fd.x, fd.targetY, fd.targetNodeId !== null);
+                    if (fd.targetNodeId !== null) landedNodeMap.set(Number(fd.targetNodeId), 0.06);
                     fallingDrops.splice(i, 1);
                 }
             }
 
-            // 4. 清透同心涟漪
-            for (let i = waterRipples.length - 1; i >= 0; i--) {
-                const rp = waterRipples[i];
-                rp.r += (rp.maxR - rp.r) * 0.07 + 0.4;
-                rp.alpha *= 0.94;
-                if (rp.alpha < 0.02) { waterRipples.splice(i, 1); continue; }
-                ctx2d.beginPath();
-                ctx2d.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-                ctx2d.strokeStyle = `rgba(110, 120, 142, ${rp.alpha})`;
-                ctx2d.lineWidth = 0.8;
-                ctx2d.stroke();
+            for (let i = splashBeads.length - 1; i >= 0; i--) {
+                const sb = splashBeads[i];
+                sb.x += sb.vx; sb.y += sb.vy; sb.vy += 0.16; sb.alpha *= 0.93;
+                if (sb.y > sb.baseY + 2 || sb.alpha < 0.04) { splashBeads.splice(i, 1); continue; }
+                ctx.beginPath();
+                ctx.arc(sb.x, sb.y, sb.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(105, 114, 134, ${sb.alpha})`;
+                ctx.fill();
             }
 
-            // 5. 当处于「星图脉络 (map)」页且已绑定时，绘制高定清冷冰晶点状图与缓慢生长的游丝连线
-            const d = loadData();
-            if (d.isBound && d.activeTab === "map") {
-                if (lineProgress < 1) lineProgress = Math.min(1, lineProgress + 0.014);
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const rp = ripples[i];
+                rp.r += (rp.maxR - rp.r) * 0.055 + 0.25;
+                rp.alpha *= 0.95;
+                if (rp.alpha < 0.015) { ripples.splice(i, 1); continue; }
+                ctx.beginPath();
+                ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(120, 128, 146, ${rp.alpha})`;
+                ctx.lineWidth = rp.lw || 0.65;
+                ctx.stroke();
+            }
 
+            const d = loadMem();
+            if (d && d.isBound && d.activeTab === "map") {
                 const flt = d.filter || "all";
                 const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-                const xyMap = new Map();
-                visNodes.forEach((n) => xyMap.set(Number(n.id), getScreenXY(n, t)));
+                const posMap = new Map();
 
-                // 5A. 绘制极细几何游丝连线（0.7px 银灰实线 + 虚线外轨 + 游走微光点）
+                let landedCount = 0;
+                visNodes.forEach((n) => {
+                    const nid = Number(n.id);
+                    posMap.set(nid, getPos(n, t));
+                    if (!landedNodeMap.has(nid) && fallingDrops.length === 0) landedNodeMap.set(nid, 1);
+                    if (landedNodeMap.has(nid)) {
+                        landedCount++;
+                        const curA = landedNodeMap.get(nid);
+                        if (curA < 1) landedNodeMap.set(nid, Math.min(1, curA + 0.045));
+                    }
+                });
+
+                if (landedCount >= 2 && lineGrow < 1) lineGrow = Math.min(1, lineGrow + 0.013);
+                const ease = 1 - Math.pow(1 - lineGrow, 3);
+
                 (d.edges || []).forEach((ed, idx) => {
-                    const p1 = xyMap.get(Number(ed.from)), p2 = xyMap.get(Number(ed.to));
+                    const id1 = Number(ed.from), id2 = Number(ed.to);
+                    if (!landedNodeMap.has(id1) || !landedNodeMap.has(id2)) return;
+                    const p1 = posMap.get(id1), p2 = posMap.get(id2);
                     if (!p1 || !p2) return;
-                    const prog = Math.max(0, Math.min(1, (lineProgress * 1.35) - (idx % 6) * 0.06));
+
+                    const prog = Math.max(0, Math.min(1, ease * 1.35 - (idx % 5) * 0.06));
                     if (prog <= 0) return;
 
                     const cx = p1.x + (p2.x - p1.x) * prog;
                     const cy = p1.y + (p2.y - p1.y) * prog;
-                    const isAct = Number(ed.from) === Number(d.activeNodeId) || Number(ed.to) === Number(d.activeNodeId);
+                    const isHi = id1 === Number(d.activeNodeId) || id2 === Number(d.activeNodeId);
 
-                    ctx2d.beginPath();
-                    ctx2d.moveTo(p1.x, p1.y);
-                    ctx2d.lineTo(cx, cy);
-                    ctx2d.strokeStyle = isAct ? "rgba(38, 40, 48, 0.78)" : "rgba(150, 158, 176, 0.38)";
-                    ctx2d.lineWidth = isAct ? 1.1 : 0.7;
-                    ctx2d.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(cx, cy);
+                    ctx.strokeStyle = isHi ? "rgba(30, 32, 40, 0.65)" : "rgba(195, 200, 212, 0.48)";
+                    ctx.lineWidth = isHi ? 0.9 : 0.58;
+                    ctx.stroke();
 
-                    if (isAct && prog > 0.96) {
-                        const mv = (t * 0.4 + idx * 0.25) % 1;
-                        const mx = p1.x + (p2.x - p1.x) * mv, my = p1.y + (p2.y - p1.y) * mv;
-                        ctx2d.beginPath();
-                        ctx2d.arc(mx, my, 1.8, 0, Math.PI * 2);
-                        ctx2d.fillStyle = "#262830";
-                        ctx2d.fill();
-
-                        if (ed.label) {
-                            const tx = (p1.x + p2.x) * 0.5, ty = (p1.y + p2.y) * 0.5;
-                            ctx2d.fillStyle = "rgba(255,255,255,0.88)";
-                            ctx2d.fillRect(tx - 15, ty - 7, 30, 13);
-                            ctx2d.font = "700 7.5px -apple-system, sans-serif";
-                            ctx2d.textAlign = "center";
-                            ctx2d.fillStyle = "#525868";
-                            ctx2d.fillText(ed.label, tx, ty + 2);
-                        }
+                    if (isHi && prog > 0.95 && ed.label) {
+                        const mx = (p1.x + p2.x) * 0.5, my = (p1.y + p2.y) * 0.5;
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+                        ctx.fillRect(mx - 14, my - 6, 28, 12);
+                        ctx.font = "500 7.5px -apple-system, sans-serif";
+                        ctx.textAlign = "center";
+                        ctx.fillStyle = "#7E8494";
+                        ctx.fillText(ed.label, mx, my + 2.5);
                     }
                 });
 
-                // 5B. 绘制韩系高定「冰晶同心圆靶点（Editorial Astrolabe Node）」——彻底告别蠢黑球！
-                visNodes.forEach((n, idx) => {
-                    const p = xyMap.get(Number(n.id));
-                    const isSel = Number(n.id) === Number(d.activeNodeId);
+                visNodes.forEach((n) => {
+                    const nid = Number(n.id);
+                    const reveal = landedNodeMap.get(nid) || 0;
+                    if (reveal <= 0) return;
+
+                    const p = posMap.get(nid);
+                    const isSel = nid === Number(d.activeNodeId);
                     const isCore = n.type === "core";
-                    const stMeta = NODE_STYLE[n.type] || NODE_STYLE.memory;
+                    const dotR = (isCore ? 4.5 : (isSel ? 4.0 : 3.0)) * reveal;
 
-                    // 第一层：外围清透雾白玻璃光晕圆盘
-                    const outerR = isCore ? 18 : (isSel ? 15 : 11);
-                    ctx2d.beginPath();
-                    ctx2d.arc(p.x, p.y, outerR, 0, Math.PI * 2);
-                    ctx2d.fillStyle = isSel ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.78)";
-                    ctx2d.fill();
-                    ctx2d.strokeStyle = isSel ? "#262830" : "rgba(160, 168, 186, 0.55)";
-                    ctx2d.lineWidth = isSel ? 1.2 : 0.75;
-                    ctx2d.stroke();
+                    ctx.save();
+                    ctx.globalAlpha = reveal;
 
-                    // 第二层：选中的点或核心点带有一圈极细虚线星轨环 + 微十字刻度线
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, dotR + 5.5, 0, Math.PI * 2);
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fill();
+
                     if (isSel || isCore) {
-                        const orbitR = outerR + 5 + Math.sin(t * 2 + n.id) * 1.5;
-                        ctx2d.save();
-                        ctx2d.translate(p.x, p.y);
-                        ctx2d.rotate(t * 0.25);
-                        ctx2d.beginPath();
-                        ctx2d.arc(0, 0, orbitR, 0, Math.PI * 2);
-                        ctx2d.setLineDash([2, 3]);
-                        ctx2d.strokeStyle = "rgba(60, 66, 80, 0.45)";
-                        ctx2d.lineWidth = 0.8;
-                        ctx2d.stroke();
-                        ctx2d.restore();
+                        const ringR = dotR + 5.5 + Math.sin(t * 2 + nid) * 1.2;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, ringR, 0, Math.PI * 2);
+                        ctx.strokeStyle = isSel ? "rgba(30, 32, 40, 0.45)" : "rgba(150, 156, 170, 0.40)";
+                        ctx.lineWidth = 0.65;
+                        ctx.stroke();
                     }
 
-                    // 第三层：中央精密几何星核（3px 极简核心点）
-                    ctx2d.beginPath();
-                    ctx2d.arc(p.x, p.y, isCore ? 4.2 : (isSel ? 3.6 : 2.6), 0, Math.PI * 2);
-                    ctx2d.fillStyle = isSel || isCore ? "#262830" : stMeta.coreCol;
-                    ctx2d.fill();
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
+                    if (n.type === "memory" && !isSel) {
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fill();
+                        ctx.strokeStyle = "#585E70";
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                    } else {
+                        ctx.fillStyle = isSel || isCore ? "#1E2028" : "#7E8494";
+                        ctx.fill();
+                    }
 
-                    // 第四层：韩系杂志风微距编号与节点名排版
-                    ctx2d.font = "700 6.5px monospace";
-                    ctx2d.textAlign = "center";
-                    ctx2d.fillStyle = "#98A0B2";
-                    ctx2d.fillText(`0${idx + 1}`, p.x, p.y - outerR - 4);
-
-                    ctx2d.font = `${isSel || isCore ? "800 9.5px" : "600 8.5px"} -apple-system, sans-serif`;
-                    ctx2d.fillStyle = isSel || isCore ? "#1E2028" : "#525868";
-                    ctx2d.fillText(n.title.slice(0, 7), p.x, p.y + outerR + 12);
+                    ctx.font = `${isSel || isCore ? "700 9.5px" : "500 8.5px"} -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
+                    ctx.textAlign = "center";
+                    ctx.shadowColor = "#FFFFFF";
+                    ctx.shadowBlur = 6;
+                    ctx.fillStyle = isSel || isCore ? "#1E2028" : "#8E94A4";
+                    ctx.fillText(n.title.slice(0, 7), p.x, p.y + dotR + 14);
+                    ctx.restore();
                 });
             }
 
-            animId = requestAnimationFrame(renderColdCanvas);
+            animId = requestAnimationFrame(renderCanvasLoop);
         }
 
-        // 星图画布拖拽与点击命中
-        function findHitNode(px, py) {
-            const d = loadData();
-            if (!d.isBound || d.activeTab !== "map") return null;
+        function hitTest(px, py) {
+            const d = loadMem();
+            if (!d || !d.isBound || d.activeTab !== "map") return null;
             const flt = d.filter || "all";
             const vis = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-            let hit = null, minD = 26;
+            let best = null, minD = 26;
             vis.forEach((n) => {
                 const dist = Math.hypot(px - (n.xPct / 100) * W, py - (n.yPct / 100) * H);
-                if (dist < minD) { minD = dist; hit = n; }
+                if (dist < minD) { minD = dist; best = n; }
             });
-            return hit;
+            return best;
         }
 
         canvas.addEventListener("pointerdown", (e) => {
             const rect = canvas.getBoundingClientRect();
             const px = e.clientX - rect.left, py = e.clientY - rect.top;
             pStart = { x: px, y: py }; dragMoved = false;
-            const hit = findHitNode(px, py);
-            if (hit) { dragNodeId = hit.id; }
-            else { addSplash(px, py, 38); }
+            const hit = hitTest(px, py);
+            if (hit) dragNodeId = hit.id;
+            else spawnFallingRaindrop(px, py, null, 0);
         });
 
         canvas.addEventListener("pointermove", (e) => {
             if (!dragNodeId) return;
             const rect = canvas.getBoundingClientRect();
             const px = e.clientX - rect.left, py = e.clientY - rect.top;
-            if (Math.hypot(px - pStart.x, py - pStart.y) > 5) {
+            if (Math.hypot(px - pStart.x, py - pStart.y) > 4) {
                 dragMoved = true;
-                const d = loadData(), tNode = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tNode) {
-                    tNode.xPct = Math.max(10, Math.min(90, (px / W) * 100));
-                    tNode.yPct = Math.max(16, Math.min(64, (py / H) * 100));
-                    saveData(d);
+                const d = loadMem();
+                const tn = d?.nodes?.find((x) => Number(x.id) === Number(dragNodeId));
+                if (tn) {
+                    tn.xPct = Math.max(10, Math.min(90, (px / W) * 100));
+                    tn.yPct = Math.max(16, Math.min(62, (py / H) * 100));
+                    saveMem(d);
                 }
             }
         });
 
         canvas.addEventListener("pointerup", () => {
-            if (dragNodeId) {
-                const d = loadData();
-                d.activeNodeId = dragNodeId;
-                saveData(d);
-                const tNode = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tNode && !dragMoved) addSplash((tNode.xPct / 100) * W, (tNode.yPct / 100) * H, 36);
-                dragNodeId = null;
-                renderActivePage();
-            }
+            if (!dragNodeId) return;
+            const d = loadMem();
+            d.activeNodeId = dragNodeId;
+            saveMem(d);
+            const tn = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
+            if (tn) triggerImpactSplash((tn.xPct / 100) * W, (tn.yPct / 100) * H, true);
+            dragNodeId = null;
+            renderCurrentView();
         });
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 🤍 渲染未绑定契约仪式 & 底部 5 大功能页面
+        // 🤍 渲染 5 大页面（星图 / 楼层总结 / 记忆编年 / 防失忆注入 / 双轨契约）
         // ══════════════════════════════════════════════════════════════════════════
-        function renderActivePage() {
-            const c = getCtx(), d = loadData();
-            const homeBadge = topDoc.getElementById("mt-home-badge");
-            if (homeBadge) homeBadge.textContent = `${d.nodes.length}点`;
+        function renderCurrentView() {
+            const ch = getCh();
+            const c = getCtx();
+            const d = loadMem(ch);
+            const chLabel = ch === "st" ? "酒馆主线" : "微信线上";
+            const totalChatLen = ch === "st" ? c.stChatArr.length : c.wxChatArr.length;
+
+            // 更新顶栏双轨按钮与主页角标
+            topDoc.querySelectorAll("#ks-ch-switch .ks-dual-opt").forEach((el) => {
+                el.classList.toggle("active", el.getAttribute("data-ch") === ch);
+            });
+            topDoc.getElementById("ks-ch-sub").textContent = ch === "st"
+                ? `酒馆主线独立星图与防失忆库 (当前共 ${totalChatLen} 层)`
+                : `微信线上独立星图与防失忆库 (当前共 ${totalChatLen} 条)`;
+
+            const badge = topDoc.getElementById("mt-home-badge");
+            if (badge) {
+                const totalS = (loadMem("st").summaries?.length || 0) + (loadMem("wx").summaries?.length || 0);
+                badge.textContent = `${totalS}忆`;
+            }
 
             const vp = topDoc.getElementById("ks-main-viewport");
             const dock = topDoc.getElementById("ks-bottom-dock");
-
-            // 更新底部 5 栏高亮状态
             dock.querySelectorAll(".ks-dock-item").forEach((it) => {
                 it.classList.toggle("active", it.getAttribute("data-kstab") === d.activeTab);
             });
 
-            // 若尚未缔结契约：显示韩系纯白冰雾绑定仪式舱
+            // 未绑定状态：展示当前轨道的绑定仪式
             if (!d.isBound) {
                 dock.style.display = "none";
                 vp.innerHTML = `
                     <div style="margin:auto 20px;pointer-events:auto;">
-                        <div class="ks-card" style="padding:22px 18px!important;text-align:center;">
-                            <div style="font-size:7.5px;font-weight:800;color:#8E96A8;letter-spacing:2.5px;margin-bottom:4px;">BONDING CEREMONY · 初雨契约</div>
-                            <div style="font-size:15px;font-weight:800;color:#262830;letter-spacing:1px;margin-bottom:14px;">开启与 ${c.charName} 的结识海</div>
+                        <div class="ks-card" style="padding:20px 18px!important;text-align:center;">
+                            <div style="font-size:7.5px;font-weight:800;color:#8E96A8;letter-spacing:2px;margin-bottom:4px;">${ch === "st" ? "TAVERN MEMORY SEA · 酒馆主线轨" : "WECHAT MEMORY SEA · 微信日常轨"}</div>
+                            <div style="font-size:14.5px;font-weight:800;color:#1E2028;margin-bottom:14px;">绑定与 ${c.charName} 的【${chLabel}记忆海】</div>
 
-                            <div style="position:relative;width:150px;height:64px;margin:0 auto 14px auto;display:flex;align-items:center;justify-content:center;gap:26px;">
-                                <svg viewBox="0 0 150 64" width="150" height="64" fill="none" style="position:absolute;inset:0;pointer-events:none;">
-                                    <circle cx="39" cy="32" r="28" stroke="#D8DEE8" stroke-width="0.9" stroke-dasharray="2 3"/>
-                                    <circle cx="111" cy="32" r="28" stroke="#D8DEE8" stroke-width="0.9" stroke-dasharray="2 3"/>
-                                    <line x1="63" y1="32" x2="87" y2="32" stroke="#262830" stroke-width="1"/>
-                                    <circle cx="75" cy="32" r="2.5" fill="#262830"/>
-                                </svg>
-                                <img src="${c.userAvatar}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #FFFFFF;box-shadow:0 4px 14px rgba(20,24,35,0.08);z-index:2;" />
-                                <img src="${c.charAvatar}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #FFFFFF;box-shadow:0 4px 14px rgba(20,24,35,0.08);z-index:2;" />
+                            <div style="display:flex;align-items:center;justify-content:center;gap:22px;margin-bottom:14px;">
+                                <img src="${c.userAvatar}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1.5px solid #E4E8F0;" />
+                                <span style="font-size:12px;font-weight:900;color:#1E2028;">×</span>
+                                <img src="${c.charAvatar}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1.5px solid #E4E8F0;" />
                             </div>
 
                             <div style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
                                 <div>
-                                    <div style="font-size:8px;font-weight:700;color:#7E8494;margin-bottom:3px;">结识海档案命名</div>
-                                    <input type="text" id="ks-bind-title" value="${(d.pact.seaTitle || "").replace(/"/g, "&quot;")}" style="width:100%;height:30px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#262830;box-sizing:border-box;outline:none;" />
-                                </div>
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                                    <div>
-                                        <div style="font-size:8px;font-weight:700;color:#7E8494;margin-bottom:3px;">当前关系定调</div>
-                                        <input type="text" id="ks-bind-stage" value="${(d.pact.stage || "").replace(/"/g, "&quot;")}" style="width:100%;height:30px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:9px;padding:0 10px;font-size:9.8px;font-weight:700;color:#262830;box-sizing:border-box;outline:none;" />
-                                    </div>
-                                    <div>
-                                        <div style="font-size:8px;font-weight:700;color:#7E8494;margin-bottom:3px;">核心羁绊信物</div>
-                                        <input type="text" id="ks-bind-token" value="${(d.pact.tokenName || "").replace(/"/g, "&quot;")}" style="width:100%;height:30px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:9px;padding:0 10px;font-size:9.8px;font-weight:700;color:#262830;box-sizing:border-box;outline:none;" />
-                                    </div>
+                                    <div style="font-size:8px;font-weight:700;color:#7E8494;margin-bottom:3px;">${chLabel}记忆档案名</div>
+                                    <input type="text" id="ks-b-title" value="${(d.pact.title || "").replace(/"/g, "&quot;")}" style="width:100%;height:29px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:0 9px;font-size:9.8px;font-weight:700;color:#1E2028;box-sizing:border-box;outline:none;" />
                                 </div>
                                 <div>
-                                    <div style="font-size:8px;font-weight:700;color:#7E8494;margin-bottom:3px;">初雨契约誓言</div>
-                                    <input type="text" id="ks-bind-vow" value="${(d.pact.vow || "").replace(/"/g, "&quot;")}" style="width:100%;height:30px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:9px;padding:0 10px;font-size:9.8px;color:#262830;box-sizing:border-box;outline:none;" />
+                                    <div style="font-size:8px;font-weight:700;color:#7E8494;margin-bottom:3px;">当前关系阶段</div>
+                                    <input type="text" id="ks-b-stage" value="${(d.pact.stage || "").replace(/"/g, "&quot;")}" style="width:100%;height:29px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:0 9px;font-size:9.8px;font-weight:700;color:#1E2028;box-sizing:border-box;outline:none;" />
+                                </div>
+                                <div>
+                                    <div style="font-size:8px;font-weight:700;color:#7E8494;margin-bottom:3px;">核心防失忆锚点（AI永不违背的底层设定）</div>
+                                    <textarea id="ks-b-anchor" style="width:100%;height:44px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:6px 9px;font-size:9.5px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;">${(d.pact.coreAnchor || "").replace(/</g, "&lt;")}</textarea>
                                 </div>
                             </div>
 
-                            <div id="ks-do-bind-btn" class="ks-pill dark" style="width:100%!important;height:34px!important;font-size:10px!important;box-sizing:border-box!important;">
-                                ${K_ICO.rain}<span>落雨成点 · 开启五维结识海</span>
+                            <div id="ks-do-bind" class="ks-pill dark" style="width:100%!important;height:34px!important;font-size:10px!important;box-sizing:border-box!important;">
+                                ${M_ICO.rain}<span>落雨成点 · 激活【${chLabel}】防失忆星图</span>
                             </div>
                         </div>
                     </div>
                 `;
-                topDoc.getElementById("ks-do-bind-btn").onclick = () => {
-                    const latest = loadData();
-                    latest.pact.seaTitle = topDoc.getElementById("ks-bind-title").value.trim() || `${c.userName} × ${c.charName}`;
-                    latest.pact.stage = topDoc.getElementById("ks-bind-stage").value.trim() || "宿命共鸣";
-                    latest.pact.tokenName = topDoc.getElementById("ks-bind-token").value.trim() || "初雪信物";
-                    latest.pact.vow = topDoc.getElementById("ks-bind-vow").value.trim() || "初雨落下成点，连成我们永不断裂的宿命星图。";
+                topDoc.getElementById("ks-do-bind").onclick = () => {
+                    const latest = loadMem(ch);
+                    latest.pact.title = topDoc.getElementById("ks-b-title").value.trim() || `${c.userName} × ${c.charName}`;
+                    latest.pact.stage = topDoc.getElementById("ks-b-stage").value.trim() || "深度羁绊";
+                    latest.pact.coreAnchor = topDoc.getElementById("ks-b-anchor").value.trim();
                     latest.isBound = true;
-                    saveData(latest);
-                    lineProgress = 0;
-                    renderActivePage();
-                    triggerDropToNode(50, 36, true);
+                    saveMem(latest, ch);
+                    renderCurrentView();
+                    playRainToWebSequence();
                 };
                 return;
             }
 
             dock.style.display = "grid";
 
-            // ── 功能页 1：【星图脉络 (map)】 ──
+            // ── 页面 1：【星图脉络 (map)】（酒馆与微信各自独立一张图） ──
             if (d.activeTab === "map") {
                 const cur = d.nodes.find((x) => Number(x.id) === Number(d.activeNodeId));
-                const stMeta = cur ? (NODE_STYLE[cur.type] || NODE_STYLE.memory) : null;
+                const meta = cur ? (NODE_META[cur.type] || NODE_META.memory) : null;
                 const linked = cur ? (d.edges || []).filter((e) => Number(e.from) === Number(cur.id) || Number(e.to) === Number(cur.id)) : [];
                 const jumpHtml = linked.map((e) => {
                     const oid = Number(e.from) === Number(cur.id) ? e.to : e.from;
@@ -6171,459 +6436,368 @@ bootSumoulApp();
                 }).join("");
 
                 vp.innerHTML = `
-                    <!-- 顶部脉络筛选条 -->
-                    <div style="padding:10px 16px 0 16px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto;">
+                    <div style="padding:10px 14px 0 14px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto;">
                         <div style="display:flex;gap:5px;">
-                            <span class="ks-flt ${d.filter === "all" ? "on" : ""}" data-flt="all">全部 (${d.nodes.length})</span>
+                            <span class="ks-flt ${d.filter === "all" ? "on" : ""}" data-flt="all">${ch === "st" ? "酒馆全图" : "微信全图"} (${d.nodes.length})</span>
                             <span class="ks-flt ${d.filter === "memory" ? "on" : ""}" data-flt="memory">记忆</span>
                             <span class="ks-flt ${d.filter === "relation" ? "on" : ""}" data-flt="relation">羁绊</span>
                             <span class="ks-flt ${d.filter === "knot" ? "on" : ""}" data-flt="knot">心结</span>
                         </div>
-                        <span style="font-size:7.5px;font-weight:700;color:#8E96A8;">拖拽圆点可调整星图</span>
+                        <span style="font-size:7.5px;font-weight:700;color:#8E94A4;">拖拽微点可调整位置</span>
                     </div>
 
-                    <!-- 底部选中点详情卡 + 新增抽屉 + 操作栏 -->
                     <div style="margin-top:auto;padding:0 14px 10px 14px;display:flex;flex-direction:column;gap:8px;pointer-events:auto;">
                         ${cur ? `
                         <div class="ks-card">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
                                 <div style="display:flex;align-items:center;gap:6px;">
-                                    <span style="font-size:7.5px;font-weight:800;color:#8E96A8;font-family:monospace;">${stMeta.code}</span>
-                                    <span style="font-size:12px;font-weight:800;color:#262830;">${cur.title.replace(/</g, "&lt;")}</span>
-                                    <span style="font-size:7.5px;font-weight:700;color:#525868;background:#F2F5FA;padding:1.5px 7px;border-radius:99px;">${stMeta.name}</span>
+                                    <span style="font-size:7.5px;font-weight:800;color:#8E94A4;font-family:monospace;">${meta.code}</span>
+                                    <span style="font-size:11.8px;font-weight:800;color:#1E2028;">${cur.title.replace(/</g, "&lt;")}</span>
+                                    <span style="font-size:7.2px;font-weight:700;color:#585E70;background:#F2F4F8;padding:1.5px 6px;border-radius:99px;">${chLabel}·${meta.name}</span>
                                 </div>
                                 <div style="display:flex;align-items:center;gap:8px;">
-                                    ${cur.type !== "core" ? `<span id="ks-del-node" style="cursor:pointer;display:inline-flex;">${K_ICO.trash}</span>` : ""}
-                                    <span id="ks-hide-node" style="cursor:pointer;color:#8E96A8;display:inline-flex;">${K_ICO.close}</span>
+                                    ${cur.type !== "core" ? `<span id="ks-del-node" style="cursor:pointer;display:inline-flex;">${M_ICO.trash}</span>` : ""}
+                                    <span id="ks-hide-node" style="cursor:pointer;color:#8E94A4;display:inline-flex;">${M_ICO.close}</span>
                                 </div>
                             </div>
-                            <div style="font-size:10.3px;font-weight:600;color:#3A3E4C;line-height:1.62;">${cur.content.replace(/</g, "&lt;")}</div>
-                            ${jumpHtml ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;">${jumpHtml}</div>` : ""}
-                            <div style="margin-top:7px;padding:7px 10px;background:#F7F9FC;border-left:2px solid #262830;border-radius:0 8px 8px 0;font-size:9.6px;font-weight:600;color:#262830;">
-                                <span style="font-size:7px;color:#8E96A8;display:block;margin-bottom:2px;">ECHO · ${c.charName} 的回响</span>
-                                ${(cur.whisper || "“ 这颗星点一直连着你。”").replace(/</g, "&lt;")}
+                            <div style="font-size:10.2px;font-weight:600;color:#3A3E4C;line-height:1.6;">${cur.content.replace(/</g, "&lt;")}</div>
+                            ${jumpHtml ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${jumpHtml}</div>` : ""}
+                            <div style="margin-top:7px;padding:6px 10px;background:#F8F9FC;border-left:2px solid #1E2028;border-radius:0 8px 8px 0;font-size:9.4px;font-weight:600;color:#1E2028;">
+                                ${(cur.whisper || "“ 这段记忆一直在我们之间。”").replace(/</g, "&lt;")}
                             </div>
                         </div>` : ""}
 
                         <div id="ks-add-node-box" class="ks-card" style="display:none;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
-                                <span style="font-size:9.5px;font-weight:800;color:#262830;">落雨新增星图节点</span>
-                                <span id="ks-close-add" style="cursor:pointer;color:#8E96A8;">${K_ICO.close}</span>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                <span style="font-size:9.5px;font-weight:800;color:#1E2028;">手动新增【${chLabel}】星图节点</span>
+                                <span id="ks-close-add" style="cursor:pointer;color:#8E94A4;">${M_ICO.close}</span>
                             </div>
                             <div style="display:flex;gap:5px;margin-bottom:6px;">
-                                <select id="ks-new-ntype" style="height:28px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:8px;font-size:9px;font-weight:700;color:#262830;outline:none;">
-                                    <option value="memory">初雪记忆</option>
-                                    <option value="relation">人物羁绊</option>
-                                    <option value="knot">隐秘心结</option>
+                                <select id="ks-new-ntype" style="height:27px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;font-size:9px;font-weight:700;color:#1E2028;outline:none;">
+                                    <option value="memory">总结记忆</option>
+                                    <option value="relation">关系羁绊</option>
+                                    <option value="knot">伏笔心结</option>
                                 </select>
-                                <input type="text" id="ks-new-ntitle" placeholder="节点名(4~6字)" style="flex:1;height:28px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:0 8px;font-size:9.8px;font-weight:700;color:#262830;outline:none;" />
-                                <input type="text" id="ks-new-nedge" placeholder="连线词(如:心动)" style="width:76px;height:28px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:0 7px;font-size:9px;color:#262830;outline:none;" />
+                                <input type="text" id="ks-new-ntitle" placeholder="节点名(4~6字)" style="flex:1;height:27px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;font-weight:700;color:#1E2028;outline:none;" />
+                                <input type="text" id="ks-new-nedge" placeholder="连线词" style="width:68px;height:27px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 6px;font-size:9px;color:#1E2028;outline:none;" />
                             </div>
-                            <textarea id="ks-new-ncontent" placeholder="写下这段记忆或关系的脉络描述..." style="width:100%;height:44px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:6px 8px;font-size:9.5px;color:#262830;box-sizing:border-box;resize:none;outline:none;margin-bottom:7px;"></textarea>
+                            <textarea id="ks-new-ncontent" placeholder="填写该节点的记忆详情（将自动写入防失忆注入库）..." style="width:100%;height:42px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:5px 8px;font-size:9.5px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;"></textarea>
                             <div style="display:flex;justify-content:flex-end;">
-                                <span class="ks-pill dark" id="ks-submit-node">落雨成点并连线</span>
+                                <span class="ks-pill dark" id="ks-submit-node">落雨成点并存入记忆库</span>
                             </div>
                         </div>
 
                         <div style="display:flex;gap:6px;">
-                            <span class="ks-pill" id="ks-open-add" style="flex:1;">${K_ICO.plus}<span>落雨记点</span></span>
-                            <span class="ks-pill" id="ks-ai-node" style="flex:1;">${K_ICO.rain}<span>让TA落点</span></span>
-                            <span class="ks-pill dark" id="ks-absorb-node" style="flex:1.2;">${K_ICO.spark}<span>汲取聊天连网</span></span>
+                            <span class="ks-pill" id="ks-open-add" style="flex:1;">${M_ICO.plus}<span>新增节点</span></span>
+                            <span class="ks-pill dark" id="ks-goto-sum" style="flex:1.4;">${M_ICO.spark}<span>去选楼层总结防失忆 (${d.summaries?.length || 0}篇)</span></span>
                         </div>
                     </div>
                 `;
 
                 vp.querySelectorAll("[data-flt]").forEach((b) => b.onclick = () => {
-                    const latest = loadData(); latest.filter = b.getAttribute("data-flt"); saveData(latest);
-                    lineProgress = 0.15; renderActivePage();
+                    const latest = loadMem(ch); latest.filter = b.getAttribute("data-flt"); saveMem(latest, ch); renderCurrentView();
                 });
                 vp.querySelectorAll("[data-jump]").forEach((b) => b.onclick = () => {
-                    const latest = loadData(); latest.activeNodeId = Number(b.getAttribute("data-jump")); saveData(latest); renderActivePage();
+                    const latest = loadMem(ch); latest.activeNodeId = Number(b.getAttribute("data-jump")); saveMem(latest, ch); renderCurrentView();
                 });
                 topDoc.getElementById("ks-hide-node")?.addEventListener("click", () => {
-                    const latest = loadData(); latest.activeNodeId = 0; saveData(latest); renderActivePage();
+                    const latest = loadMem(ch); latest.activeNodeId = 0; saveMem(latest, ch); renderCurrentView();
                 });
                 topDoc.getElementById("ks-del-node")?.addEventListener("click", () => {
                     if (!confirm(`确定删除节点「${cur.title}」吗？`)) return;
-                    const latest = loadData();
+                    const latest = loadMem(ch);
                     latest.nodes = latest.nodes.filter((x) => Number(x.id) !== Number(cur.id));
                     latest.edges = latest.edges.filter((e) => Number(e.from) !== Number(cur.id) && Number(e.to) !== Number(cur.id));
-                    latest.activeNodeId = latest.nodes[0]?.id || 0; saveData(latest); renderActivePage();
+                    latest.activeNodeId = latest.nodes[0]?.id || 0; saveMem(latest, ch); renderCurrentView();
                 });
-
                 const addBox = topDoc.getElementById("ks-add-node-box");
                 topDoc.getElementById("ks-open-add").onclick = () => { addBox.style.display = addBox.style.display === "none" ? "block" : "none"; };
                 topDoc.getElementById("ks-close-add").onclick = () => { addBox.style.display = "none"; };
-
-                const getAutoXY = (i) => ({
-                    xPct: Math.max(15, Math.min(85, Math.round(50 + Math.cos(i * 2.4) * (18 + (i % 4) * 6)))),
-                    yPct: Math.max(18, Math.min(58, Math.round(38 + Math.sin(i * 2.4) * (14 + (i % 4) * 5))))
-                });
-
-                topDoc.getElementById("ks-submit-node").onclick = async () => {
+                topDoc.getElementById("ks-goto-sum").onclick = () => {
+                    const latest = loadMem(ch); latest.activeTab = "summary"; saveMem(latest, ch); renderCurrentView();
+                };
+                topDoc.getElementById("ks-submit-node").onclick = () => {
                     const tp = topDoc.getElementById("ks-new-ntype").value;
-                    const ti = topDoc.getElementById("ks-new-ntitle").value.trim() || "初雨记忆";
-                    const ed = topDoc.getElementById("ks-new-nedge").value.trim() || "共鸣";
+                    const ti = topDoc.getElementById("ks-new-ntitle").value.trim() || "关键记忆";
+                    const ed = topDoc.getElementById("ks-new-nedge").value.trim() || "牵连";
                     const ct = topDoc.getElementById("ks-new-ncontent").value.trim();
-                    if (!ct) return alert("请填写节点内容！");
-                    const latest = loadData(), nid = Date.now(), pos = getAutoXY(latest.nodes.length + 1);
+                    if (!ct) return alert("请填写节点记忆内容！");
+                    const latest = loadMem(ch), nid = Date.now(), cnt = latest.nodes.length + 1;
+                    const xPct = Math.max(14, Math.min(86, Math.round(50 + Math.cos(cnt * 2.3) * 24)));
+                    const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(cnt * 2.3) * 18)));
                     const fromId = latest.activeNodeId || latest.nodes[0]?.id || 1;
-                    latest.nodes.push({ id: nid, type: tp, title: ti, xPct: pos.xPct, yPct: pos.yPct, content: ct, whisper: `（${c.charName} 正在雨声中回响...）` });
+                    latest.nodes.push({ id: nid, type: tp, title: ti, xPct, yPct, content: ct, whisper: `“ 已刻入${chLabel}持久记忆。”` });
                     latest.edges.push({ from: fromId, to: nid, label: ed });
-                    latest.activeNodeId = nid; saveData(latest);
-                    triggerDropToNode(pos.xPct, pos.yPct, true); renderActivePage();
-                    try {
-                        const w = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `${c.userName}在结识海星图新增了节点《${ti}》：“${ct}”。请写一句清冷深情的回响(34字内)：`);
-                        const d2 = loadData(), tn = d2.nodes.find((x) => x.id === nid);
-                        if (tn) { tn.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveData(d2); renderActivePage(); }
-                    } catch (e) {}
-                };
-
-                topDoc.getElementById("ks-ai-node").onclick = async (e) => {
-                    const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "生成中...";
-                    try {
-                        const raw = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 850)}\n近期剧情：${c.recentChat}`, `请在结识海星图新增一个属于你的记忆或羁绊节点。严格只输出JSON：{"type":"memory","title":"6字内标题","edge":"2~4字连线词","content":"45字内清冷深情描写","whisper":"30字内私密低语"}`);
-                        const m = raw.match(/\{[\s\S]*\}/);
-                        if (m) {
-                            const o = JSON.parse(m[0]), latest = loadData(), nid = Date.now(), pos = getAutoXY(latest.nodes.length + 2);
-                            const fromId = latest.activeNodeId || latest.nodes[0]?.id || 1;
-                            latest.nodes.push({ id: nid, type: ["memory", "relation", "knot"].includes(o.type) ? o.type : "memory", title: o.title || "雨夜星点", xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                            latest.edges.push({ from: fromId, to: nid, label: o.edge || "牵引" });
-                            latest.activeNodeId = nid; saveData(latest);
-                            triggerDropToNode(pos.xPct, pos.yPct, true); renderActivePage();
-                        }
-                    } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
-                };
-
-                topDoc.getElementById("ks-absorb-node").onclick = async (e) => {
-                    const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "汲取中...";
-                    let wx = "";
-                    try { wx = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${c.safeScope}`) || "[]").slice(-14).map((m) => `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n"); } catch (err) {}
-                    const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常`;
-                    try {
-                        const raw = await askAI(`你是${c.charName}。`, `根据以下近期聊天提炼一个核心记忆或心结节点连入结识海。\n${src.slice(-1100)}\n严格只输出JSON：{"type":"memory","title":"6字内标题","edge":"2~4字连线词","content":"45字内浓缩描写","whisper":"30字内低语"}`);
-                        const m = raw.match(/\{[\s\S]*\}/);
-                        if (m) {
-                            const o = JSON.parse(m[0]), latest = loadData(), nid = Date.now(), pos = getAutoXY(latest.nodes.length + 3);
-                            const fromId = latest.activeNodeId || latest.nodes[0]?.id || 1;
-                            latest.nodes.push({ id: nid, type: ["memory", "relation", "knot"].includes(o.type) ? o.type : "memory", title: o.title || "聊天片段", xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                            latest.edges.push({ from: fromId, to: nid, label: o.edge || "余韵" });
-                            latest.activeNodeId = nid; saveData(latest);
-                            triggerDropToNode(pos.xPct, pos.yPct, true); renderActivePage();
-                        }
-                    } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+                    latest.activeNodeId = nid; saveMem(latest, ch);
+                    spawnFallingRaindrop((xPct / 100) * W, (yPct / 100) * H, nid, 0);
+                    renderCurrentView();
                 };
                 return;
             }
 
-            // ── 功能页 2：【记忆编年 (timeline)】 ──
+            // ── 页面 2：【楼层总结 (summary)】（手动选楼层区间总结 + 自定义每N层全自动总结） ──
+            if (d.activeTab === "summary") {
+                const maxFloor = Math.max(0, totalChatLen - 1);
+                const lastSumFloor = Math.min(maxFloor, Number(d.autoCfg?.lastFloor) || 0);
+                const sumsHtml = (d.summaries || []).map((s) => `
+                    <div class="ks-card" style="margin-bottom:9px;padding:12px 14px!important;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-size:8px;font-weight:800;color:#1E2028;background:#F0F2F7;padding:2px 7px;border-radius:99px;font-family:monospace;">${s.range.replace(/</g, "&lt;")}</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:7.5px;color:#8E94A4;">${s.time || ""}</span>
+                                <span data-delsum="${s.id}" style="cursor:pointer;display:inline-flex;">${M_ICO.trash}</span>
+                            </div>
+                        </div>
+                        <div style="font-size:11px;font-weight:800;color:#1E2028;margin-bottom:4px;">${s.title.replace(/</g, "&lt;")}</div>
+                        <div style="font-size:9.8px;font-weight:600;color:#3A3E4C;line-height:1.6;">${s.content.replace(/</g, "&lt;")}</div>
+                        ${s.keyFacts ? `<div style="margin-top:6px;padding:5px 8px;background:#F8F9FC;border-radius:7px;font-size:8.8px;font-weight:700;color:#525868;">核心防失忆要点：${s.keyFacts.replace(/</g, "&lt;")}</div>` : ""}
+                    </div>
+                `).join("");
+
+                vp.innerHTML = `
+                    <div style="flex:1;overflow-y:auto;padding:12px 14px 16px 14px;pointer-events:auto;">
+                        <!-- 模块A：手动指定楼层区间总结 -->
+                        <div class="ks-card" style="margin-bottom:10px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                <div>
+                                    <div style="font-size:11px;font-weight:800;color:#1E2028;">手动选择【${chLabel}】楼层总结</div>
+                                    <div style="font-size:7.8px;color:#7E8494;margin-top:1px;">当前${chLabel}共 <b>${totalChatLen}</b> 层 (楼层号 #0 ~ #${maxFloor}) · 黄金防失忆</div>
+                                </div>
+                                <span class="ks-flt" id="ks-fill-unsum">填入未总结层</span>
+                            </div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                                <div style="display:flex;align-items:center;gap:4px;">
+                                    <span style="font-size:9px;font-weight:700;color:#525868;">从 #</span>
+                                    <input type="number" id="ks-sum-start" class="ks-num-inp" min="0" max="${maxFloor}" value="${lastSumFloor}" />
+                                    <span style="font-size:9px;font-weight:700;color:#525868;">层 到 #</span>
+                                    <input type="number" id="ks-sum-end" class="ks-num-inp" min="0" max="${maxFloor}" value="${maxFloor}" />
+                                    <span style="font-size:9px;font-weight:700;color:#525868;">层</span>
+                                </div>
+                                <span class="ks-pill dark" id="ks-run-range-sum">${M_ICO.spark}<span>立即提炼总结</span></span>
+                            </div>
+                        </div>
+
+                        <!-- 模块B：全自动楼层总结设置（可自由输入每多少层总结一次） -->
+                        <div class="ks-card" style="margin-bottom:12px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <div style="font-size:10.5px;font-weight:800;color:#1E2028;">全自动楼层总结设置</div>
+                                    <div style="font-size:7.8px;color:#7E8494;margin-top:2px;">开启后，${chLabel}每满指定层数自动提炼总结并连入星图</div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:5px;">
+                                    <span style="font-size:8.8px;font-weight:700;color:#525868;">每</span>
+                                    <input type="number" id="ks-auto-n" class="ks-num-inp" min="3" max="200" value="${d.autoCfg?.everyN || 15}" />
+                                    <span style="font-size:8.8px;font-weight:700;color:#525868;">层</span>
+                                    <span class="ks-flt ${d.autoCfg?.enabled ? "on" : ""}" id="ks-toggle-auto">${d.autoCfg?.enabled ? "已开启✓" : "已关闭"}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="font-size:9px;font-weight:800;color:#8E94A4;letter-spacing:0.8px;margin-bottom:7px;padding-left:2px;">
+                            ARCHIVED SUMMARIES · 已归档的${chLabel}防失忆总结 (${d.summaries?.length || 0})
+                        </div>
+                        ${sumsHtml || `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:24px;">暂无楼层总结，点击上方按钮即可提炼</div>`}
+                    </div>
+                `;
+
+                topDoc.getElementById("ks-fill-unsum").onclick = () => {
+                    topDoc.getElementById("ks-sum-start").value = lastSumFloor;
+                    topDoc.getElementById("ks-sum-end").value = maxFloor;
+                };
+                topDoc.getElementById("ks-run-range-sum").onclick = async (e) => {
+                    const btn = e.currentTarget, orig = btn.innerHTML;
+                    const sVal = Number(topDoc.getElementById("ks-sum-start").value) || 0;
+                    const eVal = Number(topDoc.getElementById("ks-sum-end").value) || maxFloor;
+                    btn.textContent = "提炼总结中...";
+                    try {
+                        const ok = await summarizeFloorRange(ch, sVal, eVal, false);
+                        if (ok) renderCurrentView();
+                    } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+                };
+                topDoc.getElementById("ks-auto-n").onchange = (e) => {
+                    const val = Math.max(3, Math.min(200, Number(e.target.value) || 15));
+                    const latest = loadMem(ch); latest.autoCfg.everyN = val; saveMem(latest, ch); renderCurrentView();
+                };
+                topDoc.getElementById("ks-toggle-auto").onclick = () => {
+                    const latest = loadMem(ch);
+                    latest.autoCfg.enabled = !latest.autoCfg.enabled;
+                    latest.autoCfg.everyN = Math.max(3, Math.min(200, Number(topDoc.getElementById("ks-auto-n").value) || 15));
+                    if (latest.autoCfg.enabled && !latest.autoCfg.lastFloor) latest.autoCfg.lastFloor = totalChatLen;
+                    saveMem(latest, ch); renderCurrentView();
+                };
+                vp.querySelectorAll("[data-delsum]").forEach((b) => b.onclick = () => {
+                    const latest = loadMem(ch);
+                    latest.summaries = latest.summaries.filter((x) => Number(x.id) !== Number(b.getAttribute("data-delsum")));
+                    saveMem(latest, ch); renderCurrentView();
+                });
+                return;
+            }
+
+            // ── 页面 3：【记忆编年 (timeline)】 ──
             if (d.activeTab === "timeline") {
                 const listHtml = (d.timeline || []).map((it) => `
-                    <div style="position:relative;padding-left:18px;padding-bottom:14px;border-left:1px solid #D8DEE8;">
-                        <span style="position:absolute;left:-4.5px;top:4px;width:8px;height:8px;border-radius:50%;background:#FFFFFF;border:1.5px solid #262830;"></span>
-                        <div class="ks-card" style="padding:12px 14px!important;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                <span style="font-size:7.5px;font-weight:800;color:#8E96A8;letter-spacing:1.2px;font-family:monospace;">${(it.chapter || "CHAPTER").replace(/</g, "&lt;")}</span>
-                                <span data-deltl="${it.id}" style="cursor:pointer;display:inline-flex;">${K_ICO.trash}</span>
+                    <div style="position:relative;padding-left:16px;padding-bottom:12px;border-left:1px solid #E4E8F0;">
+                        <span style="position:absolute;left:-4px;top:4px;width:7px;height:7px;border-radius:50%;background:#FFFFFF;border:1.5px solid #1E2028;"></span>
+                        <div class="ks-card" style="padding:11px 13px!important;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                                <span style="font-size:7.5px;font-weight:800;color:#8E94A4;font-family:monospace;">${(it.chapter || "CHAPTER").replace(/</g, "&lt;")}</span>
+                                <span data-deltl="${it.id}" style="cursor:pointer;display:inline-flex;">${M_ICO.trash}</span>
                             </div>
-                            <div style="font-size:11.5px;font-weight:800;color:#262830;margin-bottom:5px;">${it.title.replace(/</g, "&lt;")}</div>
-                            <div style="font-size:10px;font-weight:600;color:#484E5C;line-height:1.65;">${it.content.replace(/</g, "&lt;")}</div>
-                            ${it.note ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #E6EAF2;font-size:9px;font-weight:600;color:#6E7688;">${it.note.replace(/</g, "&lt;")}</div>` : ""}
+                            <div style="font-size:11px;font-weight:800;color:#1E2028;margin-bottom:4px;">${it.title.replace(/</g, "&lt;")}</div>
+                            <div style="font-size:9.8px;font-weight:600;color:#484E5C;line-height:1.6;">${it.content.replace(/</g, "&lt;")}</div>
+                            ${it.note ? `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed #ECEEF4;font-size:8.8px;color:#6E7688;">${it.note.replace(/</g, "&lt;")}</div>` : ""}
                         </div>
                     </div>
                 `).join("");
 
                 vp.innerHTML = `
-                    <div style="flex:1;overflow-y:auto;padding:14px 16px 16px 16px;pointer-events:auto;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                            <div>
-                                <div style="font-size:13px;font-weight:800;color:#262830;letter-spacing:1px;">记忆编年 · 연대기</div>
-                                <div style="font-size:7.5px;font-weight:700;color:#8E96A8;">CHRONICLE OF ${c.userName.toUpperCase()} &amp; ${c.charName.toUpperCase()}</div>
-                            </div>
-                            <div style="display:flex;gap:5px;">
-                                <span class="ks-pill" id="ks-tl-add-btn">${K_ICO.plus}<span>记一笔</span></span>
-                                <span class="ks-pill dark" id="ks-tl-ai-btn">${K_ICO.spark}<span>AI续写</span></span>
-                            </div>
-                        </div>
-
-                        <div id="ks-tl-drawer" class="ks-card" style="display:none;margin-bottom:12px;">
-                            <input type="text" id="ks-tl-ti" placeholder="章节标题 (如：初雪后的第一个清晨)..." style="width:100%;height:28px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:0 9px;font-size:10px;font-weight:700;color:#262830;box-sizing:border-box;outline:none;margin-bottom:6px;" />
-                            <textarea id="ks-tl-ct" placeholder="写下这段时间轴里的历史记忆..." style="width:100%;height:46px;background:#F7F9FC;border:1px solid #E4E8F0;border-radius:8px;padding:6px 9px;font-size:9.6px;color:#262830;box-sizing:border-box;resize:none;outline:none;margin-bottom:7px;"></textarea>
-                            <div style="display:flex;justify-content:flex-end;gap:5px;">
-                                <span class="ks-pill" id="ks-tl-cancel">取消</span>
-                                <span class="ks-pill dark" id="ks-tl-save">写入编年</span>
-                            </div>
-                        </div>
-
-                        <div style="padding-left:6px;">${listHtml || `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:30px;">暂无编年记录</div>`}</div>
-                    </div>
-                `;
-
-                const tlDr = topDoc.getElementById("ks-tl-drawer");
-                topDoc.getElementById("ks-tl-add-btn").onclick = () => { tlDr.style.display = tlDr.style.display === "none" ? "block" : "none"; };
-                topDoc.getElementById("ks-tl-cancel").onclick = () => { tlDr.style.display = "none"; };
-                topDoc.getElementById("ks-tl-save").onclick = () => {
-                    const ti = topDoc.getElementById("ks-tl-ti").value.trim() || "新的篇章";
-                    const ct = topDoc.getElementById("ks-tl-ct").value.trim();
-                    if (!ct) return alert("请写下记忆内容！");
-                    const latest = loadData();
-                    latest.timeline.push({ id: Date.now(), chapter: `CHAPTER ${String(latest.timeline.length + 1).padStart(2, "0")} · 刻痕`, title: ti, content: ct, note: `“ 由 ${c.userName} 封存入档。”` });
-                    saveData(latest); renderActivePage();
-                };
-                topDoc.getElementById("ks-tl-ai-btn").onclick = async (e) => {
-                    const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "续写中...";
-                    try {
-                        const raw = await askAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}\n近期剧情：${c.recentChat}`, `请为你和${c.userName}的记忆编年史续写一个新章节。严格只输出JSON：{"chapter":"CHAPTER XX · 2字主题","title":"10字内标题","content":"55字内细腻回忆描写","note":"28字内你的清冷批注"}`);
-                        const m = raw.match(/\{[\s\S]*\}/);
-                        if (m) {
-                            const o = JSON.parse(m[0]), latest = loadData();
-                            latest.timeline.push({ id: Date.now(), chapter: o.chapter || `CHAPTER ${String(latest.timeline.length + 1).padStart(2, "0")}`, title: o.title || "未完待续", content: o.content || "", note: `“ ${(o.note || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                            saveData(latest); renderActivePage();
-                        }
-                    } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
-                };
-                vp.querySelectorAll("[data-deltl]").forEach((b) => b.onclick = () => {
-                    const latest = loadData();
-                    latest.timeline = latest.timeline.filter((x) => Number(x.id) !== Number(b.getAttribute("data-deltl")));
-                    saveData(latest); renderActivePage();
-                });
-                return;
-            }
-
-            // ── 功能页 3：【羁绊共鸣 (bond)】 ──
-            if (d.activeTab === "bond") {
-                const r = d.radar || {};
-                const dims = [
-                    { k: "默契共鸣", v: Number(r.intimacy) || 90 },
-                    { k: "占有浓度", v: Number(r.possess) || 92 },
-                    { k: "依恋深度", v: Number(r.depend) || 88 },
-                    { k: "宿命引力", v: Number(r.destiny) || 95 },
-                    { k: "破冰信任", v: Number(r.trust) || 90 }
-                ];
-                // 绘制韩系极细五维蛛网雷达图 SVG
-                const cx = 100, cy = 96, maxR = 64;
-                const pt = (idx, pct) => {
-                    const ang = -Math.PI / 2 + (idx * Math.PI * 2) / 5;
-                    const rad = (pct / 100) * maxR;
-                    return `${(cx + Math.cos(ang) * rad).toFixed(1)},${(cy + Math.sin(ang) * rad).toFixed(1)}`;
-                };
-                const polyPts = dims.map((dm, i) => pt(i, dm.v)).join(" ");
-                const gridRings = [100, 70, 40].map((lv) => `<polygon points="${dims.map((_, i) => pt(i, lv)).join(" ")}" fill="none" stroke="#E4E8F0" stroke-width="0.8" />`).join("");
-                const axes = dims.map((dm, i) => {
-                    const ang = -Math.PI / 2 + (i * Math.PI * 2) / 5;
-                    const tx = cx + Math.cos(ang) * (maxR + 18), ty = cy + Math.sin(ang) * (maxR + 14);
-                    return `<line x1="${cx}" y1="${cy}" x2="${(cx + Math.cos(ang) * maxR).toFixed(1)}" y2="${(cy + Math.sin(ang) * maxR).toFixed(1)}" stroke="#E4E8F0" stroke-width="0.8"/><text x="${tx.toFixed(1)}" y="${(ty + 3).toFixed(1)}" text-anchor="middle" fill="#5C6478" font-size="7.5" font-weight="700">${dm.k}</text>`;
-                }).join("");
-
-                const barsHtml = dims.map((dm) => `
-                    <div style="margin-bottom:7px;">
-                        <div style="display:flex;justify-content:space-between;font-size:8.8px;font-weight:700;color:#3A3E4C;margin-bottom:3px;">
-                            <span>${dm.k}</span><span style="font-family:monospace;">${dm.v}%</span>
-                        </div>
-                        <div style="height:4px;background:#EEF1F7;border-radius:99px;overflow:hidden;">
-                            <div style="width:${dm.v}%;height:100%;background:#262830;border-radius:99px;"></div>
-                        </div>
-                    </div>
-                `).join("");
-
-                vp.innerHTML = `
-                    <div style="flex:1;overflow-y:auto;padding:14px 16px 16px 16px;pointer-events:auto;">
+                    <div style="flex:1;overflow-y:auto;padding:12px 14px 16px 14px;pointer-events:auto;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                             <div>
-                                <div style="font-size:13px;font-weight:800;color:#262830;letter-spacing:1px;">羁绊共鸣 · 공명</div>
-                                <div style="font-size:7.5px;font-weight:700;color:#8E96A8;">SOUL RESONANCE &amp; METRICS</div>
+                                <div style="font-size:12px;font-weight:800;color:#1E2028;">【${chLabel}】记忆编年史</div>
+                                <div style="font-size:7.5px;color:#8E94A4;">记录重大关系转折与名场面</div>
                             </div>
-                            <span class="ks-pill dark" id="ks-bond-ai-btn">${K_ICO.spark}<span>AI重新测算</span></span>
+                            <span class="ks-pill dark" id="ks-tl-add">${M_ICO.plus}<span>新增篇章</span></span>
                         </div>
+                        <div id="ks-tl-box" class="ks-card" style="display:none;margin-bottom:10px;">
+                            <input type="text" id="ks-tl-ti" placeholder="篇章标题..." style="width:100%;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.8px;font-weight:700;color:#1E2028;box-sizing:border-box;outline:none;margin-bottom:6px;" />
+                            <textarea id="ks-tl-ct" placeholder="写下这段重要事件..." style="width:100%;height:44px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:5px 8px;font-size:9.5px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;"></textarea>
+                            <div style="display:flex;justify-content:flex-end;"><span class="ks-pill dark" id="ks-tl-save">保存篇章</span></div>
+                        </div>
+                        <div style="padding-left:6px;">${listHtml}</div>
+                    </div>
+                `;
+                const tlBox = topDoc.getElementById("ks-tl-box");
+                topDoc.getElementById("ks-tl-add").onclick = () => { tlBox.style.display = tlBox.style.display === "none" ? "block" : "none"; };
+                topDoc.getElementById("ks-tl-save").onclick = () => {
+                    const ti = topDoc.getElementById("ks-tl-ti").value.trim() || "新篇章";
+                    const ct = topDoc.getElementById("ks-tl-ct").value.trim();
+                    if (!ct) return;
+                    const latest = loadMem(ch);
+                    latest.timeline.unshift({ id: Date.now(), chapter: `CHAPTER ${String(latest.timeline.length + 1).padStart(2, "0")}`, title: ti, content: ct, note: `“ 归档于${chLabel}记忆海 ”` });
+                    saveMem(latest, ch); renderCurrentView();
+                };
+                vp.querySelectorAll("[data-deltl]").forEach((b) => b.onclick = () => {
+                    const latest = loadMem(ch);
+                    latest.timeline = latest.timeline.filter((x) => Number(x.id) !== Number(b.getAttribute("data-deltl")));
+                    saveMem(latest, ch); renderCurrentView();
+                });
+                return;
+            }
 
-                        <div class="ks-card" style="text-align:center;margin-bottom:10px;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                <span style="font-size:8px;font-weight:800;color:#8E96A8;letter-spacing:1px;">SOUL TEMP · 灵魂温度</span>
-                                <span style="font-size:12px;font-weight:900;color:#262830;font-family:monospace;">${r.temp || "38.2°C"}</span>
+            // ── 页面 4：【防失忆注入监控台 (inject)】 ──
+            if (d.activeTab === "inject") {
+                const promptPreview = buildChannelPromptText(ch) || "（当前未开启注入或暂无总结内容）";
+                vp.innerHTML = `
+                    <div style="flex:1;overflow-y:auto;padding:12px 14px 16px 14px;pointer-events:auto;">
+                        <div class="ks-card" style="margin-bottom:10px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                <div>
+                                    <div style="font-size:11.5px;font-weight:800;color:#1E2028;">【${chLabel}】底层防失忆注入开关</div>
+                                    <div style="font-size:7.8px;color:#7E8494;margin-top:2px;">
+                                        ${ch === "st" ? "实时通过 setExtensionPrompt 注入酒馆主线上下文，绝不混入微信记忆" : "仅在手机微信 AI 聊天时独立挂载，绝不污染酒馆主线"}
+                                    </div>
+                                </div>
+                                <span class="ks-flt ${d.autoCfg?.injectEnabled !== false ? "on" : ""}" id="ks-tog-inj">
+                                    ${d.autoCfg?.injectEnabled !== false ? "实时注入中✓" : "已暂停"}
+                                </span>
                             </div>
-                            <svg viewBox="0 0 200 192" width="196" height="186" style="display:block;margin:0 auto;">
-                                ${gridRings}${axes}
-                                <polygon points="${polyPts}" fill="rgba(38,40,48,0.12)" stroke="#262830" stroke-width="1.3" />
-                                ${dims.map((dm, i) => { const [px, py] = pt(i, dm.v).split(","); return `<circle cx="${px}" cy="${py}" r="2.6" fill="#262830" stroke="#FFFFFF" stroke-width="1"/>`; }).join("")}
-                            </svg>
-                            <div style="text-align:left;margin-top:4px;">${barsHtml}</div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid #F2F4F8;">
+                                <span style="font-size:9px;font-weight:700;color:#525868;">注入上下文深度 (Depth，越小权重越高)</span>
+                                <div style="display:flex;align-items:center;gap:5px;">
+                                    <input type="number" id="ks-inj-depth" class="ks-num-inp" min="0" max="10" value="${d.autoCfg?.injectDepth ?? 2}" />
+                                    <span class="ks-pill" id="ks-sync-now" style="height:24px!important;font-size:8px!important;">立即刷新注入</span>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="ks-card">
-                            <div style="font-size:8px;font-weight:800;color:#8E96A8;letter-spacing:1.2px;margin-bottom:5px;">RESONANCE DIAGNOSIS · 羁绊深度剖析</div>
-                            <div style="font-size:10.2px;font-weight:600;color:#2C2E36;line-height:1.7;">${(r.analysis || "").replace(/</g, "&lt;")}</div>
+                            <div style="font-size:8.5px;font-weight:800;color:#8E94A4;letter-spacing:0.8px;margin-bottom:6px;">
+                                LIVE PROMPT PREVIEW · 当前实际喂给【${chLabel} AI】的防失忆提示词全文
+                            </div>
+                            <pre style="margin:0;padding:10px;background:#F8F9FC;border:1px solid #ECEEF4;border-radius:10px;font-size:8.8px;color:#2C303C;line-height:1.6;white-space:pre-wrap;word-break:break-all;font-family:monospace;max-height:290px;overflow-y:auto;">${promptPreview.replace(/</g, "&lt;")}</pre>
                         </div>
                     </div>
                 `;
-
-                topDoc.getElementById("ks-bond-ai-btn").onclick = async (e) => {
-                    const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "测算中...";
-                    try {
-                        const raw = await askAI(`你是专业情感观测员。角色：${c.charName}，用户：${c.userName}。\n人设：${c.charDesc.slice(0, 700)}\n近期剧情：${c.recentChat}`, `请评估两人当前的五维羁绊数值(60~100)与灵魂温度，并写一段60字内的清冷精准剖析。严格只输出JSON：{"intimacy":92,"possess":95,"depend":88,"destiny":96,"trust":90,"temp":"38.4°C","analysis":"60字内剖析"}`);
-                        const m = raw.match(/\{[\s\S]*\}/);
-                        if (m) {
-                            const o = JSON.parse(m[0]), latest = loadData();
-                            latest.radar = Object.assign(latest.radar, o);
-                            saveData(latest); renderActivePage();
-                        }
-                    } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+                topDoc.getElementById("ks-tog-inj").onclick = () => {
+                    const latest = loadMem(ch);
+                    latest.autoCfg.injectEnabled = !(latest.autoCfg.injectEnabled !== false);
+                    saveMem(latest, ch); renderCurrentView();
+                };
+                topDoc.getElementById("ks-inj-depth").onchange = (e) => {
+                    const latest = loadMem(ch);
+                    latest.autoCfg.injectDepth = Math.max(0, Math.min(10, Number(e.target.value) || 2));
+                    saveMem(latest, ch); renderCurrentView();
+                };
+                topDoc.getElementById("ks-sync-now").onclick = () => {
+                    syncMemoryInjectionToSystem();
+                    alert(`已将【${chLabel}】最新总结与星图记忆同步注入到底层上下文！`);
                 };
                 return;
             }
 
-            // ── 功能页 4：【心结解剖 (knot)】 ──
-            if (d.activeTab === "knot") {
-                const knotsHtml = (d.knots || []).map((k) => `
-                    <div class="ks-card" style="margin-bottom:10px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                            <span style="font-size:11.2px;font-weight:800;color:#262830;">${k.title.replace(/</g, "&lt;")}</span>
-                            <div style="display:flex;align-items:center;gap:6px;">
-                                <span class="ks-flt" data-unlk="${k.id}" style="font-size:7.5px!important;">解结 +10%</span>
-                                <span data-delkn="${k.id}" style="cursor:pointer;display:inline-flex;">${K_ICO.trash}</span>
-                            </div>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;font-size:8px;font-weight:700;color:#7E8494;margin-bottom:4px;">
-                            <span>触发点：${(k.trigger || "未知").replace(/</g, "&lt;")}</span>
-                            <span style="font-family:monospace;color:#262830;">${k.progress ?? 60}%</span>
-                        </div>
-                        <div style="height:4px;background:#EEF1F7;border-radius:99px;overflow:hidden;margin-bottom:8px;">
-                            <div style="width:${Math.min(100, Number(k.progress) || 60)}%;height:100%;background:#262830;"></div>
-                        </div>
-                        <div style="font-size:9.8px;font-weight:600;color:#3A3E4C;line-height:1.6;background:#F7F9FC;padding:7px 10px;border-radius:9px;">
-                            <span style="font-size:7.2px;color:#8E96A8;display:block;margin-bottom:2px;">INNER TRUTH · 潜藏心声</span>
-                            ${k.truth.replace(/</g, "&lt;")}
-                        </div>
-                    </div>
-                `).join("");
-
-                vp.innerHTML = `
-                    <div style="flex:1;overflow-y:auto;padding:14px 16px 16px 16px;pointer-events:auto;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                            <div>
-                                <div style="font-size:13px;font-weight:800;color:#262830;letter-spacing:1px;">心结解剖 · 심결</div>
-                                <div style="font-size:7.5px;font-weight:700;color:#8E96A8;">HIDDEN KNOTS &amp; SOFT SPOTS</div>
-                            </div>
-                            <span class="ks-pill dark" id="ks-kn-ai-btn">${K_ICO.spark}<span>洞察新心结</span></span>
-                        </div>
-                        ${knotsHtml || `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:30px;">暂无心结记录</div>`}
-                    </div>
-                `;
-
-                vp.querySelectorAll("[data-unlk]").forEach((b) => b.onclick = () => {
-                    const latest = loadData(), t = latest.knots.find((x) => Number(x.id) === Number(b.getAttribute("data-unlk")));
-                    if (t) { t.progress = Math.min(100, (Number(t.progress) || 50) + 10); saveData(latest); renderActivePage(); }
-                });
-                vp.querySelectorAll("[data-delkn]").forEach((b) => b.onclick = () => {
-                    const latest = loadData();
-                    latest.knots = latest.knots.filter((x) => Number(x.id) !== Number(b.getAttribute("data-delkn")));
-                    saveData(latest); renderActivePage();
-                });
-                topDoc.getElementById("ks-kn-ai-btn").onclick = async (e) => {
-                    const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "剖析中...";
-                    try {
-                        const raw = await askAI(`你是${c.charName}的内心潜意识。人设：${c.charDesc.slice(0, 800)}\n近期剧情：${c.recentChat}`, `请剖析一个${c.charName}对${c.userName}藏在心底未说出口的心结、吃醋点或脆弱软肋。严格只输出JSON：{"title":"10字内心结标题","trigger":"15字内触发雷区","progress":65,"truth":"45字内真实潜意识心声"}`);
-                        const m = raw.match(/\{[\s\S]*\}/);
-                        if (m) {
-                            const o = JSON.parse(m[0]), latest = loadData();
-                            latest.knots.unshift({ id: Date.now(), title: o.title || "未言明的在意", trigger: o.trigger || "你转身离开时", progress: Number(o.progress) || 60, truth: o.truth || "" });
-                            saveData(latest); renderActivePage();
-                        }
-                    } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
-                };
-                return;
-            }
-
-            // ── 功能页 5：【潮汐契约 (pact)】 ──
+            // ── 页面 5：【双轨契约 (pact)】 ──
             if (d.activeTab === "pact") {
-                const p = d.pact || {};
-                const tokensHtml = (p.tokens || []).map((tk, idx) => `
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#F7F9FC;border:1px solid #E6EAF2;border-radius:11px;">
-                        <div>
-                            <div style="font-size:10px;font-weight:800;color:#262830;">${tk.name.replace(/</g, "&lt;")}</div>
-                            <div style="font-size:8.5px;color:#6E7688;margin-top:2px;">${tk.desc.replace(/</g, "&lt;")}</div>
-                        </div>
-                        <span data-deltk="${idx}" style="cursor:pointer;display:inline-flex;">${K_ICO.trash}</span>
-                    </div>
-                `).join("");
-
                 vp.innerHTML = `
-                    <div style="flex:1;overflow-y:auto;padding:14px 16px 16px 16px;pointer-events:auto;">
-                        <div class="ks-card" style="text-align:center;margin-bottom:10px;padding:18px 16px!important;">
-                            <div style="font-size:7.5px;font-weight:800;color:#8E96A8;letter-spacing:2px;margin-bottom:6px;">SOUL CONTRACT · 结识海契约书</div>
+                    <div style="flex:1;overflow-y:auto;padding:12px 14px 16px 14px;pointer-events:auto;">
+                        <div class="ks-card" style="text-align:center;padding:18px 16px!important;">
+                            <div style="font-size:7.5px;font-weight:800;color:#8E94A4;letter-spacing:2px;margin-bottom:6px;">${ch === "st" ? "TAVERN PACT · 酒馆主线契约" : "WECHAT PACT · 微信线上契约"}</div>
                             <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:10px;">
-                                <img src="${c.userAvatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:1.5px solid #E4E8F0;" />
-                                <span style="font-size:11px;font-weight:800;color:#262830;">×</span>
-                                <img src="${c.charAvatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:1.5px solid #E4E8F0;" />
+                                <img src="${c.userAvatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid #E4E8F0;" />
+                                <span style="font-size:11px;font-weight:800;color:#1E2028;">×</span>
+                                <img src="${c.charAvatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid #E4E8F0;" />
                             </div>
-                            <div style="font-size:13px;font-weight:800;color:#262830;margin-bottom:3px;">${(p.seaTitle || "").replace(/</g, "&lt;")}</div>
-                            <div style="font-size:8.5px;font-weight:700;color:#7E8494;margin-bottom:10px;">${(p.stage || "").replace(/</g, "&lt;")} · 主信物：${(p.tokenName || "").replace(/</g, "&lt;")}</div>
-                            <div style="font-size:10px;font-weight:600;color:#3A3E4C;line-height:1.65;padding:9px 12px;background:#F7F9FC;border-radius:10px;margin-bottom:12px;">
-                                “ ${(p.vow || "").replace(/</g, "&lt;")} ”
+                            <div style="font-size:13px;font-weight:800;color:#1E2028;margin-bottom:4px;">${(d.pact?.title || "").replace(/</g, "&lt;")}</div>
+                            <div style="font-size:8.5px;font-weight:700;color:#7E8494;margin-bottom:10px;">${(d.pact?.stage || "").replace(/</g, "&lt;")}</div>
+                            <div style="text-align:left;background:#F8F9FC;padding:10px 12px;border-radius:10px;margin-bottom:12px;">
+                                <div style="font-size:7.5px;font-weight:800;color:#8E94A4;margin-bottom:3px;">CORE ANCHOR · 核心防失忆人设与关系锚点</div>
+                                <div style="font-size:9.8px;font-weight:600;color:#2C303C;line-height:1.6;">${(d.pact?.coreAnchor || "").replace(/</g, "&lt;")}</div>
                             </div>
-                            <span class="ks-pill" id="ks-rebind-pact" style="width:100%!important;box-sizing:border-box!important;">重新修订契约与誓言</span>
-                        </div>
-
-                        <div class="ks-card">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
-                                <span style="font-size:10.5px;font-weight:800;color:#262830;">羁绊信物柜 · TOKENS</span>
-                                <span class="ks-pill dark" id="ks-add-tk-btn" style="height:23px!important;font-size:8.2px!important;">${K_ICO.plus}<span>存入信物</span></span>
-                            </div>
-                            <div id="ks-tk-drawer" style="display:none;margin-bottom:8px;padding:8px;background:#F7F9FC;border-radius:10px;">
-                                <input type="text" id="ks-tk-name" placeholder="信物名称 (如：旧车票)..." style="width:100%;height:26px;background:#FFFFFF;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;color:#262830;box-sizing:border-box;outline:none;margin-bottom:5px;" />
-                                <input type="text" id="ks-tk-desc" placeholder="信物背后的记忆意义..." style="width:100%;height:26px;background:#FFFFFF;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.5px;color:#262830;box-sizing:border-box;outline:none;margin-bottom:6px;" />
-                                <div style="display:flex;justify-content:flex-end;"><span class="ks-pill dark" id="ks-tk-save" style="height:23px!important;">存入</span></div>
-                            </div>
-                            <div style="display:flex;flex-direction:column;gap:6px;">${tokensHtml}</div>
+                            <span class="ks-pill" id="ks-rebind-btn" style="width:100%!important;box-sizing:border-box!important;">修改【${chLabel}】契约与核心锚点</span>
                         </div>
                     </div>
                 `;
-
-                topDoc.getElementById("ks-rebind-pact").onclick = () => {
-                    const latest = loadData(); latest.isBound = false; saveData(latest); renderActivePage();
+                topDoc.getElementById("ks-rebind-btn").onclick = () => {
+                    const latest = loadMem(ch); latest.isBound = false; saveMem(latest, ch); renderCurrentView();
                 };
-                const tkDr = topDoc.getElementById("ks-tk-drawer");
-                topDoc.getElementById("ks-add-tk-btn").onclick = () => { tkDr.style.display = tkDr.style.display === "none" ? "block" : "none"; };
-                topDoc.getElementById("ks-tk-save").onclick = () => {
-                    const nm = topDoc.getElementById("ks-tk-name").value.trim();
-                    const ds = topDoc.getElementById("ks-tk-desc").value.trim() || "两人的专属见证";
-                    if (!nm) return alert("请填写信物名称！");
-                    const latest = loadData();
-                    latest.pact.tokens = latest.pact.tokens || [];
-                    latest.pact.tokens.unshift({ name: nm, desc: ds });
-                    saveData(latest); renderActivePage();
-                };
-                vp.querySelectorAll("[data-deltk]").forEach((b) => b.onclick = () => {
-                    const latest = loadData();
-                    latest.pact.tokens.splice(Number(b.getAttribute("data-deltk")), 1);
-                    saveData(latest); renderActivePage();
-                });
             }
         }
 
-        // ── 底部 5 栏导航切换与顶栏事件绑定 ──
-        topDoc.querySelectorAll("#ks-bottom-dock .ks-dock-item").forEach((item) => {
-            item.onclick = () => {
-                const tab = item.getAttribute("data-kstab");
-                const d = loadData();
-                d.activeTab = tab;
-                saveData(d);
-                if (tab === "map") lineProgress = 0.2;
-                renderActivePage();
+        // 顶栏「酒馆记忆 ⇄ 微信记忆」切换事件
+        topDoc.querySelectorAll("#ks-ch-switch .ks-dual-opt").forEach((opt) => {
+            opt.onclick = (e) => {
+                e.stopPropagation();
+                const targetCh = opt.getAttribute("data-ch");
+                if (targetCh === getCh()) return;
+                setCh(targetCh);
+                renderCurrentView();
+                playRainToWebSequence();
             };
         });
 
-        topDoc.getElementById("ks-rain-replay-btn").onclick = () => {
-            lineProgress = 0;
-            const d = loadData();
-            (d.nodes || []).slice(0, 4).forEach((n, i) => setTimeout(() => triggerDropToNode(n.xPct, n.yPct, i === 0), i * 100));
+        // 底部 5 大 Tab 切换事件
+        topDoc.querySelectorAll("#ks-bottom-dock .ks-dock-item").forEach((item) => {
+            item.onclick = () => {
+                const tab = item.getAttribute("data-kstab");
+                const ch = getCh(), d = loadMem(ch);
+                d.activeTab = tab;
+                saveMem(d, ch);
+                renderCurrentView();
+                if (tab === "map") playRainToWebSequence();
+            };
+        });
+
+        topDoc.getElementById("ks-rain-replay-btn").onclick = (e) => {
+            e.stopPropagation();
+            playRainToWebSequence();
         };
 
         function openSea() {
             overlay.classList.add("open");
             resizeCanvas();
-            lineProgress = 0;
-            renderActivePage();
-            if (!animId) animId = requestAnimationFrame(renderColdCanvas);
+            renderCurrentView();
+            playRainToWebSequence();
+            if (!animId) animId = requestAnimationFrame(renderCanvasLoop);
         }
         function closeSea() {
             overlay.classList.remove("open");
@@ -6633,414 +6807,35 @@ bootSumoulApp();
         topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openSea(); });
         topDoc.getElementById("ks-close-btn").onclick = () => closeSea();
         topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resizeCanvas(); });
-    }
 
-    mountKoreanColdSea5Tabs();
-})();
-
-
-
-
-// ==========================================================================
-// 🔒 【结识海 · 双轨永久防失忆总结与底层强注入引擎 (100%零样式改动 · 锁死不失忆不串戏)】
-// 核心：1.酒馆记忆通过 SillyTavern.setExtensionPrompt 永久钉入底层上下文(聊几千楼也不失忆)
-//       2.微信记忆通过 fetch 拦截自动注入微信专属上下文(与酒馆100%物理隔离绝不串戏)
-//       3.支持「一键提炼长文阶段总结」+「酒馆每满15楼自动后台静默总结」
-// 用法：直接粘贴在 index.js 最末尾最后一行后面！
-// ==========================================================================
-(function () {
-    const topWin = window.parent || window;
-    const topDoc = topWin.document;
-    const MODE_KEY = "sumoul_v16_ksea_memory_channel";
-    const PROMPT_TAG = "SUMOUL_KSEA_ST_ETERNAL_MEMORY";
-
-    function getChannel() {
-        return localStorage.getItem(MODE_KEY) === "wx" ? "wx" : "st";
-    }
-
-    function getCtxInfo() {
-        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "", stChatArr = [];
-        try {
-            const st = topWin.SillyTavern?.getContext?.();
-            if (st) {
-                userName = st.name1 || userName;
-                if (st.characterId !== undefined && st.characters?.[st.characterId]) {
-                    const c = st.characters[st.characterId];
-                    charName = c.name || st.name2 || charName;
-                    scope = c.avatar || c.name || String(st.characterId);
-                    charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
-                } else if (st.name2) {
-                    charName = st.name2; scope = st.name2;
-                }
-                if (Array.isArray(st.chat)) {
-                    stChatArr = st.chat;
-                }
-            }
-        } catch (e) {}
-        const safeScope = String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
-        try {
-            const wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || "{}");
-            if (wCfg.myNick) userName = wCfg.myNick;
-            if (wCfg.remark) charName = wCfg.remark;
-        } catch (e) {}
-        return { userName, charName, safeScope, charDesc, stChatArr };
-    }
-
-    // 直接按指定轨道 ('st' 或 'wx') 读写独立存储，绝不混淆
-    function loadTrackData(track) {
-        const { safeScope } = getCtxInfo();
-        const rawGet = Storage.prototype.getItem;
-        try {
-            const raw = rawGet.call(localStorage, `sumoul_v16_ksea_5tabs_${track}__${safeScope}`);
-            return raw ? JSON.parse(raw) : null;
-        } catch (e) { return null; }
-    }
-
-    function saveTrackData(track, data) {
-        const { safeScope } = getCtxInfo();
-        const rawSet = Storage.prototype.setItem;
-        try {
-            rawSet.call(localStorage, `sumoul_v16_ksea_5tabs_${track}__${safeScope}`, JSON.stringify(data));
-        } catch (e) {}
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // 🧠 核心 1：组装高密度「防失忆长期记忆锚点文本」（分别供酒馆 ST 与微信 WX 独立注入）
-    // ══════════════════════════════════════════════════════════════════════════
-    function buildEternalMemoryPrompt(track) {
-        const d = loadTrackData(track);
-        if (!d || !d.isBound) return "";
-        const { userName, charName } = getCtxInfo();
-        const isSt = track === "st";
-        const trackTitle = isSt ? "【酒馆主线剧情 · 永久记忆库(与线上微信隔离)】" : "【手机微信日常 · 永久记忆库(与酒馆主线隔离)】";
-
-        const pactLine = d.pact
-            ? `▸ 关系契约：${d.pact.seaTitle || ""}｜当前阶段：${d.pact.stage || ""}｜信物：${d.pact.tokenName || ""}｜誓言：“${d.pact.vow || ""}”`
-            : "";
-
-        // 提炼所有星图节点（核心记忆、人物关系、隐秘心结）
-        const nodesLines = (d.nodes || []).slice(-18).map((n) => {
-            const tLabel = n.type === "knot" ? "[心结]" : (n.type === "relation" ? "[羁绊]" : "[记忆]");
-            return `  · ${tLabel}《${n.title}》：${n.content}`;
-        }).join("\n");
-
-        // 提炼记忆编年史章节
-        const tlLines = (d.timeline || []).slice(-10).map((t) => {
-            return `  · [${t.chapter}] ${t.title}：${t.content}`;
-        }).join("\n");
-
-        // 提炼阶段性长文总结（防止几百楼后失忆的核心利器！）
-        const sumLines = (d.summaries || []).slice(-8).map((s, idx) => {
-            return `  · [阶段总结 #${idx + 1} (${s.range || "历史浓缩"})]：${s.text}`;
-        }).join("\n");
-
-        // 提炼未解心结与潜意识软肋
-        const knotLines = (d.knots || []).slice(-6).map((k) => {
-            return `  · [潜藏心结: ${k.title}] 触发点：${k.trigger}｜真实内心：${k.truth}`;
-        }).join("\n");
-
-        return [
-            `\n=== ${trackTitle} ===`,
-            `[系统铁律：以下为 ${charName} 与 ${userName} 已发生的真实历史记忆、阶段总结与关系设定，请严格铭记并在言行中自然体现，绝对禁止遗忘、禁止前后矛盾、禁止与另一轨道串戏！]`,
-            pactLine,
-            sumLines ? `▸ 历史长线阶段总结（防失忆核心锚点）：\n${sumLines}` : "",
-            nodesLines ? `▸ 结识海关键记忆与关系节点：\n${nodesLines}` : "",
-            tlLines ? `▸ 记忆编年史脉络：\n${tlLines}` : "",
-            knotLines ? `▸ ${charName} 的潜意识心结与在意点：\n${knotLines}` : "",
-            `=== 记忆锚点结束 ===\n`
-        ].filter(Boolean).join("\n");
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // 🔒 核心 2：将【酒馆记忆 · ST】实时钉死到 SillyTavern 底层上下文 (setExtensionPrompt)
-    // ══════════════════════════════════════════════════════════════════════════
-    function syncSillyTavernEternalMemory() {
-        try {
-            const st = topWin.SillyTavern?.getContext?.();
-            if (!st) return;
-            const stPrompt = buildEternalMemoryPrompt("st");
-
-            // 方式A：使用酒馆官方 setExtensionPrompt 接口（位置1 = 紧随系统提示词/角色卡之后，权重最高，永不被聊天楼层挤掉！）
-            if (typeof st.setExtensionPrompt === "function") {
-                st.setExtensionPrompt(PROMPT_TAG, stPrompt, 1, 0);
-            }
-            // 方式B：同步写入 extensionPrompts 字典兜底
-            if (st.extensionPrompts && typeof st.extensionPrompts === "object") {
-                st.extensionPrompts[PROMPT_TAG] = { value: stPrompt, position: 1, depth: 0 };
-            }
-        } catch (e) {}
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // 🔒 核心 3：拦截微信 AI 请求，将【微信记忆 · WX】自动注入微信对话，且与酒馆 100% 物理隔离
-    // ══════════════════════════════════════════════════════════════════════════
-    function installWeChatMemoryInjector() {
-        if (topWin.__sumoul_wx_memory_injector_installed) return;
-        topWin.__sumoul_wx_memory_injector_installed = true;
-
-        const origFetch = topWin.fetch;
-        topWin.fetch = async function (input, init) {
-            try {
-                const urlStr = typeof input === "string" ? input : (input?.url || "");
-                if (urlStr.includes("/chat/completions") && init && typeof init.body === "string") {
-                    const bodyObj = JSON.parse(init.body);
-                    if (Array.isArray(bodyObj.messages) && bodyObj.messages.length > 0) {
-                        const sysMsg = bodyObj.messages[0]?.content || "";
-                        // 判断是否为手机内微信聊天发起的请求（而非结识海内部JSON生成请求）
-                        const isInternalJsonTask = bodyObj.messages.some((m) => String(m.content).includes("严格只输出JSON"));
-                        if (!isInternalJsonTask) {
-                            const wxPrompt = buildEternalMemoryPrompt("wx");
-                            if (wxPrompt) {
-                                bodyObj.messages[0].content = `${sysMsg}\n${wxPrompt}`;
-                                init.body = JSON.stringify(bodyObj);
-                            }
-                        }
-                    }
-                }
-            } catch (e) {}
-            return origFetch.apply(this, arguments);
-        };
-    }
-
-    async function callSummaryAI(sys, usr) {
-        const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
-        const k = topDoc.getElementById("smt-api-key")?.value?.trim();
-        const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
-        if (!u || !k) { topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click(); throw new Error("请先在【API设置】填写独立 API 地址与 Key"); }
-        const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
-        const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.7, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] }) });
-        if (!r.ok) throw new Error(`API HTTP ${r.status}`);
-        const d = await r.json();
-        return d?.choices?.[0]?.message?.content?.trim() || "";
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // 🧠 核心 4：一键总结长聊天（或每满 15 楼自动后台总结）并同步写入【总结库 + 星图 + 编年史】
-    // ══════════════════════════════════════════════════════════════════════════
-    async function runTrackMemorySummary(track, isAuto = false) {
-        const { userName, charName, safeScope, charDesc, stChatArr } = getCtxInfo();
-        const d = loadTrackData(track);
-        if (!d || !d.isBound) {
-            if (!isAuto) alert("请先完成当前轨道的结识海契约绑定！");
-            return;
-        }
-
-        let rawLines = [];
-        let totalLen = 0;
-        if (track === "st") {
-            totalLen = stChatArr.length;
-            rawLines = stChatArr.slice(-30).map((m, idx) => `[#${ Math.max(1, totalLen - 30 + idx + 1) }] ${m.is_user ? userName : charName}: ${String(m.mes || "").slice(0, 180)}`);
-        } else {
-            let wxArr = [];
-            try { wxArr = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${safeScope}`) || "[]"); } catch (e) {}
-            totalLen = wxArr.length;
-            rawLines = wxArr.slice(-35).map((m, idx) => `[#${ Math.max(1, totalLen - 35 + idx + 1) }] ${m.role === "user" ? userName : charName}: ${String(m.text || "").slice(0, 140)}`);
-        }
-
-        if (rawLines.length < 2) {
-            if (!isAuto) alert(`当前【${track === "st" ? "酒馆主线" : "微信聊天"}】消息太少，先聊几句再来总结吧！`);
-            return;
-        }
-
-        const rangeTag = track === "st"
-            ? `酒馆第 ${Math.max(1, totalLen - rawLines.length + 1)}~${totalLen} 楼`
-            : `微信近 ${rawLines.length} 条记录`;
-
-        const prevSums = (d.summaries || []).slice(-3).map((s) => s.text).join("；");
-        const prompt = `请严格阅读以下【${track === "st" ? "酒馆线下主线剧情" : "手机微信线上聊天"}】记录（${rangeTag}），做一次高密度防失忆长期总结（严禁串入另一轨道内容）。
-已有前情总结：${prevSums || "暂无"}
-最新对话记录：
-${rawLines.join("\n")}
-
-请严格只输出以下JSON格式（不要多余文字）：
-{
-  "summary": "120字以内的防失忆阶段总结（包含发生的关键事件、重要约定、地点/状态变化、绝对不能忘记的细节）",
-  "nodeTitle": "6字内核心记忆点标题",
-  "nodeEdge": "2~4字连线关系词",
-  "nodeContent": "45字内星图节点记忆描写",
-  "whisper": "30字内${charName}的内心回响"
-}`;
-
-        const resText = await callSummaryAI(`你是负责为${charName}与${userName}维护永久记忆档案的记录官。人设参考：${charDesc.slice(0, 600)}`, prompt);
-        const match = resText.match(/\{[\s\S]*\}/);
-        if (!match) throw new Error("总结解析失败，请重试");
-
-        const obj = JSON.parse(match[0]);
-        const latest = loadTrackData(track) || d;
-        latest.summaries = latest.summaries || [];
-        latest.summaries.push({
-            id: Date.now(),
-            range: rangeTag,
-            text: obj.summary || "",
-            msgCountAtSum: totalLen
-        });
-
-        // 同步在星图中落下一个新记忆点，并写入编年史，让总结在全页面可见！
-        const nid = Date.now() + 1;
-        const idx = (latest.nodes?.length || 6) + 2;
-        const xPct = Math.max(15, Math.min(85, Math.round(50 + Math.cos(idx * 2.4) * (18 + (idx % 4) * 6))));
-        const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(idx * 2.4) * (14 + (idx % 4) * 5))));
-        const fromId = latest.activeNodeId || latest.nodes?.[0]?.id || 1;
-
-        latest.nodes = latest.nodes || [];
-        latest.edges = latest.edges || [];
-        latest.nodes.push({
-            id: nid,
-            type: "memory",
-            title: obj.nodeTitle || "阶段记忆",
-            xPct, yPct,
-            content: obj.nodeContent || obj.summary || "",
-            whisper: `“ ${(obj.whisper || "这段记忆我已经刻在心底了。").replace(/^[“"]|[”"]$/g, "")} ”`
-        });
-        latest.edges.push({ from: fromId, to: nid, label: obj.nodeEdge || "铭记" });
-        latest.activeNodeId = nid;
-
-        latest.timeline = latest.timeline || [];
-        latest.timeline.push({
-            id: Date.now() + 2,
-            chapter: `${track === "st" ? "TAVERN" : "WECHAT"} · ${rangeTag}`,
-            title: obj.nodeTitle || "阶段总结归档",
-            content: obj.summary || "",
-            note: `“ ${(obj.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”`
-        });
-
-        latest.lastAutoSumCount = totalLen;
-        saveTrackData(track, latest);
-        syncSillyTavernEternalMemory();
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // 🤍 核心 5：在不改变任何原有 UI 样式的前提下，在【记忆编年】顶部挂载「防失忆长线总结舱」
-    // ══════════════════════════════════════════════════════════════════════════
-    function injectSummaryPanelIntoTimeline() {
-        const vp = topDoc.getElementById("ks-main-viewport");
-        if (!vp) { setTimeout(injectSummaryPanelIntoTimeline, 250); return; }
-
-        const obs = new MutationObserver(() => {
-            const ch = getChannel();
-            const d = loadTrackData(ch);
-            syncSillyTavernEternalMemory();
-
-            // 仅当处于【记忆编年 (timeline)】或【潮汐契约 (pact)】页面且未插入总结舱时挂载
-            const tlAddBtn = topDoc.getElementById("ks-tl-add-btn");
-            if (tlAddBtn && !topDoc.getElementById("ks-eternal-sum-card")) {
-                const scrollWrap = tlAddBtn.closest('div[style*="overflow-y:auto"]');
-                if (!scrollWrap) return;
-
-                const sums = d?.summaries || [];
-                const autoOn = d?.autoSumEnabled !== false; // 默认开启每15楼自动防失忆总结
-                const trackName = ch === "st" ? "酒馆主线剧情 (ST)" : "手机微信聊天 (WX)";
-
-                const sumCard = topDoc.createElement("div");
-                sumCard.id = "ks-eternal-sum-card";
-                sumCard.className = "ks-card";
-                sumCard.style.cssText = "margin-bottom:14px!important;padding:13px 15px!important;";
-                sumCard.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <div>
-                            <div style="font-size:10.5px;font-weight:800;color:#262830;">防失忆长线总结库 · ${trackName}</div>
-                            <div style="font-size:7.5px;font-weight:700;color:#8E96A8;margin-top:1px;">
-                                已永久锁死注入 ${ch === "st" ? "SillyTavern 酒馆底层上下文" : "微信独立对话大脑"} · 绝不失忆不串戏
-                            </div>
-                        </div>
-                        <span class="ks-pill dark" id="ks-do-now-sum" style="height:25px!important;font-size:8.5px!important;">立即总结归档</span>
-                    </div>
-
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #F0F2F7;border-bottom:1px solid #F0F2F7;margin-bottom:8px;">
-                        <span style="font-size:8.5px;font-weight:700;color:#525868;">每满 15 条新消息自动后台静默总结</span>
-                        <span class="ks-flt ${autoOn ? "on" : ""}" id="ks-toggle-autosum" style="font-size:7.8px!important;">${autoOn ? "已开启自动防失忆" : "已关闭"}</span>
-                    </div>
-
-                    <div id="ks-sum-list-wrap" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;">
-                        ${sums.length ? sums.slice().reverse().map((s) => `
-                            <div style="padding:8px 10px;background:#F7F9FC;border:1px solid #E6EAF2;border-radius:10px;position:relative;">
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-                                    <span style="font-size:7.5px;font-weight:800;color:#7E8494;font-family:monospace;">${(s.range || "阶段浓缩").replace(/</g, "&lt;")}</span>
-                                    <span data-delsum="${s.id}" style="font-size:8px;color:#9A6868;cursor:pointer;font-weight:700;">删除</span>
-                                </div>
-                                <div style="font-size:9.6px;font-weight:600;color:#2C2E36;line-height:1.6;">${(s.text || "").replace(/</g, "&lt;")}</div>
-                            </div>
-                        `).join("") : `<div style="font-size:8.8px;color:#98A0B2;text-align:center;padding:8px 0;">暂无阶段总结 · 点击右上角「立即总结归档」提炼长线记忆</div>`}
-                    </div>
-                `;
-
-                const headerRow = tlAddBtn.parentElement?.parentElement;
-                if (headerRow) {
-                    headerRow.insertAdjacentElement("afterend", sumCard);
-                } else {
-                    scrollWrap.insertBefore(sumCard, scrollWrap.firstChild);
-                }
-
-                // 绑定「立即总结归档」
-                topDoc.getElementById("ks-do-now-sum").onclick = async (e) => {
-                    const btn = e.currentTarget, orig = btn.textContent;
-                    btn.textContent = "提炼总结中...";
+        // ══════════════════════════════════════════════════════════════════════════
+        // ⏱️ 后台全自动楼层监听器：当酒馆或微信聊天层数达到设定的「每 N 层」时，自动触发防失忆总结！
+        // ══════════════════════════════════════════════════════════════════════════
+        let isAutoRunning = false;
+        setInterval(async () => {
+            if (isAutoRunning) return;
+            syncMemoryInjectionToSystem();
+            const c = getCtx();
+            for (const ch of ["st", "wx"]) {
+                const d = loadMem(ch);
+                if (!d.isBound || !d.autoCfg?.enabled) continue;
+                const everyN = Math.max(3, Number(d.autoCfg.everyN) || 15);
+                const lastF = Number(d.autoCfg.lastFloor) || 0;
+                const curLen = ch === "st" ? c.stChatArr.length : c.wxChatArr.length;
+                if (curLen - lastF >= everyN) {
+                    isAutoRunning = true;
                     try {
-                        await runTrackMemorySummary(getChannel(), false);
-                        const tlTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="timeline"]');
-                        if (tlTab) tlTab.click();
-                    } catch (err) {
-                        alert(err.message);
-                    } finally {
-                        btn.textContent = orig;
-                    }
-                };
-
-                // 绑定「自动防失忆开关」
-                topDoc.getElementById("ks-toggle-autosum").onclick = () => {
-                    const curCh = getChannel(), curD = loadTrackData(curCh);
-                    if (!curD) return;
-                    curD.autoSumEnabled = curD.autoSumEnabled === false ? true : false;
-                    saveTrackData(curCh, curD);
-                    const tlTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="timeline"]');
-                    if (tlTab) tlTab.click();
-                };
-
-                // 绑定删除单条总结
-                sumCard.querySelectorAll("[data-delsum]").forEach((delBtn) => {
-                    delBtn.onclick = () => {
-                        const sid = Number(delBtn.getAttribute("data-delsum"));
-                        const curCh = getChannel(), curD = loadTrackData(curCh);
-                        if (!curD) return;
-                        curD.summaries = (curD.summaries || []).filter((x) => Number(x.id) !== sid);
-                        saveTrackData(curCh, curD);
-                        syncSillyTavernEternalMemory();
-                        const tlTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="timeline"]');
-                        if (tlTab) tlTab.click();
-                    };
-                });
-            }
-        });
-
-        obs.observe(vp, { childList: true });
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // ⏱️ 核心 6：后台守护轮询（每 4 秒同步一次酒馆底层记忆锚点 + 检测满 15 楼自动静默总结）
-    // ══════════════════════════════════════════════════════════════════════════
-    let isAutoSummarizing = false;
-    setInterval(async () => {
-        syncSillyTavernEternalMemory();
-        if (isAutoSummarizing) return;
-
-        try {
-            const { stChatArr } = getCtxInfo();
-            const stData = loadTrackData("st");
-            if (stData && stData.isBound && stData.autoSumEnabled !== false) {
-                const lastCnt = Number(stData.lastAutoSumCount) || 0;
-                // 当酒馆主线新增超过 15 条消息时，自动在后台静默总结归档并钉入记忆！
-                if (stChatArr.length >= 15 && stChatArr.length - lastCnt >= 15) {
-                    isAutoSummarizing = true;
-                    await runTrackMemorySummary("st", true);
-                    isAutoSummarizing = false;
+                        await summarizeFloorRange(ch, lastF, curLen - 1, true);
+                        if (overlay.classList.contains("open") && getCh() === ch) renderCurrentView();
+                    } catch (e) {}
+                    isAutoRunning = false;
+                    break;
                 }
             }
-        } catch (e) {
-            isAutoSummarizing = false;
-        }
-    }, 4500);
+        }, 6000);
 
-    installWeChatMemoryInjector();
-    syncSillyTavernEternalMemory();
-    injectSummaryPanelIntoTimeline();
+        syncMemoryInjectionToSystem();
+    }
+
+    mountDualMemorySeaApp();
 })();
