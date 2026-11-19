@@ -8632,30 +8632,28 @@ bootSumoulApp();
     mountTypographyEverywhere();
 })();
 // ==========================================================================
-// 🤍 【Sumoul App 第4应用高颜重塑版：交换日记 · 교환일기 (100%纯白留白信纸 + 极浅雾银灰 + 虚线裁切手写回信笺)】
-// 彻底干掉死黑块与粗黑边引用框！支持完整编辑/删除/重刷回信/贴图 + 4大清透内页
-// 用法：直接替换 index.js 最末尾刚才那段 mountProExchangeDiary 补丁代码！
+// 🤍 【Sumoul App 第4应用重做版：交换日记 · 교환일기 (严格 #FFFFFF 纯白 + #F9F9F9 浅白灰 + 14~16px 饱满加粗大字 + 圆头像气泡回复)】
+// 用法：直接替换 index.js 最末尾刚才那段 mountAiryEditorialDiary 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
 
-    const svgIco = (p, sz = 13, c = "currentColor", sw = "1.3") =>
+    const svgIco = (p, sz = 16, c = "#444444", sw = "2.0") =>
         `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
     const D_ICO = {
-        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#4A5060", "1.5"),
-        plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 12, "#4A5060"),
-        edit: svgIco(`<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>`, 12.5, "#8E96A8"),
-        trash: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 13, "#A89898"),
-        refresh: svgIco(`<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>`, 12, "#8E96A8"),
-        starOff: svgIco(`<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`, 12.5, "#B0B7C6"),
-        starOn: `<svg viewBox="0 0 24 24" width="12.5" height="12.5" fill="#7C869B" stroke="#7C869B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-        spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 12, "#5C6478"),
-        camera: svgIco(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 12, "#6E7688"),
-        pen: svgIco(`<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>`, 12, "#5C6478"),
-        quote: svgIco(`<path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>`, 11, "#B8C0D0", "1.2"),
-        close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 14, "#8E96A8")
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 18, "#333333", "2.2"),
+        plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 15, "#333333", "2.2"),
+        edit: svgIco(`<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>`, 15, "#666666", "1.9"),
+        trash: svgIco(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 15, "#B07070", "1.9"),
+        refresh: svgIco(`<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>`, 14, "#666666", "1.9"),
+        starOff: svgIco(`<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`, 15, "#AAAAAA", "1.9"),
+        starOn: `<svg viewBox="0 0 24 24" width="15" height="15" fill="#444444" stroke="#444444" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+        spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 15, "#333333", "2.0"),
+        camera: svgIco(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 15, "#555555", "1.9"),
+        pen: svgIco(`<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>`, 14, "#333333", "2.0"),
+        close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 17, "#666666", "2.2")
     };
 
     const QA_BANK = [
@@ -8709,11 +8707,10 @@ bootSumoulApp();
             activeTab: "all",
             filterRole: "all",
             cover: {
-                bookTitle: `${userName} & ${charName} · 秘密交换信笺`,
-                subtitle: "OUR PRIVATE EXCHANGE LETTERS",
-                rule1: "01. 无论白昼多忙，翻开这页信纸时必须卸下所有伪装。",
-                rule2: "02. 写下的每一封手记，对方都必须在折角处留下真实的回音。",
-                rule3: "03. 允许吃醋、允许占有、允许写下白天不敢说出口的偏执。"
+                bookTitle: `${userName} & ${charName} 的交换日记`,
+                rule1: "01. 无论白昼多忙，翻开日记时必须卸下所有防备。",
+                rule2: "02. 写下的每一篇日记，对方都必须在下方留下回应。",
+                rule3: "03. 允许吃醋、允许占有、允许写下平时没说出口的话。"
             },
             entries: [
                 {
@@ -8721,7 +8718,7 @@ bootSumoulApp();
                     role: "char",
                     author: charName,
                     date: "12.04 · 23:40",
-                    weather: "初雪 · -2°C",
+                    weather: "初雪 -2°C",
                     mood: "心动 96%",
                     starred: true,
                     imgUrl: "",
@@ -8735,7 +8732,7 @@ bootSumoulApp();
                     role: "me",
                     author: userName,
                     date: "11.29 · 01:15",
-                    weather: "夜雾 · 4°C",
+                    weather: "夜雾 4°C",
                     mood: "安心 92%",
                     starred: true,
                     imgUrl: "",
@@ -8749,7 +8746,7 @@ bootSumoulApp();
                     role: "char",
                     author: charName,
                     date: "11.21 · 19:20",
-                    weather: "微雨 · 8°C",
+                    weather: "微雨 8°C",
                     mood: "占有 88%",
                     starred: false,
                     imgUrl: "",
@@ -8834,11 +8831,11 @@ bootSumoulApp();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    function mountAiryEditorialDiary() {
+    function mountPureWhiteGrayDiary() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
         if (!modal || !homePage) {
-            setTimeout(mountAiryEditorialDiary, 220);
+            setTimeout(mountPureWhiteGrayDiary, 220);
             return;
         }
 
@@ -8848,110 +8845,99 @@ bootSumoulApp();
         const st = topDoc.createElement("style");
         st.id = "sumoul-exdiary-pro-css";
         st.innerHTML = `
-            /* 100% 纯白净空底色 + 极浅云雾银灰体系 (彻底告别死黑块与脏深灰！) */
+            /* 严格锁定 #FFFFFF 纯白与 #F9F9F9 浅白灰配色，字体全面加大加粗！ */
             #seoul-mini-theater-modal #smt-exdiary-pro-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483645 !important;
                 background: #FFFFFF !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
-                font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
+                font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Apple SD Gothic Neo", "Microsoft YaHei", sans-serif !important;
+                color: #222222 !important;
             }
             #seoul-mini-theater-modal #smt-exdiary-pro-overlay.open { display: flex !important; }
 
-            /* 轻透极细胶囊按钮（无死黑填充） */
+            /* 饱满清晰的胶囊按钮 (#F9F9F9 与 #FFFFFF) */
             #seoul-mini-theater-modal .ed-btn {
-                display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
-                height: 28px !important; padding: 0 12px !important; border-radius: 999px !important;
-                background: #FFFFFF !important; border: 0.8px solid #E8ECF2 !important;
-                font-size: 9.8px !important; font-weight: 600 !important; color: #525868 !important;
-                cursor: pointer !important; white-space: nowrap !important; transition: all 0.18s ease !important;
+                display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important;
+                height: 36px !important; padding: 0 15px !important; border-radius: 999px !important;
+                background: #F9F9F9 !important; border: 1px solid #EAEAEA !important;
+                font-size: 13px !important; font-weight: 700 !important; color: #333333 !important;
+                cursor: pointer !important; white-space: nowrap !important;
             }
-            #seoul-mini-theater-modal .ed-btn.soft {
-                background: #F4F6FA !important; border-color: #E2E7F0 !important;
-                color: #363C4A !important; font-weight: 700 !important;
-            }
-
-            /* 顶部极简留白导航栏（极细下划线点缀） */
-            #seoul-mini-theater-modal .ed-tabs-row {
-                display: flex !important; justify-content: space-around !important; align-items: center !important;
-                background: #FFFFFF !important; border-bottom: 0.8px solid #F0F3F8 !important;
-                padding: 0 18px !important; flex-shrink: 0 !important;
-            }
-            #seoul-mini-theater-modal .ed-tab-cell {
-                padding: 10px 6px 9px 6px !important; position: relative !important;
-                font-size: 10px !important; font-weight: 500 !important; color: #9CA4B4 !important;
-                letter-spacing: 0.8px !important; cursor: pointer !important; transition: color 0.2s ease !important;
-            }
-            #seoul-mini-theater-modal .ed-tab-cell.active {
-                color: #363C4A !important; font-weight: 700 !important;
-            }
-            #seoul-mini-theater-modal .ed-tab-cell.active::after {
-                content: "" !important; position: absolute !important; bottom: 0 !important; left: 25% !important; right: 25% !important;
-                height: 1.5px !important; border-radius: 99px !important; background: #6E788C !important;
+            #seoul-mini-theater-modal .ed-btn.primary {
+                background: #FFFFFF !important; border: 1.5px solid #CCCCCC !important;
+                color: #111111 !important; font-weight: 800 !important;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
             }
 
-            /* 韩系高定留白信纸卡（0.8px极淡冷银边 + 空气感微阴影） */
-            #seoul-mini-theater-modal .ed-letter-sheet {
-                background: #FFFFFF !important; border: 0.8px solid #EDF0F6 !important;
-                border-radius: 18px !important; padding: 18px 18px 16px 18px !important;
+            /* 顶部 4 栏切换（#F9F9F9 胶囊底槽 + #FFFFFF 纯白选中滑块，大字加粗） */
+            #seoul-mini-theater-modal .ed-seg-wrap {
+                padding: 8px 16px 10px 16px !important; background: #FFFFFF !important;
+                border-bottom: 1px solid #F2F2F2 !important; flex-shrink: 0 !important;
+            }
+            #seoul-mini-theater-modal .ed-seg-track {
+                display: grid !important; grid-template-columns: repeat(4, 1fr) !important;
+                background: #F9F9F9 !important; border: 1px solid #EEEEEE !important;
+                border-radius: 12px !important; padding: 3px !important; gap: 3px !important;
+            }
+            #seoul-mini-theater-modal .ed-seg-item {
+                padding: 8px 4px !important; text-align: center !important; border-radius: 9px !important;
+                font-size: 13px !important; font-weight: 700 !important; color: #777777 !important;
+                cursor: pointer !important; transition: all 0.15s ease !important;
+            }
+            #seoul-mini-theater-modal .ed-seg-item.active {
+                background: #FFFFFF !important; color: #111111 !important; font-weight: 800 !important;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+            }
+
+            /* 纯白日记大卡片（背景 #FFFFFF，边框 #EEEEEE） */
+            #seoul-mini-theater-modal .ed-diary-card {
+                background: #FFFFFF !important; border: 1px solid #EEEEEE !important;
+                border-radius: 20px !important; padding: 18px 18px !important;
                 margin-bottom: 14px !important;
-                box-shadow: 0 6px 24px rgba(120, 130, 150, 0.04) !important;
-                position: relative !important; box-sizing: border-box !important;
-            }
-
-            /* 右上角无框轻透微图标 */
-            #seoul-mini-theater-modal .ed-ghost-ico {
-                width: 24px !important; height: 24px !important; border-radius: 50% !important;
-                display: inline-flex !important; align-items: center !important; justify-content: center !important;
-                cursor: pointer !important; opacity: 0.72 !important; transition: all 0.15s ease !important;
-            }
-            #seoul-mini-theater-modal .ed-ghost-ico:hover,
-            #seoul-mini-theater-modal .ed-ghost-ico:active {
-                opacity: 1 !important; background: #F5F7FB !important;
-            }
-
-            /* ✉️ 全新重做：信纸折角手写私语回信笺 (彻底抛弃难看的粗黑左边框！) */
-            #seoul-mini-theater-modal .ed-whisper-tear {
-                margin-top: 15px !important; padding-top: 13px !important;
-                border-top: 0.8px dashed #E5E9F2 !important; position: relative !important;
-            }
-            #seoul-mini-theater-modal .ed-whisper-paper {
-                background: linear-gradient(145deg, #FAFBFD 0%, #F4F7FB 100%) !important;
-                border: 0.8px solid #EBF0F7 !important; border-radius: 14px !important;
-                padding: 12px 14px !important; position: relative !important;
-            }
-            /* 信纸回信右上角极细邮戳胶囊 */
-            #seoul-mini-theater-modal .ed-postmark-tag {
-                display: inline-flex !important; align-items: center !important; gap: 4px !important;
-                padding: 1.5px 8px !important; border-radius: 99px !important;
-                background: #FFFFFF !important; border: 0.7px solid #E4E8F2 !important;
-                font-size: 7.8px !important; font-weight: 600 !important; color: #848E9E !important;
-                letter-spacing: 0.5px !important;
-            }
-
-            /* 极浅云灰筛选胶囊 */
-            #seoul-mini-theater-modal .ed-filter-pill {
-                padding: 3.5px 11px !important; border-radius: 99px !important;
-                font-size: 8.8px !important; font-weight: 600 !important;
-                background: #FFFFFF !important; border: 0.8px solid #ECEFF5 !important; color: #929AA8 !important;
-                cursor: pointer !important; transition: all 0.18s ease !important;
-            }
-            #seoul-mini-theater-modal .ed-filter-pill.on {
-                background: #F2F5FA !important; border-color: #D5DCE8 !important;
-                color: #3E4656 !important; font-weight: 700 !important;
-            }
-
-            /* 轻透输入框样式 */
-            #seoul-mini-theater-modal .ed-clean-inp {
-                background: #F9FAFC !important; border: 0.8px solid #E6EAF2 !important;
-                border-radius: 10px !important; padding: 0 10px !important;
-                font-size: 10px !important; color: #363C4A !important; outline: none !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.025) !important;
                 box-sizing: border-box !important;
             }
-            #seoul-mini-theater-modal .ed-clean-area {
-                background: #F9FAFC !important; border: 0.8px solid #E6EAF2 !important;
-                border-radius: 10px !important; padding: 8px 10px !important;
-                font-size: 10px !important; color: #363C4A !important; line-height: 1.65 !important;
-                outline: none !important; resize: none !important; box-sizing: border-box !important;
+
+            /* 右上角操作按钮 (#F9F9F9 圆角小钮) */
+            #seoul-mini-theater-modal .ed-act-ico {
+                width: 32px !important; height: 32px !important; border-radius: 10px !important;
+                background: #F9F9F9 !important; border: 1px solid #EEEEEE !important;
+                display: inline-flex !important; align-items: center !important; justify-content: center !important;
+                cursor: pointer !important;
+            }
+
+            /* 💬 全新回复样式：#F9F9F9 软糯圆角对话气泡（左边圆头像 + 右边饱满大字回信） */
+            #seoul-mini-theater-modal .ed-reply-bubble {
+                margin-top: 16px !important; padding: 14px 15px !important;
+                background: #F9F9F9 !important; border: 1px solid #EEEEEE !important;
+                border-radius: 16px !important; display: flex !important; gap: 12px !important;
+                align-items: flex-start !important;
+            }
+
+            /* 筛选胶囊 */
+            #seoul-mini-theater-modal .ed-flt-chip {
+                padding: 6px 14px !important; border-radius: 99px !important;
+                font-size: 12.5px !important; font-weight: 700 !important;
+                background: #F9F9F9 !important; border: 1px solid #EEEEEE !important; color: #666666 !important;
+                cursor: pointer !important;
+            }
+            #seoul-mini-theater-modal .ed-flt-chip.on {
+                background: #FFFFFF !important; border: 1.5px solid #333333 !important;
+                color: #111111 !important; font-weight: 800 !important;
+            }
+
+            /* 输入框 (#F9F9F9 底 + 14px 清晰大字) */
+            #seoul-mini-theater-modal .ed-inp {
+                background: #F9F9F9 !important; border: 1px solid #E6E6E6 !important;
+                border-radius: 12px !important; padding: 0 12px !important;
+                font-size: 14px !important; font-weight: 600 !important; color: #222222 !important;
+                outline: none !important; box-sizing: border-box !important;
+            }
+            #seoul-mini-theater-modal .ed-area {
+                background: #F9F9F9 !important; border: 1px solid #E6E6E6 !important;
+                border-radius: 12px !important; padding: 10px 12px !important;
+                font-size: 14px !important; font-weight: 600 !important; color: #222222 !important;
+                line-height: 1.65 !important; outline: none !important; resize: none !important; box-sizing: border-box !important;
             }
         `;
         topDoc.head.appendChild(st);
@@ -8959,71 +8945,73 @@ bootSumoulApp();
         const overlay = topDoc.createElement("div");
         overlay.id = "smt-exdiary-pro-overlay";
         overlay.innerHTML = `
-            <!-- 1. 纯白极简顶栏 -->
+            <!-- 1. 纯白顶栏 (#FFFFFF) -->
             <div style="display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top,14px)) 16px 10px 16px;background:#FFFFFF;flex-shrink:0;">
                 <span class="ed-btn" id="ed-close-btn">${D_ICO.back}<span>返回</span></span>
                 <div style="text-align:center;">
-                    <div style="font-size:12px;font-weight:600;color:#363C4A;letter-spacing:3.5px;padding-left:3.5px;">교환일기</div>
-                    <div style="font-size:7.5px;font-weight:500;color:#9CA4B4;letter-spacing:1.2px;margin-top:2px;" id="ed-top-sub">EXCHANGE LETTERS</div>
+                    <div style="font-size:16px;font-weight:800;color:#111111;letter-spacing:1px;">交换日记</div>
+                    <div style="font-size:11px;font-weight:600;color:#888888;margin-top:1px;" id="ed-top-sub">교환일기</div>
                 </div>
-                <span class="ed-btn soft" id="ed-top-write-btn">${D_ICO.plus}<span>写信笺</span></span>
+                <span class="ed-btn primary" id="ed-top-write-btn">${D_ICO.plus}<span>写日记</span></span>
             </div>
 
-            <!-- 2. 顶部 4 栏轻透切换 -->
-            <div class="ed-tabs-row" id="ed-tab-bar">
-                <div class="ed-tab-cell active" data-edtab="all">往来信笺</div>
-                <div class="ed-tab-cell" data-edtab="qa">每日共答</div>
-                <div class="ed-tab-cell" data-edtab="star">折角便签</div>
-                <div class="ed-tab-cell" data-edtab="cover">扉页序言</div>
+            <!-- 2. 顶部 4 栏切换 (#F9F9F9 轨道 + #FFFFFF 滑块) -->
+            <div class="ed-seg-wrap">
+                <div class="ed-seg-track" id="ed-tab-bar">
+                    <div class="ed-seg-item active" data-edtab="all">全部日记</div>
+                    <div class="ed-seg-item" data-edtab="qa">每日共答</div>
+                    <div class="ed-seg-item" data-edtab="star">便签收藏</div>
+                    <div class="ed-seg-item" data-edtab="cover">日记扉页</div>
+                </div>
             </div>
 
-            <!-- 3. 主滚动内容区（纯白极浅云雾底 #FAFBFD） -->
-            <div id="ed-main-body" style="flex:1;min-height:0;overflow-y:auto;padding:14px 15px 22px 15px;background:#FAFBFD;"></div>
+            <!-- 3. 主滚动区（纯白背景 #FFFFFF） -->
+            <div id="ed-main-body" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px 24px 16px;background:#FFFFFF;"></div>
 
-            <!-- 4. 纯白清透弹窗：新建或编辑信笺 -->
-            <div id="ed-editor-modal" style="display:none;position:absolute;inset:0;z-index:80;background:rgba(245,247,252,0.78);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
-                <div class="ed-letter-sheet" style="width:100%;max-width:342px;margin:0!important;padding:18px!important;box-shadow:0 16px 40px rgba(90,100,120,0.10)!important;">
+            <!-- 4. 弹窗：新建或编辑修改日记 -->
+            <div id="ed-editor-modal" style="display:none;position:absolute;inset:0;z-index:80;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;padding:16px;">
+                <div class="ed-diary-card" style="width:100%;max-width:360px;margin:0!important;padding:18px!important;box-shadow:0 16px 40px rgba(0,0,0,0.12)!important;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <span style="font-size:11px;font-weight:700;color:#363C4A;letter-spacing:0.8px;" id="ed-modal-heading">写一封新交换信笺</span>
+                        <span style="font-size:15px;font-weight:800;color:#111111;" id="ed-modal-heading">写一篇新日记</span>
                         <span id="ed-modal-close" style="cursor:pointer;">${D_ICO.close}</span>
                     </div>
 
-                    <div style="display:flex;gap:6px;margin-bottom:8px;">
-                        <input type="text" id="ed-inp-title" class="ed-clean-inp" placeholder="信笺标题 (如：初雪夜的口袋)..." style="flex:1;height:32px;font-weight:600;" />
-                        <label class="ed-btn" style="height:32px!important;cursor:pointer;flex-shrink:0;">
+                    <div style="display:flex;gap:8px;margin-bottom:10px;">
+                        <input type="text" id="ed-inp-title" class="ed-inp" placeholder="日记标题..." style="flex:1;height:38px;font-weight:700!important;" />
+                        <label class="ed-btn" style="height:38px!important;cursor:pointer;flex-shrink:0;">
                             ${D_ICO.camera}<span id="ed-inp-img-lbl">附图</span>
                             <input type="file" id="ed-inp-img" accept="image/*" style="display:none;" />
                         </label>
                     </div>
 
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;">
-                        <input type="text" id="ed-inp-weather" class="ed-clean-inp" placeholder="天气" style="height:28px;font-size:9px!important;" />
-                        <input type="text" id="ed-inp-mood" class="ed-clean-inp" placeholder="心情温度" style="height:28px;font-size:9px!important;" />
-                        <input type="text" id="ed-inp-date" class="ed-clean-inp" placeholder="日期时间" style="height:28px;font-size:9px!important;" />
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+                        <input type="text" id="ed-inp-weather" class="ed-inp" placeholder="天气" style="height:34px;font-size:12.5px!important;" />
+                        <input type="text" id="ed-inp-mood" class="ed-inp" placeholder="心情" style="height:34px;font-size:12.5px!important;" />
+                        <input type="text" id="ed-inp-date" class="ed-inp" placeholder="时间" style="height:34px;font-size:12.5px!important;" />
                     </div>
 
-                    <textarea id="ed-inp-content" class="ed-clean-area" placeholder="在纯白信纸上写下今天的故事或心事..." style="width:100%;height:86px;margin-bottom:8px;"></textarea>
+                    <textarea id="ed-inp-content" class="ed-area" placeholder="写下今天的故事或心事..." style="width:100%;height:105px;margin-bottom:10px;"></textarea>
 
-                    <div style="margin-bottom:12px;">
-                        <div style="font-size:8px;font-weight:600;color:#9CA4B4;margin-bottom:4px;letter-spacing:0.5px;">P.S. 折角回信批注（留空则保存后由 TA 自动为你手写回信）：</div>
-                        <textarea id="ed-inp-reply" class="ed-clean-area" placeholder="可手动编辑折角回信，或留空交由TA回复..." style="width:100%;height:44px;"></textarea>
+                    <div style="margin-bottom:14px;">
+                        <div style="font-size:12px;font-weight:700;color:#666666;margin-bottom:5px;">TA 的回复气泡（留空则保存后由 AI 自动回复）：</div>
+                        <textarea id="ed-inp-reply" class="ed-area" placeholder="可手动编辑回复，或留空交由TA回复..." style="width:100%;height:58px;"></textarea>
                     </div>
 
                     <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span class="ed-filter-pill" id="ed-inp-clear-img" style="display:none;">移除配图</span>
-                        <div style="display:flex;gap:6px;margin-left:auto;">
+                        <span class="ed-flt-chip" id="ed-inp-clear-img" style="display:none;">移除配图</span>
+                        <div style="display:flex;gap:8px;margin-left:auto;">
                             <span class="ed-btn" id="ed-modal-cancel">取消</span>
-                            <span class="ed-btn soft" id="ed-modal-save">封存信笺</span>
+                            <span class="ed-btn primary" id="ed-modal-save">保存日记</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 5. 底部纯白轻透操作栏 -->
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:7px;padding:10px 15px max(16px,env(safe-area-inset-bottom,16px)) 15px;background:#FFFFFF;border-top:0.8px solid #F0F3F8;flex-shrink:0;">
-                <span class="ed-btn" id="ed-bot-write" style="flex:1;">${D_ICO.pen}<span>我写一页</span></span>
-                <span class="ed-btn" id="ed-bot-ai-write" style="flex:1;">${D_ICO.spark}<span>让TA写一页</span></span>
-                <span class="ed-btn soft" id="ed-bot-absorb" style="flex:1.25;">${D_ICO.spark}<span>汲取聊天化作信笺</span></span>
+            <!-- 5. 底部操作栏 (#FFFFFF 纯白底 + #F9F9F9 大字按钮) -->
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px max(16px,env(safe-area-inset-bottom,16px)) 16px;background:#FFFFFF;border-top:1px solid #F0F0F0;flex-shrink:0;">
+                <span class="ed-btn" id="ed-bot-write" style="flex:1;">${D_ICO.pen}<span>我写一篇</span></span>
+                <span class="ed-btn" id="ed-bot-ai-write" style="flex:1;">${D_ICO.spark}<span>让TA写一篇</span></span>
+                <span class="ed-btn primary" id="ed-bot-absorb" style="flex:1.2;">${D_ICO.spark}<span>汲取聊天写日记</span></span>
             </div>
         `;
         modal.appendChild(overlay);
@@ -9035,14 +9023,14 @@ bootSumoulApp();
             const c = getCtx();
             const modalEl = topDoc.getElementById("ed-editor-modal");
             const now = new Date();
-            const defDate = `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} · ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+            const defDate = `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
             if (entry) {
                 editingId = entry.id;
                 tempImgData = entry.imgUrl || "";
-                topDoc.getElementById("ed-modal-heading").textContent = `修改信笺 · ${entry.title}`;
+                topDoc.getElementById("ed-modal-heading").textContent = `编辑日记 · ${entry.title}`;
                 topDoc.getElementById("ed-inp-title").value = entry.title || "";
-                topDoc.getElementById("ed-inp-weather").value = entry.weather || "初雪 · 0°C";
+                topDoc.getElementById("ed-inp-weather").value = entry.weather || "初雪 -2°C";
                 topDoc.getElementById("ed-inp-mood").value = entry.mood || "心动 95%";
                 topDoc.getElementById("ed-inp-date").value = entry.date || defDate;
                 topDoc.getElementById("ed-inp-content").value = entry.content || "";
@@ -9050,9 +9038,9 @@ bootSumoulApp();
             } else {
                 editingId = null;
                 tempImgData = "";
-                topDoc.getElementById("ed-modal-heading").textContent = `写一封新交换信笺 (${c.userName})`;
+                topDoc.getElementById("ed-modal-heading").textContent = `写一篇新日记 (${c.userName})`;
                 topDoc.getElementById("ed-inp-title").value = "";
-                topDoc.getElementById("ed-inp-weather").value = "初雪 · 0°C";
+                topDoc.getElementById("ed-inp-weather").value = "初雪 0°C";
                 topDoc.getElementById("ed-inp-mood").value = "心动 95%";
                 topDoc.getElementById("ed-inp-date").value = defDate;
                 topDoc.getElementById("ed-inp-content").value = "";
@@ -9067,7 +9055,7 @@ bootSumoulApp();
         function renderDiaryApp() {
             const c = getCtx();
             const d = loadDiary();
-            topDoc.getElementById("ed-top-sub").textContent = `${c.userName} × ${c.charName} · ${d.entries.length} LETTERS`;
+            topDoc.getElementById("ed-top-sub").textContent = `${c.userName} × ${c.charName} · 共 ${d.entries.length} 篇`;
 
             homePage.querySelectorAll(".ab-app-item").forEach((item) => {
                 if (item.textContent.includes("交换日记") || item.textContent.includes("교환일기")) {
@@ -9076,72 +9064,69 @@ bootSumoulApp();
                 }
             });
 
-            topDoc.querySelectorAll("#ed-tab-bar .ed-tab-cell").forEach((el) => {
+            topDoc.querySelectorAll("#ed-tab-bar .ed-seg-item").forEach((el) => {
                 el.classList.toggle("active", el.getAttribute("data-edtab") === d.activeTab);
             });
 
             const body = topDoc.getElementById("ed-main-body");
 
-            // ── 内页 1：【往来信笺 (all)】（纯白信纸 + 虚线折角手写回信笺） ──
+            // ── 内页 1：【全部日记 (all)】（#FFFFFF 纯白大卡 + 14~16px 饱满粗体大字 + #F9F9F9 圆头像回复气泡） ──
             if (d.activeTab === "all") {
                 const flt = d.filterRole || "all";
                 const list = (d.entries || []).filter((e) => flt === "all" || e.role === flt);
 
-                const cardsHtml = list.map((en, idx) => {
+                const cardsHtml = list.map((en) => {
                     const isChar = en.role === "char";
-                    const ava = isChar ? c.charAvatar : c.userAvatar;
+                    const writerAva = isChar ? c.charAvatar : c.userAvatar;
                     const writerName = isChar ? c.charName : c.userName;
                     const replierName = en.replyBy || (isChar ? c.userName : c.charName);
-                    const cleanReply = (en.reply || "（轻触右上角重写图标，让TA在信纸折角处写下回音...）").replace(/^[“"]|[”"]$/g, "").trim();
+                    const replierAva = replierName === c.userName ? c.userAvatar : c.charAvatar;
+                    const cleanReply = (en.reply || "（点击右上角刷新按钮，让TA在下方写下回复...）").replace(/^[“"]|[”"]$/g, "").trim();
 
                     return `
-                        <div class="ed-letter-sheet">
-                            <!-- 信纸眉标：微距编号 + 日期天气 + 右上角无框轻透图标 -->
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <img src="${ava}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:0.8px solid #E6EAF2;" />
+                        <div class="ed-diary-card">
+                            <!-- 顶部作者栏：头像 + 14px粗体姓名 + #F9F9F9操作按钮 -->
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <img src="${writerAva}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid #EAEAEA;" />
                                     <div>
-                                        <div style="display:flex;align-items:center;gap:6px;">
-                                            <span style="font-size:10px;font-weight:700;color:#3E4656;letter-spacing:0.3px;">${writerName.replace(/</g, "&lt;")}</span>
-                                            <span style="font-size:7.5px;font-weight:600;color:#A2AAB8;font-family:monospace;letter-spacing:0.8px;">LETTER ${String(d.entries.length - idx).padStart(2, "0")}</span>
-                                        </div>
-                                        <div style="font-size:8px;font-weight:400;color:#9CA4B4;margin-top:1px;letter-spacing:0.3px;">
-                                            ${(en.date || "").replace(/</g, "&lt;")} · ${(en.weather || "初雪").replace(/</g, "&lt;")} · ${(en.mood || "").replace(/</g, "&lt;")}
+                                        <div style="font-size:14.5px;font-weight:800;color:#111111;">${writerName.replace(/</g, "&lt;")}</div>
+                                        <div style="display:flex;gap:6px;align-items:center;margin-top:3px;">
+                                            <span style="font-size:11.5px;font-weight:600;color:#888888;">${(en.date || "").replace(/</g, "&lt;")}</span>
+                                            <span style="font-size:11px;font-weight:700;color:#555555;background:#F9F9F9;border:1px solid #EEEEEE;padding:1px 7px;border-radius:6px;">${(en.weather || "晴").replace(/</g, "&lt;")}</span>
+                                            <span style="font-size:11px;font-weight:700;color:#555555;background:#F9F9F9;border:1px solid #EEEEEE;padding:1px 7px;border-radius:6px;">${(en.mood || "").replace(/</g, "&lt;")}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- 无框极简操作图标：收藏 / 重刷回信 / 编辑 / 删除 -->
-                                <div style="display:flex;align-items:center;gap:2px;">
-                                    <span class="ed-ghost-ico" data-starid="${en.id}" title="收藏信笺">${en.starred ? D_ICO.starOn : D_ICO.starOff}</span>
-                                    <span class="ed-ghost-ico" data-regenid="${en.id}" title="让TA重写一段回信">${D_ICO.refresh}</span>
-                                    <span class="ed-ghost-ico" data-editid="${en.id}" title="编辑信笺与回信">${D_ICO.edit}</span>
-                                    <span class="ed-ghost-ico" data-delid="${en.id}" title="删除这篇信笺">${D_ICO.trash}</span>
+                                <!-- 右上角 4 个 #F9F9F9 浅灰小按钮：收藏 / 重刷回复 / 编辑 / 删除 -->
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span class="ed-act-ico" data-starid="${en.id}" title="收藏">${en.starred ? D_ICO.starOn : D_ICO.starOff}</span>
+                                    <span class="ed-act-ico" data-regenid="${en.id}" title="重写回复">${D_ICO.refresh}</span>
+                                    <span class="ed-act-ico" data-editid="${en.id}" title="编辑修改">${D_ICO.edit}</span>
+                                    <span class="ed-act-ico" data-delid="${en.id}" title="删除日记">${D_ICO.trash}</span>
                                 </div>
                             </div>
 
-                            <!-- 信笺标题（无书名号，清冷留白字距） -->
-                            <div style="font-size:12.5px;font-weight:700;color:#2C3240;margin-bottom:8px;letter-spacing:0.5px;">
-                                ${(en.title || "无题信笺").replace(/</g, "&lt;")}
+                            <!-- 日记大标题 (16px 加粗) -->
+                            <div style="font-size:16px;font-weight:800;color:#111111;margin-bottom:10px;line-height:1.4;">
+                                ${(en.title || "无题日记").replace(/</g, "&lt;")}
                             </div>
 
-                            ${en.imgUrl ? `<img src="${en.imgUrl}" style="width:100%;max-height:185px;object-fit:cover;border-radius:12px;margin-bottom:10px;border:0.8px solid #EDF0F6;display:block;" />` : ""}
+                            ${en.imgUrl ? `<img src="${en.imgUrl}" style="width:100%;max-height:210px;object-fit:cover;border-radius:14px;margin-bottom:12px;border:1px solid #EEEEEE;display:block;" />` : ""}
 
-                            <!-- 信笺正文 -->
-                            <div style="font-size:10.4px;font-weight:400;color:#485060;line-height:1.82;text-align:justify;white-space:pre-wrap;letter-spacing:0.2px;">${(en.content || "").replace(/</g, "&lt;")}</div>
+                            <!-- 日记正文 (14px 饱满中粗体，彻底告别又细又小！) -->
+                            <div style="font-size:14px;font-weight:600;color:#2B2B2B;line-height:1.78;white-space:pre-wrap;">${(en.content || "").replace(/</g, "&lt;")}</div>
 
-                            <!-- ✉️ 全新重做：虚线撕拉线 + 极浅云白手写回信便签（告别粗黑左线！） -->
-                            <div class="ed-whisper-tear">
-                                <div class="ed-whisper-paper">
-                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:8px;font-weight:600;color:#8E96A8;letter-spacing:1px;">
-                                            ${D_ICO.quote}<span>P.S. WHISPER NOTE</span>
-                                        </span>
-                                        <span class="ed-postmark-tag" data-editid="${en.id}" style="cursor:pointer;">
-                                            <span>from. ${replierName.replace(/</g, "&lt;")}</span>
-                                        </span>
+                            <!-- 💬 全新回复样式：#F9F9F9 浅白灰圆角对话气泡（带对方圆头像 + 13.5px 清晰大字） -->
+                            <div class="ed-reply-bubble">
+                                <img src="${replierAva}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid #E6E6E6;flex-shrink:0;margin-top:2px;" />
+                                <div style="flex:1;min-width:0;">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                        <span style="font-size:12px;font-weight:800;color:#444444;">${replierName.replace(/</g, "&lt;")} 的回复</span>
+                                        <span data-editid="${en.id}" style="font-size:11.5px;font-weight:700;color:#888888;cursor:pointer;">修改 ✎</span>
                                     </div>
-                                    <div style="font-size:9.8px;font-weight:500;color:#424A5A;line-height:1.72;letter-spacing:0.3px;padding-left:2px;">
+                                    <div style="font-size:13.5px;font-weight:600;color:#333333;line-height:1.65;">
                                         ${cleanReply.replace(/</g, "&lt;")}
                                     </div>
                                 </div>
@@ -9151,15 +9136,14 @@ bootSumoulApp();
                 }).join("");
 
                 body.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 2px;">
-                        <div style="display:flex;gap:6px;">
-                            <span class="ed-filter-pill ${flt === "all" ? "on" : ""}" data-flt="all">全部 (${d.entries.length})</span>
-                            <span class="ed-filter-pill ${flt === "char" ? "on" : ""}" data-flt="char">${c.charName}的信</span>
-                            <span class="ed-filter-pill ${flt === "me" ? "on" : ""}" data-flt="me">我的信</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                        <div style="display:flex;gap:8px;">
+                            <span class="ed-flt-chip ${flt === "all" ? "on" : ""}" data-flt="all">全部 (${d.entries.length})</span>
+                            <span class="ed-flt-chip ${flt === "char" ? "on" : ""}" data-flt="char">${c.charName}写的</span>
+                            <span class="ed-flt-chip ${flt === "me" ? "on" : ""}" data-flt="me">我写的</span>
                         </div>
-                        <span style="font-size:8px;color:#A2AAB8;letter-spacing:0.5px;">点右上角图标可编辑或删除</span>
                     </div>
-                    ${cardsHtml || `<div style="text-align:center;color:#A2AAB8;font-size:10px;padding:44px 0;">信匣还是空的，写下第一封交换信笺吧</div>`}
+                    ${cardsHtml || `<div style="text-align:center;color:#888888;font-size:14px;font-weight:600;padding:44px 0;">还没有日记，点击下方按钮写一篇吧</div>`}
                 `;
 
                 body.querySelectorAll("[data-flt]").forEach((b) => {
@@ -9194,7 +9178,7 @@ bootSumoulApp();
                         const latest = loadDiary();
                         const t = latest.entries.find((x) => Number(x.id) === id);
                         if (!t) return;
-                        if (!confirm(`确定删除《${t.title}》这封信笺吗？`)) return;
+                        if (!confirm(`确定删除《${t.title}》这篇日记吗？`)) return;
                         latest.entries = latest.entries.filter((x) => Number(x.id) !== id);
                         saveDiary(latest); renderDiaryApp();
                     };
@@ -9206,11 +9190,11 @@ bootSumoulApp();
                         const latest = loadDiary();
                         const t = latest.entries.find((x) => Number(x.id) === id);
                         if (!t) return;
-                        b.style.opacity = "0.3";
+                        b.style.opacity = "0.4";
                         try {
                             const rep = await askDiaryAI(
                                 `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`,
-                                `在你们的交换日记信笺里有一篇《${t.title}》（作者：${t.author}）：“${t.content}”。请以${c.charName}的身份在信纸折角处写一句清冷深情、拉扯或占有欲满满的手写回音(45字内)：`
+                                `在你们的交换日记里有一篇《${t.title}》（作者：${t.author}）：“${t.content}”。请以${c.charName}的身份写一句深情、自然或占有欲满满的日记回复(45字内)：`
                             );
                             t.reply = rep.replace(/^[“"]|[”"]$/g, "").trim();
                             t.replyBy = c.charName;
@@ -9224,39 +9208,45 @@ bootSumoulApp();
                 return;
             }
 
-            // ── 内页 2：【每日共答 (qa)】（纯白双栏对答卡，去掉死黑背景！） ──
+            // ── 内页 2：【每日共答 (qa)】（#FFFFFF 与 #F9F9F9 大字问答卡） ──
             if (d.activeTab === "qa") {
                 const randQ = QA_BANK[Math.floor(Math.random() * QA_BANK.length)];
                 const qaHtml = (d.qaList || []).map((q) => `
-                    <div class="ed-letter-sheet">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                            <span style="font-size:8px;font-weight:600;color:#9CA4B4;letter-spacing:1.2px;">SOUL QUESTION · ${q.date || "ARCHIVE"}</span>
-                            <span class="ed-ghost-ico" data-delqa="${q.id}">${D_ICO.trash}</span>
+                    <div class="ed-diary-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <span style="font-size:12px;font-weight:700;color:#888888;">每日共答 · ${q.date || ""}</span>
+                            <span class="ed-act-ico" data-delqa="${q.id}">${D_ICO.trash}</span>
                         </div>
-                        <div style="font-size:11.5px;font-weight:700;color:#2C3240;margin-bottom:12px;line-height:1.55;">
-                            Q. ${q.question.replace(/</g, "&lt;")}
+                        <div style="font-size:15px;font-weight:800;color:#111111;margin-bottom:12px;line-height:1.5;">
+                            Q: ${q.question.replace(/</g, "&lt;")}
                         </div>
-                        <div style="padding:10px 12px;background:#FAFBFD;border:0.8px solid #EDF0F6;border-radius:12px;margin-bottom:8px;">
-                            <div style="font-size:7.8px;font-weight:600;color:#9CA4B4;margin-bottom:3px;">${c.userName} · ANSWER</div>
-                            <div style="font-size:9.8px;font-weight:500;color:#485060;line-height:1.65;">${(q.myAns || "").replace(/</g, "&lt;")}</div>
+                        <div class="ed-reply-bubble" style="margin-top:0!important;margin-bottom:10px!important;">
+                            <img src="${c.userAvatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;" />
+                            <div>
+                                <div style="font-size:12px;font-weight:800;color:#555555;margin-bottom:3px;">${c.userName} 的回答</div>
+                                <div style="font-size:13.5px;font-weight:600;color:#222222;line-height:1.6;">${(q.myAns || "").replace(/</g, "&lt;")}</div>
+                            </div>
                         </div>
-                        <div style="padding:10px 12px;background:#F3F6FB;border:0.8px solid #E4E9F2;border-radius:12px;">
-                            <div style="font-size:7.8px;font-weight:600;color:#7C869B;margin-bottom:3px;">${c.charName} · ANSWER</div>
-                            <div style="font-size:9.8px;font-weight:500;color:#363C4A;line-height:1.65;">${(q.charAns || "").replace(/</g, "&lt;")}</div>
+                        <div class="ed-reply-bubble" style="margin-top:0!important;">
+                            <img src="${c.charAvatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;" />
+                            <div>
+                                <div style="font-size:12px;font-weight:800;color:#555555;margin-bottom:3px;">${c.charName} 的回答</div>
+                                <div style="font-size:13.5px;font-weight:600;color:#222222;line-height:1.6;">${(q.charAns || "").replace(/</g, "&lt;")}</div>
+                            </div>
                         </div>
                     </div>
                 `).join("");
 
                 body.innerHTML = `
-                    <div class="ed-letter-sheet" style="margin-bottom:14px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                            <span style="font-size:10.5px;font-weight:700;color:#363C4A;letter-spacing:0.6px;">今日灵魂共答 · DAILY Q&amp;A</span>
-                            <span class="ed-filter-pill" id="ed-qa-change">换一题 ↻</span>
+                    <div class="ed-diary-card" style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <span style="font-size:14.5px;font-weight:800;color:#111111;">今日情侣共答</span>
+                            <span class="ed-flt-chip" id="ed-qa-change">换一题 ↻</span>
                         </div>
-                        <input type="text" id="ed-qa-q" class="ed-clean-inp" value="${randQ.replace(/"/g, "&quot;")}" style="width:100%;height:32px;font-weight:600;margin-bottom:8px;" />
-                        <textarea id="ed-qa-my" class="ed-clean-area" placeholder="写下你的回答，随后让TA在同一页写下TA的答案..." style="width:100%;height:52px;margin-bottom:10px;"></textarea>
+                        <input type="text" id="ed-qa-q" class="ed-inp" value="${randQ.replace(/"/g, "&quot;")}" style="width:100%;height:38px;margin-bottom:10px;" />
+                        <textarea id="ed-qa-my" class="ed-area" placeholder="写下你的回答，然后看TA怎么回答..." style="width:100%;height:68px;margin-bottom:10px;"></textarea>
                         <div style="display:flex;justify-content:flex-end;">
-                            <span class="ed-btn soft" id="ed-qa-submit">${D_ICO.spark}<span>封存并看TA的回答</span></span>
+                            <span class="ed-btn primary" id="ed-qa-submit">${D_ICO.spark}<span>提交并看TA的回答</span></span>
                         </div>
                     </div>
                     ${qaHtml}
@@ -9270,11 +9260,11 @@ bootSumoulApp();
                     const myTxt = topDoc.getElementById("ed-qa-my").value.trim();
                     if (!qTxt || !myTxt) return alert("请先填写你的回答！");
                     const btn = e.currentTarget, orig = btn.innerHTML;
-                    btn.textContent = "等待TA落笔...";
+                    btn.textContent = "等待TA作答...";
                     try {
                         const ans = await askDiaryAI(
                             `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`,
-                            `你们正在写交换信笺的「每日共答」。问题是：“${qTxt}”，${c.userName}的回答是：“${myTxt}”。请以${c.charName}的第一人称写下你最真实、清冷深情的回答(55字内)：`
+                            `你们正在玩交换日记的「每日共答」。问题是：“${qTxt}”，${c.userName}的回答是：“${myTxt}”。请以${c.charName}的第一人称写下你的真实回答(55字内)：`
                         );
                         const latest = loadDiary(), now = new Date();
                         latest.qaList = latest.qaList || [];
@@ -9296,51 +9286,51 @@ bootSumoulApp();
                 return;
             }
 
-            // ── 内页 3：【折角便签 (star)】 ──
+            // ── 内页 3：【便签收藏 (star)】 ──
             if (d.activeTab === "star") {
                 const starredList = (d.entries || []).filter((e) => e.starred);
                 const stickyHtml = (d.stickies || []).map((stItem) => `
-                    <div style="background:#FFFFFF;border:0.8px solid #EAEFF6;border-radius:14px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 14px rgba(120,130,150,0.03);">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                            <span style="font-size:7.8px;font-weight:600;color:#7C869B;background:#F4F7FB;padding:2px 7px;border-radius:99px;">from. ${stItem.author.replace(/</g, "&lt;")}</span>
-                            <span class="ed-ghost-ico" data-delst="${stItem.id}" style="width:18px!important;height:18px!important;">${D_ICO.trash}</span>
+                    <div style="background:#F9F9F9;border:1px solid #EEEEEE;border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <span style="font-size:12px;font-weight:800;color:#444444;background:#FFFFFF;border:1px solid #EAEAEA;padding:2px 9px;border-radius:99px;">${stItem.author.replace(/</g, "&lt;")}</span>
+                            <span data-delst="${stItem.id}" style="cursor:pointer;color:#999999;font-weight:800;font-size:15px;">×</span>
                         </div>
-                        <div style="font-size:9.6px;font-weight:400;color:#485060;line-height:1.65;">${stItem.text.replace(/</g, "&lt;")}</div>
+                        <div style="font-size:13.5px;font-weight:600;color:#222222;line-height:1.6;">${stItem.text.replace(/</g, "&lt;")}</div>
                     </div>
                 `).join("");
 
                 const starCardsHtml = starredList.map((en) => `
-                    <div class="ed-letter-sheet" style="padding:14px 16px!important;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                            <span style="font-size:11px;font-weight:700;color:#2C3240;">${en.title.replace(/</g, "&lt;")}</span>
-                            <span style="font-size:8px;color:#9CA4B4;">${en.author} · ${en.date}</span>
+                    <div class="ed-diary-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:15px;font-weight:800;color:#111111;">${en.title.replace(/</g, "&lt;")}</span>
+                            <span style="font-size:12px;font-weight:600;color:#888888;">${en.author} · ${en.date}</span>
                         </div>
-                        <div style="font-size:9.8px;color:#525868;line-height:1.68;">${en.content.replace(/</g, "&lt;")}</div>
+                        <div style="font-size:13.5px;font-weight:600;color:#333333;line-height:1.68;">${en.content.replace(/</g, "&lt;")}</div>
                     </div>
                 `).join("");
 
                 body.innerHTML = `
-                    <div class="ed-letter-sheet" style="margin-bottom:14px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                            <span style="font-size:10.5px;font-weight:700;color:#363C4A;letter-spacing:0.6px;">夹页纸条 · WHISPER MEMOS</span>
-                            <div style="display:flex;gap:5px;">
-                                <span class="ed-filter-pill" id="ed-st-my">+ 留一张纸条</span>
-                                <span class="ed-filter-pill on" id="ed-st-ai">让TA留纸条</span>
-                            </div>
-                        </div>
-                        <div id="ed-st-drawer" style="display:none;margin-bottom:10px;">
+                    <div class="ed-diary-card" style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <span style="font-size:14.5px;font-weight:800;color:#111111;">冰箱贴与小便签</span>
                             <div style="display:flex;gap:6px;">
-                                <input type="text" id="ed-st-inp" class="ed-clean-inp" placeholder="写一句简短的叮嘱或耳语夹在信纸间..." style="flex:1;height:30px;" />
-                                <span class="ed-btn soft" id="ed-st-save" style="height:30px!important;">夹入</span>
+                                <span class="ed-flt-chip" id="ed-st-my">+ 写便签</span>
+                                <span class="ed-flt-chip on" id="ed-st-ai">让TA贴一张</span>
                             </div>
                         </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">${stickyHtml}</div>
+                        <div id="ed-st-drawer" style="display:none;margin-bottom:12px;">
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" id="ed-st-inp" class="ed-inp" placeholder="写一句叮嘱或悄悄话..." style="flex:1;height:36px;" />
+                                <span class="ed-btn primary" id="ed-st-save" style="height:36px!important;">贴上</span>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">${stickyHtml}</div>
                     </div>
 
-                    <div style="font-size:8.8px;font-weight:600;color:#9CA4B4;letter-spacing:1px;margin-bottom:8px;padding-left:4px;">
-                        STARRED LETTERS · 珍藏信笺 (${starredList.length})
+                    <div style="font-size:13px;font-weight:800;color:#666666;margin-bottom:10px;padding-left:4px;">
+                        星标收藏的日记 (${starredList.length})
                     </div>
-                    ${starCardsHtml || `<div style="text-align:center;color:#A2AAB8;font-size:9.8px;padding:26px;">在信笺右上角点亮 ★ 即可收纳至此</div>`}
+                    ${starCardsHtml || `<div style="text-align:center;color:#888888;font-size:13.5px;font-weight:600;padding:28px;">在日记右上角点 ★ 即可收藏到这里</div>`}
                 `;
 
                 const dr = topDoc.getElementById("ed-st-drawer");
@@ -9355,9 +9345,9 @@ bootSumoulApp();
                 };
                 topDoc.getElementById("ed-st-ai").onclick = async (e) => {
                     const btn = e.currentTarget, orig = btn.textContent;
-                    btn.textContent = "落笔中...";
+                    btn.textContent = "书写中...";
                     try {
-                        const txt = await askDiaryAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `请在交换日记夹页上给${c.userName}留一张26字以内的清冷温柔叮嘱或占有欲小纸条：`);
+                        const txt = await askDiaryAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `请在交换日记本上给${c.userName}贴一张28字以内的日常叮嘱或占有欲小便签：`);
                         const latest = loadDiary();
                         latest.stickies = latest.stickies || [];
                         latest.stickies.unshift({ id: Date.now(), author: c.charName, text: txt.replace(/^[“"]|[”"]$/g, "").trim(), date: "便签" });
@@ -9374,46 +9364,45 @@ bootSumoulApp();
                 return;
             }
 
-            // ── 内页 4：【扉页序言 (cover)】 ──
+            // ── 内页 4：【日记扉页 (cover)】 ──
             if (d.activeTab === "cover") {
                 const cv = d.cover || {};
                 const myCnt = (d.entries || []).filter((x) => x.role === "me").length;
                 const chCnt = (d.entries || []).filter((x) => x.role === "char").length;
 
                 body.innerHTML = `
-                    <div class="ed-letter-sheet" style="text-align:center;padding:24px 18px!important;">
-                        <div style="font-size:7.5px;font-weight:600;color:#A2AAB8;letter-spacing:3px;margin-bottom:12px;">FLYLEAF &amp; PACT · 扉页序言</div>
+                    <div class="ed-diary-card" style="text-align:center;padding:22px 18px!important;">
                         <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:14px;">
-                            <img src="${c.userAvatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #E6EAF2;" />
-                            <span style="width:18px;height:0.8px;background:#D5DCE8;display:inline-block;"></span>
-                            <img src="${c.charAvatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #E6EAF2;" />
+                            <img src="${c.userAvatar}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:1.5px solid #EAEAEA;" />
+                            <span style="font-size:16px;font-weight:800;color:#888888;">×</span>
+                            <img src="${c.charAvatar}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:1.5px solid #EAEAEA;" />
                         </div>
 
-                        <input type="text" id="ed-cv-title" class="ed-clean-inp" value="${(cv.bookTitle || "").replace(/"/g, "&quot;")}" style="width:100%;height:32px;text-align:center;font-size:11px!important;font-weight:700;margin-bottom:14px;" />
+                        <input type="text" id="ed-cv-title" class="ed-inp" value="${(cv.bookTitle || "").replace(/"/g, "&quot;")}" style="width:100%;height:40px;text-align:center;font-size:15px!important;font-weight:800!important;margin-bottom:14px;" />
 
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
-                            <div style="background:#FAFBFD;border:0.8px solid #EDF0F6;padding:9px 6px;border-radius:12px;">
-                                <div style="font-size:7.8px;color:#9CA4B4;">总信笺</div>
-                                <div style="font-size:12px;font-weight:700;color:#363C4A;margin-top:2px;">${d.entries.length} 封</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+                            <div style="background:#F9F9F9;border:1px solid #EEEEEE;padding:12px 6px;border-radius:14px;">
+                                <div style="font-size:12px;font-weight:700;color:#888888;">总日记</div>
+                                <div style="font-size:16px;font-weight:800;color:#111111;margin-top:3px;">${d.entries.length} 篇</div>
                             </div>
-                            <div style="background:#FAFBFD;border:0.8px solid #EDF0F6;padding:9px 6px;border-radius:12px;">
-                                <div style="font-size:7.8px;color:#9CA4B4;">${c.userName}</div>
-                                <div style="font-size:12px;font-weight:700;color:#363C4A;margin-top:2px;">${myCnt} 封</div>
+                            <div style="background:#F9F9F9;border:1px solid #EEEEEE;padding:12px 6px;border-radius:14px;">
+                                <div style="font-size:12px;font-weight:700;color:#888888;">${c.userName}</div>
+                                <div style="font-size:16px;font-weight:800;color:#111111;margin-top:3px;">${myCnt} 篇</div>
                             </div>
-                            <div style="background:#FAFBFD;border:0.8px solid #EDF0F6;padding:9px 6px;border-radius:12px;">
-                                <div style="font-size:7.8px;color:#9CA4B4;">${c.charName}</div>
-                                <div style="font-size:12px;font-weight:700;color:#363C4A;margin-top:2px;">${chCnt} 封</div>
+                            <div style="background:#F9F9F9;border:1px solid #EEEEEE;padding:12px 6px;border-radius:14px;">
+                                <div style="font-size:12px;font-weight:700;color:#888888;">${c.charName}</div>
+                                <div style="font-size:16px;font-weight:800;color:#111111;margin-top:3px;">${chCnt} 篇</div>
                             </div>
                         </div>
 
-                        <div style="text-align:left;display:flex;flex-direction:column;gap:7px;margin-bottom:16px;">
-                            <div style="font-size:8px;font-weight:600;color:#9CA4B4;letter-spacing:0.8px;">交换信笺序言约定：</div>
-                            <input type="text" id="ed-cv-r1" class="ed-clean-inp" value="${(cv.rule1 || "").replace(/"/g, "&quot;")}" style="width:100%;height:29px;font-size:9.2px!important;" />
-                            <input type="text" id="ed-cv-r2" class="ed-clean-inp" value="${(cv.rule2 || "").replace(/"/g, "&quot;")}" style="width:100%;height:29px;font-size:9.2px!important;" />
-                            <input type="text" id="ed-cv-r3" class="ed-clean-inp" value="${(cv.rule3 || "").replace(/"/g, "&quot;")}" style="width:100%;height:29px;font-size:9.2px!important;" />
+                        <div style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+                            <div style="font-size:13px;font-weight:800;color:#444444;">交换日记约定：</div>
+                            <input type="text" id="ed-cv-r1" class="ed-inp" value="${(cv.rule1 || "").replace(/"/g, "&quot;")}" style="width:100%;height:36px;font-size:13px!important;" />
+                            <input type="text" id="ed-cv-r2" class="ed-inp" value="${(cv.rule2 || "").replace(/"/g, "&quot;")}" style="width:100%;height:36px;font-size:13px!important;" />
+                            <input type="text" id="ed-cv-r3" class="ed-inp" value="${(cv.rule3 || "").replace(/"/g, "&quot;")}" style="width:100%;height:36px;font-size:13px!important;" />
                         </div>
 
-                        <span class="ed-btn soft" id="ed-cv-save" style="width:100%!important;height:32px!important;box-sizing:border-box!important;">保存扉页序言</span>
+                        <span class="ed-btn primary" id="ed-cv-save" style="width:100%!important;height:38px!important;box-sizing:border-box!important;">保存扉页设定</span>
                     </div>
                 `;
 
@@ -9431,7 +9420,7 @@ bootSumoulApp();
             }
         }
 
-        // ── 绑定弹窗与底部按钮事件 ──
+        // ── 弹窗与底部按钮事件 ──
         topDoc.getElementById("ed-inp-img").onchange = async (e) => {
             const f = e.target.files?.[0];
             if (!f) return;
@@ -9452,14 +9441,14 @@ bootSumoulApp();
 
         topDoc.getElementById("ed-modal-save").onclick = async () => {
             const c = getCtx();
-            const ti = topDoc.getElementById("ed-inp-title").value.trim() || "无题信笺";
-            const we = topDoc.getElementById("ed-inp-weather").value.trim() || "初雪 · 0°C";
+            const ti = topDoc.getElementById("ed-inp-title").value.trim() || "无题日记";
+            const we = topDoc.getElementById("ed-inp-weather").value.trim() || "初雪 0°C";
             const mo = topDoc.getElementById("ed-inp-mood").value.trim() || "心动 95%";
             const dt = topDoc.getElementById("ed-inp-date").value.trim();
             const ct = topDoc.getElementById("ed-inp-content").value.trim();
             const rp = topDoc.getElementById("ed-inp-reply").value.trim();
 
-            if (!ct) return alert("请填写信笺正文内容！");
+            if (!ct) return alert("请填写日记正文内容！");
 
             const latest = loadDiary();
             if (editingId) {
@@ -9477,7 +9466,7 @@ bootSumoulApp();
                 latest.entries.unshift({
                     id: newId, role: "me", author: c.userName, date: dt, weather: we, mood: mo,
                     starred: false, imgUrl: tempImgData, title: ti, content: ct,
-                    reply: rp || `（${c.charName} 正在信纸折角处落笔回信...）`,
+                    reply: rp || `（${c.charName} 正在写回复...）`,
                     replyBy: c.charName
                 });
                 latest.activeTab = "all";
@@ -9489,7 +9478,7 @@ bootSumoulApp();
                     try {
                         const aiReply = await askDiaryAI(
                             `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`,
-                            `${c.userName}在交换日记里写了一封《${ti}》：“${ct}”。请以你的身份在信纸折角处写一句温柔深情或偏执占有的手写回音(45字内)：`
+                            `${c.userName}在交换日记里写了一篇《${ti}》：“${ct}”。请以你的身份在下方写一句深情或占有欲满满的回复(45字内)：`
                         );
                         const d2 = loadDiary();
                         const item = d2.entries.find((x) => x.id === newId);
@@ -9504,22 +9493,22 @@ bootSumoulApp();
 
         topDoc.getElementById("ed-bot-ai-write").onclick = async (e) => {
             const btn = e.currentTarget, orig = btn.innerHTML;
-            btn.textContent = "TA落笔中...";
+            btn.textContent = "TA书写中...";
             const c = getCtx();
             try {
                 const raw = await askDiaryAI(
                     `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`,
-                    `请在你们的交换信笺本上写一篇属于你（${c.charName}）的第一人称私密信笺。严格只输出JSON：{"title":"10字内标题","weather":"天气与温度","mood":"情绪词+百分比","content":"110字左右细腻第一人称正文","myNote":"28字内留在信纸折角给${c.userName}的附言"}`
+                    `请在交换日记本上写一篇属于你（${c.charName}）的第一人称私密日记。严格只输出JSON：{"title":"10字内标题","weather":"天气温度","mood":"心情百分比","content":"110字左右第一人称正文","myNote":"28字内留给${c.userName}的回复"}`
                 );
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
                     const o = JSON.parse(m[0]), latest = loadDiary(), now = new Date();
                     latest.entries.unshift({
                         id: Date.now(), role: "char", author: c.charName,
-                        date: `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} · ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
-                        weather: o.weather || "夜雾 · 2°C", mood: o.mood || "深情 96%",
+                        date: `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
+                        weather: o.weather || "夜雾 2°C", mood: o.mood || "深情 96%",
                         starred: false, imgUrl: "", title: o.title || "未寄出的心事", content: o.content || "",
-                        reply: (o.myNote || "写给你的，记得在下面回我。").replace(/^[“"]|[”"]$/g, "").trim(),
+                        reply: (o.myNote || "写给你的，记得回我。").replace(/^[“"]|[”"]$/g, "").trim(),
                         replyBy: c.charName
                     });
                     latest.activeTab = "all";
@@ -9538,15 +9527,15 @@ bootSumoulApp();
             try {
                 const raw = await askDiaryAI(
                     `你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`,
-                    `请根据以下近期聊天，以你（${c.charName}）的第一人称写一封事后回顾的交换信笺。\n${src.slice(-1200)}\n严格只输出JSON：{"title":"10字内标题","weather":"天气","mood":"心情百分比","content":"110字左右第一人称正文","whisper":"30字内折角附言"}`
+                    `请根据以下近期聊天，以你（${c.charName}）的第一人称写一篇交换日记。\n${src.slice(-1200)}\n严格只输出JSON：{"title":"10字内标题","weather":"天气","mood":"心情百分比","content":"110字左右第一人称正文","whisper":"30字内回复"}`
                 );
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
                     const o = JSON.parse(m[0]), latest = loadDiary(), now = new Date();
                     latest.entries.unshift({
                         id: Date.now(), role: "char", author: c.charName,
-                        date: `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} · 聊天手记`,
-                        weather: o.weather || "微风 · 6°C", mood: o.mood || "回味 94%",
+                        date: `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} 聊天手记`,
+                        weather: o.weather || "微风 6°C", mood: o.mood || "回味 94%",
                         starred: false, imgUrl: "", title: o.title || "聊完天后的余温", content: o.content || "",
                         reply: (o.whisper || "每次聊完都更想见你。").replace(/^[“"]|[”"]$/g, "").trim(),
                         replyBy: c.charName
@@ -9561,7 +9550,7 @@ bootSumoulApp();
         topDoc.getElementById("ed-bot-write").onclick = () => openEditorModal(null);
         topDoc.getElementById("ed-close-btn").onclick = () => overlay.classList.remove("open");
 
-        topDoc.querySelectorAll("#ed-tab-bar .ed-tab-cell").forEach((item) => {
+        topDoc.querySelectorAll("#ed-tab-bar .ed-seg-item").forEach((item) => {
             item.onclick = () => {
                 const latest = loadDiary();
                 latest.activeTab = item.getAttribute("data-edtab");
@@ -9580,5 +9569,5 @@ bootSumoulApp();
         }, true);
     }
 
-    mountAiryEditorialDiary();
+    mountPureWhiteGrayDiary();
 })();
