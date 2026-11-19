@@ -5561,7 +5561,8 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// ❄️ 【Sumoul App 有情树 · 基于用户原版定向精修：唯一独木粗壮真树干 + 浓密雾凇繁叶 + 移除年月日与遮挡文字终极版】
+// ❄️ 【Sumoul App 个人主页第5应用：初雪风铃回声馆 · 풍경의 기억 (韓系极致清冷 + 全屏初雪物理互动 + 摇曳冰晶风铃阵)】
+// 动态亮点：1.全屏实时飘雪+指尖划过泛起冰晶涟漪 2.错落悬垂的流体玻璃风铃随风摆动(可自由拖拽) 3.一键吹拂微风触发全屏声波共振 4.动态声波律动双面回声签
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
@@ -5569,13 +5570,13 @@ bootSumoulApp();
     const svgIco = (p, sz = 14, c = "currentColor", sw = "1.5") =>
         `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
-    const MT_ICO = {
-        appIcon: svgIco(`<path d="M12 22v-7l-2-2"/><path d="M17 8v.8A6 6 0 0 1 13.8 20v0H10v0A6.5 6.5 0 0 1 7 8h0a5 5 0 0 1 10 0Z"/><path d="m14 14-2 2"/>`, 22, "#3A3A40"),
-        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#3A3A42", "1.8"),
+    const WC_ICO = {
+        appIcon: svgIco(`<path d="M12 2v4"/><circle cx="12" cy="8" r="2"/><path d="M8 10h8l1 9H7l1-9Z"/><path d="M12 19v4"/><path d="M9 22h6"/>`, 21, "#3A3A40"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#3A3D46", "1.8"),
+        wind: svgIco(`<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>`, 13),
         plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
         spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
-        leaf: svgIco(`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`, 13),
-        list: svgIco(`<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>`, 13),
+        flip: svgIco(`<path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>`, 12),
         trash: svgIco(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 12, "#9A6868"),
         close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 13)
     };
@@ -5606,73 +5607,65 @@ bootSumoulApp();
         return { userName, charName, safeScope, charDesc, recentChat };
     }
 
-    function getTreeKey() { return `sumoul_v16_millennium_tree__${getCtx().safeScope}`; }
+    function getChimeKey() { return `sumoul_v16_windchime__${getCtx().safeScope}`; }
 
-    function createDefaultTree(charName, userName) {
+    function createDefaultChimes(charName, userName) {
         return {
-            activeId: 101,
-            leaves: [
-                { id: 101, title: "初雪揣进口袋的指尖", author: charName, joy: 96, xPct: 26, yPct: 20, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
-                { id: 102, title: "凌晨三点的秒回", author: userName, joy: 90, xPct: 48, yPct: 16, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
-                { id: 103, title: "耳机分你一半的午后", author: charName, joy: 82, xPct: 18, yPct: 33, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
-                { id: 104, title: "微雨夜屋檐下的对视", author: charName, joy: 66, xPct: 38, yPct: 29, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
-                { id: 105, title: "吃醋时别扭的沉默", author: userName, joy: 45, xPct: 58, yPct: 24, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
-                { id: 106, title: "短暂分别时的酸涩", author: charName, joy: 18, xPct: 30, yPct: 40, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
+            activeId: 301,
+            flipped: false,
+            windWhisper: `微风拂过檐下的冰晶风铃，听见 ${charName} 留在风里的呼吸声……`,
+            items: [
+                { id: 301, title: "初雪揣进口袋", author: charName, joy: 96, xPct: 16, yPct: 14, wireH: 48, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
+                { id: 302, title: "凌晨三点秒回", author: userName, joy: 90, xPct: 36, yPct: 9,  wireH: 76, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
+                { id: 303, title: "耳机分你一半", author: charName, joy: 82, xPct: 58, yPct: 15, wireH: 54, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的冷风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
+                { id: 304, title: "屋檐下的对视", author: charName, joy: 66, xPct: 79, yPct: 11, wireH: 68, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
+                { id: 305, title: "吃醋时的沉默", author: userName, joy: 45, xPct: 26, yPct: 30, wireH: 42, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
+                { id: 306, title: "分别时的酸涩", author: charName, joy: 20, xPct: 68, yPct: 31, wireH: 46, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
             ]
         };
     }
 
-    function loadTree() {
-        const c = getCtx(), k = getTreeKey();
+    function loadChimes() {
+        const c = getCtx(), k = getChimeKey();
         try {
             const raw = localStorage.getItem(k);
-            if (!raw) { const init = createDefaultTree(c.charName, c.userName); localStorage.setItem(k, JSON.stringify(init)); return init; }
-            return Object.assign(createDefaultTree(c.charName, c.userName), JSON.parse(raw));
-        } catch (e) { return createDefaultTree(c.charName, c.userName); }
+            if (!raw) { const init = createDefaultChimes(c.charName, c.userName); localStorage.setItem(k, JSON.stringify(init)); return init; }
+            return Object.assign(createDefaultChimes(c.charName, c.userName), JSON.parse(raw));
+        } catch (e) { return createDefaultChimes(c.charName, c.userName); }
     }
-    function saveTree(d) { try { localStorage.setItem(getTreeKey(), JSON.stringify(d)); } catch (e) {} }
+    function saveChimes(d) { try { localStorage.setItem(getChimeKey(), JSON.stringify(d)); } catch (e) {} }
 
-    // ❄️ 清冷霜雪色阶：开心度决定叶片从「冰透纯白」到「清冷雾银」再到「深邃冷炭」
-    function getLeafStyleByJoy(joy = 85) {
+    // ❄️ 清冷冰晶色阶：开心度决定风铃从「纯白透亮琉璃」到「清冷霜银」再到「寒夜深炭水晶」
+    function getChimeStyleByJoy(joy = 85) {
         const j = Math.max(0, Math.min(100, Number(joy) || 85));
         if (j >= 85) {
-            return { grad1: "#FFFFFF", grad2: "#F4F6FA", stroke: "#949AA8", vein: "#BDC3D2", glow: "drop-shadow(0 0 12px #FFFFFF) drop-shadow(0 3px 8px rgba(80,86,102,0.16))", label: `极开心 ${j}% · 冰魄霜白叶` };
+            return {
+                glassBg: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(242,245,252,0.82) 100%)",
+                border: "rgba(255,255,255,0.98)", shadow: "0 8px 24px rgba(180,190,210,0.28), 0 0 14px rgba(255,255,255,0.95)",
+                textCol: "#323642", subCol: "#8890A4", bellCol: "#FFFFFF", label: `极开心 ${j}% · 纯白冰魄琉璃`
+            };
         } else if (j >= 65) {
-            return { grad1: "#EEF0F6", grad2: "#D8DDE8", stroke: "#7C8292", vein: "#A2A8B8", glow: "drop-shadow(0 0 8px rgba(255,255,255,0.85)) drop-shadow(0 3px 8px rgba(80,86,102,0.16))", label: `愉悦 ${j}% · 雾凇浅银叶` };
+            return {
+                glassBg: "linear-gradient(180deg, rgba(238,242,250,0.90) 0%, rgba(216,222,236,0.78) 100%)",
+                border: "rgba(235,240,248,0.9)", shadow: "0 8px 20px rgba(140,150,175,0.22)",
+                textCol: "#323642", subCol: "#727A8E", bellCol: "#E6EAF2", label: `愉悦 ${j}% · 凝霜浅银风铃`
+            };
         } else if (j >= 40) {
-            return { grad1: "#B8BECB", grad2: "#9298A8", stroke: "#585E6E", vein: "#787E8E", glow: "drop-shadow(0 4px 10px rgba(80,85,100,0.28))", label: `微涩 ${j}% · 冷月烟灰叶` };
+            return {
+                glassBg: "linear-gradient(180deg, rgba(184,190,206,0.86) 0%, rgba(152,160,178,0.78) 100%)",
+                border: "rgba(200,206,220,0.75)", shadow: "0 8px 20px rgba(90,96,115,0.25)",
+                textCol: "#FFFFFF", subCol: "#E2E6F0", bellCol: "#B0B8C8", label: `微涩 ${j}% · 冷月雾灰风铃`
+            };
         } else {
-            return { grad1: "#545866", grad2: "#343742", stroke: "#22242C", vein: "#7E8494", glow: "drop-shadow(0 6px 14px rgba(25,27,35,0.42))", label: `思念 ${j}% · 寒夜深炭叶` };
+            return {
+                glassBg: "linear-gradient(180deg, rgba(72,76,90,0.90) 0%, rgba(44,47,58,0.86) 100%)",
+                border: "rgba(110,116,134,0.65)", shadow: "0 10px 24px rgba(25,28,38,0.38)",
+                textCol: "#F4F6FA", subCol: "#98A0B4", bellCol: "#484C5A", label: `思念 ${j}% · 寒夜玄墨风铃`
+            };
         }
     }
 
-    // 绘制高定清冷银杏扇叶 / 滴水菩提叶标本 SVG
-    function renderRealisticLeafSvg(id, joy, isSel, idx) {
-        const st = getLeafStyleByJoy(joy);
-        const isGinkgo = idx % 2 === 0;
-        const w = isSel ? 44 : 34, h = isSel ? 52 : 40, gid = `lg_${id}`;
-        if (isGinkgo) {
-            return `<svg viewBox="0 0 60 70" width="${w}" height="${h}" fill="none" style="display:block;filter:${st.glow};overflow:visible;">
-                <defs><linearGradient id="${gid}" x1="10" y1="10" x2="50" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${st.grad1}"/><stop offset="100%" stop-color="${st.grad2}"/></linearGradient></defs>
-                <line x1="30" y1="-10" x2="30" y2="6" stroke="${st.stroke}" stroke-width="0.75" stroke-dasharray="1.5 1.5" opacity="0.65"/>
-                <circle cx="30" cy="-10" r="1.6" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.75"/>
-                <path d="M30 6 C29 14, 30 20, 30 24" stroke="${st.stroke}" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M30 23 C20 26, 7 36, 6 47 C5 53, 12 57, 19 56 C24 55, 28 50, 30 46 C32 50, 36 55, 41 56 C48 57, 55 53, 54 47 C53 36, 40 26, 30 23 Z" fill="url(#${gid})" stroke="${isSel ? "#2C2E38" : st.stroke}" stroke-width="${isSel ? "1.8" : "1.0"}" stroke-linejoin="round"/>
-                <g stroke="${st.vein}" stroke-width="0.6" stroke-linecap="round" opacity="0.85"><path d="M30 25 C24 34, 16 42, 11 49"/><path d="M30 25 C26 35, 21 44, 18 52"/><path d="M30 25 C28 34, 26 42, 25 49"/><path d="M30 25 C32 34, 34 42, 35 49"/><path d="M30 25 C34 35, 39 44, 42 52"/><path d="M30 25 C36 34, 44 42, 49 49"/></g>
-            </svg>`;
-        }
-        return `<svg viewBox="0 0 56 72" width="${w}" height="${h}" fill="none" style="display:block;filter:${st.glow};overflow:visible;">
-            <defs><linearGradient id="${gid}" x1="12" y1="8" x2="44" y2="64" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${st.grad1}"/><stop offset="100%" stop-color="${st.grad2}"/></linearGradient></defs>
-            <line x1="28" y1="-10" x2="28" y2="5" stroke="${st.stroke}" stroke-width="0.75" stroke-dasharray="1.5 1.5" opacity="0.65"/>
-            <circle cx="28" cy="-10" r="1.6" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.75"/>
-            <path d="M28 5 L28 14" stroke="${st.stroke}" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M28 13 C14 18, 9 34, 15 47 C19 55, 27 60, 29 66 C29 59, 37 54, 41 47 C47 34, 42 18, 28 13 Z" fill="url(#${gid})" stroke="${isSel ? "#2C2E38" : st.stroke}" stroke-width="${isSel ? "1.8" : "1.0"}" stroke-linejoin="round"/>
-            <g stroke="${st.vein}" stroke-width="0.65" stroke-linecap="round" opacity="0.85"><path d="M28 14 C28 32, 28 48, 29 63" stroke-width="0.85"/><path d="M28 24 C23 27, 19 31, 16 35"/><path d="M28 28 C33 31, 37 35, 39 39"/><path d="M28 35 C23 38, 19 42, 18 46"/><path d="M28 39 C33 42, 36 46, 37 49"/></g>
-            <circle cx="29" cy="68" r="${isSel ? "2.2" : "1.5"}" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.8"/>
-        </svg>`;
-    }
-
-    async function askTreeAI(sys, usr) {
+    async function askChimeAI(sys, usr) {
         const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
         const k = topDoc.getElementById("smt-api-key")?.value?.trim();
         const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
@@ -5684,369 +5677,387 @@ bootSumoulApp();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    function mulberry32(seed) {
-        return function () {
-            let t = (seed += 0x6d2b79f5);
-            t = Math.imul(t ^ (t >>> 15), t | 1);
-            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-        };
-    }
-
-    function mountColdSilverSacredTree() {
+    function mountKoreanWindChimeGallery() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountColdSilverSacredTree, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountKoreanWindChimeGallery, 200); return; }
 
-        topDoc.getElementById("smt-page-memory_tree")?.remove();
-        topDoc.getElementById("smt-real-tree-overlay")?.remove();
-        topDoc.getElementById("sumoul-memory-tree-css")?.remove();
+        // 清理之前旧组件
+        ["smt-page-memory_tree", "smt-real-tree-overlay", "smt-film-studio-overlay", "sumoul-memory-tree-css", "smt-home-open-memtree"].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
         st.id = "sumoul-memory-tree-css";
         st.innerHTML = `
-            @keyframes mtLeafGentleSway { 0%, 100% { transform: translate(-50%, 0) rotate(-2.5deg); } 50% { transform: translate(-50%, 0) rotate(3deg); } }
-            #seoul-mini-theater-modal #smt-real-tree-overlay {
+            /* 1. 风铃日常微风呼吸摆动 */
+            @keyframes wcGentlePendulum {
+                0%, 100% { transform: translate(-50%, 0) rotate(-3.2deg); }
+                50%      { transform: translate(-50%, 0) rotate(3.6deg); }
+            }
+            /* 2. 吹拂微风时的剧烈清脆摇曳动画 */
+            @keyframes wcStrongGust {
+                0%   { transform: translate(-50%, 0) rotate(0deg); }
+                20%  { transform: translate(-50%, 0) rotate(14deg); }
+                45%  { transform: translate(-50%, 0) rotate(-11deg); }
+                70%  { transform: translate(-50%, 0) rotate(7deg); }
+                88%  { transform: translate(-50%, 0) rotate(-4deg); }
+                100% { transform: translate(-50%, 0) rotate(0deg); }
+            }
+            /* 3. 风铃声波扩散涟漪环 */
+            @keyframes wcRippleOut {
+                0%   { transform: scale(0.6); opacity: 0.85; }
+                100% { transform: scale(2.6); opacity: 0; }
+            }
+            /* 4. 实时声波律动柱 */
+            @keyframes wcAudioWave {
+                0%, 100% { height: 4px; opacity: 0.35; }
+                50%      { height: 14px; opacity: 0.9; }
+            }
+            /* 5. 信笺翻转切入动效 */
+            @keyframes wcCardReveal {
+                from { opacity: 0; transform: translateY(10px) scale(0.97); }
+                to   { opacity: 1; transform: translateY(0) scale(1); }
+            }
+
+            #seoul-mini-theater-modal #smt-chime-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: linear-gradient(170deg, #E8ECF5 0%, #F3F5FA 52%, #FFFFFF 100%) !important;
+                background: radial-gradient(circle at 50% 18%, #FFFFFF 0%, #F2F5FA 52%, #E5EAF3 100%) !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
-            #seoul-mini-theater-modal #smt-real-tree-overlay.open { display: flex !important; }
-            #seoul-mini-theater-modal #mt-ancient-canvas { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; display: block !important; pointer-events: none !important; z-index: 1 !important; }
-            #seoul-mini-theater-modal #mt-leaves-stage { position: absolute !important; inset: 0 !important; z-index: 6 !important; overflow: hidden !important; pointer-events: none !important; }
-            #seoul-mini-theater-modal .mt-hanging-leaf { position: absolute !important; transform-origin: top center !important; display: flex !important; flex-direction: column !important; align-items: center !important; cursor: grab !important; touch-action: none !important; pointer-events: auto !important; z-index: 12 !important; animation: mtLeafGentleSway 4.8s ease-in-out infinite !important; }
-            #seoul-mini-theater-modal .mt-hanging-leaf.dragging { cursor: grabbing !important; animation: none !important; transform: translate(-50%, 0) scale(1.18) !important; z-index: 60 !important; }
-            #seoul-mini-theater-modal .mt-hanging-leaf.selected-leaf { z-index: 45 !important; }
-            #seoul-mini-theater-modal .mt-glass-pill { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; height: 28px !important; padding: 0 11px !important; border-radius: 999px !important; background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important; border: 1px solid rgba(226, 228, 236, 0.95) !important; font-size: 9.2px !important; font-weight: 700 !important; color: #3A3D46 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 20, 30, 0.04) !important; }
-            #seoul-mini-theater-modal .mt-glass-pill.dark { background: #3A3D46 !important; border-color: #3A3D46 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
-            #seoul-mini-theater-modal .mt-float-card { background: rgba(255, 255, 255, 0.94) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border: 1px solid #E6E8F0 !important; border-radius: 18px !important; padding: 13px 15px !important; box-shadow: 0 12px 36px rgba(20, 20, 35, 0.08) !important; }
+            #seoul-mini-theater-modal #smt-chime-overlay.open { display: flex !important; }
+
+            #seoul-mini-theater-modal #wc-snow-canvas {
+                position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+                display: block !important; z-index: 1 !important; pointer-events: auto !important;
+            }
+            #seoul-mini-theater-modal #wc-chimes-stage {
+                position: absolute !important; inset: 0 !important; z-index: 5 !important; pointer-events: none !important; overflow: hidden !important;
+            }
+
+            /* 单枚悬挂的韩系冰晶玻璃风铃节点 */
+            #seoul-mini-theater-modal .wc-chime-node {
+                position: absolute !important; transform-origin: top center !important;
+                display: flex !important; flex-direction: column !important; align-items: center !important;
+                cursor: grab !important; pointer-events: auto !important; touch-action: none !important;
+                animation: wcGentlePendulum 4.6s ease-in-out infinite !important;
+                z-index: 10 !important;
+            }
+            #seoul-mini-theater-modal .wc-chime-node.gust-ringing {
+                animation: wcStrongGust 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+            }
+            #seoul-mini-theater-modal .wc-chime-node.dragging {
+                cursor: grabbing !important; animation: none !important;
+                transform: translate(-50%, 0) scale(1.14) !important; z-index: 60 !important;
+            }
+            #seoul-mini-theater-modal .wc-chime-node.active-chime { z-index: 40 !important; }
+
+            /* 冰晶铃铛头与声波扩散环 */
+            #seoul-mini-theater-modal .wc-bell-dome {
+                width: 24px !important; height: 18px !important;
+                border-radius: 14px 14px 4px 4px !important;
+                backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
+                position: relative !important; display: flex !important; align-items: center !important; justify-content: center !important;
+            }
+            #seoul-mini-theater-modal .wc-ripple-ring {
+                position: absolute !important; width: 26px !important; height: 26px !important;
+                border-radius: 50% !important; border: 1px solid rgba(255,255,255,0.95) !important;
+                pointer-events: none !important; animation: wcRippleOut 2.4s ease-out infinite !important;
+            }
+
+            /* 竖排清透磨砂玻璃风铃签（단책 Tanzaku） */
+            #seoul-mini-theater-modal .wc-glass-strip {
+                width: 30px !important; min-height: 86px !important; padding: 10px 4px !important;
+                border-radius: 7px !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important;
+                display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+                writing-mode: vertical-rl !important; text-orientation: upright !important;
+                font-size: 9.5px !important; font-weight: 800 !important; letter-spacing: 2.5px !important;
+                box-sizing: border-box !important; transition: transform 0.2s ease !important;
+            }
+
+            #seoul-mini-theater-modal .wc-pill {
+                display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
+                height: 28px !important; padding: 0 11px !important; border-radius: 999px !important;
+                background: rgba(255, 255, 255, 0.88) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important;
+                border: 1px solid rgba(226, 230, 240, 0.95) !important; font-size: 9.2px !important; font-weight: 700 !important;
+                color: #323642 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 24, 35, 0.04) !important;
+            }
+            #seoul-mini-theater-modal .wc-pill.dark {
+                background: #323642 !important; border-color: #323642 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
+            }
+            #seoul-mini-theater-modal .wc-detail-card {
+                background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important;
+                border: 1px solid rgba(230, 234, 244, 0.95) !important; border-radius: 20px !important;
+                padding: 14px 16px !important; box-shadow: 0 14px 38px rgba(25, 30, 45, 0.07) !important;
+                animation: wcCardReveal 0.3s ease forwards !important;
+            }
+            #seoul-mini-theater-modal .wc-wave-bar {
+                width: 2px !important; height: 5px !important; border-radius: 99px !important;
+                background: #7E869A !important; display: inline-block !important;
+                animation: wcAudioWave 1.1s ease-in-out infinite !important;
+            }
         `;
         topDoc.head.appendChild(st);
 
+        // 在个人主页挂载全新第 5 应用：【初雪风铃 (풍경의 기억)】
         const homeDockGrid = homePage.querySelector(".ab-dock-grid");
         if (homeDockGrid) {
-            topDoc.getElementById("smt-home-open-memtree")?.remove();
-            const treeBtn = topDoc.createElement("div");
-            treeBtn.className = "ab-app-item"; treeBtn.id = "smt-home-open-memtree";
-            treeBtn.innerHTML = `<div class="ab-app-squircle">${MT_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadTree().leaves.length}叶</span></div><div class="ab-app-title">有情树</div><div class="ab-app-kr">기억의 나무</div>`;
-            homeDockGrid.appendChild(treeBtn);
+            const chimeBtn = topDoc.createElement("div");
+            chimeBtn.className = "ab-app-item";
+            chimeBtn.id = "smt-home-open-memtree";
+            chimeBtn.innerHTML = `
+                <div class="ab-app-squircle">${WC_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadChimes().items.length}铃</span></div>
+                <div class="ab-app-title">初雪风铃</div>
+                <div class="ab-app-kr">풍경의 기억 · CHIME</div>
+            `;
+            homeDockGrid.appendChild(chimeBtn);
         }
 
         const overlay = topDoc.createElement("div");
-        overlay.id = "smt-real-tree-overlay";
+        overlay.id = "smt-chime-overlay";
         overlay.innerHTML = `
-            <canvas id="mt-ancient-canvas"></canvas>
-            <div id="mt-leaves-stage"></div>
+            <!-- 底层：全屏实时飘雪 + 指尖划过冰晶涟漪互动 Canvas -->
+            <canvas id="wc-snow-canvas"></canvas>
 
-            <!-- 顶部极简导航条（已彻底去掉右侧会被挡住的说明文字与年月日！） -->
+            <!-- 中层：满屏错落摇曳的流体玻璃风铃阵 (可点击、可自由按住拖拽位置) -->
+            <div id="wc-chimes-stage"></div>
+
+            <!-- 顶部清冷悬浮导航栏 -->
             <div style="position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:max(16px,env(safe-area-inset-top,16px)) 16px 0 16px;pointer-events:none;">
-                <span class="mt-glass-pill" id="mt-close-btn" style="pointer-events:auto;">${MT_ICO.back}<span>返回主页</span></span>
+                <span class="wc-pill" id="wc-close-btn" style="pointer-events:auto;">${WC_ICO.back}<span>返回主页</span></span>
                 <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
-                    <span class="mt-glass-pill" style="pointer-events:none;">${MT_ICO.leaf}<span id="mt-count-txt">6 片记忆叶</span></span>
-                    <span class="mt-glass-pill" id="mt-list-btn">${MT_ICO.list}<span>叶册名录</span></span>
+                    <span class="wc-pill" id="wc-gust-btn" title="吹拂微风，摇响所有风铃">${WC_ICO.wind}<span>吹拂微风</span></span>
+                    <span class="wc-pill" style="pointer-events:none;"><span id="wc-count-txt">6 枚风铃</span></span>
                 </div>
             </div>
 
-            <div style="position:relative;z-index:35;margin-top:auto;padding:0 16px max(20px,env(safe-area-inset-bottom,20px)) 16px;display:flex;flex-direction:column;gap:9px;pointer-events:none;">
-                <div id="mt-leaf-card-wrap" style="pointer-events:auto;"></div>
+            <!-- 顶部风声低语悬浮条 -->
+            <div style="position:relative;z-index:25;text-align:center;margin-top:8px;padding:0 24px;pointer-events:none;">
+                <div id="wc-wind-whisper" style="display:inline-block;font-size:8.8px;font-weight:600;color:#6E768A;background:rgba(255,255,255,0.68);backdrop-filter:blur(8px);padding:4px 12px;border-radius:99px;border:1px solid rgba(255,255,255,0.9);letter-spacing:0.5px;">
+                    微风拂过檐下的冰晶风铃 · 划过屏幕可拨动初雪与风铃
+                </div>
+            </div>
 
-                <div id="mt-add-modal" class="mt-float-card" style="display:none;pointer-events:auto;">
+            <!-- 底部：双面流体玻璃信笺详情卡 + 操作浮岛 -->
+            <div style="position:relative;z-index:35;margin-top:auto;padding:0 16px max(20px,env(safe-area-inset-bottom,20px)) 16px;display:flex;flex-direction:column;gap:9px;pointer-events:none;">
+                <div id="wc-card-slot" style="pointer-events:auto;"></div>
+
+                <!-- 手写挂新风铃抽屉 -->
+                <div id="wc-add-modal" class="wc-detail-card" style="display:none;pointer-events:auto;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#3A3D46;">亲手挂上一片新记忆叶（无上限 · 挂后可自由拖拽）</span>
-                        <span id="mt-add-close" style="cursor:pointer;color:#8E8E98;">${MT_ICO.close}</span>
+                        <span style="font-size:10px;font-weight:800;color:#323642;">悬挂一枚新冰晶风铃（挂后可按住自由拖拽高低位置）</span>
+                        <span id="wc-add-close" style="cursor:pointer;color:#8890A4;">${WC_ICO.close}</span>
                     </div>
-                    <input type="text" id="mt-new-title" placeholder="回忆标题 (如：初雪揣进口袋的手)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E6E8F0;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#3A3D46;box-sizing:border-box;outline:none;margin-bottom:6px;" />
-                    <textarea id="mt-new-content" placeholder="写下你想封存在树叶里的真实回忆..." style="width:100%;height:50px;background:#FFFFFF;border:1px solid #E6E8F0;border-radius:9px;padding:7px 10px;font-size:10px;color:#3A3D46;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
+                    <input type="text" id="wc-new-title" placeholder="风铃短签字 (4~6字最佳，如：初雪揣进兜)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E4E8F2;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#323642;box-sizing:border-box;outline:none;margin-bottom:6px;" />
+                    <textarea id="wc-new-content" placeholder="写下封存在这枚风铃里的记忆回声..." style="width:100%;height:50px;background:#FFFFFF;border:1px solid #E4E8F2;border-radius:9px;padding:7px 10px;font-size:10px;color:#323642;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
-                        <span style="font-size:9px;font-weight:700;color:#585C6A;">开心程度(决定叶色深浅)：</span>
-                        <input type="range" id="mt-new-joy" min="5" max="100" value="92" style="flex:1;accent-color:#484C58;" />
-                        <span id="mt-new-joy-lbl" style="font-size:8.5px;font-weight:800;color:#3A3D46;min-width:105px;text-align:right;">极开心 92% · 冰魄霜白叶</span>
+                        <span style="font-size:9px;font-weight:700;color:#585E70;">开心程度(冰晶透光度)：</span>
+                        <input type="range" id="wc-new-joy" min="5" max="100" value="94" style="flex:1;accent-color:#323642;" />
+                        <span id="wc-new-joy-lbl" style="font-size:8px;font-weight:800;color:#323642;min-width:115px;text-align:right;">极开心 94% · 纯白冰魄琉璃</span>
                     </div>
                     <div style="display:flex;justify-content:flex-end;">
-                        <span class="mt-glass-pill dark" id="mt-add-submit" style="height:28px!important;">挂上霜枝并让TA批注</span>
+                        <span class="wc-pill dark" id="wc-add-submit">悬起风铃并让TA留下回声</span>
                     </div>
                 </div>
 
-                <div id="mt-all-list-modal" class="mt-float-card" style="display:none;max-height:240px;overflow-y:auto;pointer-events:auto;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #EFEFF5;">
-                        <span style="font-size:10px;font-weight:800;color:#3A3D46;">全部记忆叶名录（点击定位查看）</span>
-                        <span id="mt-list-close" style="cursor:pointer;color:#8E8E98;">${MT_ICO.close}</span>
-                    </div>
-                    <div id="mt-all-list-body" style="display:flex;flex-direction:column;gap:5px;"></div>
-                </div>
-
-                <div style="display:flex;justify-content:flex-end;gap:6px;pointer-events:auto;">
-                    <span class="mt-glass-pill" id="mt-btn-add">${MT_ICO.plus}<span>挂记忆叶</span></span>
-                    <span class="mt-glass-pill" id="mt-btn-ai-leaf">${MT_ICO.leaf}<span>让TA挂叶</span></span>
-                    <span class="mt-glass-pill dark" id="mt-btn-absorb">${MT_ICO.spark}<span>汲取聊天结叶</span></span>
+                <!-- 底部操作栏 -->
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;pointer-events:auto;">
+                    <span class="wc-pill" id="wc-btn-add" style="flex:1;">${WC_ICO.plus}<span>手写挂铃</span></span>
+                    <span class="wc-pill" id="wc-btn-ai" style="flex:1;">${WC_ICO.wind}<span>让TA挂铃</span></span>
+                    <span class="wc-pill dark" id="wc-btn-absorb" style="flex:1.25;">${WC_ICO.spark}<span>汲取聊天结铃</span></span>
                 </div>
             </div>
         `;
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // ❄️ 精准修正你发来的渲染器：
-        // 1. 严格只保留「唯一一根」独木粗壮主干（底宽 96px ~ 115px，加盘根底座），删掉多余的第二根副干！
-        // 2. 在主干和各级霜枝上加上写实的纵向树皮明暗裂纹，让粗树干极具真实古木质感！
-        // 3. 把原本稀疏的小叶子升级为 2800 片大号饱满雾凇叶片（尺寸 9~16px），树冠浓密丰满！
+        // ❄️ 全屏实时动态初雪 + 极光雾浪 + 指尖划过冰晶涟漪互动物理引擎
         // ══════════════════════════════════════════════════════════════════════════
-        const canvas = topDoc.getElementById("mt-ancient-canvas");
+        const canvas = topDoc.getElementById("wc-snow-canvas");
         const ctx2d = canvas.getContext("2d");
-        let animId = null, W = 390, H = 780, treeDataCache = null;
-
-        function buildColdSilverTree(w, h) {
-            const rng = mulberry32(20260401);
-            const branches = [];
-            const frostMist = [];
-            const backLeaves = [];
-            const frontLeaves = [];
-            const iceThreads = [];
-
-            function growSlenderBranch(x1, y1, len, ang, w1, depth) {
-                // 保持主干向主枝平滑过渡，粗壮有力不突兀
-                const w2 = Math.max(1.2, w1 * (depth === 7 ? 0.68 : (depth >= 5 ? 0.66 : 0.64)));
-                const curve = (rng() - 0.46) * 0.16;
-                const cx = x1 + Math.cos(ang + curve) * (len * 0.52);
-                const cy = y1 + Math.sin(ang + curve) * (len * 0.52);
-                const x2 = x1 + Math.cos(ang) * len;
-                const y2 = y1 + Math.sin(ang) * len;
-
-                branches.push({ x1, y1, cx, cy, x2, y2, w1, w2, depth });
-
-                // 从第 5 层开始沿着树枝密集簇生丰满的雾凇叶片（不再只有末端几片！）
-                if (depth <= 5) {
-                    if (depth <= 3) {
-                        frostMist.push({ x: x2, y: y2, r: 44 + rng() * 42 });
-                    }
-                    const leafCnt = depth === 1 ? 32 : (depth === 2 ? 26 : 16);
-                    const spreadRad = 18 + depth * 12;
-                    for (let i = 0; i < leafCnt; i++) {
-                        const a = rng() * Math.PI * 2;
-                        const d = Math.pow(rng(), 0.65) * spreadRad;
-                        const lx = x2 + Math.cos(a) * d;
-                        const ly = y2 + Math.sin(a) * (d * 0.75);
-                        const sz = 8.5 + rng() * 6.5;
-                        const rot = (rng() - 0.5) * 2.4;
-                        const s = rng();
-                        if (s < 0.35) {
-                            backLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(150, 158, 176, 0.68)", phase: rng() * 6.28 });
-                        } else if (s < 0.68) {
-                            frontLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(224, 229, 240, 0.88)", phase: rng() * 6.28 });
-                        } else {
-                            frontLeaves.push({ x: lx, y: ly, sz, rot, fill: "rgba(255, 255, 255, 0.96)", phase: rng() * 6.28 });
-                        }
-                    }
-                    if (depth === 2 && rng() > 0.4) {
-                        iceThreads.push({ x: x2, y: y2, len: 45 + rng() * 70, phase: rng() * 6.28 });
-                    }
-                }
-
-                if (depth <= 1) return;
-
-                const subCnt = (depth === 7 || depth === 5 || depth === 3) ? 3 : 2;
-                for (let i = 0; i < subCnt; i++) {
-                    const spread = subCnt === 2 ? (i === 0 ? -0.36 : 0.32) : (i - 1) * 0.36;
-                    const pullRight = x2 < w * 0.48 ? 0.09 : -0.02;
-                    const nextAng = ang + spread + pullRight + (rng() - 0.5) * 0.13;
-                    const nextLen = len * (0.76 + rng() * 0.11);
-                    growSlenderBranch(x2, y2, nextLen, nextAng, w2, depth - 1);
-                }
-            }
-
-            // 🔥 核心修复：严格只画「唯一一根」粗壮的独木主干！（底宽直接拉到 92px~110px，彻底删掉之前多余的第二根副干！）
-            const singleTrunkW = Math.max(88, w * 0.24);
-            growSlenderBranch(w * 0.16, h * 0.95, h * 0.25, -Math.PI * 0.45, singleTrunkW, 7);
-
-            const snowMotes = Array.from({ length: 22 }, (_, i) => ({
-                x: w * (0.1 + rng() * 0.85), y: h * rng(), r: 1.0 + rng() * 1.6, spY: 8 + rng() * 10, phase: i
-            }));
-
-            return { branches, frostMist, backLeaves, frontLeaves, iceThreads, snowMotes };
-        }
+        let animId = null, W = 390, H = 780;
+        let windForce = 0; // 吹拂微风时的物理横向风力加速度
+        const touchRipples = []; // 指尖划过或点击屏幕产生的动态冰晶水波纹
+        const snowFlakes = Array.from({ length: 52 }, (_, i) => ({
+            x: Math.random() * 400,
+            y: Math.random() * 800,
+            r: 1.2 + Math.random() * 2.8,
+            vy: 0.45 + Math.random() * 0.85,
+            vx: (Math.random() - 0.5) * 0.4,
+            alpha: 0.4 + Math.random() * 0.55,
+            phase: i * 0.7
+        }));
 
         function resizeCanvas() {
             const rect = overlay.getBoundingClientRect();
             W = rect.width || topWin.innerWidth || 390;
             H = rect.height || topWin.innerHeight || 780;
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
+            canvas.width = W * dpr; canvas.height = H * dpr;
             ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-            treeDataCache = buildColdSilverTree(W, H);
         }
 
-        // 绘制真实感粗壮冷银树干与分枝（含圆滑分叉关节 + 写实纵向树皮裂纹沟壑）
-        function drawFrostSilverBranch(b, wind) {
-            const dx = b.x2 - b.x1, dy = b.y2 - b.y1, len = Math.hypot(dx, dy) || 1;
-            const nx = -dy / len, ny = dx / len;
-            // 底部唯一主干稳如泰山不乱晃，上方细枝随风轻摆
-            const sw1 = b.depth === 7 ? 0 : wind * (7 - b.depth) * 0.22;
-            const sw2 = wind * (8 - b.depth) * 0.35;
-            const swc = (sw1 + sw2) * 0.5;
-
-            const x1 = b.x1 + sw1, y1 = b.y1, x2 = b.x2 + sw2, y2 = b.y2, cx = b.cx + swc, cy = b.cy;
-
-            // 如果是唯一主干（depth === 7），底部向外自然扩出稳固的古树盘根弧度
-            const baseExpand = b.depth === 7 ? 1.38 : 1.0;
-
-            ctx2d.beginPath();
-            ctx2d.moveTo(x1 + nx * b.w1 * 0.5 * baseExpand, y1 + ny * b.w1 * 0.5);
-            ctx2d.quadraticCurveTo(cx + nx * (b.w1 + b.w2) * 0.25, cy + ny * (b.w1 + b.w2) * 0.25, x2 + nx * b.w2 * 0.5, y2 + ny * b.w2 * 0.5);
-            ctx2d.arc(x2, y2, b.w2 * 0.5, Math.atan2(ny, nx), Math.atan2(-ny, -nx));
-            ctx2d.quadraticCurveTo(cx - nx * (b.w1 + b.w2) * 0.25, cy - ny * (b.w1 + b.w2) * 0.25, x1 - nx * b.w1 * 0.5 * baseExpand, y1 - ny * b.w1 * 0.5);
-            ctx2d.closePath();
-
-            // 立体圆柱冷银树皮受光渐变
-            const grd = ctx2d.createLinearGradient(x1 - b.w1 * 0.5, y1, x1 + b.w1 * 0.5, y1);
-            grd.addColorStop(0, "#687082");
-            grd.addColorStop(0.38, "#949CAE");
-            grd.addColorStop(0.78, "#D4DAE6");
-            grd.addColorStop(1, "#FFFFFF");
-            ctx2d.fillStyle = grd;
-            ctx2d.fill();
-
-            // 在粗树干和主枝表面刻画写实的纵向树皮纹理沟壑（让树干真实有肌理，不再像塑料管！）
-            if (b.w1 > 10) {
-                const lines = b.depth === 7 ? 7 : 3;
-                for (let k = 1; k <= lines; k++) {
-                    const ratio = (k / (lines + 1)) - 0.5;
-                    ctx2d.beginPath();
-                    ctx2d.moveTo(x1 + nx * b.w1 * ratio * baseExpand, y1 + ny * b.w1 * ratio);
-                    ctx2d.quadraticCurveTo(cx + nx * (b.w1 + b.w2) * 0.5 * ratio, cy + ny * (b.w1 + b.w2) * 0.5 * ratio, x2 + nx * b.w2 * ratio, y2 + ny * b.w2 * ratio);
-                    ctx2d.strokeStyle = k % 2 === 0 ? "rgba(72, 78, 94, 0.36)" : "rgba(255, 255, 255, 0.55)";
-                    ctx2d.lineWidth = b.depth === 7 ? 1.6 : 0.9;
-                    ctx2d.lineCap = "round";
-                    ctx2d.stroke();
+        function spawnRipple(x, y, maxR = 55) {
+            touchRipples.push({ x, y, r: 4, maxR, alpha: 0.75 });
+            // 推开附近的雪花粒子
+            snowFlakes.forEach((sf) => {
+                const dx = sf.x - x, dy = sf.y - y, d = Math.hypot(dx, dy);
+                if (d < 70 && d > 1) {
+                    sf.x += (dx / d) * 14;
+                    sf.y += (dy / d) * 14;
                 }
-            }
-        }
-
-        function drawLeafBatch(list, t) {
-            list.forEach((lf) => {
-                const sw = Math.sin(t * 1.4 + lf.phase) * 2.2;
-                ctx2d.save();
-                ctx2d.translate(lf.x + sw, lf.y);
-                ctx2d.rotate(lf.rot + sw * 0.03);
-                ctx2d.beginPath();
-                ctx2d.moveTo(0, 0);
-                ctx2d.bezierCurveTo(-lf.sz * 0.5, -lf.sz * 0.32, -lf.sz * 0.42, -lf.sz, 0, -lf.sz * 1.42);
-                ctx2d.bezierCurveTo(lf.sz * 0.42, -lf.sz, lf.sz * 0.5, -lf.sz * 0.32, 0, 0);
-                ctx2d.fillStyle = lf.fill;
-                ctx2d.fill();
-                ctx2d.restore();
             });
         }
 
-        function renderCanvasLoop(ts) {
+        canvas.addEventListener("pointermove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            if (Math.random() < 0.35) spawnRipple(e.clientX - rect.left, e.clientY - rect.top, 36);
+        });
+        canvas.addEventListener("pointerdown", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            spawnRipple(e.clientX - rect.left, e.clientY - rect.top, 68);
+        });
+
+        function renderSnowAndRipples(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
-            if (!treeDataCache) resizeCanvas();
-            const t = ts * 0.001, wind = Math.sin(t * 1.0) * 2.2;
-
+            const t = ts * 0.001;
             ctx2d.clearRect(0, 0, W, H);
-            const { branches, frostMist, backLeaves, frontLeaves, iceThreads, snowMotes } = treeDataCache;
+            windForce *= 0.96;
 
-            // 1. 树冠底层清冷纯白冰雾柔光云团
-            frostMist.forEach((fm) => {
-                const g = ctx2d.createRadialGradient(fm.x + wind * 0.5, fm.y, 4, fm.x + wind * 0.5, fm.y, fm.r);
-                g.addColorStop(0, "rgba(255, 255, 255, 0.88)");
-                g.addColorStop(0.6, "rgba(232, 236, 246, 0.45)");
-                g.addColorStop(1, "rgba(255, 255, 255, 0)");
-                ctx2d.fillStyle = g;
+            // 1. 顶部韩系清冷柔光呼吸雾弦（3条随时间缓慢起伏的半透明丝绸光带）
+            for (let b = 0; b < 3; b++) {
                 ctx2d.beginPath();
-                ctx2d.arc(fm.x + wind * 0.5, fm.y, fm.r, 0, Math.PI * 2);
-                ctx2d.fill();
-            });
-
-            // 2. 树冠远景冷灰衬底繁叶
-            drawLeafBatch(backLeaves, t);
-
-            // 3. 垂落的银白冰丝气根
-            iceThreads.forEach((it) => {
-                const sw = Math.sin(t * 1.5 + it.phase) * 5.5 + wind;
-                const g = ctx2d.createLinearGradient(it.x, it.y, it.x, it.y + it.len);
-                g.addColorStop(0, "rgba(165, 172, 188, 0.6)");
-                g.addColorStop(1, "rgba(255, 255, 255, 0)");
-                ctx2d.beginPath();
-                ctx2d.moveTo(it.x, it.y);
-                ctx2d.quadraticCurveTo(it.x + sw * 0.4, it.y + it.len * 0.5, it.x + sw, it.y + it.len);
-                ctx2d.strokeStyle = g;
-                ctx2d.lineWidth = 0.9;
+                const baseY = H * (0.12 + b * 0.14);
+                ctx2d.moveTo(0, baseY);
+                for (let x = 0; x <= W; x += 30) {
+                    const y = baseY + Math.sin(x * 0.012 + t * (0.8 + b * 0.3) + b) * 18;
+                    ctx2d.lineTo(x, y);
+                }
+                ctx2d.strokeStyle = `rgba(255, 255, 255, ${0.55 - b * 0.12})`;
+                ctx2d.lineWidth = 1.4;
                 ctx2d.stroke();
-            });
+            }
 
-            // 4. 唯一一根粗壮独木主干与各级伸展霜枝
-            branches.forEach((b) => drawFrostSilverBranch(b, wind));
+            // 2. 实时飘落的初雪粒子与六角微光星芒
+            snowFlakes.forEach((sf) => {
+                sf.y += sf.vy;
+                sf.x += sf.vx + Math.sin(t * 1.2 + sf.phase) * 0.35 + windForce;
+                if (sf.y > H + 10) { sf.y = -10; sf.x = Math.random() * W; }
+                if (sf.x > W + 10) sf.x = -10;
+                if (sf.x < -10) sf.x = W + 10;
 
-            // 5. 树冠前景受光纯白/雾银浓密繁叶（半掩树枝，饱满茂密！）
-            drawLeafBatch(frontLeaves, t);
-
-            // 6. 树根底部仙气白雾消融层
-            const mistGrd = ctx2d.createLinearGradient(0, H * 0.80, 0, H);
-            mistGrd.addColorStop(0, "rgba(238, 241, 247, 0)");
-            mistGrd.addColorStop(0.58, "rgba(244, 246, 251, 0.86)");
-            mistGrd.addColorStop(1, "#FFFFFF");
-            ctx2d.fillStyle = mistGrd;
-            ctx2d.fillRect(0, H * 0.80, W, H * 0.20);
-
-            // 7. 飘浮的微雪冰尘
-            snowMotes.forEach((sm) => {
-                const py = (sm.y + t * sm.spY) % H;
-                const px = sm.x + Math.sin(t + sm.phase) * 8;
                 ctx2d.beginPath();
-                ctx2d.arc(px, py, sm.r, 0, Math.PI * 2);
-                ctx2d.fillStyle = "rgba(255, 255, 255, 0.9)";
+                ctx2d.arc(sf.x, sf.y, sf.r, 0, Math.PI * 2);
+                ctx2d.fillStyle = `rgba(255, 255, 255, ${sf.alpha})`;
+                ctx2d.shadowColor = "#FFFFFF";
+                ctx2d.shadowBlur = 6;
                 ctx2d.fill();
+                ctx2d.shadowBlur = 0;
             });
 
-            animId = requestAnimationFrame(renderCanvasLoop);
+            // 3. 指尖拨动产生的清冷冰晶扩散涟漪
+            for (let i = touchRipples.length - 1; i >= 0; i--) {
+                const rp = touchRipples[i];
+                rp.r += (rp.maxR - rp.r) * 0.08 + 0.6;
+                rp.alpha *= 0.94;
+                if (rp.alpha < 0.03) { touchRipples.splice(i, 1); continue; }
+                ctx2d.beginPath();
+                ctx2d.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                ctx2d.strokeStyle = `rgba(255, 255, 255, ${rp.alpha})`;
+                ctx2d.lineWidth = 1.3;
+                ctx2d.stroke();
+            }
+
+            animId = requestAnimationFrame(renderSnowAndRipples);
         }
 
-        function getAutoPos(idx) {
-            const g = idx * 2.39996, r = 9 + (idx % 7) * 4.2;
-            return { xPct: Math.max(12, Math.min(72, Math.round(36 + Math.cos(g) * r * 1.35))), yPct: Math.max(12, Math.min(44, Math.round(25 + Math.sin(g) * r * 0.8))) };
+        function getAutoChimePos(idx) {
+            const cols = [15, 32, 50, 68, 84];
+            const xPct = cols[idx % cols.length] + ((idx * 7) % 9 - 4);
+            const yPct = 10 + (idx % 3) * 11;
+            const wireH = 42 + ((idx * 17) % 36);
+            return { xPct, yPct, wireH };
         }
 
-        function renderLeavesAndUI() {
-            const c = getCtx(), data = loadTree();
+        function triggerWindGust() {
+            windForce = 3.8;
+            const stage = topDoc.getElementById("wc-chimes-stage");
+            stage?.querySelectorAll(".wc-chime-node").forEach((node, i) => {
+                node.classList.remove("gust-ringing");
+                void node.offsetWidth;
+                setTimeout(() => node.classList.add("gust-ringing"), i * 45);
+                setTimeout(() => node.classList.remove("gust-ringing"), 1700);
+            });
+        }
+
+        function renderChimesAndCard() {
+            const c = getCtx(), data = loadChimes();
             const homeBadge = topDoc.getElementById("mt-home-badge");
-            if (homeBadge) homeBadge.textContent = `${data.leaves.length}叶`;
-            topDoc.getElementById("mt-count-txt").textContent = `${data.leaves.length} 片记忆叶`;
+            if (homeBadge) homeBadge.textContent = `${data.items.length}铃`;
+            topDoc.getElementById("wc-count-txt").textContent = `${data.items.length} 枚风铃`;
 
-            // 树上只挂纯净的写实银杏/菩提叶片标本，不挂任何年月日或文字标签，100% 绝不遮挡！
-            const stage = topDoc.getElementById("mt-leaves-stage");
-            stage.innerHTML = (data.leaves || []).map((lf, idx) => {
-                const pos = (lf.xPct && lf.yPct) ? { xPct: lf.xPct, yPct: lf.yPct } : getAutoPos(idx);
-                const isSel = Number(lf.id) === Number(data.activeId);
-                const delay = ((idx * 0.41) % 3.6).toFixed(2);
-                return `<div class="mt-hanging-leaf ${isSel ? "selected-leaf" : ""}" data-lid="${lf.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;">
-                    ${renderRealisticLeafSvg(lf.id, lf.joy, isSel, idx)}
-                </div>`;
+            const stage = topDoc.getElementById("wc-chimes-stage");
+            stage.innerHTML = (data.items || []).map((it, idx) => {
+                const pos = (it.xPct && it.yPct) ? { xPct: it.xPct, yPct: it.yPct, wireH: it.wireH || 52 } : getAutoChimePos(idx);
+                const stInfo = getChimeStyleByJoy(it.joy);
+                const isSel = Number(it.id) === Number(data.activeId);
+                const delay = ((idx * 0.53) % 3.8).toFixed(2);
+                const dur = (4.0 + (idx % 4) * 0.45).toFixed(2);
+
+                return `
+                    <div class="wc-chime-node ${isSel ? "active-chime" : ""}" data-cid="${it.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;animation-duration:${dur}s;">
+                        <!-- 顶部悬挂发光星点与极细银丝 -->
+                        <div style="width:5px;height:5px;border-radius:50%;background:#FFFFFF;border:1px solid #98A0B4;box-shadow:0 0 8px #FFFFFF;"></div>
+                        <div style="width:1px;height:${pos.wireH || 52}px;background:linear-gradient(180deg, rgba(160,168,184,0.85), rgba(255,255,255,0.95));"></div>
+
+                        <!-- 清透冰晶风铃罩 + 动态声波环 -->
+                        <div class="wc-bell-dome" style="background:${stInfo.glassBg};border:1.2px solid ${isSel ? "#323642" : stInfo.border};box-shadow:${stInfo.shadow};">
+                            ${isSel ? `<div class="wc-ripple-ring"></div>` : ""}
+                            <div style="width:5px;height:5px;border-radius:50%;background:${stInfo.textCol};opacity:0.75;"></div>
+                        </div>
+
+                        <!-- 连接铃舌的细银线 -->
+                        <div style="width:1px;height:12px;background:rgba(160,168,184,0.8);"></div>
+
+                        <!-- 竖排流体毛玻璃风铃签 -->
+                        <div class="wc-glass-strip" style="background:${stInfo.glassBg};border:${isSel ? "1.5px solid #323642" : `1px solid ${stInfo.border}`};box-shadow:${stInfo.shadow};color:${stInfo.textCol};transform:scale(${isSel ? 1.08 : 1});">
+                            ${it.title.slice(0, 6).replace(/</g, "&lt;")}
+                        </div>
+                    </div>
+                `;
             }).join("");
 
-            stage.querySelectorAll(".mt-hanging-leaf").forEach((node) => {
-                const lid = Number(node.getAttribute("data-lid"));
+            // 绑定每枚风铃的「点击聆听」与「按住自由拖拽高低位置」
+            stage.querySelectorAll(".wc-chime-node").forEach((node) => {
+                const cid = Number(node.getAttribute("data-cid"));
                 let isDown = false, moved = false, sx = 0, sy = 0;
+
                 const onStart = (cx, cy) => { isDown = true; moved = false; sx = cx; sy = cy; node.classList.add("dragging"); };
                 const onMove = (cx, cy) => {
                     if (!isDown) return;
                     if (Math.hypot(cx - sx, cy - sy) > 6) {
                         moved = true;
                         const rect = stage.getBoundingClientRect();
-                        node.style.left = `${Math.max(6, Math.min(92, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
-                        node.style.top = `${Math.max(8, Math.min(68, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
+                        node.style.left = `${Math.max(8, Math.min(92, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
+                        node.style.top = `${Math.max(6, Math.min(48, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
                     }
                 };
                 const onEnd = () => {
                     if (!isDown) return;
                     isDown = false; node.classList.remove("dragging");
-                    const d = loadTree();
+                    const d = loadChimes();
                     if (moved) {
-                        const target = d.leaves.find((x) => Number(x.id) === lid);
+                        const target = d.items.find((x) => Number(x.id) === cid);
                         if (target) { target.xPct = parseFloat(node.style.left); target.yPct = parseFloat(node.style.top); }
+                    } else if (Number(d.activeId) === cid) {
+                        d.flipped = !d.flipped;
+                    } else {
+                        d.activeId = cid;
+                        d.flipped = false;
                     }
-                    d.activeId = lid; saveTree(d); renderLeavesAndUI();
+                    saveChimes(d);
+                    renderChimesAndCard();
                 };
+
                 node.addEventListener("mousedown", (e) => { e.stopPropagation(); onStart(e.clientX, e.clientY); });
                 topDoc.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY));
                 topDoc.addEventListener("mouseup", onEnd);
@@ -6055,101 +6066,148 @@ bootSumoulApp();
                 node.addEventListener("touchend", onEnd);
             });
 
-            // 底部卡片与名录也全部去掉了年月日显示，干净清爽！
-            const cur = data.leaves.find((x) => Number(x.id) === Number(data.activeId));
-            const wrap = topDoc.getElementById("mt-leaf-card-wrap");
+            // 渲染底部动态声波回声信笺卡
+            const cur = data.items.find((x) => Number(x.id) === Number(data.activeId));
+            const slot = topDoc.getElementById("wc-card-slot");
             if (!cur) {
-                wrap.innerHTML = "";
+                slot.innerHTML = "";
             } else {
-                const stInfo = getLeafStyleByJoy(cur.joy);
-                wrap.innerHTML = `<div class="mt-float-card">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <div style="display:flex;align-items:center;gap:6px;min-width:0;"><span style="width:9px;height:9px;border-radius:50%;background:${stInfo.grad1};border:1.2px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:11.5px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span></div>
-                        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><span style="font-size:7.8px;font-weight:700;color:#585C6A;background:#F2F4F8;padding:2px 7px;border-radius:99px;">${stInfo.label}</span><span id="mt-del-leaf" style="cursor:pointer;display:inline-flex;">${MT_ICO.trash}</span><span id="mt-hide-card" style="cursor:pointer;color:#8E8E98;display:inline-flex;">${MT_ICO.close}</span></div>
-                    </div>
-                    <div style="font-size:10.8px;font-weight:600;color:#3A3D46;line-height:1.65;">${cur.content.replace(/</g, "&lt;")}</div>
-                    <div style="margin-top:8px;padding:8px 10px;background:#F6F7FA;border-left:2px solid #585C6A;border-radius:0 8px 8px 0;font-size:10px;font-weight:600;color:#3A3D46;line-height:1.55;"><span style="font-size:7.8px;color:#989EAE;display:block;margin-bottom:2px;">${c.charName} 的叶背批注</span>${(cur.whisper || "“ 这片叶子我替你收好了。”").replace(/</g, "&lt;")}</div>
+                const stInfo = getChimeStyleByJoy(cur.joy);
+                const waveHtml = `<div style="display:inline-flex;align-items:center;gap:2.5px;height:14px;margin-right:6px;">
+                    <span class="wc-wave-bar" style="animation-delay:0s;"></span>
+                    <span class="wc-wave-bar" style="animation-delay:0.2s;"></span>
+                    <span class="wc-wave-bar" style="animation-delay:0.4s;"></span>
+                    <span class="wc-wave-bar" style="animation-delay:0.1s;"></span>
+                    <span class="wc-wave-bar" style="animation-delay:0.3s;"></span>
                 </div>`;
-                topDoc.getElementById("mt-hide-card").onclick = () => { const d = loadTree(); d.activeId = 0; saveTree(d); renderLeavesAndUI(); };
-                topDoc.getElementById("mt-del-leaf").onclick = () => {
-                    if (!confirm(`确定摘除「${cur.title}」这片记忆叶吗？`)) return;
-                    const d = loadTree(); d.leaves = d.leaves.filter((x) => Number(x.id) !== Number(cur.id)); d.activeId = d.leaves[0]?.id || 0; saveTree(d); renderLeavesAndUI();
-                };
-            }
 
-            const listBody = topDoc.getElementById("mt-all-list-body");
-            listBody.innerHTML = data.leaves.map((lf) => {
-                const stInfo = getLeafStyleByJoy(lf.joy);
-                return `<div data-pickid="${lf.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(lf.id) === Number(data.activeId) ? "#484C58" : "#EFEFF5"};background:#FFFFFF;cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;min-width:0;"><span style="width:8px;height:8px;border-radius:50%;background:${stInfo.grad1};border:1px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:10px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lf.title.replace(/</g, "&lt;")}</span></div><span style="font-size:8px;color:#8E8E98;flex-shrink:0;margin-left:8px;">${stInfo.label}</span></div>`;
-            }).join("");
-            listBody.querySelectorAll("[data-pickid]").forEach((row) => row.onclick = () => {
-                const d = loadTree(); d.activeId = Number(row.getAttribute("data-pickid")); saveTree(d);
-                topDoc.getElementById("mt-all-list-modal").style.display = "none"; renderLeavesAndUI();
-            });
+                if (!data.flipped) {
+                    slot.innerHTML = `
+                        <div class="wc-detail-card" id="wc-main-card" style="cursor:pointer;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                <div style="display:flex;align-items:center;min-width:0;">
+                                    ${waveHtml}
+                                    <span style="font-size:12px;font-weight:800;color:#323642;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                    <span style="font-size:7.5px;font-weight:700;color:#585E70;background:#F2F4F9;padding:2px 8px;border-radius:99px;">${stInfo.label}</span>
+                                    <span id="wc-del-btn" style="cursor:pointer;display:inline-flex;">${WC_ICO.trash}</span>
+                                    <span id="wc-hide-btn" style="cursor:pointer;color:#8890A4;display:inline-flex;">${WC_ICO.close}</span>
+                                </div>
+                            </div>
+                            <div style="font-size:10.6px;font-weight:600;color:#3A3E4C;line-height:1.68;padding:2px 0;">
+                                ${cur.content.replace(/</g, "&lt;")}
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:7px;border-top:1px solid #ECEFF6;font-size:8px;font-weight:700;color:#7E869A;">
+                                <span>系铃人 · ${cur.author}</span>
+                                <span style="color:#323642;display:inline-flex;align-items:center;gap:4px;">${WC_ICO.flip}<span>轻触翻转倾听风铃内壁回声</span></span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    slot.innerHTML = `
+                        <div class="wc-detail-card" id="wc-main-card" style="cursor:pointer;background:rgba(246,248,252,0.95)!important;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                <span style="font-size:8px;font-weight:800;color:#7E869A;letter-spacing:1.2px;">ECHO INSIDE · ${c.charName} 刻在风铃内壁的回声</span>
+                                <span style="font-size:8px;font-weight:700;color:#7E869A;">《${cur.title.replace(/</g, "&lt;")}》</span>
+                            </div>
+                            <div style="font-size:11.5px;font-weight:700;color:#2C303C;line-height:1.75;padding:8px 4px;text-align:center;">
+                                ${(cur.whisper || `“ 风吹响一次，就代表我在心里叫了你一次。”`).replace(/</g, "&lt;")}
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:7px;border-top:1px solid #E4E8F2;font-size:8px;font-weight:700;color:#7E869A;">
+                                <span>${waveHtml}<span>RESONATING</span></span>
+                                <span style="color:#323642;display:inline-flex;align-items:center;gap:4px;">${WC_ICO.flip}<span>翻回正面记忆</span></span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                topDoc.getElementById("wc-main-card").onclick = (e) => {
+                    if (e.target.closest("#wc-del-btn") || e.target.closest("#wc-hide-btn")) return;
+                    const d = loadChimes(); d.flipped = !d.flipped; saveChimes(d); renderChimesAndCard();
+                };
+                topDoc.getElementById("wc-hide-btn")?.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const d = loadChimes(); d.activeId = 0; saveChimes(d); renderChimesAndCard();
+                });
+                topDoc.getElementById("wc-del-btn")?.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    if (!confirm(`确定摘下《${cur.title}》这枚风铃吗？`)) return;
+                    const d = loadChimes(); d.items = d.items.filter((x) => Number(x.id) !== Number(cur.id)); d.activeId = d.items[0]?.id || 0; saveChimes(d); renderChimesAndCard();
+                });
+            }
         }
 
-        function openTreeOverlay() { overlay.classList.add("open"); resizeCanvas(); renderLeavesAndUI(); if (!animId) animId = requestAnimationFrame(renderCanvasLoop); }
-        function closeTreeOverlay() { overlay.classList.remove("open"); if (animId) { cancelAnimationFrame(animId); animId = null; } }
+        function openChimeGallery() {
+            overlay.classList.add("open");
+            resizeCanvas();
+            renderChimesAndCard();
+            if (!animId) animId = requestAnimationFrame(renderSnowAndRipples);
+            setTimeout(triggerWindGust, 200);
+        }
+        function closeChimeGallery() {
+            overlay.classList.remove("open");
+            if (animId) { cancelAnimationFrame(animId); animId = null; }
+        }
 
-        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openTreeOverlay(); });
-        topDoc.getElementById("mt-close-btn").onclick = () => closeTreeOverlay();
+        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openChimeGallery(); });
+        topDoc.getElementById("wc-close-btn").onclick = () => closeChimeGallery();
+        topDoc.getElementById("wc-gust-btn").onclick = () => triggerWindGust();
         topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resizeCanvas(); });
 
-        const addModal = topDoc.getElementById("mt-add-modal"), listModal = topDoc.getElementById("mt-all-list-modal");
-        topDoc.getElementById("mt-btn-add").onclick = () => { listModal.style.display = "none"; addModal.style.display = addModal.style.display === "none" ? "block" : "none"; };
-        topDoc.getElementById("mt-add-close").onclick = () => { addModal.style.display = "none"; };
-        topDoc.getElementById("mt-list-btn").onclick = () => { addModal.style.display = "none"; listModal.style.display = listModal.style.display === "none" ? "block" : "none"; renderLeavesAndUI(); };
-        topDoc.getElementById("mt-list-close").onclick = () => { listModal.style.display = "none"; };
+        const addModal = topDoc.getElementById("wc-add-modal");
+        topDoc.getElementById("wc-btn-add").onclick = () => { addModal.style.display = addModal.style.display === "none" ? "block" : "none"; };
+        topDoc.getElementById("wc-add-close").onclick = () => { addModal.style.display = "none"; };
 
-        const joySlider = topDoc.getElementById("mt-new-joy"), joyLbl = topDoc.getElementById("mt-new-joy-lbl");
-        joySlider.oninput = () => { joyLbl.textContent = getLeafStyleByJoy(joySlider.value).label; };
+        const joySlider = topDoc.getElementById("wc-new-joy"), joyLbl = topDoc.getElementById("wc-new-joy-lbl");
+        joySlider.oninput = () => { joyLbl.textContent = getChimeStyleByJoy(joySlider.value).label; };
 
-        topDoc.getElementById("mt-add-submit").onclick = async () => {
-            const title = topDoc.getElementById("mt-new-title").value.trim() || "独家回忆", content = topDoc.getElementById("mt-new-content").value.trim();
-            if (!content) return alert("请写下你想封存的回忆内容！");
-            const joy = Number(joySlider.value) || 92, c = getCtx(), newId = Date.now(), d = loadTree(), pos = getAutoPos(d.leaves.length + 1);
-            d.leaves.unshift({ id: newId, title, author: c.userName, joy, xPct: pos.xPct, yPct: pos.yPct, content, whisper: `（${c.charName} 正在叶背写下批注...）` });
-            d.activeId = newId; saveTree(d);
-            topDoc.getElementById("mt-new-title").value = ""; topDoc.getElementById("mt-new-content").value = "";
-            addModal.style.display = "none"; renderLeavesAndUI();
+        topDoc.getElementById("wc-add-submit").onclick = async () => {
+            const title = topDoc.getElementById("wc-new-title").value.trim() || "初雪回声", content = topDoc.getElementById("wc-new-content").value.trim();
+            if (!content) return alert("请写下你想封存在风铃里的记忆！");
+            const joy = Number(joySlider.value) || 94, c = getCtx(), nid = Date.now(), d = loadChimes(), pos = getAutoChimePos(d.items.length + 1);
+            d.items.unshift({ id: nid, title, author: c.userName, joy, xPct: pos.xPct, yPct: pos.yPct, wireH: pos.wireH, content, whisper: `（${c.charName} 正在风铃内壁刻下回声...）` });
+            d.activeId = nid; d.flipped = false; saveChimes(d);
+            topDoc.getElementById("wc-new-title").value = ""; topDoc.getElementById("wc-new-content").value = "";
+            addModal.style.display = "none"; renderChimesAndCard(); triggerWindGust();
             try {
-                const w = await askTreeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `${c.userName}在有情树上挂了一片记忆叶《${title}》（开心度${joy}%）：“${content}”。请在叶背写一句深情批注(40字内)：`);
-                const latest = loadTree(), t = latest.leaves.find((x) => x.id === newId);
-                if (t) { t.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveTree(latest); renderLeavesAndUI(); }
+                const w = await askChimeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `${c.userName}挂起了一枚记忆风铃《${title}》（开心度${joy}%）：“${content}”。请你在风铃内壁写一句清冷深情的私密回声(38字内)：`);
+                const latest = loadChimes(), t = latest.items.find((x) => x.id === nid);
+                if (t) { t.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveChimes(latest); renderChimesAndCard(); }
             } catch (e) {}
         };
 
-        topDoc.getElementById("mt-btn-ai-leaf").onclick = async (e) => {
-            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "结叶中...";
+        topDoc.getElementById("wc-btn-ai").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "结铃中...";
             const c = getCtx();
             try {
-                const raw = await askTreeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`, `请在有情树上挂一片你的独家回忆叶，并根据这段回忆的情绪打分(joy: 10~100)。严格只输出JSON：{"title":"8字内标题","joy":88,"content":"50字内回忆描写","whisper":"35字内叶背情话"}`);
+                const raw = await askChimeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`, `请挂起一枚你与${c.userName}的独家记忆风铃，并给出情绪开心度(joy: 10~100)。严格只输出JSON：{"title":"6字内短签标题","joy":90,"content":"50字内唯美记忆描写","whisper":"35字内刻在风铃内壁的情话"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), d = loadTree(), nid = Date.now(), pos = getAutoPos(d.leaves.length + 2);
-                    d.leaves.unshift({ id: nid, title: o.title || "心动瞬间", author: c.charName, joy: Number(o.joy) || 88, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                    d.activeId = nid; saveTree(d); renderLeavesAndUI();
+                    const o = JSON.parse(m[0]), d = loadChimes(), nid = Date.now(), pos = getAutoChimePos(d.items.length + 2);
+                    d.items.unshift({ id: nid, title: o.title || "风中回声", author: c.charName, joy: Number(o.joy) || 90, xPct: pos.xPct, yPct: pos.yPct, wireH: pos.wireH, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    d.activeId = nid; d.flipped = false; saveChimes(d); renderChimesAndCard(); triggerWindGust();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
 
-        topDoc.getElementById("mt-btn-absorb").onclick = async (e) => {
+        topDoc.getElementById("wc-btn-absorb").onclick = async (e) => {
             const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "汲取中...";
             const c = getCtx();
             let wx = "";
             try { wx = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${c.safeScope}`) || "[]").slice(-14).map((m) => `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n"); } catch (err) {}
             const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常`;
             try {
-                const raw = await askTreeAI(`你是${c.charName}。`, `根据以下近期聊天提炼一段最值得铭记的回忆结成有情树叶片，并给出情绪开心度(joy: 10~100)。\n${src.slice(-1100)}\n严格只输出JSON：{"title":"8字内标题","joy":92,"content":"50字内回忆浓缩","whisper":"35字内叶背批注"}`);
+                const raw = await askChimeAI(`你是${c.charName}。`, `根据以下近期聊天提炼一段最值得铭记的瞬间凝结成初雪风铃，并给出情绪开心度(joy: 10~100)。\n${src.slice(-1100)}\n严格只输出JSON：{"title":"6字内短签标题","joy":92,"content":"50字内回忆浓缩","whisper":"35字内风铃内壁回声"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), d = loadTree(), nid = Date.now(), pos = getAutoPos(d.leaves.length + 3);
-                    d.leaves.unshift({ id: nid, title: o.title || "聊天记忆", author: `${c.userName} & ${c.charName}`, joy: Number(o.joy) || 90, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                    d.activeId = nid; saveTree(d); renderLeavesAndUI();
+                    const o = JSON.parse(m[0]), d = loadChimes(), nid = Date.now(), pos = getAutoChimePos(d.items.length + 3);
+                    d.items.unshift({ id: nid, title: o.title || "聊天回音", author: `${c.userName} & ${c.charName}`, joy: Number(o.joy) || 90, xPct: pos.xPct, yPct: pos.yPct, wireH: pos.wireH, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    d.activeId = nid; d.flipped = false; saveChimes(d); renderChimesAndCard(); triggerWindGust();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
     }
 
-    mountColdSilverSacredTree();
+    mountKoreanWindChimeGallery();
 })();
