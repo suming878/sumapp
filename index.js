@@ -6642,8 +6642,8 @@ bootSumoulApp();
 
 
 // ==========================================================================
-// 🤍 【结识海 · 极致减法版：0.5px银针流光雨丝(告别黑水滴头) + 零杂乱单层微澜 + 极简留白脉络】
-// 用法：直接替换 index.js 最末尾刚才那段 mountPureWhiteRaindropWeb 补丁代码！
+// 🤍 【结识海 · 完整细节恢复精修版：100%恢复全网连线/关系词/三层涟漪/微溅水珠 + 升级清透冷银泪滴雨珠】
+// 用法：直接替换 index.js 最末尾刚才那段 mountUltraCleanSilverRainWeb 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -6675,11 +6675,11 @@ bootSumoulApp();
         try { localStorage.setItem(`sumoul_v16_ksea_5tabs__${getSafeScope()}`, JSON.stringify(d)); } catch (e) {}
     }
 
-    function mountUltraCleanSilverRainWeb() {
+    function mountRestoredCrystalRainWeb() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
         const oldCanvas = topDoc.getElementById("ks-bg-canvas");
         if (!overlay || !oldCanvas) {
-            setTimeout(mountUltraCleanSilverRainWeb, 200);
+            setTimeout(mountRestoredCrystalRainWeb, 200);
             return;
         }
 
@@ -6689,6 +6689,7 @@ bootSumoulApp();
         oldCanvas.width = 1;
         oldCanvas.height = 1;
 
+        // 1. 保持 100% 纯白干净背景 (#FFFFFF)
         const st = topDoc.createElement("style");
         st.id = "ks-v2-visual-css";
         st.innerHTML = `
@@ -6701,22 +6702,22 @@ bootSumoulApp();
                 display: block !important; z-index: 2 !important; touch-action: none !important; background: #FFFFFF !important;
             }
             #seoul-mini-theater-modal .ks-card {
-                background: rgba(255, 255, 255, 0.96) !important;
-                border: 1px solid #F0F2F6 !important;
-                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.025) !important;
+                background: rgba(255, 255, 255, 0.94) !important;
+                border: 1px solid #ECEEF4 !important;
+                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.03) !important;
             }
             #seoul-mini-theater-modal .ks-dock-bar {
                 background: #FFFFFF !important;
-                border-top: 1px solid #F2F4F8 !important;
+                border-top: 1px solid #F0F2F7 !important;
             }
             #seoul-mini-theater-modal .ks-flt {
                 background: #FFFFFF !important;
-                border: 1px solid #EAECEF !important;
-                color: #8E94A4 !important;
+                border: 1px solid #E6E8F0 !important;
+                color: #7E8494 !important;
             }
             #seoul-mini-theater-modal .ks-flt.on {
-                background: #22242C !important;
-                border-color: #22242C !important;
+                background: #1E2028 !important;
+                border-color: #1E2028 !important;
                 color: #FFFFFF !important;
             }
         `;
@@ -6730,8 +6731,10 @@ bootSumoulApp();
         let animId = null, W = 390, H = 780;
         let dragNodeId = null, dragMoved = false, pStart = { x: 0, y: 0 };
 
-        const silverThreads = [];    // 极细 0.5px 银针雨丝（无黑坨水滴头！）
-        const ripples = [];          // 极简克制的单层微水纹
+        // 完整恢复四大动态池：清透泪滴雨珠 + 触水微溅水珠 + 三层渐次水纹 + 凝点慢连丝线
+        const fallingDrops = [];
+        const splashBeads = [];
+        const ripples = [];
         const landedNodeMap = new Map();
         let lineGrow = 0;
 
@@ -6745,36 +6748,58 @@ bootSumoulApp();
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        // 触底时只荡开一圈极干净的 0.5px 细圆环（去掉乱飞的水沫与多层杂圈）
-        function triggerCleanRipple(x, y, isNode = true) {
-            ripples.push({
-                x, y,
-                r: 2,
-                maxR: isNode ? 34 : 24,
-                alpha: isNode ? 0.38 : 0.25
-            });
+        // 完整恢复：三层渐次荡开的同心涟漪 + 触水瞬间向上轻微弹起的晶莹微水珠
+        function triggerImpactSplash(x, y, isNodeImpact = true) {
+            const maxR = isNodeImpact ? 48 : 32;
+            // 第1圈主水纹
+            ripples.push({ x, y, r: 1.5, maxR, alpha: isNodeImpact ? 0.52 : 0.32, lw: 0.8 });
+            // 第2圈次水纹
+            setTimeout(() => {
+                ripples.push({ x, y, r: 1, maxR: maxR * 0.70, alpha: isNodeImpact ? 0.35 : 0.20, lw: 0.6 });
+            }, 130);
+            // 第3圈余波微纹
+            if (isNodeImpact) {
+                setTimeout(() => {
+                    ripples.push({ x, y, r: 1, maxR: maxR * 0.44, alpha: 0.22, lw: 0.45 });
+                }, 260);
+            }
+
+            // 触水回弹的清冷微水珠（改用柔和冷银色，不再是黑沫子）
+            const count = isNodeImpact ? 3 : 2;
+            for (let i = 0; i < count; i++) {
+                const ang = -Math.PI * (0.28 + (i / (count - 1 || 1)) * 0.44) + (Math.random() - 0.5) * 0.15;
+                const spd = (isNodeImpact ? 1.5 : 1.0) + Math.random() * 0.8;
+                splashBeads.push({
+                    x,
+                    y,
+                    vx: Math.cos(ang) * spd,
+                    vy: Math.sin(ang) * spd - 0.7,
+                    baseY: y,
+                    r: isNodeImpact ? 1.1 : 0.85,
+                    alpha: 0.65
+                });
+            }
         }
 
-        // 落下一根修长清冷的「银针微光雨丝」
-        function spawnSilverRainThread(tx, ty, targetNodeId = null, delayMs = 0) {
+        function spawnFallingRaindrop(tx, ty, targetNodeId = null, delayMs = 0) {
             setTimeout(() => {
-                silverThreads.push({
+                fallingDrops.push({
                     x: tx,
-                    y: Math.max(-10, ty - 135),
-                    startY: Math.max(-20, ty - 150),
+                    y: Math.max(-30, ty - (150 + Math.random() * 60)),
+                    startY: Math.max(-30, ty - 170),
                     targetY: ty,
-                    vy: 5.2,
-                    len: 46,
+                    vy: 3.0,
+                    gravity: 0.38,
+                    tailLen: 36,
                     targetNodeId
                 });
             }, delayMs);
         }
 
-        function playCleanRainSequence() {
+        function playRainToWebSequence() {
             const d = loadWebData();
             if (!d || !d.isBound) return;
-            silverThreads.length = 0;
-            ripples.length = 0;
+            fallingDrops.length = 0;
             landedNodeMap.clear();
             lineGrow = 0;
 
@@ -6784,74 +6809,118 @@ bootSumoulApp();
             visNodes.forEach((n, idx) => {
                 const tx = (n.xPct / 100) * W;
                 const ty = (n.yPct / 100) * H;
-                spawnSilverRainThread(tx, ty, Number(n.id), idx * 110);
+                spawnFallingRaindrop(tx, ty, Number(n.id), idx * 130);
             });
         }
 
-        // 绘制极简「0.6px 渐隐银针雨丝 + 1.3px 针尖微点」（干净利落，绝不笨重！）
-        function drawSilverNeedleRain(st) {
-            const topY = Math.max(st.startY, st.y - st.len);
-            const grad = ctx.createLinearGradient(st.x, topY, st.x, st.y);
-            grad.addColorStop(0, "rgba(160, 168, 184, 0)");
-            grad.addColorStop(0.75, "rgba(140, 148, 166, 0.28)");
-            grad.addColorStop(1, "rgba(70, 76, 90, 0.65)");
+        // ✨ 升级版雨滴：保留优雅的泪滴形态 + 渐隐尾迹，但改为「清透冷银玻璃渐变 + 细银边 + 白高光点」（告别死黑水滴头！）
+        function drawCrystalTeardrop(fd) {
+            ctx.save();
+            // 1. 雨珠上方渐隐的极细银丝尾迹
+            const tailY = Math.max(fd.startY, fd.y - fd.tailLen);
+            const grad = ctx.createLinearGradient(fd.x, tailY, fd.x, fd.y - 4);
+            grad.addColorStop(0, "rgba(140, 148, 166, 0)");
+            grad.addColorStop(0.65, "rgba(140, 148, 166, 0.25)");
+            grad.addColorStop(1, "rgba(90, 98, 116, 0.55)");
 
             ctx.beginPath();
-            ctx.moveTo(st.x, topY);
-            ctx.lineTo(st.x, st.y);
+            ctx.moveTo(fd.x, tailY);
+            ctx.lineTo(fd.x, fd.y - 4);
             ctx.strokeStyle = grad;
-            ctx.lineWidth = 0.65;
+            ctx.lineWidth = 0.75;
             ctx.lineCap = "round";
             ctx.stroke();
 
-            // 针尖处仅一颗 1.3px 极小微点
+            // 2. 清透玻璃感泪滴形雨珠本体（上尖下圆，内部纯白到冷银渐变）
             ctx.beginPath();
-            ctx.arc(st.x, st.y, 1.3, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(60, 66, 80, 0.72)";
+            ctx.moveTo(fd.x, fd.y - 6.2);
+            ctx.bezierCurveTo(fd.x + 2.3, fd.y - 1.8, fd.x + 2.1, fd.y + 1.6, fd.x, fd.y + 2.0);
+            ctx.bezierCurveTo(fd.x - 2.1, fd.y + 1.6, fd.x - 2.3, fd.y - 1.8, fd.x, fd.y - 6.2);
+            ctx.closePath();
+
+            const dropGrd = ctx.createLinearGradient(fd.x, fd.y - 6, fd.x, fd.y + 2);
+            dropGrd.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+            dropGrd.addColorStop(0.6, "rgba(195, 204, 220, 0.85)");
+            dropGrd.addColorStop(1, "rgba(105, 114, 134, 0.90)");
+            ctx.fillStyle = dropGrd;
             ctx.fill();
+
+            ctx.strokeStyle = "rgba(82, 90, 108, 0.65)";
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+
+            // 雨珠内部微小纯白反光点
+            ctx.beginPath();
+            ctx.arc(fd.x - 0.6, fd.y - 0.4, 0.65, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fill();
+
+            ctx.restore();
         }
 
-        // 减小漂浮幅度（仅 0.8px 微呼吸），让画面定格般宁静不晃眼
         function getPos(n, t) {
-            const fx = dragNodeId === n.id ? 0 : Math.sin(t * 0.45 + n.id * 1.7) * 0.8;
-            const fy = dragNodeId === n.id ? 0 : Math.cos(t * 0.40 + n.id * 1.3) * 0.8;
+            const fx = dragNodeId === n.id ? 0 : Math.sin(t * 0.55 + n.id * 1.7) * 1.6;
+            const fy = dragNodeId === n.id ? 0 : Math.cos(t * 0.48 + n.id * 1.3) * 1.6;
             return { x: (n.xPct / 100) * W + fx, y: (n.yPct / 100) * H + fy };
         }
 
-        function renderCleanLoop(ts) {
+        function renderLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
             const t = ts * 0.001;
             ctx.clearRect(0, 0, W, H);
 
-            // 1. 绘制正在滑落的极细银针雨丝
-            for (let i = silverThreads.length - 1; i >= 0; i--) {
-                const st = silverThreads[i];
-                st.y += st.vy;
-                drawSilverNeedleRain(st);
+            // 背景氛围：每隔约 3.5 秒在空白处静静落下一滴清透微雨（频率减半，既灵动又不乱）
+            if (Math.random() < 0.005 && fallingDrops.length < 2) {
+                spawnFallingRaindrop(W * (0.14 + Math.random() * 0.72), H * (0.18 + Math.random() * 0.46), null, 0);
+            }
 
-                if (st.y >= st.targetY) {
-                    triggerCleanRipple(st.x, st.targetY, st.targetNodeId !== null);
-                    if (st.targetNodeId !== null) {
-                        landedNodeMap.set(Number(st.targetNodeId), 0.08);
+            // 1. 绘制正在空中坠落的清透冰晶雨滴
+            for (let i = fallingDrops.length - 1; i >= 0; i--) {
+                const fd = fallingDrops[i];
+                fd.vy += fd.gravity;
+                fd.y += fd.vy;
+                drawCrystalTeardrop(fd);
+
+                if (fd.y >= fd.targetY) {
+                    triggerImpactSplash(fd.x, fd.targetY, fd.targetNodeId !== null);
+                    if (fd.targetNodeId !== null) {
+                        landedNodeMap.set(Number(fd.targetNodeId), 0.06);
                     }
-                    silverThreads.splice(i, 1);
+                    fallingDrops.splice(i, 1);
                 }
             }
 
-            // 2. 绘制极简 0.5px 单层水纹
+            // 2. 绘制触水飞溅回弹的冷银微水珠
+            for (let i = splashBeads.length - 1; i >= 0; i--) {
+                const sb = splashBeads[i];
+                sb.x += sb.vx;
+                sb.y += sb.vy;
+                sb.vy += 0.16;
+                sb.alpha *= 0.93;
+                if (sb.y > sb.baseY + 2 || sb.alpha < 0.04) {
+                    splashBeads.splice(i, 1);
+                    continue;
+                }
+                ctx.beginPath();
+                ctx.arc(sb.x, sb.y, sb.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(105, 114, 134, ${sb.alpha})`;
+                ctx.fill();
+            }
+
+            // 3. 绘制三层渐次扩散的同心水波涟漪
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const rp = ripples[i];
-                rp.r += (rp.maxR - rp.r) * 0.06 + 0.2;
-                rp.alpha *= 0.94;
+                rp.r += (rp.maxR - rp.r) * 0.055 + 0.25;
+                rp.alpha *= 0.95;
                 if (rp.alpha < 0.015) { ripples.splice(i, 1); continue; }
                 ctx.beginPath();
                 ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(145, 152, 168, ${rp.alpha})`;
-                ctx.lineWidth = 0.55;
+                ctx.strokeStyle = `rgba(120, 128, 146, ${rp.alpha})`;
+                ctx.lineWidth = rp.lw || 0.65;
                 ctx.stroke();
             }
 
-            // 3. 绘制极简星图（去掉了连线上的杂乱文字块，未选中连线极淡隐入留白！）
+            // 4. 完整恢复：全网游丝连线 + 关系小字 + 双形态 4px 极简微点
             const d = loadWebData();
             if (d && d.isBound && d.activeTab === "map") {
                 const flt = d.filter || "all";
@@ -6862,22 +6931,22 @@ bootSumoulApp();
                 visNodes.forEach((n) => {
                     const nid = Number(n.id);
                     posMap.set(nid, getPos(n, t));
-                    if (!landedNodeMap.has(nid) && silverThreads.length === 0) {
+                    if (!landedNodeMap.has(nid) && fallingDrops.length === 0) {
                         landedNodeMap.set(nid, 1);
                     }
                     if (landedNodeMap.has(nid)) {
                         landedCount++;
                         const curA = landedNodeMap.get(nid);
-                        if (curA < 1) landedNodeMap.set(nid, Math.min(1, curA + 0.05));
+                        if (curA < 1) landedNodeMap.set(nid, Math.min(1, curA + 0.045));
                     }
                 });
 
                 if (landedCount >= 2 && lineGrow < 1) {
-                    lineGrow = Math.min(1, lineGrow + 0.014);
+                    lineGrow = Math.min(1, lineGrow + 0.013);
                 }
                 const ease = 1 - Math.pow(1 - lineGrow, 3);
 
-                // 3A. 极细直线游丝（平时只有 0.5px 极淡银线，仅选中关联线加深为 0.8px，彻底消除蜘蛛网杂乱感！）
+                // 4A. 完整绘制所有连线（主线与副线全部恢复！通过精细透明度拉开层次，既丰富又不乱）
                 (d.edges || []).forEach((ed, idx) => {
                     const id1 = Number(ed.from), id2 = Number(ed.to);
                     if (!landedNodeMap.has(id1) || !landedNodeMap.has(id2)) return;
@@ -6885,26 +6954,33 @@ bootSumoulApp();
                     const p1 = posMap.get(id1), p2 = posMap.get(id2);
                     if (!p1 || !p2) return;
 
-                    const isHi = id1 === Number(d.activeNodeId) || id2 === Number(d.activeNodeId);
-                    // 非主干交叉副线平时淡化到 0.22 透明度，完全不抢戏
-                    const isMainSpoke = id1 === 1 || id2 === 1;
-                    if (!isMainSpoke && !isHi) return;
-
-                    const prog = Math.max(0, Math.min(1, ease * 1.3 - (idx % 5) * 0.05));
+                    const prog = Math.max(0, Math.min(1, ease * 1.35 - (idx % 5) * 0.06));
                     if (prog <= 0) return;
 
                     const cx = p1.x + (p2.x - p1.x) * prog;
                     const cy = p1.y + (p2.y - p1.y) * prog;
+                    const isHi = id1 === Number(d.activeNodeId) || id2 === Number(d.activeNodeId);
 
                     ctx.beginPath();
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(cx, cy);
-                    ctx.strokeStyle = isHi ? "rgba(38, 42, 52, 0.52)" : "rgba(212, 216, 226, 0.65)";
-                    ctx.lineWidth = isHi ? 0.8 : 0.5;
+                    ctx.strokeStyle = isHi ? "rgba(30, 32, 40, 0.65)" : "rgba(195, 200, 212, 0.48)";
+                    ctx.lineWidth = isHi ? 0.9 : 0.58;
                     ctx.stroke();
+
+                    // 恢复高亮连线中央的关系小字
+                    if (isHi && prog > 0.95 && ed.label) {
+                        const mx = (p1.x + p2.x) * 0.5, my = (p1.y + p2.y) * 0.5;
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+                        ctx.fillRect(mx - 14, my - 6, 28, 12);
+                        ctx.font = "500 7.5px -apple-system, sans-serif";
+                        ctx.textAlign = "center";
+                        ctx.fillStyle = "#7E8494";
+                        ctx.fillText(ed.label, mx, my + 2.5);
+                    }
                 });
 
-                // 3B. 极简微点（留白呼吸圈放大到 8px，让线条离圆点更远、更透气！）
+                // 4B. 完整恢复：核心/选中呼吸细环 + 实心/空心双形态 4px 微点
                 visNodes.forEach((n) => {
                     const nid = Number(n.id);
                     const reveal = landedNodeMap.get(nid) || 0;
@@ -6913,43 +6989,54 @@ bootSumoulApp();
                     const p = posMap.get(nid);
                     const isSel = nid === Number(d.activeNodeId);
                     const isCore = n.type === "core";
-                    const dotR = (isCore ? 4.0 : (isSel ? 3.6 : 2.6)) * reveal;
+                    const dotR = (isCore ? 4.5 : (isSel ? 4.0 : 3.0)) * reveal;
 
                     ctx.save();
                     ctx.globalAlpha = reveal;
 
-                    // 8px 纯白呼吸隔离圈（让丝线在远离圆点处自然断开，视觉极度清爽）
+                    // 6px 白色留白隔离圈（让连线在靠近圆点处优雅留白断开）
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, dotR + 7.5, 0, Math.PI * 2);
+                    ctx.arc(p.x, p.y, dotR + 5.5, 0, Math.PI * 2);
                     ctx.fillStyle = "#FFFFFF";
                     ctx.fill();
 
-                    // 仅当前选中的唯一节点带一圈 0.5px 极细静谧圆环
-                    if (isSel) {
+                    // 恢复核心点与选中点的 0.65px 极细呼吸圆环
+                    if (isSel || isCore) {
+                        const ringR = dotR + 5.5 + Math.sin(t * 2 + nid) * 1.2;
                         ctx.beginPath();
-                        ctx.arc(p.x, p.y, dotR + 5.0, 0, Math.PI * 2);
-                        ctx.strokeStyle = "rgba(38, 42, 52, 0.38)";
-                        ctx.lineWidth = 0.55;
+                        ctx.arc(p.x, p.y, ringR, 0, Math.PI * 2);
+                        ctx.strokeStyle = isSel ? "rgba(30, 32, 40, 0.45)" : "rgba(150, 156, 170, 0.40)";
+                        ctx.lineWidth = 0.65;
                         ctx.stroke();
                     }
 
-                    // 中心微点
+                    // 恢复双形态微点（记忆为空心白点，核心/心结为深炭实心点）
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
-                    ctx.fillStyle = isSel || isCore ? "#22242C" : "#98A0B2";
-                    ctx.fill();
+                    if (n.type === "memory" && !isSel) {
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fill();
+                        ctx.strokeStyle = "#585E70";
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                    } else {
+                        ctx.fillStyle = isSel || isCore ? "#1E2028" : "#7E8494";
+                        ctx.fill();
+                    }
 
-                    // 节点下方极简细体文字（字距拉开，未选中节点采用浅冷银色不抢眼）
-                    ctx.font = `${isSel || isCore ? "600 9.2px" : "400 8.2px"} -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
+                    // 节点下方极简无衬线文字（加上纯白柔光护航，防止线条穿过文字显得乱）
+                    ctx.font = `${isSel || isCore ? "700 9.5px" : "500 8.5px"} -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
                     ctx.textAlign = "center";
-                    ctx.fillStyle = isSel || isCore ? "#22242C" : "#98A0B2";
-                    ctx.fillText(n.title.slice(0, 6), p.x, p.y + dotR + 15);
+                    ctx.shadowColor = "#FFFFFF";
+                    ctx.shadowBlur = 6;
+                    ctx.fillStyle = isSel || isCore ? "#1E2028" : "#8E94A4";
+                    ctx.fillText(n.title.slice(0, 7), p.x, p.y + dotR + 14);
 
                     ctx.restore();
                 });
             }
 
-            animId = requestAnimationFrame(renderCleanLoop);
+            animId = requestAnimationFrame(renderLoop);
         }
 
         function hitTest(px, py) {
@@ -6979,7 +7066,7 @@ bootSumoulApp();
             if (hit) {
                 dragNodeId = hit.id;
             } else {
-                spawnSilverRainThread(px, py, null, 0);
+                spawnFallingRaindrop(px, py, null, 0);
             }
         });
 
@@ -6992,8 +7079,8 @@ bootSumoulApp();
                 const d = loadWebData();
                 const tn = d?.nodes?.find((x) => Number(x.id) === Number(dragNodeId));
                 if (tn) {
-                    tn.xPct = Math.max(12, Math.min(88, (px / W) * 100));
-                    tn.yPct = Math.max(16, Math.min(60, (py / H) * 100));
+                    tn.xPct = Math.max(10, Math.min(90, (px / W) * 100));
+                    tn.yPct = Math.max(16, Math.min(62, (py / H) * 100));
                     saveWebData(d);
                 }
             }
@@ -7006,7 +7093,7 @@ bootSumoulApp();
                 d.activeNodeId = dragNodeId;
                 saveWebData(d);
                 const tn = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tn) triggerCleanRipple((tn.xPct / 100) * W, (tn.yPct / 100) * H, true);
+                if (tn) triggerImpactSplash((tn.xPct / 100) * W, (tn.yPct / 100) * H, true);
             }
             dragNodeId = null;
             refreshCard();
@@ -7016,15 +7103,15 @@ bootSumoulApp();
         if (replayBtn) {
             replayBtn.onclick = (e) => {
                 e.stopPropagation();
-                playCleanRainSequence();
+                playRainToWebSequence();
             };
         }
 
         function checkOpen() {
             if (overlay.classList.contains("open")) {
                 resize();
-                playCleanRainSequence();
-                if (!animId) animId = requestAnimationFrame(renderCleanLoop);
+                playRainToWebSequence();
+                if (!animId) animId = requestAnimationFrame(renderLoop);
             } else if (animId) {
                 cancelAnimationFrame(animId);
                 animId = null;
@@ -7037,5 +7124,5 @@ bootSumoulApp();
         checkOpen();
     }
 
-    mountUltraCleanSilverRainWeb();
+    mountRestoredCrystalRainWeb();
 })();
