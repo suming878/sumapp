@@ -8631,3 +8631,959 @@ bootSumoulApp();
 
     mountTypographyEverywhere();
 })();
+// ==========================================================================
+// 🤍 【Sumoul App 第4应用完整重构补丁：交换日记 · 교환일기 (支持编辑/删除/AI重批/贴照片 + 4大丰富内页)】
+// 内页：1.双视角手账卷(可编辑/可删除/可贴图/可重刷批注) 2.每日灵魂共答(Q&A) 3.心动书签与便利贴墙 4.手账扉页契约
+// 用法：直接粘贴在 index.js 最末尾最后一行后面，自动接管并升级第4应用【交换日记】！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+
+    const svgIco = (p, sz = 14, c = "currentColor", sw = "1.6") =>
+        `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
+
+    const D_ICO = {
+        appIcon: svgIco(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>`, 21, "#1E2028"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#14161C", "1.8"),
+        plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
+        edit: svgIco(`<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>`, 13, "#3A4050"),
+        trash: svgIco(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 13, "#9A6868"),
+        refresh: svgIco(`<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>`, 12, "#3A4050"),
+        starOff: svgIco(`<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`, 13, "#8E94A4"),
+        starOn: `<svg viewBox="0 0 24 24" width="13" height="13" fill="#1E2028" stroke="#1E2028" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+        spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
+        camera: svgIco(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`, 12),
+        pen: svgIco(`<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>`, 12),
+        close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 14)
+    };
+
+    const QA_BANK = [
+        "第一次意识到自己对对方栽了，是在哪个具体瞬间？",
+        "如果今晚世界停电，最想和对方躲在哪里做什么？",
+        "对方做过哪件小事，让你偷偷在心里记了很久？",
+        "吃醋但不想明说的时候，你通常会有什么小动作？",
+        "最喜欢对方身上的哪个部位或哪种气味？",
+        "如果可以删掉或重来一段记忆，你会选哪一天？",
+        "夜深人静看着熟睡的对方时，脑海里最先闪过什么念头？"
+    ];
+
+    function getCtx() {
+        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "", recentChat = "";
+        let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
+        try {
+            const st = topWin.SillyTavern?.getContext?.();
+            if (st) {
+                userName = st.name1 || userName;
+                if (st.characterId !== undefined && st.characters?.[st.characterId]) {
+                    const c = st.characters[st.characterId];
+                    charName = c.name || st.name2 || charName;
+                    scope = c.avatar || c.name || String(st.characterId);
+                    if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
+                    charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
+                } else if (st.name2) {
+                    charName = st.name2; scope = st.name2;
+                }
+                if (Array.isArray(st.chat) && st.chat.length) {
+                    recentChat = st.chat.slice(-10).map((m) => `${m.is_user ? userName : charName}: ${m.mes}`).join("\n");
+                }
+            }
+        } catch (e) {}
+        const safeScope = String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+        try {
+            const wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || "{}");
+            if (wCfg.myNick) userName = wCfg.myNick;
+            if (wCfg.remark) charName = wCfg.remark;
+            if (wCfg.myAva) userAvatar = wCfg.myAva;
+            if (wCfg.charAva) charAvatar = wCfg.charAva;
+        } catch (e) {}
+        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat };
+    }
+
+    function getDiaryKey() {
+        return `sumoul_v16_exdiary_pro__${getCtx().safeScope}`;
+    }
+
+    function createDefaultDiary(charName, userName) {
+        return {
+            activeTab: "all",   // 'all' | 'qa' | 'star' | 'cover'
+            filterRole: "all",  // 'all' | 'me' | 'char'
+            cover: {
+                bookTitle: `${userName} & ${charName} · 秘密交换手账`,
+                subtitle: "OUR PRIVATE EXCHANGE JOURNAL",
+                rule1: "01. 无论白昼多忙，翻开这本手账时必须卸下所有伪装。",
+                rule2: "02. 写下的每一页，对方都必须在页脚留下真实的回音。",
+                rule3: "03. 允许吃醋、允许占有、允许写下白天不敢说出口的偏执。"
+            },
+            entries: [
+                {
+                    id: 1001,
+                    role: "char",
+                    author: charName,
+                    date: "12.04 · 23:40",
+                    weather: "初雪 · -2°C",
+                    mood: "心动 96%",
+                    starred: true,
+                    imgUrl: "",
+                    title: "大衣口袋里的余温",
+                    content: `今天把 ${userName} 冻得发红的指尖揣进我口袋里的时候，其实心跳快得有些失控。面上装作若无其事地往前走，手心里却攥紧了舍不得松开。送你回去后，口袋里好像还留着你的温度。`,
+                    reply: `“ 原来你当时表面那么淡定都是装出来的，下次手冷还找你。”`,
+                    replyBy: userName
+                },
+                {
+                    id: 1002,
+                    role: "me",
+                    author: userName,
+                    date: "11.29 · 01:15",
+                    weather: "夜雾 · 4°C",
+                    mood: "安心 92%",
+                    starred: true,
+                    imgUrl: "",
+                    title: "凌晨一秒接通的声音",
+                    content: `半夜做梦醒来觉得房间太安静，试探着给 ${charName} 发了一句“睡了吗”，没想到下一秒电话就直接拨过来了。听着那边带着点沙哑困意却无比耐心的声音，突然觉得被稳稳接住了。`,
+                    reply: `“ 手机永远为你调成特别提醒放在枕边。以后只要醒了，随时叫我。”`,
+                    replyBy: charName
+                },
+                {
+                    id: 1003,
+                    role: "char",
+                    author: charName,
+                    date: "11.21 · 19:20",
+                    weather: "微雨 · 8°C",
+                    mood: "占有 88%",
+                    starred: false,
+                    imgUrl: "",
+                    title: "不想分给别人的目光",
+                    content: `今天看到 ${userName} 对着别人笑得那么毫无防备，胸口像堵了一团潮湿的雾。我知道不该管得太宽，可只要你的注意力从我身上移开几秒，我就开始烦躁。`,
+                    reply: `“ 笨蛋，别人只是客套，只有对你才是真心的。”`,
+                    replyBy: userName
+                }
+            ],
+            qaList: [
+                {
+                    id: 2001,
+                    question: "第一次意识到自己对对方栽了，是在哪个具体瞬间？",
+                    myAns: `大概是在人群里第一眼就本能地找 ${charName} 身影的时候。`,
+                    charAns: `看到 ${userName} 泛红的眼尾看着我、让我瞬间连原则都想推翻的那一秒。`,
+                    date: "12.01"
+                }
+            ],
+            stickies: [
+                { id: 3001, author: charName, text: "天冷了，出门不准忘戴围巾，不然直接去抓你。", date: "置顶便签" },
+                { id: 3002, author: userName, text: "答应我这周末不准熬夜加班，要一起看电影！", date: "日常约定" }
+            ]
+        };
+    }
+
+    function loadDiary() {
+        const c = getCtx(), k = getDiaryKey();
+        try {
+            const raw = localStorage.getItem(k);
+            if (!raw) {
+                const init = createDefaultDiary(c.charName, c.userName);
+                localStorage.setItem(k, JSON.stringify(init));
+                return init;
+            }
+            const parsed = JSON.parse(raw);
+            return Object.assign(createDefaultDiary(c.charName, c.userName), parsed);
+        } catch (e) {
+            return createDefaultDiary(c.charName, c.userName);
+        }
+    }
+
+    function saveDiary(d) {
+        try {
+            localStorage.setItem(getDiaryKey(), JSON.stringify(d));
+        } catch (e) {
+            alert("图片体积过大导致存储受限，建议换一张小图。");
+        }
+    }
+
+    function compressPhoto(file, maxDim = 640) {
+        return new Promise((res) => {
+            const r = new FileReader();
+            r.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = topDoc.createElement("canvas");
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
+                    else { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
+                    c.width = w; c.height = h;
+                    c.getContext("2d").drawImage(img, 0, 0, w, h);
+                    res(c.toDataURL("image/jpeg", 0.82));
+                };
+                img.src = String(ev.target?.result || "");
+            };
+            r.readAsDataURL(file);
+        });
+    }
+
+    async function askDiaryAI(sys, usr) {
+        const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
+        const k = topDoc.getElementById("smt-api-key")?.value?.trim();
+        const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
+        if (!u || !k) {
+            topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click();
+            throw new Error("请先在【API设置】填写独立 API 地址与 Key");
+        }
+        const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
+        const r = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` },
+            body: JSON.stringify({ model: m, temperature: 0.82, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })
+        });
+        if (!r.ok) throw new Error(`API HTTP ${r.status}`);
+        const d = await r.json();
+        return d?.choices?.[0]?.message?.content?.trim() || "";
+    }
+
+    function mountProExchangeDiary() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        const homePage = topDoc.getElementById("smt-page-home");
+        if (!modal || !homePage) {
+            setTimeout(mountProExchangeDiary, 220);
+            return;
+        }
+
+        // 清理旧版覆盖层
+        topDoc.getElementById("smt-exdiary-pro-overlay")?.remove();
+        topDoc.getElementById("sumoul-exdiary-pro-css")?.remove();
+
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-exdiary-pro-css";
+        st.innerHTML = `
+            #seoul-mini-theater-modal #smt-exdiary-pro-overlay {
+                position: absolute !important; inset: 0 !important; z-index: 2147483645 !important;
+                background: #F7F8FA !important;
+                display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
+                font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
+            }
+            #seoul-mini-theater-modal #smt-exdiary-pro-overlay.open { display: flex !important; }
+
+            #seoul-mini-theater-modal .ed-pill {
+                display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
+                height: 28px !important; padding: 0 11px !important; border-radius: 999px !important;
+                background: #FFFFFF !important; border: 1px solid #DCE0EA !important;
+                font-size: 10px !important; font-weight: 700 !important; color: #14161C !important;
+                cursor: pointer !important; white-space: nowrap !important;
+            }
+            #seoul-mini-theater-modal .ed-pill.dark {
+                background: #181A22 !important; border-color: #181A22 !important;
+                color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
+            }
+
+            /* 顶部 4 大功能内页分段栏 */
+            #seoul-mini-theater-modal .ed-nav-tabs {
+                display: grid !important; grid-template-columns: repeat(4, 1fr) !important;
+                background: #FFFFFF !important; border-bottom: 1px solid #E6E9F0 !important;
+                padding: 0 12px !important; flex-shrink: 0 !important;
+            }
+            #seoul-mini-theater-modal .ed-nav-item {
+                padding: 10px 4px !important; text-align: center !important;
+                font-size: 10.5px !important; font-weight: 700 !important; color: #788092 !important;
+                border-bottom: 2px solid transparent !important; cursor: pointer !important;
+                transition: all 0.18s ease !important;
+            }
+            #seoul-mini-theater-modal .ed-nav-item.active {
+                color: #14161C !important; font-weight: 800 !important;
+                border-bottom-color: #14161C !important;
+            }
+
+            /* 高定实色手账纸卡片（零模糊、刀刻锐利） */
+            #seoul-mini-theater-modal .ed-paper-card {
+                background: #FFFFFF !important; border: 1px solid #E2E6F0 !important;
+                border-radius: 16px !important; padding: 15px 16px !important;
+                margin-bottom: 12px !important; box-shadow: 0 4px 16px rgba(18, 22, 32, 0.03) !important;
+                position: relative !important; box-sizing: border-box !important;
+            }
+            /* 操作小圆钮（编辑/删除/重刷批注/收藏） */
+            #seoul-mini-theater-modal .ed-icon-btn {
+                width: 26px !important; height: 26px !important; border-radius: 8px !important;
+                background: #F6F8FC !important; border: 1px solid #E4E8F2 !important;
+                display: inline-flex !important; align-items: center !important; justify-content: center !important;
+                cursor: pointer !important; transition: all 0.15s ease !important;
+            }
+            #seoul-mini-theater-modal .ed-icon-btn:active {
+                transform: scale(0.92) !important; background: #EAEFF8 !important;
+            }
+
+            #seoul-mini-theater-modal .ed-chip {
+                display: inline-flex !important; align-items: center !important; gap: 4px !important;
+                padding: 3px 9px !important; border-radius: 99px !important;
+                font-size: 9px !important; font-weight: 700 !important;
+                background: #FFFFFF !important; border: 1px solid #DCE0EA !important; color: #485062 !important;
+                cursor: pointer !important;
+            }
+            #seoul-mini-theater-modal .ed-chip.on {
+                background: #181A22 !important; border-color: #181A22 !important; color: #FFFFFF !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        // 挂载全屏交换日记高定容器
+        const overlay = topDoc.createElement("div");
+        overlay.id = "smt-exdiary-pro-overlay";
+        overlay.innerHTML = `
+            <!-- 顶栏 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top,14px)) 16px 10px 16px;background:#FFFFFF;border-bottom:1px solid #ECEEF4;flex-shrink:0;">
+                <span class="ed-pill" id="ed-close-btn">${D_ICO.back}<span>返回主页</span></span>
+                <div style="text-align:center;">
+                    <div style="font-size:12px;font-weight:900;color:#14161C;letter-spacing:2px;">EXCHANGE DIARY</div>
+                    <div style="font-size:8px;font-weight:700;color:#687082;letter-spacing:1px;" id="ed-top-sub">교환일기 · 双视角秘密手账</div>
+                </div>
+                <span class="ed-pill dark" id="ed-top-write-btn">${D_ICO.plus}<span>写日记</span></span>
+            </div>
+
+            <!-- 顶部 4 大功能内页切换栏 -->
+            <div class="ed-nav-tabs" id="ed-tab-bar">
+                <div class="ed-nav-item active" data-edtab="all">手账长卷</div>
+                <div class="ed-nav-item" data-edtab="qa">每日共答</div>
+                <div class="ed-nav-item" data-edtab="star">书签便签</div>
+                <div class="ed-nav-item" data-edtab="cover">扉页契约</div>
+            </div>
+
+            <!-- 主滚动视图区 -->
+            <div id="ed-main-body" style="flex:1;min-height:0;overflow-y:auto;padding:12px 14px 20px 14px;"></div>
+
+            <!-- 弹窗抽屉：用于【新建日记】或【编辑修改已有日记】 -->
+            <div id="ed-editor-modal" style="display:none;position:absolute;inset:0;z-index:80;background:rgba(20,22,30,0.38);align-items:center;justify-content:center;padding:16px;">
+                <div class="ed-paper-card" style="width:100%;max-width:345px;margin:0!important;padding:16px!important;box-shadow:0 16px 42px rgba(0,0,0,0.18)!important;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #ECEEF4;">
+                        <span style="font-size:12px;font-weight:800;color:#14161C;" id="ed-modal-heading">撰写新交换日记</span>
+                        <span id="ed-modal-close" style="cursor:pointer;color:#687082;">${D_ICO.close}</span>
+                    </div>
+
+                    <div style="display:flex;gap:6px;margin-bottom:8px;">
+                        <input type="text" id="ed-inp-title" placeholder="日记标题 (如：初雪夜的口袋)..." style="flex:1;height:32px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:8px;padding:0 10px;font-size:11px;font-weight:700;color:#14161C;outline:none;" />
+                        <label class="ed-pill" style="height:32px!important;cursor:pointer;flex-shrink:0;">
+                            ${D_ICO.camera}<span id="ed-inp-img-lbl">配图</span>
+                            <input type="file" id="ed-inp-img" accept="image/*" style="display:none;" />
+                        </label>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;">
+                        <input type="text" id="ed-inp-weather" placeholder="天气 (如:初雪 -2°C)" style="height:28px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:7px;padding:0 8px;font-size:9.5px;color:#14161C;outline:none;" />
+                        <input type="text" id="ed-inp-mood" placeholder="心情 (如:心动 95%)" style="height:28px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:7px;padding:0 8px;font-size:9.5px;color:#14161C;outline:none;" />
+                        <input type="text" id="ed-inp-date" placeholder="日期时间" style="height:28px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:7px;padding:0 8px;font-size:9.5px;color:#14161C;outline:none;" />
+                    </div>
+
+                    <textarea id="ed-inp-content" placeholder="写下今天发生的故事、心事或想对TA说的话..." style="width:100%;height:88px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:9px;padding:8px 10px;font-size:10.5px;color:#14161C;line-height:1.6;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
+
+                    <div id="ed-inp-reply-wrap" style="margin-bottom:10px;">
+                        <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:4px;">页脚批注回复（留空则保存后由 AI 自动为你写批注）：</div>
+                        <textarea id="ed-inp-reply" placeholder="可手动修改页脚批注，或留空交由AI批注..." style="width:100%;height:46px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:8px;padding:6px 10px;font-size:9.8px;color:#3A4050;box-sizing:border-box;resize:none;outline:none;"></textarea>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="ed-chip" id="ed-inp-clear-img" style="display:none;">清除配图</span>
+                        <div style="display:flex;gap:6px;margin-left:auto;">
+                            <span class="ed-pill" id="ed-modal-cancel">取消</span>
+                            <span class="ed-pill dark" id="ed-modal-save">保存手账</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部快捷操作栏 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:7px;padding:10px 14px max(16px,env(safe-area-inset-bottom,16px)) 14px;background:#FFFFFF;border-top:1px solid #ECEEF4;flex-shrink:0;">
+                <span class="ed-pill" id="ed-bot-write" style="flex:1;">${D_ICO.pen}<span>我写一篇</span></span>
+                <span class="ed-pill" id="ed-bot-ai-write" style="flex:1;">${D_ICO.spark}<span>让TA写一篇</span></span>
+                <span class="ed-pill dark" id="ed-bot-absorb" style="flex:1.25;">${D_ICO.spark}<span>汲取聊天化作日记</span></span>
+            </div>
+        `;
+        modal.appendChild(overlay);
+
+        let editingId = null;
+        let tempImgData = "";
+
+        // 打开新增或编辑弹窗
+        function openEditorModal(entry = null) {
+            const c = getCtx();
+            const modalEl = topDoc.getElementById("ed-editor-modal");
+            const now = new Date();
+            const defDate = `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} · ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+            if (entry) {
+                editingId = entry.id;
+                tempImgData = entry.imgUrl || "";
+                topDoc.getElementById("ed-modal-heading").textContent = `编辑修改日记 · 《${entry.title}》`;
+                topDoc.getElementById("ed-inp-title").value = entry.title || "";
+                topDoc.getElementById("ed-inp-weather").value = entry.weather || "晴 · 12°C";
+                topDoc.getElementById("ed-inp-mood").value = entry.mood || "心动 90%";
+                topDoc.getElementById("ed-inp-date").value = entry.date || defDate;
+                topDoc.getElementById("ed-inp-content").value = entry.content || "";
+                topDoc.getElementById("ed-inp-reply").value = (entry.reply || "").replace(/^[“"]|[”"]$/g, "").trim();
+            } else {
+                editingId = null;
+                tempImgData = "";
+                topDoc.getElementById("ed-modal-heading").textContent = `撰写新交换日记 (${c.userName})`;
+                topDoc.getElementById("ed-inp-title").value = "";
+                topDoc.getElementById("ed-inp-weather").value = "初雪 · 0°C";
+                topDoc.getElementById("ed-inp-mood").value = "心动 95%";
+                topDoc.getElementById("ed-inp-date").value = defDate;
+                topDoc.getElementById("ed-inp-content").value = "";
+                topDoc.getElementById("ed-inp-reply").value = "";
+            }
+
+            topDoc.getElementById("ed-inp-img-lbl").textContent = tempImgData ? "已选配图✓" : "配图";
+            topDoc.getElementById("ed-inp-clear-img").style.display = tempImgData ? "inline-flex" : "none";
+            modalEl.style.display = "flex";
+        }
+
+        function renderDiaryApp() {
+            const c = getCtx();
+            const d = loadDiary();
+            topDoc.getElementById("ed-top-sub").textContent = `${c.userName} × ${c.charName} · 共 ${d.entries.length} 篇手账`;
+
+            // 同步个人主页上第4应用角标
+            homePage.querySelectorAll(".ab-app-item").forEach((item) => {
+                if (item.textContent.includes("交换日记") || item.textContent.includes("교환일기")) {
+                    const b = item.querySelector(".ab-app-floating-badge");
+                    if (b) b.textContent = `${d.entries.length}篇`;
+                }
+            });
+
+            topDoc.querySelectorAll("#ed-tab-bar .ed-nav-item").forEach((el) => {
+                el.classList.toggle("active", el.getAttribute("data-edtab") === d.activeTab);
+            });
+
+            const body = topDoc.getElementById("ed-main-body");
+
+            // ── 内页 1：【手账长卷 (all)】（带完整编辑、删除、AI重刷批注、星标收藏、贴图） ──
+            if (d.activeTab === "all") {
+                const flt = d.filterRole || "all";
+                const list = (d.entries || []).filter((e) => flt === "all" || e.role === flt);
+
+                const cardsHtml = list.map((en, idx) => {
+                    const isChar = en.role === "char";
+                    const ava = isChar ? c.charAvatar : c.userAvatar;
+                    const roleTag = isChar ? `${c.charName} 的手账` : `${c.userName} 的手账`;
+
+                    return `
+                        <div class="ed-paper-card">
+                            <!-- 卡片头部：作者头像 + 编号日期 + 右上角【收藏 / 重写批注 / 编辑 / 删除】四大操作按钮 -->
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #F0F2F7;">
+                                <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+                                    <img src="${ava}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid #E2E6F0;flex-shrink:0;" />
+                                    <div style="min-width:0;">
+                                        <div style="display:flex;align-items:center;gap:6px;">
+                                            <span style="font-size:11px;font-weight:800;color:#14161C;">${roleTag.replace(/</g, "&lt;")}</span>
+                                            <span style="font-size:8px;font-weight:800;color:#687082;background:#F2F4F9;padding:1.5px 6px;border-radius:5px;font-family:monospace;">NO.${String(d.entries.length - idx).padStart(2, "0")}</span>
+                                        </div>
+                                        <div style="font-size:8.5px;font-weight:600;color:#788092;margin-top:2px;">
+                                            ${(en.date || "").replace(/</g, "&lt;")} · ${(en.weather || "晴").replace(/</g, "&lt;")} · ${(en.mood || "").replace(/</g, "&lt;")}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 右上角 4 大操作按钮：星标收藏 / AI重写批注 / 编辑 / 删除 -->
+                                <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+                                    <span class="ed-icon-btn" data-starid="${en.id}" title="收藏至心动书签">${en.starred ? D_ICO.starOn : D_ICO.starOff}</span>
+                                    <span class="ed-icon-btn" data-regenid="${en.id}" title="让AI重新写一段页脚批注">${D_ICO.refresh}</span>
+                                    <span class="ed-icon-btn" data-editid="${en.id}" title="编辑修改这篇日记">${D_ICO.edit}</span>
+                                    <span class="ed-icon-btn" data-delid="${en.id}" title="删除这篇日记">${D_ICO.trash}</span>
+                                </div>
+                            </div>
+
+                            <!-- 日记标题与配图 -->
+                            <div style="font-size:13px;font-weight:800;color:#14161C;margin-bottom:7px;letter-spacing:0.3px;">
+                                《${(en.title || "无题手账").replace(/</g, "&lt;")}》
+                            </div>
+                            ${en.imgUrl ? `<img src="${en.imgUrl}" style="width:100%;max-height:190px;object-fit:cover;border-radius:10px;margin-bottom:9px;border:1px solid #ECEEF4;display:block;" />` : ""}
+
+                            <!-- 日记正文 -->
+                            <div style="font-size:10.8px;font-weight:500;color:#242832;line-height:1.75;text-align:justify;white-space:pre-wrap;">${(en.content || "").replace(/</g, "&lt;")}</div>
+
+                            <!-- 页脚交换批注区 -->
+                            <div style="margin-top:12px;padding:10px 12px;background:#F7F9FC;border-left:2.5px solid #181A22;border-radius:0 10px 10px 0;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                    <span style="font-size:8px;font-weight:800;color:#687082;letter-spacing:0.8px;">
+                                        MARGIN WHISPER · ${en.replyBy || (isChar ? c.userName : c.charName)} 的页脚批注
+                                    </span>
+                                    <span data-editid="${en.id}" style="font-size:8px;font-weight:700;color:#485062;cursor:pointer;">修改批注 ✎</span>
+                                </div>
+                                <div style="font-size:10px;font-weight:700;color:#181A22;line-height:1.6;">
+                                    ${(en.reply || "（点击右上角刷新按钮，让TA为你写下批注...）").replace(/</g, "&lt;")}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                body.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <div style="display:flex;gap:5px;">
+                            <span class="ed-chip ${flt === "all" ? "on" : ""}" data-flt="all">全部 (${d.entries.length})</span>
+                            <span class="ed-chip ${flt === "char" ? "on" : ""}" data-flt="char">${c.charName}写的</span>
+                            <span class="ed-chip ${flt === "me" ? "on" : ""}" data-flt="me">我写的</span>
+                        </div>
+                        <span style="font-size:8.5px;font-weight:700;color:#687082;">支持随时编辑与删除</span>
+                    </div>
+                    ${cardsHtml || `<div style="text-align:center;color:#8E94A4;font-size:11px;padding:40px 0;">手账本还是空的，点击下方按钮写下第一篇吧</div>`}
+                `;
+
+                body.querySelectorAll("[data-flt]").forEach((b) => {
+                    b.onclick = () => {
+                        const latest = loadDiary();
+                        latest.filterRole = b.getAttribute("data-flt");
+                        saveDiary(latest);
+                        renderDiaryApp();
+                    };
+                });
+
+                // 收藏/取消收藏
+                body.querySelectorAll("[data-starid]").forEach((b) => {
+                    b.onclick = () => {
+                        const id = Number(b.getAttribute("data-starid"));
+                        const latest = loadDiary();
+                        const t = latest.entries.find((x) => Number(x.id) === id);
+                        if (t) { t.starred = !t.starred; saveDiary(latest); renderDiaryApp(); }
+                    };
+                });
+
+                // 编辑修改日记
+                body.querySelectorAll("[data-editid]").forEach((b) => {
+                    b.onclick = () => {
+                        const id = Number(b.getAttribute("data-editid"));
+                        const latest = loadDiary();
+                        const t = latest.entries.find((x) => Number(x.id) === id);
+                        if (t) openEditorModal(t);
+                    };
+                });
+
+                // 删除单篇日记
+                body.querySelectorAll("[data-delid]").forEach((b) => {
+                    b.onclick = () => {
+                        const id = Number(b.getAttribute("data-delid"));
+                        const latest = loadDiary();
+                        const t = latest.entries.find((x) => Number(x.id) === id);
+                        if (!t) return;
+                        if (!confirm(`确定从交换手账中永久删除《${t.title}》这篇日记吗？`)) return;
+                        latest.entries = latest.entries.filter((x) => Number(x.id) !== id);
+                        saveDiary(latest);
+                        renderDiaryApp();
+                    };
+                });
+
+                // AI 重新生成页脚批注
+                body.querySelectorAll("[data-regenid]").forEach((b) => {
+                    b.onclick = async () => {
+                        const id = Number(b.getAttribute("data-regenid"));
+                        const latest = loadDiary();
+                        const t = latest.entries.find((x) => Number(x.id) === id);
+                        if (!t) return;
+                        b.style.opacity = "0.4";
+                        try {
+                            const rep = await askDiaryAI(
+                                `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`,
+                                `在你们的交换日记本里有一篇《${t.title}》（作者：${t.author}）：“${t.content}”。请以${c.charName}的身份在页脚写一句深情、占有欲或拉扯感十足的手写批注(45字以内)：`
+                            );
+                            t.reply = `“ ${rep.replace(/^[“"]|[”"]$/g, "").trim()} ”`;
+                            t.replyBy = c.charName;
+                            saveDiary(latest);
+                            renderDiaryApp();
+                        } catch (err) {
+                            alert(err.message);
+                            b.style.opacity = "1";
+                        }
+                    };
+                });
+                return;
+            }
+
+            // ── 内页 2：【每日共答 (qa)】（365日情侣灵魂共答） ──
+            if (d.activeTab === "qa") {
+                const randQ = QA_BANK[Math.floor(Math.random() * QA_BANK.length)];
+                const qaHtml = (d.qaList || []).map((q) => `
+                    <div class="ed-paper-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <span style="font-size:8.5px;font-weight:800;color:#687082;letter-spacing:1px;">SOUL QUESTION · ${q.date || "共答"}</span>
+                            <span data-delqa="${q.id}" style="cursor:pointer;">${D_ICO.trash}</span>
+                        </div>
+                        <div style="font-size:11.8px;font-weight:800;color:#14161C;margin-bottom:10px;line-height:1.5;">
+                            Q: ${q.question.replace(/</g, "&lt;")}
+                        </div>
+                        <div style="padding:9px 11px;background:#F6F8FC;border-radius:10px;margin-bottom:7px;">
+                            <div style="font-size:8px;font-weight:800;color:#687082;margin-bottom:3px;">${c.userName} 的回答：</div>
+                            <div style="font-size:10.2px;font-weight:600;color:#181A22;line-height:1.6;">${(q.myAns || "").replace(/</g, "&lt;")}</div>
+                        </div>
+                        <div style="padding:9px 11px;background:#181A22;border-radius:10px;color:#FFFFFF;">
+                            <div style="font-size:8px;font-weight:800;color:rgba(255,255,255,0.7);margin-bottom:3px;">${c.charName} 的回答：</div>
+                            <div style="font-size:10.2px;font-weight:600;color:#FFFFFF;line-height:1.6;">${(q.charAns || "").replace(/</g, "&lt;")}</div>
+                        </div>
+                    </div>
+                `).join("");
+
+                body.innerHTML = `
+                    <div class="ed-paper-card" style="margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:11px;font-weight:800;color:#14161C;">今日灵魂共答 · DAILY Q&amp;A</span>
+                            <span class="ed-chip" id="ed-qa-change">换一题 ↻</span>
+                        </div>
+                        <input type="text" id="ed-qa-q" value="${randQ.replace(/"/g, "&quot;")}" style="width:100%;height:30px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:8px;padding:0 10px;font-size:10.2px;font-weight:800;color:#14161C;box-sizing:border-box;outline:none;margin-bottom:7px;" />
+                        <textarea id="ed-qa-my" placeholder="先写下你的回答，点击下方按钮让TA与你同步作答..." style="width:100%;height:50px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:8px;padding:7px 10px;font-size:10px;color:#14161C;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
+                        <div style="display:flex;justify-content:flex-end;">
+                            <span class="ed-pill dark" id="ed-qa-submit">${D_ICO.spark}<span>封存答案并看TA怎么答</span></span>
+                        </div>
+                    </div>
+                    ${qaHtml}
+                `;
+
+                topDoc.getElementById("ed-qa-change").onclick = () => {
+                    topDoc.getElementById("ed-qa-q").value = QA_BANK[Math.floor(Math.random() * QA_BANK.length)];
+                };
+                topDoc.getElementById("ed-qa-submit").onclick = async (e) => {
+                    const qTxt = topDoc.getElementById("ed-qa-q").value.trim();
+                    const myTxt = topDoc.getElementById("ed-qa-my").value.trim();
+                    if (!qTxt || !myTxt) return alert("请先填写你的回答！");
+                    const btn = e.currentTarget, orig = btn.innerHTML;
+                    btn.textContent = "等待TA作答...";
+                    try {
+                        const ans = await askDiaryAI(
+                            `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`,
+                            `你们正在玩情侣交换日记的「每日共答」。问题是：“${qTxt}”，${c.userName}的回答是：“${myTxt}”。请以${c.charName}的第一人称写下你最真实、深情或占有欲的回答(55字内)：`
+                        );
+                        const latest = loadDiary();
+                        const now = new Date();
+                        latest.qaList = latest.qaList || [];
+                        latest.qaList.unshift({
+                            id: Date.now(),
+                            question: qTxt,
+                            myAns: myTxt,
+                            charAns: ans.replace(/^[“"]|[”"]$/g, "").trim(),
+                            date: `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")}`
+                        });
+                        saveDiary(latest);
+                        renderDiaryApp();
+                    } catch (err) { alert(err.message); btn.innerHTML = orig; }
+                };
+                body.querySelectorAll("[data-delqa]").forEach((b) => {
+                    b.onclick = () => {
+                        const latest = loadDiary();
+                        latest.qaList = (latest.qaList || []).filter((x) => Number(x.id) !== Number(b.getAttribute("data-delqa")));
+                        saveDiary(latest); renderDiaryApp();
+                    };
+                });
+                return;
+            }
+
+            // ── 内页 3：【书签便签 (star)】（星标手账夹 + 双人便利贴墙） ──
+            if (d.activeTab === "star") {
+                const starredList = (d.entries || []).filter((e) => e.starred);
+                const stickyHtml = (d.stickies || []).map((stItem) => `
+                    <div style="background:#FFFFFF;border:1px solid #DCE0EA;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;justify-content:space-between;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                            <span style="font-size:8px;font-weight:800;color:#181A22;background:#F2F4F9;padding:1.5px 6px;border-radius:5px;">${stItem.author.replace(/</g, "&lt;")}</span>
+                            <span data-delst="${stItem.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
+                        </div>
+                        <div style="font-size:9.8px;font-weight:600;color:#242832;line-height:1.55;">${stItem.text.replace(/</g, "&lt;")}</div>
+                    </div>
+                `).join("");
+
+                const starCardsHtml = starredList.map((en) => `
+                    <div class="ed-paper-card" style="padding:12px 14px!important;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-size:11px;font-weight:800;color:#14161C;">《${en.title.replace(/</g, "&lt;")}》</span>
+                            <span style="font-size:8px;color:#687082;">${en.author} · ${en.date}</span>
+                        </div>
+                        <div style="font-size:10px;color:#3A4050;line-height:1.6;">${en.content.replace(/</g, "&lt;")}</div>
+                    </div>
+                `).join("");
+
+                body.innerHTML = `
+                    <div class="ed-paper-card" style="margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <span style="font-size:11px;font-weight:800;color:#14161C;">手账夹页便利贴 · STICKY NOTES</span>
+                            <div style="display:flex;gap:5px;">
+                                <span class="ed-chip" id="ed-st-my">+ 贴一张我的便签</span>
+                                <span class="ed-chip on" id="ed-st-ai">让TA贴一张</span>
+                            </div>
+                        </div>
+                        <div id="ed-st-drawer" style="display:none;margin-bottom:8px;">
+                            <div style="display:flex;gap:5px;">
+                                <input type="text" id="ed-st-inp" placeholder="写一句叮嘱、愿望或悄悄话贴在手账上..." style="flex:1;height:28px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:7px;padding:0 8px;font-size:9.8px;color:#14161C;outline:none;" />
+                                <span class="ed-pill dark" id="ed-st-save" style="height:28px!important;">贴上</span>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">${stickyHtml}</div>
+                    </div>
+
+                    <div style="font-size:9.5px;font-weight:800;color:#687082;margin-bottom:8px;padding-left:2px;">
+                        STARRED ENTRIES · 星标珍藏手账 (${starredList.length}篇)
+                    </div>
+                    ${starCardsHtml || `<div style="text-align:center;color:#8E94A4;font-size:10px;padding:24px;">在手账长卷中点亮 ★ 即可收纳至此</div>`}
+                `;
+
+                const dr = topDoc.getElementById("ed-st-drawer");
+                topDoc.getElementById("ed-st-my").onclick = () => { dr.style.display = dr.style.display === "none" ? "block" : "none"; };
+                topDoc.getElementById("ed-st-save").onclick = () => {
+                    const txt = topDoc.getElementById("ed-st-inp").value.trim();
+                    if (!txt) return;
+                    const latest = loadDiary();
+                    latest.stickies = latest.stickies || [];
+                    latest.stickies.unshift({ id: Date.now(), author: c.userName, text: txt, date: "便签" });
+                    saveDiary(latest); renderDiaryApp();
+                };
+                topDoc.getElementById("ed-st-ai").onclick = async (e) => {
+                    const btn = e.currentTarget, orig = btn.textContent;
+                    btn.textContent = "书写中...";
+                    try {
+                        const txt = await askDiaryAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `请在你们的交换日记夹页上贴一张给${c.userName}的简短日常叮嘱、占有欲小纸条或备忘便利贴(28字内)：`);
+                        const latest = loadDiary();
+                        latest.stickies = latest.stickies || [];
+                        latest.stickies.unshift({ id: Date.now(), author: c.charName, text: txt.replace(/^[“"]|[”"]$/g, "").trim(), date: "便签" });
+                        saveDiary(latest); renderDiaryApp();
+                    } catch (err) { alert(err.message); btn.textContent = orig; }
+                };
+                body.querySelectorAll("[data-delst]").forEach((b) => {
+                    b.onclick = () => {
+                        const latest = loadDiary();
+                        latest.stickies = (latest.stickies || []).filter((x) => Number(x.id) !== Number(b.getAttribute("data-delst")));
+                        saveDiary(latest); renderDiaryApp();
+                    };
+                });
+                return;
+            }
+
+            // ── 内页 4：【扉页契约 (cover)】 ──
+            if (d.activeTab === "cover") {
+                const cv = d.cover || {};
+                const myCnt = (d.entries || []).filter((x) => x.role === "me").length;
+                const chCnt = (d.entries || []).filter((x) => x.role === "char").length;
+
+                body.innerHTML = `
+                    <div class="ed-paper-card" style="text-align:center;padding:20px 18px!important;">
+                        <div style="font-size:8px;font-weight:800;color:#8E94A4;letter-spacing:2.5px;margin-bottom:8px;">JOURNAL FLYLEAF · 手账扉页</div>
+                        <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:12px;">
+                            <img src="${c.userAvatar}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1.5px solid #DCE0EA;" />
+                            <span style="font-size:12px;font-weight:900;color:#14161C;">×</span>
+                            <img src="${c.charAvatar}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1.5px solid #DCE0EA;" />
+                        </div>
+
+                        <input type="text" id="ed-cv-title" value="${(cv.bookTitle || "").replace(/"/g, "&quot;")}" style="width:100%;height:32px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:8px;text-align:center;font-size:12px;font-weight:800;color:#14161C;outline:none;margin-bottom:12px;" />
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+                            <div style="background:#F6F8FC;padding:8px;border-radius:10px;">
+                                <div style="font-size:8px;color:#687082;">总手账数</div>
+                                <div style="font-size:13px;font-weight:900;color:#14161C;margin-top:2px;">${d.entries.length} 篇</div>
+                            </div>
+                            <div style="background:#F6F8FC;padding:8px;border-radius:10px;">
+                                <div style="font-size:8px;color:#687082;">${c.userName}执笔</div>
+                                <div style="font-size:13px;font-weight:900;color:#14161C;margin-top:2px;">${myCnt} 篇</div>
+                            </div>
+                            <div style="background:#F6F8FC;padding:8px;border-radius:10px;">
+                                <div style="font-size:8px;color:#687082;">${c.charName}执笔</div>
+                                <div style="font-size:13px;font-weight:900;color:#14161C;margin-top:2px;">${chCnt} 篇</div>
+                            </div>
+                        </div>
+
+                        <div style="text-align:left;display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+                            <div style="font-size:8.5px;font-weight:800;color:#687082;">交换手账三条家规（可自由修改）：</div>
+                            <input type="text" id="ed-cv-r1" value="${(cv.rule1 || "").replace(/"/g, "&quot;")}" style="width:100%;height:28px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:7px;padding:0 8px;font-size:9.5px;color:#14161C;box-sizing:border-box;outline:none;" />
+                            <input type="text" id="ed-cv-r2" value="${(cv.rule2 || "").replace(/"/g, "&quot;")}" style="width:100%;height:28px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:7px;padding:0 8px;font-size:9.5px;color:#14161C;box-sizing:border-box;outline:none;" />
+                            <input type="text" id="ed-cv-r3" value="${(cv.rule3 || "").replace(/"/g, "&quot;")}" style="width:100%;height:28px;background:#F6F8FC;border:1px solid #DCE0EA;border-radius:7px;padding:0 8px;font-size:9.5px;color:#14161C;box-sizing:border-box;outline:none;" />
+                        </div>
+
+                        <span class="ed-pill dark" id="ed-cv-save" style="width:100%!important;height:32px!important;box-sizing:border-box!important;">保存扉页设定</span>
+                    </div>
+                `;
+
+                topDoc.getElementById("ed-cv-save").onclick = () => {
+                    const latest = loadDiary();
+                    latest.cover = {
+                        bookTitle: topDoc.getElementById("ed-cv-title").value.trim(),
+                        rule1: topDoc.getElementById("ed-cv-r1").value.trim(),
+                        rule2: topDoc.getElementById("ed-cv-r2").value.trim(),
+                        rule3: topDoc.getElementById("ed-cv-r3").value.trim()
+                    };
+                    saveDiary(latest);
+                    alert("手账扉页设定已保存！");
+                };
+            }
+        }
+
+        // ── 绑定弹窗保存、新建、AI代写、汲取聊天写日记事件 ──
+        topDoc.getElementById("ed-inp-img").onchange = async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            tempImgData = await compressPhoto(f, 640);
+            topDoc.getElementById("ed-inp-img-lbl").textContent = "已选配图✓";
+            topDoc.getElementById("ed-inp-clear-img").style.display = "inline-flex";
+            e.target.value = "";
+        };
+
+        topDoc.getElementById("ed-inp-clear-img").onclick = () => {
+            tempImgData = "";
+            topDoc.getElementById("ed-inp-img-lbl").textContent = "配图";
+            topDoc.getElementById("ed-inp-clear-img").style.display = "none";
+        };
+
+        topDoc.getElementById("ed-modal-close").onclick = () => { topDoc.getElementById("ed-editor-modal").style.display = "none"; };
+        topDoc.getElementById("ed-modal-cancel").onclick = () => { topDoc.getElementById("ed-editor-modal").style.display = "none"; };
+
+        topDoc.getElementById("ed-modal-save").onclick = async () => {
+            const c = getCtx();
+            const ti = topDoc.getElementById("ed-inp-title").value.trim() || "私密手账";
+            const we = topDoc.getElementById("ed-inp-weather").value.trim() || "初雪 · 0°C";
+            const mo = topDoc.getElementById("ed-inp-mood").value.trim() || "心动 95%";
+            const dt = topDoc.getElementById("ed-inp-date").value.trim();
+            const ct = topDoc.getElementById("ed-inp-content").value.trim();
+            const rp = topDoc.getElementById("ed-inp-reply").value.trim();
+
+            if (!ct) return alert("请填写日记正文内容！");
+
+            const latest = loadDiary();
+            if (editingId) {
+                // 编辑修改已有日记
+                const target = latest.entries.find((x) => Number(x.id) === Number(editingId));
+                if (target) {
+                    target.title = ti;
+                    target.weather = we;
+                    target.mood = mo;
+                    target.date = dt;
+                    target.content = ct;
+                    target.imgUrl = tempImgData;
+                    if (rp) target.reply = `“ ${rp.replace(/^[“"]|[”"]$/g, "")} ”`;
+                }
+                saveDiary(latest);
+                topDoc.getElementById("ed-editor-modal").style.display = "none";
+                renderDiaryApp();
+            } else {
+                // 新建我写的日记
+                const newId = Date.now();
+                latest.entries.unshift({
+                    id: newId,
+                    role: "me",
+                    author: c.userName,
+                    date: dt,
+                    weather: we,
+                    mood: mo,
+                    starred: false,
+                    imgUrl: tempImgData,
+                    title: ti,
+                    content: ct,
+                    reply: rp ? `“ ${rp} ”` : `（${c.charName} 正在认真阅读并写下页脚批注...）`,
+                    replyBy: c.charName
+                });
+                latest.activeTab = "all";
+                saveDiary(latest);
+                topDoc.getElementById("ed-editor-modal").style.display = "none";
+                renderDiaryApp();
+
+                if (!rp) {
+                    try {
+                        const aiReply = await askDiaryAI(
+                            `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`,
+                            `${c.userName}在交换日记里写了一篇《${ti}》：“${ct}”。请以你的身份在页脚写一句深情或占有欲满满的回应批注(45字内)：`
+                        );
+                        const d2 = loadDiary();
+                        const item = d2.entries.find((x) => x.id === newId);
+                        if (item) {
+                            item.reply = `“ ${aiReply.replace(/^[“"]|[”"]$/g, "").trim()} ”`;
+                            saveDiary(d2);
+                            renderDiaryApp();
+                        }
+                    } catch (e) {}
+                }
+            }
+        };
+
+        // 让 TA 写一篇交换日记
+        topDoc.getElementById("ed-bot-ai-write").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML;
+            btn.textContent = "TA执笔中...";
+            const c = getCtx();
+            try {
+                const raw = await askDiaryAI(
+                    `你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`,
+                    `请在你们的秘密交换日记本上写一篇属于你（${c.charName}）的第一人称私密日记（写出平时表面克制但私下对${c.userName}的深情、细节观察或暗暗吃醋）。严格只输出JSON：{"title":"10字内日记标题","weather":"天气与温度","mood":"情绪词+百分比","content":"110字左右细腻第一人称日记正文","myNote":"28字内预留给${c.userName}看的页脚悄悄话"}`
+                );
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) {
+                    const o = JSON.parse(m[0]), latest = loadDiary(), now = new Date();
+                    latest.entries.unshift({
+                        id: Date.now(),
+                        role: "char",
+                        author: c.charName,
+                        date: `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} · ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
+                        weather: o.weather || "夜雾 · 2°C",
+                        mood: o.mood || "深情 96%",
+                        starred: false,
+                        imgUrl: "",
+                        title: o.title || "未寄出的心事",
+                        content: o.content || "",
+                        reply: `“ ${(o.myNote || "写给你的，不准装没看见。").replace(/^[“"]|[”"]$/g, "")} ”`,
+                        replyBy: c.charName
+                    });
+                    latest.activeTab = "all";
+                    saveDiary(latest);
+                    renderDiaryApp();
+                }
+            } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+        };
+
+        // 汲取最新聊天记录化作一篇交换日记
+        topDoc.getElementById("ed-bot-absorb").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML;
+            btn.textContent = "汲取书写中...";
+            const c = getCtx();
+            let wx = "";
+            try { wx = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${c.safeScope}`) || "[]").slice(-14).map((m) => `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n"); } catch (err) {}
+            const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.userName} 的日常互动`;
+            try {
+                const raw = await askDiaryAI(
+                    `你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`,
+                    `请根据以下你和${c.userName}的近期聊天，以你（${c.charName}）的第一人称视角写一篇事后回顾的交换日记，记录你当时没说出口的真实内心活动。\n${src.slice(-1200)}\n严格只输出JSON：{"title":"10字内标题","weather":"天气","mood":"心情百分比","content":"110字左右第一人称日记正文","whisper":"30字内页脚批注"}`
+                );
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) {
+                    const o = JSON.parse(m[0]), latest = loadDiary(), now = new Date();
+                    latest.entries.unshift({
+                        id: Date.now(),
+                        role: "char",
+                        author: c.charName,
+                        date: `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} · 聊天手记`,
+                        weather: o.weather || "微风 · 6°C",
+                        mood: o.mood || "回味 94%",
+                        starred: false,
+                        imgUrl: "",
+                        title: o.title || "聊完天后的余温",
+                        content: o.content || "",
+                        reply: `“ ${(o.whisper || "每次聊完都更想见你。").replace(/^[“"]|[”"]$/g, "")} ”`,
+                        replyBy: c.charName
+                    });
+                    latest.activeTab = "all";
+                    saveDiary(latest);
+                    renderDiaryApp();
+                }
+            } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+        };
+
+        topDoc.getElementById("ed-top-write-btn").onclick = () => openEditorModal(null);
+        topDoc.getElementById("ed-bot-write").onclick = () => openEditorModal(null);
+        topDoc.getElementById("ed-close-btn").onclick = () => overlay.classList.remove("open");
+
+        topDoc.querySelectorAll("#ed-tab-bar .ed-nav-item").forEach((item) => {
+            item.onclick = () => {
+                const latest = loadDiary();
+                latest.activeTab = item.getAttribute("data-edtab");
+                saveDiary(latest);
+                renderDiaryApp();
+            };
+        });
+
+        // 拦截个人主页上第4应用【交换日记】图标点击，直接打开全新高定版交换日记
+        modal.addEventListener("click", (e) => {
+            const appItem = e.target.closest(".ab-app-item");
+            if (appItem && (appItem.textContent.includes("交换日记") || appItem.textContent.includes("교환일기") || appItem.getAttribute("data-app") === "diary")) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                overlay.classList.add("open");
+                renderDiaryApp();
+            }
+        }, true);
+    }
+
+    mountProExchangeDiary();
+})();
