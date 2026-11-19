@@ -6839,3 +6839,573 @@ bootSumoulApp();
 
     mountDualMemorySeaApp();
 })();
+// ==========================================================================
+// 🤍 【结识海 · 楼层总结增强补丁：未总结楼层看板 + 依次分段批量总结 + 自定义总结字数 + 表格/文字双视图切换】
+// 用法：直接粘贴在 index.js 最末尾最后一行后面，自动接管并升级【楼层总结】页面！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+
+    const CH_KEY = "sumoul_v16_mem_active_channel";
+    const getCh = () => (localStorage.getItem(CH_KEY) === "wx" ? "wx" : "st");
+
+    function getCtx() {
+        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "";
+        let stChatArr = [];
+        try {
+            const st = topWin.SillyTavern?.getContext?.();
+            if (st) {
+                userName = st.name1 || userName;
+                if (st.characterId !== undefined && st.characters?.[st.characterId]) {
+                    const c = st.characters[st.characterId];
+                    charName = c.name || st.name2 || charName;
+                    scope = c.avatar || c.name || String(st.characterId);
+                    charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
+                } else if (st.name2) {
+                    charName = st.name2; scope = st.name2;
+                }
+                if (Array.isArray(st.chat)) stChatArr = st.chat;
+            }
+        } catch (e) {}
+        const safeScope = String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
+        try {
+            const wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || "{}");
+            if (wCfg.myNick) userName = wCfg.myNick;
+            if (wCfg.remark) charName = wCfg.remark;
+        } catch (e) {}
+        let wxChatArr = [];
+        try {
+            wxChatArr = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${safeScope}`) || "[]");
+        } catch (e) {}
+        return { userName, charName, safeScope, charDesc, stChatArr, wxChatArr };
+    }
+
+    function getStoreKey(ch = getCh()) {
+        return `sumoul_v16_dualmem_${ch}__${getCtx().safeScope}`;
+    }
+
+    function loadMem(ch = getCh()) {
+        try {
+            return JSON.parse(localStorage.getItem(getStoreKey(ch)) || "{}");
+        } catch (e) { return {}; }
+    }
+
+    function saveMem(data, ch = getCh()) {
+        try {
+            localStorage.setItem(getStoreKey(ch), JSON.stringify(data));
+            // 同步更新底层防失忆注入
+            const stCtx = topWin.SillyTavern?.getContext?.();
+            if (ch === "st" && stCtx && typeof stCtx.setExtensionPrompt === "function" && data.isBound && data.autoCfg?.injectEnabled !== false) {
+                const sumLines = (data.summaries || []).slice(0, 15).map((s) => `• [${s.range}] 《${s.title}》：${s.content}${s.keyFacts ? `（核心事实：${s.keyFacts}）` : ""}`).join("\n");
+                const nodeLines = (data.nodes || []).slice(0, 15).map((n) => `• [${n.title}]：${n.content}`).join("\n");
+                const promptText = [
+                    "【SillyTavern 酒馆主线长期记忆库（严禁遗忘或与线上微信串戏）】",
+                    `▸ 当前关系阶段：${data.pact?.stage || "深度羁绊"}`,
+                    `▸ 核心锚点：${data.pact?.coreAnchor || ""}`,
+                    sumLines ? `▸ 历次楼层阶段总结：\n${sumLines}` : "",
+                    nodeLines ? `▸ 星图记忆节点：\n${nodeLines}` : ""
+                ].filter(Boolean).join("\n");
+                topWin.__SUMOUL_ST_MEMORY_PROMPT__ = promptText;
+                stCtx.setExtensionPrompt("SUMOUL_TAVERN_MEMORY_SEA", promptText, 1, Number(data.autoCfg?.injectDepth) ?? 2);
+            }
+        } catch (e) {}
+    }
+
+    async function askSumAI(sys, usr) {
+        const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
+        const k = topDoc.getElementById("smt-api-key")?.value?.trim();
+        const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
+        if (!u || !k) {
+            topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click();
+            throw new Error("请先在【API设置】填写独立 API 地址与 Key");
+        }
+        const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
+        const r = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` },
+            body: JSON.stringify({ model: m, temperature: 0.72, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })
+        });
+        if (!r.ok) throw new Error(`API HTTP ${r.status}`);
+        const d = await r.json();
+        return d?.choices?.[0]?.message?.content?.trim() || "";
+    }
+
+    // 执行单段楼层总结（支持严格控制目标字数 wordCount）
+    async function executeSingleBatchSummary(ch, sFloor, eFloor, wordCount = 160, modeTag = "手动总结") {
+        const c = getCtx();
+        const rawArr = ch === "st" ? c.stChatArr : c.wxChatArr;
+        const chName = ch === "st" ? "酒馆主线" : "微信聊天";
+        if (!rawArr || rawArr.length === 0) throw new Error(`当前【${chName}】暂无聊天记录可总结`);
+
+        const sIdx = Math.max(0, Math.min(rawArr.length - 1, Number(sFloor) || 0));
+        const eIdx = Math.max(sIdx, Math.min(rawArr.length - 1, Number(eFloor) || (rawArr.length - 1)));
+        const targetWords = Math.max(40, Math.min(800, Number(wordCount) || 160));
+
+        const sliceText = rawArr.slice(sIdx, eIdx + 1).map((m, idx) => {
+            const fNum = sIdx + idx;
+            if (ch === "st") {
+                const sp = m.is_user ? c.userName : (m.name || c.charName);
+                const clean = String(m.mes || "").replace(/<[^>]+>/g, "").slice(0, 320);
+                return `[#${fNum} ${sp}]: ${clean}`;
+            } else {
+                const sp = m.role === "user" ? c.userName : c.charName;
+                return `[#${fNum} ${sp}]: ${String(m.text || "").slice(0, 240)}`;
+            }
+        }).join("\n");
+
+        const rawJson = await askSumAI(
+            `你是高精度防失忆档案官。当前轨道：【${chName}】（严禁与另一轨道串戏）。角色：${c.charName}，用户：${c.userName}。`,
+            `请将以下【${chName} 第 #${sIdx} 层 ~ 第 #${eIdx} 层】的聊天记录提炼为防失忆总结。\n要求：正文总结 (summary) 字数请控制在 **${targetWords} 字左右**，细节扎实、不漏伏笔与承诺。\n\n${sliceText.slice(-4200)}\n\n严格只输出JSON格式：\n{"sumTitle":"12字内阶段标题","summary":"约${targetWords}字的高密度剧情与情感递进总结","keyFacts":"35字内不可遗忘的核心事实铁律","nodeType":"memory","nodeTitle":"6字内星图节点名","edgeLabel":"2~4字连线词","nodeWhisper":"28字内${c.charName}的清冷内心批注"}`
+        );
+
+        const match = rawJson.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error(`#${sIdx}~#${eIdx} 总结解析失败`);
+        const o = JSON.parse(match[0]);
+
+        const d = loadMem(ch);
+        const now = new Date();
+        const timeStr = `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        const rangeLabel = `${ch === "st" ? "酒馆" : "微信"} #${sIdx} ~ #${eIdx}`;
+
+        d.summaries = d.summaries || [];
+        d.summaries.unshift({
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            range: rangeLabel,
+            sFloor: sIdx,
+            eFloor: eIdx,
+            wordTarget: targetWords,
+            title: o.sumTitle || `${rangeLabel} 纪要`,
+            content: o.summary || "",
+            keyFacts: o.keyFacts || "",
+            time: `${modeTag} · ${timeStr}`
+        });
+
+        // 同步在当前轨道的星图上新增对应记忆微点
+        d.nodes = d.nodes || [];
+        d.edges = d.edges || [];
+        const nid = Date.now() + Math.floor(Math.random() * 1000) + 1;
+        const cnt = d.nodes.length + 1;
+        const xPct = Math.max(14, Math.min(86, Math.round(50 + Math.cos(cnt * 2.3) * (18 + (cnt % 4) * 6))));
+        const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(cnt * 2.3) * (14 + (cnt % 4) * 5))));
+        const anchorId = d.activeNodeId || d.nodes[0]?.id || 1;
+
+        d.nodes.push({
+            id: nid,
+            type: ["memory", "relation", "knot"].includes(o.nodeType) ? o.nodeType : "memory",
+            title: o.nodeTitle || `#${sIdx}-${eIdx}`,
+            xPct, yPct,
+            content: `[${rangeLabel}] ${o.summary || ""}`,
+            whisper: `“ ${(o.nodeWhisper || "这段记忆已锁入心底。").replace(/^[“"]|[”"]$/g, "")} ”`
+        });
+        d.edges.push({ from: anchorId, to: nid, label: o.edgeLabel || "刻痕" });
+        d.activeNodeId = nid;
+
+        d.autoCfg = d.autoCfg || {};
+        if (eIdx + 1 > (Number(d.autoCfg.lastFloor) || 0)) {
+            d.autoCfg.lastFloor = eIdx + 1;
+        }
+
+        saveMem(d, ch);
+    }
+
+    function mountEnhancedSummaryCenter() {
+        const overlay = topDoc.getElementById("smt-ksea-overlay");
+        const vp = topDoc.getElementById("ks-main-viewport");
+        if (!overlay || !vp) {
+            setTimeout(mountEnhancedSummaryCenter, 220);
+            return;
+        }
+
+        // 注入韩系高定「表格样式 ⇄ 文字样式」与未总结看板专属 CSS
+        topDoc.getElementById("ks-sum-pro-css")?.remove();
+        const st = topDoc.createElement("style");
+        st.id = "ks-sum-pro-css";
+        st.innerHTML = `
+            /* 未总结楼层 3 格仪表盘 */
+            #seoul-mini-theater-modal .ks-stat-grid {
+                display: grid !important; grid-template-columns: repeat(3, 1fr) !important;
+                gap: 7px !important; margin-bottom: 10px !important;
+            }
+            #seoul-mini-theater-modal .ks-stat-box {
+                background: #F8F9FC !important; border: 1px solid #ECEEF4 !important;
+                border-radius: 12px !important; padding: 8px 10px !important; text-align: center !important;
+            }
+            #seoul-mini-theater-modal .ks-stat-box.highlight {
+                background: #1E2028 !important; border-color: #1E2028 !important; color: #FFFFFF !important;
+            }
+            #seoul-mini-theater-modal .ks-stat-num {
+                font-size: 12px !important; font-weight: 900 !important; font-family: monospace !important;
+                letter-spacing: 0.3px !important; margin-top: 2px !important;
+            }
+
+            /* 表格样式 (Table View) */
+            #seoul-mini-theater-modal .ks-sum-table-wrap {
+                width: 100% !important; overflow-x: auto !important;
+                background: #FFFFFF !important; border: 1px solid #E6E9F2 !important;
+                border-radius: 14px !important; box-shadow: 0 4px 18px rgba(0,0,0,0.02) !important;
+            }
+            #seoul-mini-theater-modal .ks-sum-table {
+                width: 100% !important; border-collapse: collapse !important;
+                font-size: 9.2px !important; text-align: left !important;
+            }
+            #seoul-mini-theater-modal .ks-sum-table th {
+                background: #F6F8FC !important; color: #6E7688 !important;
+                font-size: 8px !important; font-weight: 800 !important; letter-spacing: 0.6px !important;
+                padding: 8px 10px !important; border-bottom: 1px solid #E6E9F2 !important;
+                white-space: nowrap !important;
+            }
+            #seoul-mini-theater-modal .ks-sum-table td {
+                padding: 9px 10px !important; border-bottom: 1px solid #F0F2F7 !important;
+                color: #2C303C !important; vertical-align: top !important; line-height: 1.55 !important;
+            }
+            #seoul-mini-theater-modal .ks-sum-table tr:last-child td {
+                border-bottom: none !important;
+            }
+            #seoul-mini-theater-modal .ks-range-badge {
+                display: inline-block !important; padding: 2px 6px !important;
+                background: #1E2028 !important; color: #FFFFFF !important;
+                border-radius: 6px !important; font-size: 7.8px !important; font-weight: 800 !important;
+                font-family: monospace !important; white-space: nowrap !important;
+            }
+
+            /* 文字样式 (Editorial Text View) */
+            #seoul-mini-theater-modal .ks-editorial-doc {
+                background: #FFFFFF !important; border: 1px solid #E6E9F2 !important;
+                border-radius: 16px !important; padding: 16px 16px !important;
+                box-shadow: 0 6px 24px rgba(0,0,0,0.025) !important;
+            }
+            #seoul-mini-theater-modal .ks-ed-entry {
+                padding-bottom: 14px !important; margin-bottom: 14px !important;
+                border-bottom: 1px dashed #E4E8F0 !important;
+            }
+            #seoul-mini-theater-modal .ks-ed-entry:last-child {
+                padding-bottom: 0 !important; margin-bottom: 0 !important; border-bottom: none !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        let isRenderingSum = false;
+        let isSequentialRunning = false;
+
+        function renderProSummaryUI() {
+            const ch = getCh();
+            const d = loadMem(ch);
+            if (!d || !d.isBound || d.activeTab !== "summary" || isRenderingSum) return;
+
+            isRenderingSum = true;
+            const c = getCtx();
+            const chLabel = ch === "st" ? "酒馆主线" : "微信线上";
+            const totalLen = ch === "st" ? c.stChatArr.length : c.wxChatArr.length;
+            const maxFloor = Math.max(0, totalLen - 1);
+
+            d.autoCfg = d.autoCfg || {};
+            const lastF = Math.min(totalLen, Math.max(0, Number(d.autoCfg.lastFloor) || 0));
+            const unsumCount = Math.max(0, totalLen - lastF);
+            const unsumRangeTxt = unsumCount > 0 ? `#${lastF} ~ #${maxFloor}` : "全部已结清";
+
+            const stepN = Math.max(3, Number(d.autoCfg.everyN) || 15);
+            const wordLimit = Math.max(40, Number(d.autoCfg.wordLimit) || 160);
+            const viewMode = d.autoCfg.viewMode === "table" ? "table" : "text"; // 'table' | 'text'
+
+            const sums = d.summaries || [];
+
+            // 1. 构造「表格样式 (Table View)」HTML
+            const tableHtml = sums.length === 0
+                ? `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:28px;">暂无归档总结，请在上方选择楼层或点击依次总结</div>`
+                : `<div class="ks-sum-table-wrap">
+                    <table class="ks-sum-table">
+                        <thead>
+                            <tr>
+                                <th style="width:78px;">楼层区间</th>
+                                <th style="width:88px;">阶段标题</th>
+                                <th>剧情与关系进展总结</th>
+                                <th style="width:96px;">防失忆铁律要点</th>
+                                <th style="width:28px;text-align:center;">删</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sums.map((s) => `
+                                <tr>
+                                    <td>
+                                        <span class="ks-range-badge">${(s.range || "").replace(/</g, "&lt;")}</span>
+                                        <div style="font-size:7px;color:#98A0B2;margin-top:4px;">${(s.time || "").replace(/</g, "&lt;")}</div>
+                                    </td>
+                                    <td style="font-weight:800;color:#1E2028;">${(s.title || "").replace(/</g, "&lt;")}</td>
+                                    <td style="font-weight:600;color:#3A3E4C;">${(s.content || "").replace(/</g, "&lt;")}</td>
+                                    <td style="font-size:8.4px;font-weight:700;color:#525868;background:#FAFBFD;">${(s.keyFacts || "—").replace(/</g, "&lt;")}</td>
+                                    <td style="text-align:center;">
+                                        <span data-delsum="${s.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;" title="删除该条">×</span>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>`;
+
+            // 2. 构造「文字样式 (Editorial Text View)」HTML
+            const textHtml = sums.length === 0
+                ? `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:28px;">暂无归档总结，请在上方选择楼层或点击依次总结</div>`
+                : `<div class="ks-editorial-doc">
+                    ${sums.map((s, idx) => `
+                        <div class="ks-ed-entry">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span style="font-size:8px;font-weight:900;color:#8E94A4;font-family:monospace;">ARCHIVE ${String(sums.length - idx).padStart(2, "0")}</span>
+                                    <span class="ks-range-badge">${(s.range || "").replace(/</g, "&lt;")}</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <span style="font-size:7.5px;color:#98A0B2;">${(s.time || "").replace(/</g, "&lt;")}</span>
+                                    <span data-delsum="${s.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
+                                </div>
+                            </div>
+                            <div style="font-size:11.5px;font-weight:800;color:#1E2028;margin-bottom:5px;letter-spacing:0.3px;">
+                                《${(s.title || "").replace(/</g, "&lt;")}》
+                            </div>
+                            <div style="font-size:9.8px;font-weight:600;color:#343844;line-height:1.72;text-align:justify;">
+                                ${(s.content || "").replace(/</g, "&lt;")}
+                            </div>
+                            ${s.keyFacts ? `
+                                <div style="margin-top:7px;padding:6px 10px;background:#F6F8FC;border-left:2px solid #1E2028;border-radius:0 7px 7px 0;font-size:8.6px;font-weight:700;color:#484E5E;">
+                                    防失忆核心锚点：${s.keyFacts.replace(/</g, "&lt;")}
+                                </div>
+                            ` : ""}
+                        </div>
+                    `).join("")}
+                </div>`;
+
+            vp.innerHTML = `
+                <div id="ks-pro-sum-container" style="flex:1;overflow-y:auto;padding:12px 14px 18px 14px;pointer-events:auto;">
+                    <!-- 1. 顶部实时「未总结楼层」三格监控看板 -->
+                    <div class="ks-stat-grid">
+                        <div class="ks-stat-box">
+                            <div style="font-size:7.5px;font-weight:700;color:#8E94A4;">${chLabel}总层数</div>
+                            <div class="ks-stat-num" style="color:#1E2028;">${totalLen} 层</div>
+                            <div style="font-size:6.8px;color:#98A0B2;">#0 ~ #${maxFloor}</div>
+                        </div>
+                        <div class="ks-stat-box">
+                            <div style="font-size:7.5px;font-weight:700;color:#8E94A4;">已总结至水位</div>
+                            <div class="ks-stat-num" style="color:#1E2028;">#${Math.max(0, lastF - 1)} 层</div>
+                            <div style="font-size:6.8px;color:#98A0B2;">共 ${sums.length} 篇归档</div>
+                        </div>
+                        <div class="ks-stat-box highlight">
+                            <div style="font-size:7.5px;font-weight:700;color:rgba(255,255,255,0.75);">当前未总结楼层</div>
+                            <div class="ks-stat-num" style="color:#FFFFFF;">${unsumCount} 层</div>
+                            <div style="font-size:6.8px;color:rgba(255,255,255,0.8);">${unsumRangeTxt}</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 核心控制舱：全局每次总结字数 + 依次分段总结未总结层 + 全自动开关 -->
+                    <div class="ks-card" style="margin-bottom:10px;padding:12px 14px!important;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F0F2F7;">
+                            <div>
+                                <div style="font-size:10.5px;font-weight:800;color:#1E2028;">每次总结字数 &amp; 分段步长设置</div>
+                                <div style="font-size:7.5px;color:#7E8494;">设定每多少层切一段、以及每段要求 AI 输出多少字</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:5px;">
+                                <span style="font-size:8.5px;font-weight:700;color:#525868;">每次字数</span>
+                                <input type="number" id="ks-pro-word-inp" class="ks-num-inp" min="40" max="800" step="10" value="${wordLimit}" style="width:52px!important;" />
+                                <span style="font-size:8.5px;font-weight:700;color:#525868;">字</span>
+                            </div>
+                        </div>
+
+                        <!-- 依次总结未总结楼层（支持排队分段执行） -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F0F2F7;">
+                            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                                <span style="font-size:8.8px;font-weight:700;color:#2C303C;">按每</span>
+                                <input type="number" id="ks-pro-step-inp" class="ks-num-inp" min="3" max="200" value="${stepN}" />
+                                <span style="font-size:8.8px;font-weight:700;color:#2C303C;">层一段 · 依次总结未总结层 (${unsumRangeTxt})</span>
+                            </div>
+                            <span class="ks-pill dark" id="ks-pro-seq-btn" style="flex-shrink:0;">
+                                <span>依次总结 (${unsumCount}层)</span>
+                            </span>
+                        </div>
+
+                        <!-- 后台全自动监听开关 + 手动微调已总结水位线 -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                            <div style="display:flex;align-items:center;gap:5px;">
+                                <span style="font-size:8.2px;font-weight:700;color:#6E7688;">重置未总结起点为 #</span>
+                                <input type="number" id="ks-pro-cursor-inp" class="ks-num-inp" min="0" max="${totalLen}" value="${lastF}" style="width:44px!important;height:22px!important;" />
+                                <span class="ks-flt" id="ks-pro-cursor-set" style="padding:2px 7px!important;">设置</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:5px;">
+                                <span style="font-size:8.2px;font-weight:700;color:#525868;">满${stepN}层自动总结：</span>
+                                <span class="ks-flt ${d.autoCfg?.enabled ? "on" : ""}" id="ks-pro-auto-tog">${d.autoCfg?.enabled ? "自动开启中✓" : "已关闭"}</span>
+                            </div>
+                        </div>
+
+                        <!-- 依次批量总结实时进度条 -->
+                        <div id="ks-seq-progress-bar" style="display:none;margin-top:8px;padding:7px 10px;background:#F6F8FC;border-radius:8px;font-size:8.8px;font-weight:700;color:#1E2028;"></div>
+                    </div>
+
+                    <!-- 3. 任选起止楼层精准单次总结 -->
+                    <div class="ks-card" style="margin-bottom:12px;padding:10px 14px!important;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-size:8.8px;font-weight:800;color:#1E2028;">指定区间：#</span>
+                                <input type="number" id="ks-pro-s" class="ks-num-inp" min="0" max="${maxFloor}" value="${Math.min(lastF, maxFloor)}" />
+                                <span style="font-size:8.8px;font-weight:700;color:#525868;">至 #</span>
+                                <input type="number" id="ks-pro-e" class="ks-num-inp" min="0" max="${maxFloor}" value="${maxFloor}" />
+                                <span style="font-size:8.8px;font-weight:700;color:#525868;">层</span>
+                            </div>
+                            <span class="ks-pill" id="ks-pro-manual-btn">单独提炼此区间</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. 归档总结列表头部 + 【表格样式 ⇄ 文字样式】双视图切换器 -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 2px;">
+                        <span style="font-size:9px;font-weight:800;color:#7E8494;letter-spacing:0.6px;">
+                            SUMMARY ARCHIVE · 已归档总结 (${sums.length}篇)
+                        </span>
+                        <div class="ks-dual-switch">
+                            <span class="ks-dual-opt ${viewMode === "table" ? "active" : ""}" data-vmode="table" style="padding:2.5px 9px!important;font-size:8px!important;">表格样式</span>
+                            <span class="ks-dual-opt ${viewMode === "text" ? "active" : ""}" data-vmode="text" style="padding:2.5px 9px!important;font-size:8px!important;">文字样式</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. 表格视图 或 文字视图 主体 -->
+                    ${viewMode === "table" ? tableHtml : textHtml}
+                </div>
+            `;
+
+            // ── 绑定所有控制器事件 ──
+            const saveCfgField = (field, val) => {
+                const latest = loadMem(ch);
+                latest.autoCfg = latest.autoCfg || {};
+                latest.autoCfg[field] = val;
+                saveMem(latest, ch);
+            };
+
+            topDoc.getElementById("ks-pro-word-inp").onchange = (e) => {
+                const v = Math.max(40, Math.min(800, Number(e.target.value) || 160));
+                saveCfgField("wordLimit", v);
+                isRenderingSum = false; renderProSummaryUI();
+            };
+
+            topDoc.getElementById("ks-pro-step-inp").onchange = (e) => {
+                const v = Math.max(3, Math.min(200, Number(e.target.value) || 15));
+                saveCfgField("everyN", v);
+                isRenderingSum = false; renderProSummaryUI();
+            };
+
+            topDoc.getElementById("ks-pro-cursor-set").onclick = () => {
+                const v = Math.max(0, Math.min(totalLen, Number(topDoc.getElementById("ks-pro-cursor-inp").value) || 0));
+                saveCfgField("lastFloor", v);
+                isRenderingSum = false; renderProSummaryUI();
+            };
+
+            topDoc.getElementById("ks-pro-auto-tog").onclick = () => {
+                const latest = loadMem(ch);
+                latest.autoCfg = latest.autoCfg || {};
+                latest.autoCfg.enabled = !latest.autoCfg.enabled;
+                latest.autoCfg.everyN = Math.max(3, Number(topDoc.getElementById("ks-pro-step-inp").value) || 15);
+                latest.autoCfg.wordLimit = Math.max(40, Number(topDoc.getElementById("ks-pro-word-inp").value) || 160);
+                saveMem(latest, ch);
+                isRenderingSum = false; renderProSummaryUI();
+            };
+
+            // 切换【表格样式 ⇄ 文字样式】
+            vp.querySelectorAll("[data-vmode]").forEach((btn) => {
+                btn.onclick = () => {
+                    saveCfgField("viewMode", btn.getAttribute("data-vmode"));
+                    isRenderingSum = false; renderProSummaryUI();
+                };
+            });
+
+            // 删除单条总结
+            vp.querySelectorAll("[data-delsum]").forEach((btn) => {
+                btn.onclick = () => {
+                    const latest = loadMem(ch);
+                    latest.summaries = (latest.summaries || []).filter((x) => Number(x.id) !== Number(btn.getAttribute("data-delsum")));
+                    saveMem(latest, ch);
+                    isRenderingSum = false; renderProSummaryUI();
+                };
+            });
+
+            // 单独提炼指定区间
+            topDoc.getElementById("ks-pro-manual-btn").onclick = async (e) => {
+                const btn = e.currentTarget, orig = btn.textContent;
+                const sVal = Number(topDoc.getElementById("ks-pro-s").value) || 0;
+                const eVal = Number(topDoc.getElementById("ks-pro-e").value) || maxFloor;
+                const wVal = Number(topDoc.getElementById("ks-pro-word-inp").value) || 160;
+                btn.textContent = "提炼中...";
+                try {
+                    await executeSingleBatchSummary(ch, sVal, eVal, wVal, "手动区间");
+                    isRenderingSum = false; renderProSummaryUI();
+                } catch (err) {
+                    alert(err.message);
+                    btn.textContent = orig;
+                }
+            };
+
+            // 核心：【依次分段总结所有未总结楼层】
+            topDoc.getElementById("ks-pro-seq-btn").onclick = async () => {
+                if (isSequentialRunning) return;
+                if (totalLen === 0) return alert(`当前【${chLabel}】还没有聊天消息！`);
+
+                const step = Math.max(3, Math.min(200, Number(topDoc.getElementById("ks-pro-step-inp").value) || 15));
+                const wVal = Math.max(40, Math.min(800, Number(topDoc.getElementById("ks-pro-word-inp").value) || 160));
+                saveCfgField("everyN", step);
+                saveCfgField("wordLimit", wVal);
+
+                let curStart = Math.min(maxFloor, Number(loadMem(ch).autoCfg?.lastFloor) || 0);
+                // 若当前已全部总结完，询问是否从最后一段重新总结
+                if (curStart >= totalLen) {
+                    curStart = Math.max(0, totalLen - step);
+                }
+
+                // 拆分批次队列
+                const batches = [];
+                for (let s = curStart; s <= maxFloor; s += step) {
+                    const e = Math.min(maxFloor, s + step - 1);
+                    batches.push([s, e]);
+                }
+
+                if (batches.length === 0) return alert("当前没有未总结的楼层！");
+
+                isSequentialRunning = true;
+                const progBar = topDoc.getElementById("ks-seq-progress-bar");
+                const seqBtn = topDoc.getElementById("ks-pro-seq-btn");
+                if (progBar) progBar.style.display = "block";
+
+                try {
+                    for (let i = 0; i < batches.length; i++) {
+                        const [bStart, bEnd] = batches[i];
+                        if (seqBtn) seqBtn.textContent = `依次总结中 (${i + 1}/${batches.length})...`;
+                        if (progBar) {
+                            progBar.textContent = `正在依次总结第 ${i + 1}/${batches.length} 批：楼层 #${bStart} ~ #${bEnd}（要求约 ${wVal} 字）...`;
+                        }
+                        await executeSingleBatchSummary(ch, bStart, bEnd, wVal, `依次总结(${i + 1}/${batches.length})`);
+                    }
+                    isSequentialRunning = false;
+                    isRenderingSum = false;
+                    renderProSummaryUI();
+                } catch (err) {
+                    alert(`依次总结中断：${err.message}`);
+                    isSequentialRunning = false;
+                    isRenderingSum = false;
+                    renderProSummaryUI();
+                }
+            };
+
+            setTimeout(() => { isRenderingSum = false; }, 60);
+        }
+
+        // 监听视图容器变化，只要切换到【楼层总结 (summary)】Tab 就自动渲染增强版界面
+        const obs = new MutationObserver(() => {
+            const d = loadMem(getCh());
+            if (d && d.isBound && d.activeTab === "summary" && !topDoc.getElementById("ks-pro-sum-container")) {
+                renderProSummaryUI();
+            }
+        });
+        obs.observe(vp, { childList: true });
+
+        // 初始检查
+        const initD = loadMem(getCh());
+        if (initD && initD.isBound && initD.activeTab === "summary") {
+            renderProSummaryUI();
+        }
+    }
+
+    mountEnhancedSummaryCenter();
+})();
