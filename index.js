@@ -6977,8 +6977,9 @@ bootSumoulApp();
     mountGlobalApiSettings();
 })();
 // ==========================================================================
-// 🌧️ 【结识海 · 韩系清冷落雨 & 柔弧冰星星图 视觉重塑独立补丁】
-// 用法：直接粘贴在 index.js 最末尾最后一行后面，自动接管并重绘结识海的落雨与星图！
+// 🤍 【结识海 · HTML5 高定毛玻璃悬浮节点 + SVG 0.6px 极细游丝 + 静谧雨雾重塑补丁】
+// 彻底干掉廉价的Canvas画星与乱跑圆球！采用真实DOM毛玻璃胶囊节点 + SVG极细流光丝线
+// 用法：直接替换 index.js 最末尾刚才那段 upgradeRainAndStarMap 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -7010,482 +7011,390 @@ bootSumoulApp();
         try { localStorage.setItem(`sumoul_v16_ksea_5tabs__${getSafeScope()}`, JSON.stringify(d)); } catch (e) {}
     }
 
-    function upgradeRainAndStarMap() {
+    function mountEditorialGlassConstellation() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
         const oldCanvas = topDoc.getElementById("ks-bg-canvas");
         if (!overlay || !oldCanvas) {
-            setTimeout(upgradeRainAndStarMap, 250);
+            setTimeout(mountEditorialGlassConstellation, 220);
             return;
         }
 
-        // 1. 注入更通透的韩系雨雾背景与玻璃质感微调
+        // 清理上一版残留画布与样式
+        topDoc.getElementById("ks-v2-canvas")?.remove();
         topDoc.getElementById("ks-v2-visual-css")?.remove();
+        topDoc.getElementById("ks-v3-stage")?.remove();
+
+        oldCanvas.width = 1;
+        oldCanvas.height = 1;
+
         const st = topDoc.createElement("style");
         st.id = "ks-v2-visual-css";
         st.innerHTML = `
+            /* 1. 极细丝线由 0% 到 100% 缓慢生长 */
+            @keyframes ksLineDraw {
+                from { stroke-dashoffset: 400; opacity: 0; }
+                to   { stroke-dashoffset: 0;   opacity: 1; }
+            }
+            /* 2. 高亮丝线上的柔和呼吸流光（绝无蠢圆球！） */
+            @keyframes ksSilkFlow {
+                0%   { stroke-dashoffset: 160; }
+                100% { stroke-dashoffset: 0; }
+            }
+            /* 3. 节点落雨涟漪缓慢扩散 */
+            @keyframes ksRippleExpand {
+                0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0.75; }
+                100% { transform: translate(-50%, -50%) scale(2.9); opacity: 0; }
+            }
+            /* 4. 悬浮节点整体微幅上下呼吸 */
+            @keyframes ksNodeFloat {
+                0%, 100% { margin-top: 0px; }
+                50%      { margin-top: -3.5px; }
+            }
+            /* 5. 雨滴垂直落向节点的动效 */
+            @keyframes ksRainDropFall {
+                0%   { transform: translate(-50%, -90px) scaleY(2.2); opacity: 0; }
+                30%  { opacity: 0.85; }
+                100% { transform: translate(-50%, 0px) scaleY(0.5); opacity: 0; }
+            }
+
             #seoul-mini-theater-modal #smt-ksea-overlay {
-                background: linear-gradient(168deg, #F7F9FD 0%, #EBF0F8 46%, #DDE5F2 100%) !important;
+                background: radial-gradient(circle at 50% 24%, #FFFFFF 0%, #F5F7FA 58%, #EAEFF6 100%) !important;
             }
-            #seoul-mini-theater-modal #ks-bg-canvas {
-                display: none !important;
-                pointer-events: none !important;
+            #seoul-mini-theater-modal #ks-bg-canvas { display: none !important; }
+
+            #seoul-mini-theater-modal #ks-v3-stage {
+                position: absolute !important; inset: 0 !important; z-index: 3 !important;
+                overflow: hidden !important; pointer-events: none !important;
             }
-            #seoul-mini-theater-modal .ks-dock-bar {
+            #seoul-mini-theater-modal #ks-v3-stage.map-mode {
+                pointer-events: auto !important;
+            }
+
+            /* 高定 HTML 毛玻璃节点容器 */
+            #seoul-mini-theater-modal .ks3-node {
+                position: absolute !important; transform: translate(-50%, -50%) !important;
+                display: flex !important; flex-direction: column !important; align-items: center !important;
+                cursor: grab !important; user-select: none !important; touch-action: none !important;
+                animation: ksNodeFloat 4.8s ease-in-out infinite !important;
+                z-index: 10 !important;
+            }
+            #seoul-mini-theater-modal .ks3-node.dragging {
+                cursor: grabbing !important; animation: none !important; z-index: 50 !important;
+            }
+            #seoul-mini-theater-modal .ks3-node.is-active { z-index: 30 !important; }
+
+            /* 节点中心：微距水滴核 + 极细同心涟漪环 */
+            #seoul-mini-theater-modal .ks3-dot-wrap {
+                position: relative !important; width: 20px !important; height: 20px !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+            }
+            #seoul-mini-theater-modal .ks3-core-dot {
+                width: 5px !important; height: 5px !important; border-radius: 50% !important;
+                background: #6E7688 !important; box-shadow: 0 0 0 2.5px rgba(255,255,255,0.92), 0 2px 6px rgba(30,36,48,0.18) !important;
+                transition: all 0.25s ease !important; position: relative !important; z-index: 3 !important;
+            }
+            #seoul-mini-theater-modal .ks3-node.is-core .ks3-core-dot,
+            #seoul-mini-theater-modal .ks3-node.is-active .ks3-core-dot {
+                width: 6.5px !important; height: 6.5px !important;
+                background: #1E2028 !important;
+                box-shadow: 0 0 0 3px #FFFFFF, 0 0 12px rgba(30,32,40,0.25) !important;
+            }
+            #seoul-mini-theater-modal .ks3-ring-static {
+                position: absolute !important; inset: 2px !important; border-radius: 50% !important;
+                border: 0.8px solid rgba(130, 138, 156, 0.38) !important; pointer-events: none !important;
+            }
+            #seoul-mini-theater-modal .ks3-node.is-active .ks3-ring-static,
+            #seoul-mini-theater-modal .ks3-node.is-core .ks3-ring-static {
+                border-color: rgba(30, 32, 40, 0.55) !important;
+            }
+            #seoul-mini-theater-modal .ks3-ripple {
+                position: absolute !important; left: 50% !important; top: 50% !important;
+                width: 14px !important; height: 14px !important; border-radius: 50% !important;
+                border: 0.8px solid rgba(90, 98, 118, 0.52) !important; pointer-events: none !important;
+                animation: ksRippleExpand 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+            }
+
+            /* 节点下方：韩系极简磨砂玻璃微胶囊铭牌 */
+            #seoul-mini-theater-modal .ks3-pill-label {
+                margin-top: 3px !important; padding: 2px 8px !important; border-radius: 999px !important;
                 background: rgba(255, 255, 255, 0.78) !important;
-                backdrop-filter: blur(22px) !important;
-                -webkit-backdrop-filter: blur(22px) !important;
+                backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+                border: 0.8px solid rgba(222, 226, 236, 0.92) !important;
+                box-shadow: 0 3px 10px rgba(25, 30, 42, 0.04) !important;
+                font-size: 8.5px !important; font-weight: 600 !important; color: #525868 !important;
+                letter-spacing: 0.4px !important; white-space: nowrap !important;
+                transition: all 0.22s ease !important;
             }
-            #seoul-mini-theater-modal .ks-card {
-                background: rgba(255, 255, 255, 0.80) !important;
-                border: 1px solid rgba(255, 255, 255, 0.92) !important;
-                box-shadow: 0 12px 34px rgba(56, 68, 92, 0.07) !important;
+            #seoul-mini-theater-modal .ks3-node.is-active .ks3-pill-label {
+                background: #22242C !important; border-color: #22242C !important;
+                color: #FFFFFF !important; font-weight: 700 !important;
+                box-shadow: 0 5px 14px rgba(25, 28, 36, 0.16) !important;
+                transform: translateY(1px) !important;
+            }
+            #seoul-mini-theater-modal .ks3-node.is-core:not(.is-active) .ks3-pill-label {
+                background: rgba(255, 255, 255, 0.94) !important;
+                border-color: #B8C0D0 !important; color: #1E2028 !important; font-weight: 800 !important;
+            }
+
+            /* 连线中央的极简悬浮关系词 */
+            #seoul-mini-theater-modal .ks3-edge-tag {
+                position: absolute !important; transform: translate(-50%, -50%) !important;
+                padding: 1px 6px !important; border-radius: 99px !important;
+                background: rgba(255, 255, 255, 0.86) !important;
+                border: 0.6px solid rgba(208, 214, 226, 0.85) !important;
+                font-size: 7.2px !important; font-weight: 600 !important; color: #788092 !important;
+                letter-spacing: 0.5px !important; pointer-events: none !important; z-index: 6 !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        // 降低旧画布尺寸以释放性能
-        oldCanvas.width = 1;
-        oldCanvas.height = 1;
+        // 创建三层高清混合舞台：1.静谧微雨背景Canvas + 2.SVG极细丝线层 + 3.HTML毛玻璃节点层
+        const stage = topDoc.createElement("div");
+        stage.id = "ks-v3-stage";
+        stage.innerHTML = `
+            <canvas id="ks3-ambient-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
+            <svg id="ks3-edges-svg" width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;"></svg>
+            <div id="ks3-edges-labels" style="position:absolute;inset:0;pointer-events:none;z-index:3;"></div>
+            <div id="ks3-nodes-layer" style="position:absolute;inset:0;z-index:4;"></div>
+        `;
+        oldCanvas.insertAdjacentElement("afterend", stage);
 
-        // 2. 创建全新高清渲染画布
-        topDoc.getElementById("ks-v2-canvas")?.remove();
-        const canvas = topDoc.createElement("canvas");
-        canvas.id = "ks-v2-canvas";
-        canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2;touch-action:none;cursor:default;";
-        oldCanvas.insertAdjacentElement("afterend", canvas);
+        const ambCanvas = topDoc.getElementById("ks3-ambient-canvas");
+        const ambCtx = ambCanvas.getContext("2d");
+        const edgesSvg = topDoc.getElementById("ks3-edges-svg");
+        const edgeLabelsLayer = topDoc.getElementById("ks3-edges-labels");
+        const nodesLayer = topDoc.getElementById("ks3-nodes-layer");
 
-        const ctx = canvas.getContext("2d");
         let animId = null, W = 390, H = 780;
-        let lineProgress = 0;
-        let dragNodeId = null, dragMoved = false, pStart = { x: 0, y: 0 };
-
-        // 3层景深斜风细雨粒子（近/中/远三层速度与透明度不同）
-        const rain = Array.from({ length: 72 }, (_, i) => {
-            const layer = i % 3; // 0:远 1:中 2:近
-            return {
-                x: Math.random() * 480,
-                y: Math.random() * 860,
-                len: layer === 0 ? 18 + Math.random() * 14 : (layer === 1 ? 30 + Math.random() * 20 : 48 + Math.random() * 28),
-                vy: layer === 0 ? 3.2 + Math.random() * 1.4 : (layer === 1 ? 5.6 + Math.random() * 2.2 : 8.5 + Math.random() * 3.0),
-                vx: layer === 0 ? -0.55 : (layer === 1 ? -1.05 : -1.65),
-                width: layer === 0 ? 0.55 : (layer === 1 ? 0.85 : 1.15),
-                alpha: layer === 0 ? 0.14 : (layer === 1 ? 0.24 : 0.36),
-                layer
-            };
-        });
-
-        // 窗外柔焦微光光斑 (Seoul Rainy Window Bokeh)
-        const bokehs = Array.from({ length: 12 }, (_, i) => ({
-            rx: (i * 0.19 + 0.08) % 1,
-            ry: (i * 0.27 + 0.12) % 0.85,
-            r: 22 + (i % 4) * 18,
-            alpha: 0.14 + (i % 3) * 0.07,
-            phase: i * 1.1
+        const clickRipples = [];
+        // 仅保留 22 根极细、极慢、半透明的垂直雨雾丝，营造克制安静的韩系雨窗氛围
+        const fineRain = Array.from({ length: 22 }, () => ({
+            x: Math.random() * 400,
+            y: Math.random() * 800,
+            len: 24 + Math.random() * 22,
+            vy: 1.8 + Math.random() * 1.4,
+            alpha: 0.08 + Math.random() * 0.12
         }));
 
-        const ripples = [];
-        const starDrops = [];
-
-        function resize() {
+        function resizeAmbient() {
             const rect = overlay.getBoundingClientRect();
             W = rect.width || topWin.innerWidth || 390;
             H = rect.height || topWin.innerHeight || 780;
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ambCanvas.width = W * dpr;
+            ambCanvas.height = H * dpr;
+            ambCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        function spawnRipple(x, y, maxR = 44) {
-            ripples.push({ x, y, r: 2, maxR, alpha: 0.62, lw: 1.0 });
-            ripples.push({ x, y, r: 0.5, maxR: maxR * 0.58, alpha: 0.40, lw: 0.7 });
-        }
+        function renderAmbientLoop() {
+            if (!overlay.classList.contains("open")) { animId = null; return; }
+            ambCtx.clearRect(0, 0, W, H);
 
-        function dropToNode(xPct, yPct, resetLine = false) {
-            const tx = (xPct / 100) * W, ty = (yPct / 100) * H;
-            starDrops.push({ x: tx + 28, y: 20, tx, ty, progress: 0, resetLine });
-        }
+            // 垂直极细渐隐雨丝
+            fineRain.forEach((r) => {
+                r.y += r.vy;
+                if (r.y > H + 30) { r.y = -40; r.x = Math.random() * W; }
+                const g = ambCtx.createLinearGradient(r.x, r.y - r.len, r.x, r.y);
+                g.addColorStop(0, "rgba(140, 148, 166, 0)");
+                g.addColorStop(1, `rgba(140, 148, 166, ${r.alpha})`);
+                ambCtx.beginPath();
+                ambCtx.moveTo(r.x, r.y - r.len);
+                ambCtx.lineTo(r.x, r.y);
+                ambCtx.strokeStyle = g;
+                ambCtx.lineWidth = 0.65;
+                ambCtx.stroke();
+            });
 
-        // 绘制极简清冷四芒冰星 ✦
-        function drawFourPointStar(x, y, rOuter, rInner, fill) {
-            ctx.beginPath();
-            for (let i = 0; i < 8; i++) {
-                const a = (i * Math.PI) / 4;
-                const r = i % 2 === 0 ? rOuter : rInner;
-                const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r;
-                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            // 点击空白处产生的极细水纹
+            for (let i = clickRipples.length - 1; i >= 0; i--) {
+                const rp = clickRipples[i];
+                rp.r += (rp.maxR - rp.r) * 0.06 + 0.3;
+                rp.alpha *= 0.94;
+                if (rp.alpha < 0.02) { clickRipples.splice(i, 1); continue; }
+                ambCtx.beginPath();
+                ambCtx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                ambCtx.strokeStyle = `rgba(120, 128, 148, ${rp.alpha})`;
+                ambCtx.lineWidth = 0.7;
+                ambCtx.stroke();
             }
-            ctx.closePath();
-            ctx.fillStyle = fill;
-            ctx.fill();
+
+            animId = requestAnimationFrame(renderAmbientLoop);
         }
 
-        // 计算柔美二次贝塞尔弧线控制点
-        function getArcCtrl(p1, p2, idx) {
-            const mx = (p1.x + p2.x) * 0.5, my = (p1.y + p2.y) * 0.5;
-            const dx = p2.x - p1.x, dy = p2.y - p1.y;
-            const dist = Math.hypot(dx, dy) || 1;
-            const curveSign = idx % 2 === 0 ? 1 : -1;
-            const offset = Math.min(28, dist * 0.16) * curveSign;
-            return { cx: mx - (dy / dist) * offset, cy: my + (dx / dist) * offset };
+        // 仅重绘 SVG 连线（拖拽节点时 60fps 实时丝滑跟随）
+        function updateEdgesOnly(d, animateDraw = false) {
+            if (!d || !d.isBound || d.activeTab !== "map") {
+                edgesSvg.innerHTML = "";
+                edgeLabelsLayer.innerHTML = "";
+                return;
+            }
+            const flt = d.filter || "all";
+            const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+            const nodeMap = new Map();
+            visNodes.forEach((n) => nodeMap.set(Number(n.id), n));
+
+            let svgHtml = "";
+            let lblHtml = "";
+
+            (d.edges || []).forEach((ed, idx) => {
+                const n1 = nodeMap.get(Number(ed.from));
+                const n2 = nodeMap.get(Number(ed.to));
+                if (!n1 || !n2) return;
+
+                const isHi = Number(ed.from) === Number(d.activeNodeId) || Number(ed.to) === Number(d.activeNodeId);
+                const x1 = `${n1.xPct}%`, y1 = `${n1.yPct}%`, x2 = `${n2.xPct}%`, y2 = `${n2.yPct}%`;
+                const animStyle = animateDraw ? `stroke-dasharray:400;animation:ksLineDraw 0.9s cubic-bezier(0.22,1,0.36,1) ${(idx * 0.07).toFixed(2)}s backwards;` : "";
+
+                // 底层静态极细银丝
+                svgHtml += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${isHi ? "rgba(40,44,54,0.45)" : "rgba(150,158,176,0.28)"}" stroke-width="${isHi ? "0.9" : "0.65"}" style="${animStyle}" />`;
+
+                // 高亮连线：叠加一层极细微的丝绸呼吸流光（无任何圆球，只有极细光线流动）
+                if (isHi) {
+                    svgHtml += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#1E2028" stroke-width="1.05" stroke-dasharray="18 142" stroke-linecap="round" style="animation:ksSilkFlow 3.6s linear infinite;" />`;
+                    if (ed.label) {
+                        const mx = ((Number(n1.xPct) + Number(n2.xPct)) * 0.5).toFixed(1);
+                        const my = ((Number(n1.yPct) + Number(n2.yPct)) * 0.5).toFixed(1);
+                        lblHtml += `<div class="ks3-edge-tag" style="left:${mx}%;top:${my}%;">${ed.label.replace(/</g, "&lt;")}</div>`;
+                    }
+                }
+            });
+
+            edgesSvg.innerHTML = svgHtml;
+            edgeLabelsLayer.innerHTML = lblHtml;
         }
 
-        function evalQuad(p1, ctrl, p2, u) {
-            const m = 1 - u;
-            return {
-                x: m * m * p1.x + 2 * m * u * ctrl.cx + u * u * p2.x,
-                y: m * m * p1.y + 2 * m * u * ctrl.cy + u * u * p2.y
+        // 渲染 HTML 毛玻璃悬浮节点与 SVG 丝线
+        function renderConstellationDOM(animateRainDrop = false) {
+            const d = loadWebData();
+            if (!d || !d.isBound || d.activeTab !== "map") {
+                stage.classList.remove("map-mode");
+                edgesSvg.innerHTML = "";
+                edgeLabelsLayer.innerHTML = "";
+                nodesLayer.innerHTML = "";
+                return;
+            }
+
+            stage.classList.add("map-mode");
+            const flt = d.filter || "all";
+            const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+
+            updateEdgesOnly(d, animateRainDrop);
+
+            nodesLayer.innerHTML = visNodes.map((n, idx) => {
+                const isSel = Number(n.id) === Number(d.activeNodeId);
+                const isCore = n.type === "core";
+                const delay = ((idx * 0.45) % 3.2).toFixed(2);
+                const dropHtml = animateRainDrop
+                    ? `<div style="position:absolute;left:50%;top:50%;width:1px;height:22px;background:linear-gradient(180deg,transparent,#22242C);animation:ksRainDropFall 0.45s ease-in ${(idx * 0.06).toFixed(2)}s backwards;pointer-events:none;"></div>`
+                    : "";
+
+                return `
+                    <div class="ks3-node ${isSel ? "is-active" : ""} ${isCore ? "is-core" : ""}" data-nid="${n.id}" style="left:${n.xPct}%;top:${n.yPct}%;animation-delay:${delay}s;">
+                        ${dropHtml}
+                        <div class="ks3-dot-wrap">
+                            <div class="ks3-ring-static"></div>
+                            ${isSel || isCore ? `<div class="ks3-ripple"></div>` : ""}
+                            <div class="ks3-core-dot"></div>
+                        </div>
+                        <div class="ks3-pill-label">${n.title.slice(0, 7).replace(/</g, "&lt;")}</div>
+                    </div>
+                `;
+            }).join("");
+
+            // 绑定每个毛玻璃节点的「点击选中」与「按住丝滑拖拽」
+            nodesLayer.querySelectorAll(".ks3-node").forEach((nodeEl) => {
+                const nid = Number(nodeEl.getAttribute("data-nid"));
+                let isDown = false, moved = false, sx = 0, sy = 0;
+
+                const onDown = (cx, cy) => {
+                    isDown = true; moved = false; sx = cx; sy = cy;
+                    nodeEl.classList.add("dragging");
+                };
+                const onMove = (cx, cy) => {
+                    if (!isDown) return;
+                    if (Math.hypot(cx - sx, cy - sy) > 5) {
+                        moved = true;
+                        const rect = stage.getBoundingClientRect();
+                        const xp = Math.max(10, Math.min(90, ((cx - rect.left) / rect.width) * 100));
+                        const yp = Math.max(16, Math.min(62, ((cy - rect.top) / rect.height) * 100));
+                        nodeEl.style.left = `${xp.toFixed(1)}%`;
+                        nodeEl.style.top = `${yp.toFixed(1)}%`;
+
+                        const curData = loadWebData();
+                        const tNode = curData?.nodes?.find((x) => Number(x.id) === nid);
+                        if (tNode) {
+                            tNode.xPct = parseFloat(xp.toFixed(1));
+                            tNode.yPct = parseFloat(yp.toFixed(1));
+                            saveWebData(curData);
+                            updateEdgesOnly(curData, false);
+                        }
+                    }
+                };
+                const onUp = () => {
+                    if (!isDown) return;
+                    isDown = false;
+                    nodeEl.classList.remove("dragging");
+                    const curData = loadWebData();
+                    if (curData) {
+                        curData.activeNodeId = nid;
+                        saveWebData(curData);
+                    }
+                    // 触发下方详情卡同步刷新
+                    const activeTabEl = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="map"]');
+                    if (activeTabEl) activeTabEl.click();
+                    renderConstellationDOM(false);
+                };
+
+                nodeEl.addEventListener("pointerdown", (e) => {
+                    e.stopPropagation();
+                    nodeEl.setPointerCapture?.(e.pointerId);
+                    onDown(e.clientX, e.clientY);
+                });
+                nodeEl.addEventListener("pointermove", (e) => onMove(e.clientX, e.clientY));
+                nodeEl.addEventListener("pointerup", onUp);
+                nodeEl.addEventListener("pointercancel", onUp);
+            });
+        }
+
+        // 点击背景空白处泛起极细水纹
+        stage.addEventListener("pointerdown", (e) => {
+            if (e.target.closest(".ks3-node")) return;
+            const rect = stage.getBoundingClientRect();
+            clickRipples.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, r: 2, maxR: 38, alpha: 0.55 });
+        });
+
+        // 拦截顶栏「落雨」按钮，触发全屏落雨成点与丝线缓慢重连动效
+        const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
+        if (replayBtn) {
+            replayBtn.onclick = (e) => {
+                e.stopPropagation();
+                renderConstellationDOM(true);
             };
         }
 
-        function getNodeXY(n, t) {
-            const fx = dragNodeId === n.id ? 0 : Math.sin(t * 0.72 + n.id * 1.7) * 3.2;
-            const fy = dragNodeId === n.id ? 0 : Math.cos(t * 0.62 + n.id * 1.3) * 3.2;
-            return { x: (n.xPct / 100) * W + fx, y: (n.yPct / 100) * H + fy };
+        // 监听原界面 DOM 变化（如切换底栏 Tab、筛选分类、新增/删除节点），实时同步星图
+        const vp = topDoc.getElementById("ks-main-viewport");
+        if (vp) {
+            const vpObs = new MutationObserver(() => renderConstellationDOM(false));
+            vpObs.observe(vp, { childList: true });
         }
 
-        function renderLoop(ts) {
-            if (!overlay.classList.contains("open")) { animId = null; return; }
-            const t = ts * 0.001;
-            ctx.clearRect(0, 0, W, H);
-
-            // 1. 窗外清冷柔焦光斑（营造韩剧雨天玻璃窗后的朦胧空气感）
-            bokehs.forEach((bk) => {
-                const bx = bk.rx * W + Math.sin(t * 0.3 + bk.phase) * 10;
-                const by = bk.ry * H + Math.cos(t * 0.25 + bk.phase) * 8;
-                const g = ctx.createRadialGradient(bx, by, 0, bx, by, bk.r);
-                g.addColorStop(0, `rgba(255, 255, 255, ${bk.alpha * 1.35})`);
-                g.addColorStop(0.6, `rgba(236, 242, 252, ${bk.alpha * 0.5})`);
-                g.addColorStop(1, "rgba(255, 255, 255, 0)");
-                ctx.fillStyle = g;
-                ctx.beginPath();
-                ctx.arc(bx, by, bk.r, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // 2. 三层景深斜风渐隐雨丝（尾部透明 -> 尖端冰白冷银）
-            ctx.lineCap = "round";
-            rain.forEach((r) => {
-                r.x += r.vx;
-                r.y += r.vy;
-                if (r.y > H + 40) {
-                    if (r.layer === 2 && Math.random() < 0.14) {
-                        spawnRipple(r.x, H * (0.22 + Math.random() * 0.52), 20 + Math.random() * 14);
-                    }
-                    r.y = -r.len - Math.random() * 40;
-                    r.x = Math.random() * (W + 120);
-                }
-                const tailX = r.x - r.vx * (r.len / r.vy);
-                const tailY = r.y - r.len;
-                const grad = ctx.createLinearGradient(tailX, tailY, r.x, r.y);
-                grad.addColorStop(0, "rgba(255, 255, 255, 0)");
-                grad.addColorStop(0.65, `rgba(148, 164, 192, ${r.alpha * 0.7})`);
-                grad.addColorStop(1, `rgba(255, 255, 255, ${Math.min(0.95, r.alpha * 2.2)})`);
-
-                ctx.beginPath();
-                ctx.moveTo(tailX, tailY);
-                ctx.lineTo(r.x, r.y);
-                ctx.strokeStyle = grad;
-                ctx.lineWidth = r.width;
-                ctx.stroke();
-            });
-
-            // 3. 正在坠落的「成点主雨滴」
-            for (let i = starDrops.length - 1; i >= 0; i--) {
-                const sd = starDrops[i];
-                sd.progress = Math.min(1, sd.progress + 0.055);
-                const ease = sd.progress * sd.progress;
-                const cx = sd.x + (sd.tx - sd.x) * ease;
-                const cy = sd.y + (sd.ty - sd.y) * ease;
-
-                const g = ctx.createLinearGradient(cx + 6, cy - 34, cx, cy);
-                g.addColorStop(0, "rgba(255,255,255,0)");
-                g.addColorStop(1, "rgba(92, 108, 138, 0.75)");
-                ctx.beginPath();
-                ctx.moveTo(cx + 6, cy - 34);
-                ctx.lineTo(cx, cy);
-                ctx.strokeStyle = g;
-                ctx.lineWidth = 1.4;
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(cx, cy, 2.4, 0, Math.PI * 2);
-                ctx.fillStyle = "#FFFFFF";
-                ctx.fill();
-
-                if (sd.progress >= 1) {
-                    spawnRipple(sd.tx, sd.ty, 54);
-                    if (sd.resetLine) lineProgress = 0.01;
-                    starDrops.splice(i, 1);
-                }
-            }
-
-            // 4. 斜向透视双层水雾涟漪
-            for (let i = ripples.length - 1; i >= 0; i--) {
-                const rp = ripples[i];
-                rp.r += (rp.maxR - rp.r) * 0.065 + 0.35;
-                rp.alpha *= 0.94;
-                if (rp.alpha < 0.02) { ripples.splice(i, 1); continue; }
-                ctx.beginPath();
-                ctx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.56, 0, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(255, 255, 255, ${rp.alpha * 1.15})`;
-                ctx.lineWidth = rp.lw;
-                ctx.stroke();
-            }
-
-            // 5. 星图脉络渲染（柔弧银丝 + 尾迹流光星尘 + 冰晶露珠星点）
-            const d = loadWebData();
-            if (d && d.isBound && d.activeTab === "map") {
-                if (lineProgress < 1) lineProgress = Math.min(1, lineProgress + 0.015);
-                const easeGrow = 1 - Math.pow(1 - lineProgress, 3);
-
-                const flt = d.filter || "all";
-                const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-                const posMap = new Map();
-                visNodes.forEach((n) => posMap.set(Number(n.id), getNodeXY(n, t)));
-
-                // 5A. 柔美二次贝塞尔弧线与流光星尘
-                (d.edges || []).forEach((ed, idx) => {
-                    const p1 = posMap.get(Number(ed.from));
-                    const p2 = posMap.get(Number(ed.to));
-                    if (!p1 || !p2) return;
-
-                    const localP = Math.max(0, Math.min(1, easeGrow * 1.32 - (idx % 6) * 0.055));
-                    if (localP <= 0) return;
-
-                    const ctrl = getArcCtrl(p1, p2, idx);
-                    const isHi = Number(ed.from) === Number(d.activeNodeId) || Number(ed.to) === Number(d.activeNodeId);
-
-                    // 分段采样绘制平滑生长的弧线
-                    const segs = 24;
-                    const maxSeg = Math.max(1, Math.floor(segs * localP));
-                    ctx.beginPath();
-                    ctx.moveTo(p1.x, p1.y);
-                    for (let s = 1; s <= maxSeg; s++) {
-                        const pt = evalQuad(p1, ctrl, p2, (s / segs));
-                        ctx.lineTo(pt.x, pt.y);
-                    }
-                    const lGrad = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-                    if (isHi) {
-                        lGrad.addColorStop(0, "rgba(74, 88, 116, 0.65)");
-                        lGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.92)");
-                        lGrad.addColorStop(1, "rgba(74, 88, 116, 0.65)");
-                    } else {
-                        lGrad.addColorStop(0, "rgba(130, 146, 174, 0.16)");
-                        lGrad.addColorStop(0.5, "rgba(130, 146, 174, 0.34)");
-                        lGrad.addColorStop(1, "rgba(130, 146, 174, 0.16)");
-                    }
-                    ctx.strokeStyle = lGrad;
-                    ctx.lineWidth = isHi ? 1.25 : 0.75;
-                    ctx.stroke();
-
-                    // 高亮弧线上缓缓流动的星尘光点 + 轻透关系词
-                    if (isHi && localP > 0.96) {
-                        const u = (t * 0.35 + idx * 0.23) % 1;
-                        const sp = evalQuad(p1, ctrl, p2, u);
-                        const gOrb = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, 6);
-                        gOrb.addColorStop(0, "rgba(255, 255, 255, 1)");
-                        gOrb.addColorStop(0.5, "rgba(168, 186, 218, 0.65)");
-                        gOrb.addColorStop(1, "rgba(255, 255, 255, 0)");
-                        ctx.fillStyle = gOrb;
-                        ctx.beginPath();
-                        ctx.arc(sp.x, sp.y, 6, 0, Math.PI * 2);
-                        ctx.fill();
-
-                        if (ed.label) {
-                            const mid = evalQuad(p1, ctrl, p2, 0.5);
-                            ctx.save();
-                            ctx.font = "600 8px -apple-system, 'Apple SD Gothic Neo', sans-serif";
-                            ctx.textAlign = "center";
-                            ctx.shadowColor = "rgba(255, 255, 255, 0.95)";
-                            ctx.shadowBlur = 6;
-                            ctx.fillStyle = "rgba(72, 84, 108, 0.82)";
-                            ctx.fillText(ed.label, mid.x, mid.y - 5);
-                            ctx.restore();
-                        }
-                    }
-                });
-
-                // 5B. 冰晶星芒 & 晨露玻璃节点
-                visNodes.forEach((n) => {
-                    const p = posMap.get(Number(n.id));
-                    const isSel = Number(n.id) === Number(d.activeNodeId);
-                    const isCore = n.type === "core";
-                    const breathe = Math.sin(t * 2.1 + n.id) * 1.6;
-
-                    // 第一层：柔和冰白光晕
-                    const haloR = (isCore ? 26 : (isSel ? 22 : 14)) + breathe;
-                    const gHalo = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, haloR);
-                    if (n.type === "knot") {
-                        gHalo.addColorStop(0, isSel ? "rgba(100, 116, 148, 0.45)" : "rgba(110, 126, 158, 0.25)");
-                        gHalo.addColorStop(1, "rgba(110, 126, 158, 0)");
-                    } else {
-                        gHalo.addColorStop(0, isSel || isCore ? "rgba(255, 255, 255, 0.98)" : "rgba(255, 255, 255, 0.85)");
-                        gHalo.addColorStop(0.55, "rgba(218, 228, 245, 0.42)");
-                        gHalo.addColorStop(1, "rgba(255, 255, 255, 0)");
-                    }
-                    ctx.fillStyle = gHalo;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, haloR, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // 第二层：选中态/核心态极细雾银玻璃环
-                    if (isSel || isCore) {
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, (isCore ? 12 : 10) + breathe * 0.5, 0, Math.PI * 2);
-                        ctx.strokeStyle = isSel ? "rgba(74, 88, 116, 0.55)" : "rgba(128, 142, 168, 0.42)";
-                        ctx.lineWidth = 0.85;
-                        ctx.stroke();
-                    }
-
-                    // 第三层：不同类型节点的精致形态
-                    if (isCore || isSel) {
-                        // 核心或选中：极简清冷四芒冰星 ✦
-                        drawFourPointStar(p.x, p.y, isCore ? 8.5 : 7.2, 2.1, isSel ? "#364054" : "#586680");
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
-                        ctx.fillStyle = "#FFFFFF";
-                        ctx.fill();
-                    } else if (n.type === "relation") {
-                        // 关系点：通透小菱晶
-                        ctx.save();
-                        ctx.translate(p.x, p.y);
-                        ctx.rotate(Math.PI / 4);
-                        ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
-                        ctx.strokeStyle = "rgba(112, 126, 154, 0.72)";
-                        ctx.lineWidth = 1;
-                        ctx.fillRect(-3.6, -3.6, 7.2, 7.2);
-                        ctx.strokeRect(-3.6, -3.6, 7.2, 7.2);
-                        ctx.restore();
-                    } else if (n.type === "knot") {
-                        // 心结点：深邃暮蓝雾珠
-                        const gKnot = ctx.createRadialGradient(p.x - 1.5, p.y - 1.5, 0.5, p.x, p.y, 5);
-                        gKnot.addColorStop(0, "#9CA8C2");
-                        gKnot.addColorStop(1, "#444E64");
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, 4.6, 0, Math.PI * 2);
-                        ctx.fillStyle = gKnot;
-                        ctx.fill();
-                        ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
-                        ctx.lineWidth = 0.9;
-                        ctx.stroke();
-                    } else {
-                        // 记忆点：纯净冰白玻璃露珠
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, 4.4, 0, Math.PI * 2);
-                        ctx.fillStyle = "#FFFFFF";
-                        ctx.fill();
-                        ctx.strokeStyle = "rgba(126, 140, 168, 0.65)";
-                        ctx.lineWidth = 1.0;
-                        ctx.stroke();
-                    }
-
-                    // 第四层：清冷呼吸感文字标题（无杂乱编号、无死板底框）
-                    ctx.save();
-                    ctx.font = `${isSel || isCore ? "700 9.8px" : "500 8.8px"} -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
-                    ctx.textAlign = "center";
-                    ctx.shadowColor = "rgba(255, 255, 255, 0.98)";
-                    ctx.shadowBlur = 7;
-                    ctx.fillStyle = isSel || isCore ? "#2A303E" : "rgba(76, 86, 108, 0.86)";
-                    ctx.fillText(n.title.slice(0, 7), p.x, p.y + (isCore || isSel ? 22 : 17));
-                    ctx.restore();
-                });
-            }
-
-            animId = requestAnimationFrame(renderLoop);
-        }
-
-        function hitNode(px, py) {
-            const d = loadWebData();
-            if (!d || !d.isBound || d.activeTab !== "map") return null;
-            const flt = d.filter || "all";
-            const vis = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-            let best = null, minD = 26;
-            vis.forEach((n) => {
-                const dist = Math.hypot(px - (n.xPct / 100) * W, py - (n.yPct / 100) * H);
-                if (dist < minD) { minD = dist; best = n; }
-            });
-            return best;
-        }
-
-        // 触发原页面底部卡片同步刷新
-        function syncMapCard() {
-            const mapTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="map"]');
-            if (mapTab) mapTab.click();
-        }
-
-        canvas.addEventListener("pointerdown", (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const px = e.clientX - rect.left, py = e.clientY - rect.top;
-            pStart = { x: px, y: py };
-            dragMoved = false;
-            const hit = hitNode(px, py);
-            if (hit) {
-                dragNodeId = hit.id;
-            } else {
-                spawnRipple(px, py, 46);
-            }
-        });
-
-        canvas.addEventListener("pointermove", (e) => {
-            if (!dragNodeId) return;
-            const rect = canvas.getBoundingClientRect();
-            const px = e.clientX - rect.left, py = e.clientY - rect.top;
-            if (Math.hypot(px - pStart.x, py - pStart.y) > 5) {
-                dragMoved = true;
-                const d = loadWebData();
-                const tn = d?.nodes?.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tn) {
-                    tn.xPct = Math.max(10, Math.min(90, (px / W) * 100));
-                    tn.yPct = Math.max(16, Math.min(64, (py / H) * 100));
-                    saveWebData(d);
-                }
-            }
-        });
-
-        canvas.addEventListener("pointerup", () => {
-            if (!dragNodeId) return;
-            const d = loadWebData();
-            if (d) {
-                d.activeNodeId = dragNodeId;
-                saveWebData(d);
-                const tn = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tn && !dragMoved) spawnRipple((tn.xPct / 100) * W, (tn.yPct / 100) * H, 42);
-            }
-            dragNodeId = null;
-            syncMapCard();
-        });
-
-        // 接管顶栏「落雨」重演按钮
-        const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
-        if (replayBtn) {
-            replayBtn.addEventListener("click", (e) => {
-                e.stopImmediatePropagation();
-                lineProgress = 0;
-                const d = loadWebData();
-                (d?.nodes || []).slice(0, 5).forEach((n, i) => {
-                    setTimeout(() => dropToNode(n.xPct, n.yPct, i === 0), i * 95);
-                });
-            }, true);
-        }
-
-        // 监听结识海打开/关闭，自动启停动画
-        function checkStart() {
+        function syncOpenState() {
             if (overlay.classList.contains("open")) {
-                resize();
-                lineProgress = 0;
-                if (!animId) animId = requestAnimationFrame(renderLoop);
+                resizeAmbient();
+                renderConstellationDOM(true);
+                if (!animId) animId = requestAnimationFrame(renderAmbientLoop);
             } else if (animId) {
                 cancelAnimationFrame(animId);
                 animId = null;
             }
         }
 
-        const obs = new MutationObserver(checkStart);
-        obs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
-        topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resize(); });
-        checkStart();
+        const openObs = new MutationObserver(syncOpenState);
+        openObs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
+        topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resizeAmbient(); });
+        syncOpenState();
     }
 
-    upgradeRainAndStarMap();
+    mountEditorialGlassConstellation();
 })();
