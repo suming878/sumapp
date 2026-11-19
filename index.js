@@ -8053,3 +8053,151 @@ bootSumoulApp();
 
     mountUltimateMemorySeaPatch();
 })();
+// ==========================================================================
+// 🤍 【结识海 · 极简纯白清冷开屏动画覆盖补丁 (零头像/零转盘/零读条 · 一滴雨落凝成双点牵丝)】
+// 用法：直接粘贴在 index.js 最末尾最后一行后面，自动接管并替换为极简清冷开屏！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+
+    function mountMinimalColdSplash() {
+        const overlay = topDoc.getElementById("smt-ksea-overlay");
+        if (!overlay) {
+            setTimeout(mountMinimalColdSplash, 200);
+            return;
+        }
+
+        // 移除旧的繁杂开屏节点与样式
+        topDoc.getElementById("ks-splash-screen")?.remove();
+        topDoc.getElementById("ks-clean-splash-css")?.remove();
+
+        const st = topDoc.createElement("style");
+        st.id = "ks-clean-splash-css";
+        st.innerHTML = `
+            /* 1. 极细 0.5px 银丝雨滴静谧垂落 */
+            @keyframes ksPureRainDrop {
+                0%   { top: 24%; height: 0px; opacity: 0; }
+                35%  { height: 36px; opacity: 0.55; }
+                75%  { top: 46%; height: 8px; opacity: 0.7; }
+                100% { top: 46.5%; height: 0px; opacity: 0; }
+            }
+            /* 2. 极淡 0.5px 同心水纹缓缓化开 */
+            @keyframes ksPureRipple {
+                0%, 55% { transform: translate(-50%, -50%) scale(0.25); opacity: 0; }
+                68%     { opacity: 0.45; }
+                100%    { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+            }
+            /* 3. 微点浮现并向两侧轻微舒展 */
+            @keyframes ksDotLeft {
+                0%, 58% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                100%    { transform: translate(calc(-50% - 26px), -50%) scale(1); opacity: 1; }
+            }
+            @keyframes ksDotRight {
+                0%, 62% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                100%    { transform: translate(calc(-50% + 26px), -50%) scale(1); opacity: 1; }
+            }
+            /* 4. 两点之间极细 0.5px 丝线缓慢拉通 */
+            @keyframes ksThreadLink {
+                0%, 66% { width: 0px; opacity: 0; }
+                100%    { width: 44px; opacity: 0.55; }
+            }
+            /* 5. 韩系极细留白文字柔焦浮现 */
+            @keyframes ksWhisperText {
+                0%, 50% { opacity: 0; filter: blur(4px); transform: translateY(4px); letter-spacing: 10px; }
+                100%    { opacity: 1; filter: blur(0px); transform: translateY(0); letter-spacing: 6px; }
+            }
+
+            #seoul-mini-theater-modal #ks-pure-splash {
+                position: absolute !important; inset: 0 !important; z-index: 99999 !important;
+                background: #FFFFFF !important;
+                display: none; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+                transition: opacity 0.55s ease !important;
+                user-select: none !important; cursor: pointer !important;
+            }
+            #seoul-mini-theater-modal #ks-pure-splash.show {
+                display: flex !important; opacity: 1 !important;
+            }
+            #seoul-mini-theater-modal #ks-pure-splash.fade-out {
+                opacity: 0 !important; pointer-events: none !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        const splash = topDoc.createElement("div");
+        splash.id = "ks-pure-splash";
+        overlay.appendChild(splash);
+
+        let timer = null;
+
+        function playPureColdSplash() {
+            const ch = localStorage.getItem("sumoul_v16_mem_active_channel") === "wx" ? "wx" : "st";
+            // 读取是否开启了开屏动画
+            try {
+                const rawKeys = Object.keys(localStorage).filter((k) => k.startsWith(`sumoul_v16_dualmem_${ch}__`));
+                if (rawKeys.length) {
+                    const cfg = JSON.parse(localStorage.getItem(rawKeys[0]) || "{}")?.autoCfg;
+                    if (cfg && cfg.showSplash === false) return;
+                }
+            } catch (e) {}
+
+            splash.classList.remove("fade-out");
+            splash.classList.add("show");
+            splash.innerHTML = `
+                <!-- 极简留白舞台：一滴细雨 -> 涟漪 -> 双点牵丝 -->
+                <div style="position:relative;width:180px;height:120px;">
+                    <!-- 0.5px 垂直落雨细丝 -->
+                    <div style="position:absolute;left:50%;transform:translateX(-50%);width:0.65px;background:linear-gradient(180deg,transparent,#22242C);animation:ksPureRainDrop 0.8s cubic-bezier(0.4,0,0.2,1) forwards;"></div>
+
+                    <!-- 两圈 0.5px 极淡同心水纹 -->
+                    <div style="position:absolute;left:50%;top:46.5%;width:32px;height:32px;border-radius:50%;border:0.6px solid rgba(34,36,44,0.42);animation:ksPureRipple 1.35s ease-out forwards;"></div>
+                    <div style="position:absolute;left:50%;top:46.5%;width:32px;height:32px;border-radius:50%;border:0.5px solid rgba(140,146,160,0.32);animation:ksPureRipple 1.35s ease-out 0.16s forwards;"></div>
+
+                    <!-- 两点之间缓缓拉通的 0.5px 极细游丝 -->
+                    <div style="position:absolute;left:50%;top:46.5%;transform:translate(-50%,-50%);height:0.6px;background:#22242C;animation:ksThreadLink 1.2s cubic-bezier(0.22,1,0.36,1) forwards;"></div>
+
+                    <!-- 左微点 (3.5px 实心深炭微点) -->
+                    <div style="position:absolute;left:50%;top:46.5%;width:3.8px;height:3.8px;border-radius:50%;background:#22242C;box-shadow:0 0 0 3px #FFFFFF;animation:ksDotLeft 1.15s cubic-bezier(0.22,1,0.36,1) forwards;"></div>
+
+                    <!-- 右微点 (3.5px 空心冷银微点，呼应星图双形态) -->
+                    <div style="position:absolute;left:50%;top:46.5%;width:3.8px;height:3.8px;border-radius:50%;background:#FFFFFF;border:1.1px solid #585E70;box-sizing:border-box;box-shadow:0 0 0 3px #FFFFFF;animation:ksDotRight 1.15s cubic-bezier(0.22,1,0.36,1) forwards;"></div>
+                </div>
+
+                <!-- 极细冷感留白排印 -->
+                <div style="text-align:center;animation:ksWhisperText 1.15s cubic-bezier(0.22,1,0.36,1) forwards;margin-top:4px;">
+                    <div style="font-size:13px;font-weight:300;color:#22242C;padding-left:6px;">结 识 海</div>
+                    <div style="font-size:7px;font-weight:400;color:#98A0B2;letter-spacing:3.5px;margin-top:7px;padding-left:3.5px;">
+                        인연의 바다 · ${ch === "st" ? "TAVERN" : "WECHAT"}
+                    </div>
+                </div>
+            `;
+
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                splash.classList.add("fade-out");
+                setTimeout(() => splash.classList.remove("show", "fade-out"), 520);
+            }, 1450);
+        }
+
+        splash.onclick = () => {
+            if (timer) clearTimeout(timer);
+            splash.classList.add("fade-out");
+            setTimeout(() => splash.classList.remove("show", "fade-out"), 300);
+        };
+
+        let wasOpen = overlay.classList.contains("open");
+        const obs = new MutationObserver(() => {
+            const isOpen = overlay.classList.contains("open");
+            if (isOpen && !wasOpen) {
+                // 隐藏旧版开屏（防止闪烁）
+                const oldSp = topDoc.getElementById("ks-splash-screen");
+                if (oldSp) oldSp.style.display = "none";
+                playPureColdSplash();
+            }
+            wasOpen = isOpen;
+        });
+        obs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
+    }
+
+    mountMinimalColdSplash();
+})();
