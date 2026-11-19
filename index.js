@@ -6640,346 +6640,9 @@ bootSumoulApp();
 
 
 // ==========================================================================
-// 🤍 【Sumoul App API设置增强补丁：全局软件壁纸(相册/链接/雾度/模糊) + 全局系统大小(80%~120%实时缩放)】
-// 用法：直接粘贴在 index.js 最末尾最后一行后面，打开【API设置】即可看到！
-// ==========================================================================
-(function () {
-    const topWin = window.parent || window;
-    const topDoc = topWin.document;
-    const STORE_KEY = "sumoul_v16_global_ui_prefs";
-
-    const svgIco = (p, sz = 14, c = "currentColor", sw = "1.5") =>
-        `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
-
-    const G_ICO = {
-        image: svgIco(`<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`, 14, "#3A3A42"),
-        scale: svgIco(`<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>`, 14, "#3A3A42"),
-        reset: svgIco(`<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>`, 12, "currentColor")
-    };
-
-    function loadPrefs() {
-        const def = {
-            wallpaperUrl: "",
-            maskAlpha: "0.48",  // 白雾遮罩透明度
-            blurPx: "0",        // 壁纸模糊像素
-            uiScale: 100        // 全局系统大小 (80 ~ 120)
-        };
-        try {
-            return Object.assign(def, JSON.parse(localStorage.getItem(STORE_KEY) || "{}"));
-        } catch (e) {
-            return def;
-        }
-    }
-
-    function savePrefs(p) {
-        try {
-            localStorage.setItem(STORE_KEY, JSON.stringify(p));
-        } catch (e) {
-            alert("图片体积过大导致存储受限，请换一张小一点的图片或使用图片链接。");
-        }
-    }
-
-    function compressWallpaper(file, maxDim = 960) {
-        return new Promise((res) => {
-            const r = new FileReader();
-            r.onload = (ev) => {
-                const img = new Image();
-                img.onload = () => {
-                    const c = topDoc.createElement("canvas");
-                    let w = img.width, h = img.height;
-                    if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
-                    else { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
-                    c.width = w; c.height = h;
-                    c.getContext("2d").drawImage(img, 0, 0, w, h);
-                    res(c.toDataURL("image/jpeg", 0.78));
-                };
-                img.src = String(ev.target?.result || "");
-            };
-            r.readAsDataURL(file);
-        });
-    }
-
-    // 应用全局壁纸与系统缩放
-    function applyGlobalAppearance() {
-        const modal = topDoc.getElementById("seoul-mini-theater-modal");
-        if (!modal) return;
-        const p = loadPrefs();
-
-        // 1. 挂载或更新底层全局壁纸层（不干扰全屏覆盖类子应用）
-        let wpLayer = topDoc.getElementById("sumoul-global-wp-layer");
-        if (!wpLayer) {
-            wpLayer = topDoc.createElement("div");
-            wpLayer.id = "sumoul-global-wp-layer";
-            wpLayer.style.cssText = "position:absolute!important;inset:0!important;z-index:0!important;pointer-events:none!important;overflow:hidden!important;display:none;";
-            wpLayer.innerHTML = `<div id="sumoul-global-wp-img" style="position:absolute;inset:-16px;background-size:cover;background-position:center;transition:filter 0.25s ease;"></div><div id="sumoul-global-wp-mask" style="position:absolute;inset:0;transition:background 0.25s ease;"></div>`;
-            modal.insertBefore(wpLayer, modal.firstChild);
-        }
-
-        const wpImg = topDoc.getElementById("sumoul-global-wp-img");
-        const wpMask = topDoc.getElementById("sumoul-global-wp-mask");
-        const hasWp = Boolean(p.wallpaperUrl && p.wallpaperUrl.trim());
-
-        if (hasWp) {
-            wpLayer.style.display = "block";
-            wpImg.style.backgroundImage = `url('${p.wallpaperUrl}')`;
-            wpImg.style.filter = Number(p.blurPx) > 0 ? `blur(${p.blurPx}px)` : "none";
-            wpMask.style.background = `rgba(255, 255, 255, ${p.maskAlpha ?? 0.48})`;
-        } else {
-            wpLayer.style.display = "none";
-            wpImg.style.backgroundImage = "none";
-        }
-
-        // 2. 注入动态样式：透明化主页面底色以透出全局壁纸 + 应用全局系统缩放
-        let dynCss = topDoc.getElementById("sumoul-global-ui-dyn-css");
-        if (!dynCss) {
-            dynCss = topDoc.createElement("style");
-            dynCss.id = "sumoul-global-ui-dyn-css";
-            topDoc.head.appendChild(dynCss);
-        }
-
-        const scaleVal = (Math.max(80, Math.min(120, Number(p.uiScale) || 100)) / 100).toFixed(2);
-        const wpTransparentCss = hasWp ? `
-            #seoul-mini-theater-modal > *:not(#sumoul-global-wp-layer) { position: relative; z-index: 1; }
-            #seoul-mini-theater-modal .smt-fs-body,
-            #seoul-mini-theater-modal #smt-page-home,
-            #seoul-mini-theater-modal #smt-page-api,
-            #seoul-mini-theater-modal #smt-page-talk,
-            #seoul-mini-theater-modal #smt-page-wx_settings,
-            #seoul-mini-theater-modal #ios-wxset-root,
-            #seoul-mini-theater-modal #ios-wxset-root > div {
-                background: transparent !important;
-                background-color: transparent !important;
-            }
-            #seoul-mini-theater-modal .smt-fs-header,
-            #seoul-mini-theater-modal .smt-bottom-tabs,
-            #seoul-mini-theater-modal .smt-tab-bar {
-                background: rgba(255, 255, 255, 0.72) !important;
-                backdrop-filter: blur(14px) !important;
-                -webkit-backdrop-filter: blur(14px) !important;
-            }
-            #seoul-mini-theater-modal #smt-page-talk .smt-wx-quick {
-                background: rgba(255, 255, 255, 0.75) !important;
-                backdrop-filter: blur(10px) !important;
-            }
-            #seoul-mini-theater-modal .ios-group-card,
-            #seoul-mini-theater-modal .smt-g-card {
-                background: rgba(255, 255, 255, 0.82) !important;
-                backdrop-filter: blur(12px) !important;
-                -webkit-backdrop-filter: blur(12px) !important;
-            }
-        ` : "";
-
-        const scaleCss = scaleVal !== "1.00" ? `
-            #seoul-mini-theater-modal .smt-fs-header,
-            #seoul-mini-theater-modal .smt-fs-body,
-            #seoul-mini-theater-modal .smt-bottom-tabs,
-            #seoul-mini-theater-modal .smt-tab-bar {
-                zoom: ${scaleVal} !important;
-            }
-        ` : "";
-
-        dynCss.innerHTML = wpTransparentCss + scaleCss;
-    }
-
-    function mountGlobalApiSettings() {
-        const modal = topDoc.getElementById("seoul-mini-theater-modal");
-        const apiPage = topDoc.getElementById("smt-page-api");
-        if (!modal || !apiPage) {
-            setTimeout(mountGlobalApiSettings, 250);
-            return;
-        }
-
-        // 注入设置卡片样式（独立不依赖其他补丁）
-        if (!topDoc.getElementById("sumoul-global-api-ui-css")) {
-            const st = topDoc.createElement("style");
-            st.id = "sumoul-global-api-ui-css";
-            st.innerHTML = `
-                #seoul-mini-theater-modal .smt-g-sec-title {
-                    display: flex !important; align-items: center !important; justify-content: space-between !important;
-                    padding: 12px 4px 6px 4px !important; font-size: 9px !important; font-weight: 800 !important;
-                    color: #8E8E98 !important; letter-spacing: 0.8px !important;
-                }
-                #seoul-mini-theater-modal .smt-g-card {
-                    background: #FFFFFF !important; border: 1px solid #E8E8F0 !important;
-                    border-radius: 16px !important; padding: 0 14px !important; margin-bottom: 12px !important;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.015) !important; box-sizing: border-box !important;
-                }
-                #seoul-mini-theater-modal .smt-g-row {
-                    display: flex !important; align-items: center !important; justify-content: space-between !important;
-                    min-height: 42px !important; padding: 6px 0 !important; gap: 10px !important;
-                    border-bottom: 1px solid #F2F2F7 !important; box-sizing: border-box !important;
-                }
-                #seoul-mini-theater-modal .smt-g-row.last { border-bottom: none !important; }
-                #seoul-mini-theater-modal .smt-g-lbl {
-                    font-size: 10.2px !important; font-weight: 700 !important; color: #2C2C32 !important;
-                    display: inline-flex !important; align-items: center !important; gap: 6px !important; flex-shrink: 0 !important;
-                }
-                #seoul-mini-theater-modal .smt-g-inp {
-                    -webkit-appearance: none !important; appearance: none !important; flex: 1 !important;
-                    border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important;
-                    height: 28px !important; font-size: 10px !important; font-weight: 600 !important;
-                    color: #3A3A42 !important; text-align: right !important; min-width: 0 !important;
-                }
-                #seoul-mini-theater-modal .smt-g-chip {
-                    display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important;
-                    height: 24px !important; padding: 0 9px !important; border-radius: 999px !important;
-                    background: #FFFFFF !important; border: 1px solid #E4E4EE !important;
-                    font-size: 8.6px !important; font-weight: 600 !important; color: #55555E !important;
-                    cursor: pointer !important; white-space: nowrap !important; transition: all 0.15s ease !important;
-                }
-                #seoul-mini-theater-modal .smt-g-chip.on {
-                    background: #2C2C34 !important; border-color: #2C2C34 !important;
-                    color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important;
-                }
-            `;
-            topDoc.head.appendChild(st);
-        }
-
-        if (!topDoc.getElementById("smt-global-appearance-wrap")) {
-            const wrap = topDoc.createElement("div");
-            wrap.id = "smt-global-appearance-wrap";
-            wrap.innerHTML = `
-                <div class="smt-g-sec-title">
-                    <span>GLOBAL APPEARANCE · 全局软件壁纸与系统大小</span>
-                    <span class="smt-g-chip" id="smt-g-reset-all" style="height:20px!important;font-size:8px!important;">${G_ICO.reset}<span>恢复默认</span></span>
-                </div>
-                <div class="smt-g-card">
-                    <!-- 1. 软件全局壁纸 -->
-                    <div class="smt-g-row">
-                        <span class="smt-g-lbl">${G_ICO.image}<span>软件全局壁纸</span></span>
-                        <div style="display:flex;align-items:center;gap:5px;flex:1;justify-content:flex-end;min-width:0;">
-                            <input type="text" id="smt-g-wp-url" class="smt-g-inp" placeholder="粘贴图片URL 或选图..." />
-                            <label class="smt-g-chip on" style="cursor:pointer;">
-                                <span>相册选图</span>
-                                <input type="file" id="smt-g-wp-file" accept="image/*" style="display:none;" />
-                            </label>
-                            <span class="smt-g-chip" id="smt-g-wp-clear">清除</span>
-                        </div>
-                    </div>
-
-                    <!-- 2. 壁纸白雾遮罩浓度 -->
-                    <div class="smt-g-row">
-                        <span class="smt-g-lbl">壁纸白雾遮罩</span>
-                        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;" id="smt-g-mask-grp">
-                            <span class="smt-g-chip" data-mask="0.15">原图通透</span>
-                            <span class="smt-g-chip" data-mask="0.48">轻雾 48%</span>
-                            <span class="smt-g-chip" data-mask="0.72">清冷柔雾</span>
-                            <span class="smt-g-chip" data-mask="0.86">高雾护眼</span>
-                        </div>
-                    </div>
-
-                    <!-- 3. 壁纸模糊度 -->
-                    <div class="smt-g-row">
-                        <span class="smt-g-lbl">壁纸柔焦模糊</span>
-                        <div style="display:flex;gap:4px;" id="smt-g-blur-grp">
-                            <span class="smt-g-chip" data-blur="0">清晰</span>
-                            <span class="smt-g-chip" data-blur="3">微柔 3px</span>
-                            <span class="smt-g-chip" data-blur="8">磨砂 8px</span>
-                        </div>
-                    </div>
-
-                    <!-- 4. 全局系统大小 -->
-                    <div class="smt-g-row last" style="flex-direction:column;align-items:stretch!important;padding:10px 0 12px 0!important;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                            <span class="smt-g-lbl">${G_ICO.scale}<span>全局系统大小</span></span>
-                            <span id="smt-g-scale-val" style="font-size:10px;font-weight:800;color:#2C2C34;font-family:monospace;">100%</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                            <span style="font-size:8px;font-weight:700;color:#9A9AA5;">80%</span>
-                            <input type="range" id="smt-g-scale-range" min="80" max="120" step="1" value="100" style="flex:1;accent-color:#2C2C34;cursor:pointer;" />
-                            <span style="font-size:8px;font-weight:700;color:#9A9AA5;">120%</span>
-                        </div>
-                        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:space-between;" id="smt-g-scale-grp">
-                            <span class="smt-g-chip" data-sc="85">85% 小巧</span>
-                            <span class="smt-g-chip" data-sc="92">92% 精致</span>
-                            <span class="smt-g-chip" data-sc="100">100% 标准</span>
-                            <span class="smt-g-chip" data-sc="108">108% 偏大</span>
-                            <span class="smt-g-chip" data-sc="115">115% 大号</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            apiPage.appendChild(wrap);
-
-            function syncUI() {
-                const p = loadPrefs();
-                topDoc.getElementById("smt-g-wp-url").value = p.wallpaperUrl?.startsWith("data:") ? "[已设置本地相册壁纸]" : (p.wallpaperUrl || "");
-                topDoc.querySelectorAll("#smt-g-mask-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", c.getAttribute("data-mask") === String(p.maskAlpha)));
-                topDoc.querySelectorAll("#smt-g-blur-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", c.getAttribute("data-blur") === String(p.blurPx)));
-
-                const sc = Number(p.uiScale) || 100;
-                topDoc.getElementById("smt-g-scale-range").value = sc;
-                topDoc.getElementById("smt-g-scale-val").textContent = `${sc}%`;
-                topDoc.querySelectorAll("#smt-g-scale-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", Number(c.getAttribute("data-sc")) === sc));
-            }
-
-            // 绑定壁纸链接输入与相册上传
-            topDoc.getElementById("smt-g-wp-url").onchange = (e) => {
-                const val = e.target.value.trim();
-                if (val === "[已设置本地相册壁纸]") return;
-                const p = loadPrefs();
-                p.wallpaperUrl = val;
-                savePrefs(p); applyGlobalAppearance(); syncUI();
-            };
-
-            topDoc.getElementById("smt-g-wp-file").onchange = async (e) => {
-                const f = e.target.files?.[0];
-                if (!f) return;
-                const dUrl = await compressWallpaper(f, 960);
-                const p = loadPrefs();
-                p.wallpaperUrl = dUrl;
-                savePrefs(p); applyGlobalAppearance(); syncUI();
-                e.target.value = "";
-            };
-
-            topDoc.getElementById("smt-g-wp-clear").onclick = () => {
-                const p = loadPrefs();
-                p.wallpaperUrl = "";
-                savePrefs(p); applyGlobalAppearance(); syncUI();
-            };
-
-            topDoc.querySelectorAll("#smt-g-mask-grp .smt-g-chip").forEach((c) => c.onclick = () => {
-                const p = loadPrefs(); p.maskAlpha = c.getAttribute("data-mask");
-                savePrefs(p); applyGlobalAppearance(); syncUI();
-            });
-
-            topDoc.querySelectorAll("#smt-g-blur-grp .smt-g-chip").forEach((c) => c.onclick = () => {
-                const p = loadPrefs(); p.blurPx = c.getAttribute("data-blur");
-                savePrefs(p); applyGlobalAppearance(); syncUI();
-            });
-
-            // 绑定全局系统大小滑杆与快捷档位
-            const rangeEl = topDoc.getElementById("smt-g-scale-range");
-            rangeEl.oninput = () => {
-                const sc = Number(rangeEl.value) || 100;
-                topDoc.getElementById("smt-g-scale-val").textContent = `${sc}%`;
-                const p = loadPrefs(); p.uiScale = sc;
-                savePrefs(p); applyGlobalAppearance();
-                topDoc.querySelectorAll("#smt-g-scale-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", Number(c.getAttribute("data-sc")) === sc));
-            };
-
-            topDoc.querySelectorAll("#smt-g-scale-grp .smt-g-chip").forEach((c) => c.onclick = () => {
-                const p = loadPrefs(); p.uiScale = Number(c.getAttribute("data-sc")) || 100;
-                savePrefs(p); applyGlobalAppearance(); syncUI();
-            });
-
-            topDoc.getElementById("smt-g-reset-all").onclick = () => {
-                savePrefs({ wallpaperUrl: "", maskAlpha: "0.48", blurPx: "0", uiScale: 100 });
-                applyGlobalAppearance(); syncUI();
-            };
-
-            syncUI();
-        }
-
-        applyGlobalAppearance();
-    }
-
-    mountGlobalApiSettings();
-})();
-// ==========================================================================
-// 🤍 【结识海 · HTML5 高定毛玻璃悬浮节点 + SVG 0.6px 极细游丝 + 静谧雨雾重塑补丁】
-// 彻底干掉廉价的Canvas画星与乱跑圆球！采用真实DOM毛玻璃胶囊节点 + SVG极细流光丝线
-// 用法：直接替换 index.js 最末尾刚才那段 upgradeRainAndStarMap 补丁代码！
+// 🤍 【结识海 · 彻底抛弃蜘蛛网！韩系杂志级「垂直雨弦 · 留白同心水波画卷」终极重塑补丁】
+// 美学：砍掉杂乱斜线与胶囊框！采用「唯一垂直0.5px银丝雨弦 + 巨型极细同心水波环 + 裸感电影级留白排印」
+// 用法：直接替换 index.js 最末尾刚才那段 mountEditorialGlassConstellation 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -7011,18 +6674,26 @@ bootSumoulApp();
         try { localStorage.setItem(`sumoul_v16_ksea_5tabs__${getSafeScope()}`, JSON.stringify(d)); } catch (e) {}
     }
 
-    function mountEditorialGlassConstellation() {
+    const TYPE_KR = {
+        core:     "CORE ORIGIN · 핵심",
+        memory:   "RAIN MEMORY · 기억",
+        relation: "FATE THREAD · 인연",
+        knot:     "HIDDEN KNOT · 심결"
+    };
+
+    function mountMinimalistRainChord() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
         const oldCanvas = topDoc.getElementById("ks-bg-canvas");
         if (!overlay || !oldCanvas) {
-            setTimeout(mountEditorialGlassConstellation, 220);
+            setTimeout(mountMinimalistRainChord, 220);
             return;
         }
 
-        // 清理上一版残留画布与样式
+        // 清理旧版蜘蛛网星图节点
         topDoc.getElementById("ks-v2-canvas")?.remove();
         topDoc.getElementById("ks-v2-visual-css")?.remove();
         topDoc.getElementById("ks-v3-stage")?.remove();
+        topDoc.getElementById("ks-v4-chord-stage")?.remove();
 
         oldCanvas.width = 1;
         oldCanvas.height = 1;
@@ -7030,371 +6701,267 @@ bootSumoulApp();
         const st = topDoc.createElement("style");
         st.id = "ks-v2-visual-css";
         st.innerHTML = `
-            /* 1. 极细丝线由 0% 到 100% 缓慢生长 */
-            @keyframes ksLineDraw {
-                from { stroke-dashoffset: 400; opacity: 0; }
-                to   { stroke-dashoffset: 0;   opacity: 1; }
+            /* 1. 雨滴顺着唯一垂直银丝滑落的流光动画 */
+            @keyframes ksRainSlideDown {
+                0%   { top: -15%; opacity: 0; }
+                20%  { opacity: 1; }
+                80%  { opacity: 1; }
+                100% { top: 105%; opacity: 0; }
             }
-            /* 2. 高亮丝线上的柔和呼吸流光（绝无蠢圆球！） */
-            @keyframes ksSilkFlow {
-                0%   { stroke-dashoffset: 160; }
-                100% { stroke-dashoffset: 0; }
+            /* 2. 巨型极细同心水波环缓慢呼吸扩散 */
+            @keyframes ksWaterRingPulse {
+                0%   { transform: translate(-50%, -50%) scale(0.35); opacity: 0.85; }
+                100% { transform: translate(-50%, -50%) scale(1.85); opacity: 0; }
             }
-            /* 3. 节点落雨涟漪缓慢扩散 */
-            @keyframes ksRippleExpand {
-                0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0.75; }
-                100% { transform: translate(-50%, -50%) scale(2.9); opacity: 0; }
-            }
-            /* 4. 悬浮节点整体微幅上下呼吸 */
-            @keyframes ksNodeFloat {
-                0%, 100% { margin-top: 0px; }
-                50%      { margin-top: -3.5px; }
-            }
-            /* 5. 雨滴垂直落向节点的动效 */
-            @keyframes ksRainDropFall {
-                0%   { transform: translate(-50%, -90px) scaleY(2.2); opacity: 0; }
-                30%  { opacity: 0.85; }
-                100% { transform: translate(-50%, 0px) scaleY(0.5); opacity: 0; }
+            /* 3. 静态大水波环微幅荡漾 */
+            @keyframes ksRingBreathe {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.38; }
+                50%      { transform: translate(-50%, -50%) scale(1.06); opacity: 0.65; }
             }
 
             #seoul-mini-theater-modal #smt-ksea-overlay {
-                background: radial-gradient(circle at 50% 24%, #FFFFFF 0%, #F5F7FA 58%, #EAEFF6 100%) !important;
+                background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFD 52%, #F1F4F9 100%) !important;
             }
             #seoul-mini-theater-modal #ks-bg-canvas { display: none !important; }
 
-            #seoul-mini-theater-modal #ks-v3-stage {
-                position: absolute !important; inset: 0 !important; z-index: 3 !important;
-                overflow: hidden !important; pointer-events: none !important;
+            #seoul-mini-theater-modal #ks-v4-chord-stage {
+                position: absolute !important; inset: 52px 0 60px 0 !important; z-index: 4 !important;
+                overflow-y: auto !important; overflow-x: hidden !important;
+                display: none; scroll-behavior: smooth !important;
+                scrollbar-width: none !important;
             }
-            #seoul-mini-theater-modal #ks-v3-stage.map-mode {
-                pointer-events: auto !important;
+            #seoul-mini-theater-modal #ks-v4-chord-stage::-webkit-scrollbar { display: none !important; }
+            #seoul-mini-theater-modal #ks-v4-chord-stage.active-mode { display: block !important; }
+
+            /* 贯穿天地的唯一 0.5px 极细垂直雨弦 */
+            #seoul-mini-theater-modal .ks4-vertical-chord {
+                position: absolute !important; left: 24% !important; top: 0 !important; bottom: 0 !important;
+                width: 1px !important;
+                background: linear-gradient(180deg, transparent 0%, rgba(160,170,190,0.45) 8%, rgba(140,150,172,0.55) 92%, transparent 100%) !important;
+                pointer-events: none !important; z-index: 1 !important;
+            }
+            /* 顺着雨弦滑落的晶莹雨滴光丝 */
+            #seoul-mini-theater-modal .ks4-sliding-drop {
+                position: absolute !important; left: 24% !important; transform: translateX(-50%) !important;
+                width: 1.5px !important; height: 56px !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #525A6E 85%, #1E2028 100%) !important;
+                animation: ksRainSlideDown 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+                pointer-events: none !important; z-index: 2 !important;
+            }
+            #seoul-mini-theater-modal .ks4-sliding-drop::after {
+                content: "" !important; position: absolute !important; bottom: -2px !important; left: 50% !important;
+                transform: translateX(-50%) !important; width: 4px !important; height: 4px !important;
+                border-radius: 50% !important; background: #1E2028 !important;
+                box-shadow: 0 0 8px rgba(30,32,40,0.4) !important;
             }
 
-            /* 高定 HTML 毛玻璃节点容器 */
-            #seoul-mini-theater-modal .ks3-node {
-                position: absolute !important; transform: translate(-50%, -50%) !important;
-                display: flex !important; flex-direction: column !important; align-items: center !important;
-                cursor: grab !important; user-select: none !important; touch-action: none !important;
-                animation: ksNodeFloat 4.8s ease-in-out infinite !important;
-                z-index: 10 !important;
+            /* 每一个落雨涟漪节点行（左波纹 + 右留白杂志排版） */
+            #seoul-mini-theater-modal .ks4-ripple-row {
+                position: relative !important; width: 100% !important; min-height: 118px !important;
+                display: flex !important; align-items: center !important;
+                cursor: pointer !important; box-sizing: border-box !important;
+                padding: 18px 22px 18px 0 !important;
+                transition: opacity 0.3s ease !important;
             }
-            #seoul-mini-theater-modal .ks3-node.dragging {
-                cursor: grabbing !important; animation: none !important; z-index: 50 !important;
-            }
-            #seoul-mini-theater-modal .ks3-node.is-active { z-index: 30 !important; }
 
-            /* 节点中心：微距水滴核 + 极细同心涟漪环 */
-            #seoul-mini-theater-modal .ks3-dot-wrap {
-                position: relative !important; width: 20px !important; height: 20px !important;
-                display: flex !important; align-items: center !important; justify-content: center !important;
+            /* 左侧 24% 处的同心水波圆心 */
+            #seoul-mini-theater-modal .ks4-wave-anchor {
+                position: absolute !important; left: 24% !important; top: 50% !important;
+                width: 0 !important; height: 0 !important; pointer-events: none !important;
             }
-            #seoul-mini-theater-modal .ks3-core-dot {
+            /* 中心露珠原点 */
+            #seoul-mini-theater-modal .ks4-dew-point {
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                transform: translate(-50%, -50%) !important;
                 width: 5px !important; height: 5px !important; border-radius: 50% !important;
-                background: #6E7688 !important; box-shadow: 0 0 0 2.5px rgba(255,255,255,0.92), 0 2px 6px rgba(30,36,48,0.18) !important;
-                transition: all 0.25s ease !important; position: relative !important; z-index: 3 !important;
+                background: #8E96A8 !important;
+                box-shadow: 0 0 0 3px #FFFFFF !important;
+                transition: all 0.3s ease !important; z-index: 5 !important;
             }
-            #seoul-mini-theater-modal .ks3-node.is-core .ks3-core-dot,
-            #seoul-mini-theater-modal .ks3-node.is-active .ks3-core-dot {
-                width: 6.5px !important; height: 6.5px !important;
+            #seoul-mini-theater-modal .ks4-ripple-row.is-selected .ks4-dew-point {
+                width: 7px !important; height: 7px !important;
                 background: #1E2028 !important;
-                box-shadow: 0 0 0 3px #FFFFFF, 0 0 12px rgba(30,32,40,0.25) !important;
-            }
-            #seoul-mini-theater-modal .ks3-ring-static {
-                position: absolute !important; inset: 2px !important; border-radius: 50% !important;
-                border: 0.8px solid rgba(130, 138, 156, 0.38) !important; pointer-events: none !important;
-            }
-            #seoul-mini-theater-modal .ks3-node.is-active .ks3-ring-static,
-            #seoul-mini-theater-modal .ks3-node.is-core .ks3-ring-static {
-                border-color: rgba(30, 32, 40, 0.55) !important;
-            }
-            #seoul-mini-theater-modal .ks3-ripple {
-                position: absolute !important; left: 50% !important; top: 50% !important;
-                width: 14px !important; height: 14px !important; border-radius: 50% !important;
-                border: 0.8px solid rgba(90, 98, 118, 0.52) !important; pointer-events: none !important;
-                animation: ksRippleExpand 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+                box-shadow: 0 0 0 4px #FFFFFF, 0 0 0 5px rgba(30,32,40,0.25) !important;
             }
 
-            /* 节点下方：韩系极简磨砂玻璃微胶囊铭牌 */
-            #seoul-mini-theater-modal .ks3-pill-label {
-                margin-top: 3px !important; padding: 2px 8px !important; border-radius: 999px !important;
-                background: rgba(255, 255, 255, 0.78) !important;
-                backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
-                border: 0.8px solid rgba(222, 226, 236, 0.92) !important;
-                box-shadow: 0 3px 10px rgba(25, 30, 42, 0.04) !important;
-                font-size: 8.5px !important; font-weight: 600 !important; color: #525868 !important;
-                letter-spacing: 0.4px !important; white-space: nowrap !important;
-                transition: all 0.22s ease !important;
+            /* 极细几何同心水波圆环（大留白艺术感的核心！） */
+            #seoul-mini-theater-modal .ks4-circle-static {
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                border-radius: 50% !important;
+                border: 0.7px solid rgba(150, 160, 180, 0.28) !important;
+                animation: ksRingBreathe 5s ease-in-out infinite !important;
+                pointer-events: none !important;
             }
-            #seoul-mini-theater-modal .ks3-node.is-active .ks3-pill-label {
-                background: #22242C !important; border-color: #22242C !important;
-                color: #FFFFFF !important; font-weight: 700 !important;
-                box-shadow: 0 5px 14px rgba(25, 28, 36, 0.16) !important;
-                transform: translateY(1px) !important;
+            #seoul-mini-theater-modal .ks4-ripple-row.is-selected .ks4-circle-static {
+                border-color: rgba(40, 44, 56, 0.32) !important;
             }
-            #seoul-mini-theater-modal .ks3-node.is-core:not(.is-active) .ks3-pill-label {
-                background: rgba(255, 255, 255, 0.94) !important;
-                border-color: #B8C0D0 !important; color: #1E2028 !important; font-weight: 800 !important;
+            #seoul-mini-theater-modal .ks4-circle-pulse {
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                width: 96px !important; height: 96px !important; border-radius: 50% !important;
+                border: 0.8px solid rgba(50, 56, 72, 0.45) !important;
+                animation: ksWaterRingPulse 3.4s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
+                pointer-events: none !important;
             }
 
-            /* 连线中央的极简悬浮关系词 */
-            #seoul-mini-theater-modal .ks3-edge-tag {
-                position: absolute !important; transform: translate(-50%, -50%) !important;
-                padding: 1px 6px !important; border-radius: 99px !important;
-                background: rgba(255, 255, 255, 0.86) !important;
-                border: 0.6px solid rgba(208, 214, 226, 0.85) !important;
-                font-size: 7.2px !important; font-weight: 600 !important; color: #788092 !important;
-                letter-spacing: 0.5px !important; pointer-events: none !important; z-index: 6 !important;
+            /* 从圆心伸向右侧文字的极细水平牵引刻度丝 */
+            #seoul-mini-theater-modal .ks4-guide-tick {
+                position: absolute !important; left: 24% !important; top: 50% !important;
+                width: 28px !important; height: 0.7px !important;
+                background: linear-gradient(90deg, rgba(140,150,172,0.5), rgba(140,150,172,0.1)) !important;
+                pointer-events: none !important; transition: all 0.3s ease !important;
+            }
+            #seoul-mini-theater-modal .ks4-ripple-row.is-selected .ks4-guide-tick {
+                width: 36px !important;
+                background: linear-gradient(90deg, #1E2028, rgba(30,32,40,0.15)) !important;
+            }
+
+            /* 左侧留白区的极简序号与连线词 */
+            #seoul-mini-theater-modal .ks4-left-meta {
+                width: 24% !important; padding-right: 18px !important; box-sizing: border-box !important;
+                text-align: right !important; flex-shrink: 0 !important;
+            }
+            /* 右侧留白区的裸感韩系杂志排印（无死板背景框！） */
+            #seoul-mini-theater-modal .ks4-right-editorial {
+                flex: 1 !important; padding-left: 42px !important; min-width: 0 !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        // 创建三层高清混合舞台：1.静谧微雨背景Canvas + 2.SVG极细丝线层 + 3.HTML毛玻璃节点层
-        const stage = topDoc.createElement("div");
-        stage.id = "ks-v3-stage";
-        stage.innerHTML = `
-            <canvas id="ks3-ambient-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
-            <svg id="ks3-edges-svg" width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;"></svg>
-            <div id="ks3-edges-labels" style="position:absolute;inset:0;pointer-events:none;z-index:3;"></div>
-            <div id="ks3-nodes-layer" style="position:absolute;inset:0;z-index:4;"></div>
-        `;
-        oldCanvas.insertAdjacentElement("afterend", stage);
+        // 创建全新的「垂直雨弦 · 同心水波画卷」容器
+        const chordStage = topDoc.createElement("div");
+        chordStage.id = "ks-v4-chord-stage";
+        oldCanvas.insertAdjacentElement("afterend", chordStage);
 
-        const ambCanvas = topDoc.getElementById("ks3-ambient-canvas");
-        const ambCtx = ambCanvas.getContext("2d");
-        const edgesSvg = topDoc.getElementById("ks3-edges-svg");
-        const edgeLabelsLayer = topDoc.getElementById("ks3-edges-labels");
-        const nodesLayer = topDoc.getElementById("ks3-nodes-layer");
-
-        let animId = null, W = 390, H = 780;
-        const clickRipples = [];
-        // 仅保留 22 根极细、极慢、半透明的垂直雨雾丝，营造克制安静的韩系雨窗氛围
-        const fineRain = Array.from({ length: 22 }, () => ({
-            x: Math.random() * 400,
-            y: Math.random() * 800,
-            len: 24 + Math.random() * 22,
-            vy: 1.8 + Math.random() * 1.4,
-            alpha: 0.08 + Math.random() * 0.12
-        }));
-
-        function resizeAmbient() {
-            const rect = overlay.getBoundingClientRect();
-            W = rect.width || topWin.innerWidth || 390;
-            H = rect.height || topWin.innerHeight || 780;
-            const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            ambCanvas.width = W * dpr;
-            ambCanvas.height = H * dpr;
-            ambCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        }
-
-        function renderAmbientLoop() {
-            if (!overlay.classList.contains("open")) { animId = null; return; }
-            ambCtx.clearRect(0, 0, W, H);
-
-            // 垂直极细渐隐雨丝
-            fineRain.forEach((r) => {
-                r.y += r.vy;
-                if (r.y > H + 30) { r.y = -40; r.x = Math.random() * W; }
-                const g = ambCtx.createLinearGradient(r.x, r.y - r.len, r.x, r.y);
-                g.addColorStop(0, "rgba(140, 148, 166, 0)");
-                g.addColorStop(1, `rgba(140, 148, 166, ${r.alpha})`);
-                ambCtx.beginPath();
-                ambCtx.moveTo(r.x, r.y - r.len);
-                ambCtx.lineTo(r.x, r.y);
-                ambCtx.strokeStyle = g;
-                ambCtx.lineWidth = 0.65;
-                ambCtx.stroke();
-            });
-
-            // 点击空白处产生的极细水纹
-            for (let i = clickRipples.length - 1; i >= 0; i--) {
-                const rp = clickRipples[i];
-                rp.r += (rp.maxR - rp.r) * 0.06 + 0.3;
-                rp.alpha *= 0.94;
-                if (rp.alpha < 0.02) { clickRipples.splice(i, 1); continue; }
-                ambCtx.beginPath();
-                ambCtx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-                ambCtx.strokeStyle = `rgba(120, 128, 148, ${rp.alpha})`;
-                ambCtx.lineWidth = 0.7;
-                ambCtx.stroke();
-            }
-
-            animId = requestAnimationFrame(renderAmbientLoop);
-        }
-
-        // 仅重绘 SVG 连线（拖拽节点时 60fps 实时丝滑跟随）
-        function updateEdgesOnly(d, animateDraw = false) {
-            if (!d || !d.isBound || d.activeTab !== "map") {
-                edgesSvg.innerHTML = "";
-                edgeLabelsLayer.innerHTML = "";
-                return;
-            }
-            const flt = d.filter || "all";
-            const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-            const nodeMap = new Map();
-            visNodes.forEach((n) => nodeMap.set(Number(n.id), n));
-
-            let svgHtml = "";
-            let lblHtml = "";
-
-            (d.edges || []).forEach((ed, idx) => {
-                const n1 = nodeMap.get(Number(ed.from));
-                const n2 = nodeMap.get(Number(ed.to));
-                if (!n1 || !n2) return;
-
-                const isHi = Number(ed.from) === Number(d.activeNodeId) || Number(ed.to) === Number(d.activeNodeId);
-                const x1 = `${n1.xPct}%`, y1 = `${n1.yPct}%`, x2 = `${n2.xPct}%`, y2 = `${n2.yPct}%`;
-                const animStyle = animateDraw ? `stroke-dasharray:400;animation:ksLineDraw 0.9s cubic-bezier(0.22,1,0.36,1) ${(idx * 0.07).toFixed(2)}s backwards;` : "";
-
-                // 底层静态极细银丝
-                svgHtml += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${isHi ? "rgba(40,44,54,0.45)" : "rgba(150,158,176,0.28)"}" stroke-width="${isHi ? "0.9" : "0.65"}" style="${animStyle}" />`;
-
-                // 高亮连线：叠加一层极细微的丝绸呼吸流光（无任何圆球，只有极细光线流动）
-                if (isHi) {
-                    svgHtml += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#1E2028" stroke-width="1.05" stroke-dasharray="18 142" stroke-linecap="round" style="animation:ksSilkFlow 3.6s linear infinite;" />`;
-                    if (ed.label) {
-                        const mx = ((Number(n1.xPct) + Number(n2.xPct)) * 0.5).toFixed(1);
-                        const my = ((Number(n1.yPct) + Number(n2.yPct)) * 0.5).toFixed(1);
-                        lblHtml += `<div class="ks3-edge-tag" style="left:${mx}%;top:${my}%;">${ed.label.replace(/</g, "&lt;")}</div>`;
-                    }
-                }
-            });
-
-            edgesSvg.innerHTML = svgHtml;
-            edgeLabelsLayer.innerHTML = lblHtml;
-        }
-
-        // 渲染 HTML 毛玻璃悬浮节点与 SVG 丝线
-        function renderConstellationDOM(animateRainDrop = false) {
+        function renderRainChordView() {
             const d = loadWebData();
+            const vp = topDoc.getElementById("ks-main-viewport");
             if (!d || !d.isBound || d.activeTab !== "map") {
-                stage.classList.remove("map-mode");
-                edgesSvg.innerHTML = "";
-                edgeLabelsLayer.innerHTML = "";
-                nodesLayer.innerHTML = "";
+                chordStage.classList.remove("active-mode");
+                if (vp) vp.style.pointerEvents = "none";
                 return;
             }
 
-            stage.classList.add("map-mode");
+            chordStage.classList.add("active-mode");
             const flt = d.filter || "all";
             const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
 
-            updateEdgesOnly(d, animateRainDrop);
+            // 查找每个节点与核心点之间的连线词
+            const edgeMap = new Map();
+            (d.edges || []).forEach((e) => {
+                edgeMap.set(Number(e.to), e.label || "共鸣");
+                if (!edgeMap.has(Number(e.from))) edgeMap.set(Number(e.from), e.label || "原点");
+            });
 
-            nodesLayer.innerHTML = visNodes.map((n, idx) => {
+            const rowsHtml = visNodes.map((n, idx) => {
                 const isSel = Number(n.id) === Number(d.activeNodeId);
                 const isCore = n.type === "core";
-                const delay = ((idx * 0.45) % 3.2).toFixed(2);
-                const dropHtml = animateRainDrop
-                    ? `<div style="position:absolute;left:50%;top:50%;width:1px;height:22px;background:linear-gradient(180deg,transparent,#22242C);animation:ksRainDropFall 0.45s ease-in ${(idx * 0.06).toFixed(2)}s backwards;pointer-events:none;"></div>`
-                    : "";
+                const krType = TYPE_KR[n.type] || TYPE_KR.memory;
+                const edgeWord = isCore ? "ORIGIN" : (edgeMap.get(Number(n.id)) || "涟漪");
+                // 每个节点的水波环大小错落有致，形成极美的几何同心圆构图
+                const r1 = isCore ? 88 : (56 + (idx % 3) * 18);
+                const r2 = r1 * 1.55;
 
                 return `
-                    <div class="ks3-node ${isSel ? "is-active" : ""} ${isCore ? "is-core" : ""}" data-nid="${n.id}" style="left:${n.xPct}%;top:${n.yPct}%;animation-delay:${delay}s;">
-                        ${dropHtml}
-                        <div class="ks3-dot-wrap">
-                            <div class="ks3-ring-static"></div>
-                            ${isSel || isCore ? `<div class="ks3-ripple"></div>` : ""}
-                            <div class="ks3-core-dot"></div>
+                    <div class="ks4-ripple-row ${isSel ? "is-selected" : ""}" data-rnid="${n.id}">
+                        <!-- 左侧：微距序号与连线关系词 -->
+                        <div class="ks4-left-meta">
+                            <div style="font-size:8px;font-weight:700;color:${isSel ? "#1E2028" : "#98A0B2"};font-family:monospace;letter-spacing:1px;">
+                                ${String(idx + 1).padStart(2, "0")}
+                            </div>
+                            <div style="font-size:7.5px;font-weight:600;color:#8E96A8;margin-top:2px;letter-spacing:0.5px;">
+                                ${edgeWord.replace(/</g, "&lt;")}
+                            </div>
                         </div>
-                        <div class="ks3-pill-label">${n.title.slice(0, 7).replace(/</g, "&lt;")}</div>
+
+                        <!-- 24% 轴线处：雨滴落点与巨型同心水波环 -->
+                        <div class="ks4-wave-anchor">
+                            <div class="ks4-circle-static" style="width:${r1}px;height:${r1}px;animation-delay:${(idx * 0.4).toFixed(1)}s;"></div>
+                            <div class="ks4-circle-static" style="width:${r2.toFixed(0)}px;height:${r2.toFixed(0)}px;opacity:0.18;animation-delay:${(idx * 0.4 + 0.8).toFixed(1)}s;"></div>
+                            ${isSel || isCore ? `<div class="ks4-circle-pulse"></div>` : ""}
+                            <div class="ks4-dew-point"></div>
+                        </div>
+                        <div class="ks4-guide-tick"></div>
+
+                        <!-- 右侧：韩系高定裸感文字排版（点击直接展开完整回忆与回响） -->
+                        <div class="ks4-right-editorial">
+                            <div style="font-size:7px;font-weight:700;color:#98A0B2;letter-spacing:1.8px;margin-bottom:3px;">
+                                ${krType}
+                            </div>
+                            <div style="font-size:${isSel ? "14px" : "12.5px"};font-weight:${isSel ? "800" : "700"};color:${isSel ? "#181A20" : "#3A3E4C"};letter-spacing:0.6px;transition:all 0.2s ease;">
+                                ${n.title.replace(/</g, "&lt;")}
+                            </div>
+                            <div style="font-size:9.8px;font-weight:500;color:${isSel ? "#484E5E" : "#7E8698"};line-height:1.65;margin-top:4px;display:${isSel ? "block" : "-webkit-box"};-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                                ${n.content.replace(/</g, "&lt;")}
+                            </div>
+                            ${isSel ? `
+                                <div style="margin-top:8px;padding-left:9px;border-left:1.5px solid #262830;font-size:9.2px;font-weight:600;color:#262830;line-height:1.55;">
+                                    ${(n.whisper || "“ 每一滴落下的雨，都有回音。”").replace(/</g, "&lt;")}
+                                </div>
+                            ` : ""}
+                        </div>
                     </div>
                 `;
             }).join("");
 
-            // 绑定每个毛玻璃节点的「点击选中」与「按住丝滑拖拽」
-            nodesLayer.querySelectorAll(".ks3-node").forEach((nodeEl) => {
-                const nid = Number(nodeEl.getAttribute("data-nid"));
-                let isDown = false, moved = false, sx = 0, sy = 0;
+            // 计算画卷总高度，保证垂直雨弦贯穿到底，底部留出空间给操作按钮
+            const minH = Math.max(680, visNodes.length * 125 + 220);
+            chordStage.innerHTML = `
+                <div style="position:relative;width:100%;min-height:${minH}px;padding:16px 0 180px 0;box-sizing:border-box;">
+                    <!-- 唯一贯穿天地的极细垂直雨弦 + 两滴缓缓滑落的流光雨珠 -->
+                    <div class="ks4-vertical-chord"></div>
+                    <div class="ks4-sliding-drop" style="animation-delay:0s;"></div>
+                    <div class="ks4-sliding-drop" style="animation-delay:2.1s;"></div>
 
-                const onDown = (cx, cy) => {
-                    isDown = true; moved = false; sx = cx; sy = cy;
-                    nodeEl.classList.add("dragging");
-                };
-                const onMove = (cx, cy) => {
-                    if (!isDown) return;
-                    if (Math.hypot(cx - sx, cy - sy) > 5) {
-                        moved = true;
-                        const rect = stage.getBoundingClientRect();
-                        const xp = Math.max(10, Math.min(90, ((cx - rect.left) / rect.width) * 100));
-                        const yp = Math.max(16, Math.min(62, ((cy - rect.top) / rect.height) * 100));
-                        nodeEl.style.left = `${xp.toFixed(1)}%`;
-                        nodeEl.style.top = `${yp.toFixed(1)}%`;
+                    <!-- 错落排布的同心水波记忆节点 -->
+                    ${rowsHtml}
+                </div>
+            `;
 
-                        const curData = loadWebData();
-                        const tNode = curData?.nodes?.find((x) => Number(x.id) === nid);
-                        if (tNode) {
-                            tNode.xPct = parseFloat(xp.toFixed(1));
-                            tNode.yPct = parseFloat(yp.toFixed(1));
-                            saveWebData(curData);
-                            updateEdgesOnly(curData, false);
-                        }
-                    }
-                };
-                const onUp = () => {
-                    if (!isDown) return;
-                    isDown = false;
-                    nodeEl.classList.remove("dragging");
+            // 隐藏原星图页底部重复的详情大白卡（因为文字已经直接优雅地排印在每个水波右侧了，只保留顶部分类筛选与底部3个操作按钮！）
+            if (vp) {
+                const cards = vp.querySelectorAll(".ks-card");
+                cards.forEach((cEl) => {
+                    if (cEl.id !== "ks-add-node-box") cEl.style.display = "none";
+                });
+            }
+
+            // 点击任意水波行切换选中态，展开完整低语与动态脉冲水纹
+            chordStage.querySelectorAll(".ks4-ripple-row").forEach((row) => {
+                row.onclick = () => {
+                    const nid = Number(row.getAttribute("data-rnid"));
                     const curData = loadWebData();
                     if (curData) {
                         curData.activeNodeId = nid;
                         saveWebData(curData);
+                        renderRainChordView();
                     }
-                    // 触发下方详情卡同步刷新
-                    const activeTabEl = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="map"]');
-                    if (activeTabEl) activeTabEl.click();
-                    renderConstellationDOM(false);
                 };
-
-                nodeEl.addEventListener("pointerdown", (e) => {
-                    e.stopPropagation();
-                    nodeEl.setPointerCapture?.(e.pointerId);
-                    onDown(e.clientX, e.clientY);
-                });
-                nodeEl.addEventListener("pointermove", (e) => onMove(e.clientX, e.clientY));
-                nodeEl.addEventListener("pointerup", onUp);
-                nodeEl.addEventListener("pointercancel", onUp);
             });
         }
 
-        // 点击背景空白处泛起极细水纹
-        stage.addEventListener("pointerdown", (e) => {
-            if (e.target.closest(".ks3-node")) return;
-            const rect = stage.getBoundingClientRect();
-            clickRipples.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, r: 2, maxR: 38, alpha: 0.55 });
-        });
-
-        // 拦截顶栏「落雨」按钮，触发全屏落雨成点与丝线缓慢重连动效
+        // 顶栏「落雨」按钮：平滑滚动回最顶端第一滴雨，并重新触发水波扩散
         const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
         if (replayBtn) {
             replayBtn.onclick = (e) => {
                 e.stopPropagation();
-                renderConstellationDOM(true);
+                chordStage.scrollTo({ top: 0, behavior: "smooth" });
+                renderRainChordView();
             };
         }
 
-        // 监听原界面 DOM 变化（如切换底栏 Tab、筛选分类、新增/删除节点），实时同步星图
         const vp = topDoc.getElementById("ks-main-viewport");
         if (vp) {
-            const vpObs = new MutationObserver(() => renderConstellationDOM(false));
+            const vpObs = new MutationObserver(() => renderRainChordView());
             vpObs.observe(vp, { childList: true });
         }
 
-        function syncOpenState() {
-            if (overlay.classList.contains("open")) {
-                resizeAmbient();
-                renderConstellationDOM(true);
-                if (!animId) animId = requestAnimationFrame(renderAmbientLoop);
-            } else if (animId) {
-                cancelAnimationFrame(animId);
-                animId = null;
-            }
-        }
-
-        const openObs = new MutationObserver(syncOpenState);
+        const openObs = new MutationObserver(() => {
+            if (overlay.classList.contains("open")) renderRainChordView();
+        });
         openObs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
-        topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resizeAmbient(); });
-        syncOpenState();
+
+        renderRainChordView();
     }
 
-    mountEditorialGlassConstellation();
+    mountMinimalistRainChord();
 })();
