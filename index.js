@@ -5561,7 +5561,7 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// ❄️ 【Sumoul App 有情树 · 4500片超浓密遮天华盖 + 彻底移除介绍卡片 + 保留粗壮千年霜白树身终极版】
+// ❄️ 【Sumoul App 有情树 · 纯净统一满铺云冠 + 隐藏杂乱树枝 + 统一精致单叶标本挂件终极版（完整无截断）】
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
@@ -5606,18 +5606,18 @@ bootSumoulApp();
         return { userName, charName, safeScope, charDesc, recentChat };
     }
 
-    function getTreeKey() { return `sumoul_v16_lush_colossal_tree__${getCtx().safeScope}`; }
+    function getTreeKey() { return `sumoul_v16_pure_canopy_tree__${getCtx().safeScope}`; }
 
     function createDefaultTree(charName, userName) {
         return {
             activeId: 101,
             leaves: [
-                { id: 101, title: "初雪揣进口袋的指尖", date: "12.04", author: charName, joy: 96, xPct: 22, yPct: 20, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
-                { id: 102, title: "凌晨三点的秒回", date: "11.28", author: userName, joy: 90, xPct: 44, yPct: 16, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
-                { id: 103, title: "耳机分你一半的午后", date: "11.20", author: charName, joy: 82, xPct: 14, yPct: 33, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
-                { id: 104, title: "微雨夜屋檐下的对视", date: "11.15", author: charName, joy: 66, xPct: 35, yPct: 29, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
-                { id: 105, title: "吃醋时别扭的沉默", date: "11.09", author: userName, joy: 45, xPct: 58, yPct: 23, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
-                { id: 106, title: "短暂分别时的酸涩", date: "11.02", author: charName, joy: 18, xPct: 26, yPct: 39, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
+                { id: 101, title: "初雪揣进口袋的指尖", date: "12.04", author: charName, joy: 96, xPct: 20, yPct: 18, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
+                { id: 102, title: "凌晨三点的秒回", date: "11.28", author: userName, joy: 88, xPct: 42, yPct: 14, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
+                { id: 103, title: "耳机分你一半的午后", date: "11.20", author: charName, joy: 78, xPct: 64, yPct: 19, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
+                { id: 104, title: "微雨夜屋檐下的对视", date: "11.15", author: charName, joy: 62, xPct: 28, yPct: 30, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
+                { id: 105, title: "吃醋时别扭的沉默", date: "11.09", author: userName, joy: 42, xPct: 52, yPct: 28, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
+                { id: 106, title: "短暂分别时的酸涩", date: "11.02", author: charName, joy: 18, xPct: 16, yPct: 36, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
             ]
         };
     }
@@ -5632,36 +5632,25 @@ bootSumoulApp();
     }
     function saveTree(d) { try { localStorage.setItem(getTreeKey(), JSON.stringify(d)); } catch (e) {} }
 
+    // 统一色系：单独挂上去的记忆叶根据开心度（0~100%）呈现从「纯白透亮」到「深冷灰」的同色系无暇深浅过渡
     function getLeafStyleByJoy(joy = 85) {
         const j = Math.max(0, Math.min(100, Number(joy) || 85));
-        if (j >= 85) return { grad1: "#FFFFFF", grad2: "#F2F5FA", stroke: "#8E94A4", vein: "#B8C0D0", glow: "drop-shadow(0 0 10px #FFFFFF) drop-shadow(0 3px 7px rgba(50,56,72,0.22))", label: `极开心 ${j}% · 冰魄霜白叶` };
-        if (j >= 65) return { grad1: "#EBF0F7", grad2: "#D2D8E6", stroke: "#767C8E", vein: "#9AA2B4", glow: "drop-shadow(0 0 8px rgba(255,255,255,0.85)) drop-shadow(0 3px 7px rgba(50,56,72,0.22))", label: `愉悦 ${j}% · 雾凇浅银叶` };
-        if (j >= 40) return { grad1: "#B0B6C6", grad2: "#8890A2", stroke: "#525868", vein: "#727888", glow: "drop-shadow(0 4px 10px rgba(60,66,82,0.32))", label: `微涩 ${j}% · 冷月烟灰叶` };
-        return { grad1: "#4C505E", grad2: "#2C2F3A", stroke: "#1C1E26", vein: "#767C8C", glow: "drop-shadow(0 6px 14px rgba(20,22,30,0.48))", label: `思念 ${j}% · 寒夜深炭叶` };
+        const light = Math.round(28 + (j / 100) * 72); // 28% ~ 100% 亮度平滑映射
+        const fill = `hsl(220, 12%, ${light}%)`;
+        const stroke = j >= 60 ? "#8A90A0" : "#323642";
+        const vein = j >= 60 ? "#B8C0D0" : "#787E8E";
+        const label = j >= 85 ? `极开心 ${j}%` : (j >= 60 ? `愉悦 ${j}%` : (j >= 35 ? `微涩 ${j}%` : `思念 ${j}%`));
+        return { fill, stroke, vein, label };
     }
 
-    function renderRealisticLeafSvg(id, joy, isSel, idx) {
+    // 统一形态：所有挂在树冠上的记忆叶全部采用同一种精致饱满的清冷植物单叶造型（不再混杂两种形状！）
+    function renderUnifiedLeafSvg(joy, isSel) {
         const st = getLeafStyleByJoy(joy);
-        const isGinkgo = idx % 2 === 0;
-        const w = isSel ? 42 : 31, h = isSel ? 50 : 37, gid = `lg_${id}`;
-        if (isGinkgo) {
-            return `<svg viewBox="0 0 60 70" width="${w}" height="${h}" fill="none" style="display:block;filter:${st.glow};overflow:visible;">
-                <defs><linearGradient id="${gid}" x1="10" y1="10" x2="50" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${st.grad1}"/><stop offset="100%" stop-color="${st.grad2}"/></linearGradient></defs>
-                <line x1="30" y1="-8" x2="30" y2="6" stroke="${st.stroke}" stroke-width="0.8" opacity="0.7"/>
-                <circle cx="30" cy="-8" r="1.5" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.8"/>
-                <path d="M30 6 C29 14, 30 20, 30 24" stroke="${st.stroke}" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M30 23 C20 26, 7 36, 6 47 C5 53, 12 57, 19 56 C24 55, 28 50, 30 46 C32 50, 36 55, 41 56 C48 57, 55 53, 54 47 C53 36, 40 26, 30 23 Z" fill="url(#${gid})" stroke="${isSel ? "#2C2E38" : st.stroke}" stroke-width="${isSel ? "1.8" : "1.05"}" stroke-linejoin="round"/>
-                <g stroke="${st.vein}" stroke-width="0.6" stroke-linecap="round" opacity="0.85"><path d="M30 25 C24 34, 16 42, 11 49"/><path d="M30 25 C26 35, 21 44, 18 52"/><path d="M30 25 C28 34, 26 42, 25 49"/><path d="M30 25 C32 34, 34 42, 35 49"/><path d="M30 25 C34 35, 39 44, 42 52"/><path d="M30 25 C36 34, 44 42, 49 49"/></g>
-            </svg>`;
-        }
-        return `<svg viewBox="0 0 56 72" width="${w}" height="${h}" fill="none" style="display:block;filter:${st.glow};overflow:visible;">
-            <defs><linearGradient id="${gid}" x1="12" y1="8" x2="44" y2="64" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="${st.grad1}"/><stop offset="100%" stop-color="${st.grad2}"/></linearGradient></defs>
-            <line x1="28" y1="-8" x2="28" y2="5" stroke="${st.stroke}" stroke-width="0.8" opacity="0.7"/>
-            <circle cx="28" cy="-8" r="1.5" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.8"/>
-            <path d="M28 5 L28 14" stroke="${st.stroke}" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M28 13 C14 18, 9 34, 15 47 C19 55, 27 60, 29 66 C29 59, 37 54, 41 47 C47 34, 42 18, 28 13 Z" fill="url(#${gid})" stroke="${isSel ? "#2C2E38" : st.stroke}" stroke-width="${isSel ? "1.8" : "1.05"}" stroke-linejoin="round"/>
-            <g stroke="${st.vein}" stroke-width="0.65" stroke-linecap="round" opacity="0.85"><path d="M28 14 C28 32, 28 48, 29 63" stroke-width="0.85"/><path d="M28 24 C23 27, 19 31, 16 35"/><path d="M28 28 C33 31, 37 35, 39 39"/><path d="M28 35 C23 38, 19 42, 18 46"/><path d="M28 39 C33 42, 36 46, 37 49"/></g>
-            <circle cx="29" cy="68" r="${isSel ? "2.2" : "1.5"}" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.8"/>
+        const sz = isSel ? 36 : 27;
+        return `<svg viewBox="0 0 40 52" width="${sz}" height="${Math.round(sz * 1.3)}" fill="none" style="display:block;filter:drop-shadow(0 4px 10px rgba(40,44,56,0.18));overflow:visible;">
+            <path d="M20 2 C7 14, 4 32, 20 48 C36 32, 33 14, 20 2 Z" fill="${st.fill}" stroke="${isSel ? "#1E2028" : st.stroke}" stroke-width="${isSel ? "2.0" : "1.1"}" stroke-linejoin="round"/>
+            <path d="M20 5 L20 44 M20 15 L12 22 M20 23 L28 30 M20 31 L13 37" stroke="${st.vein}" stroke-width="0.85" stroke-linecap="round" opacity="0.85"/>
+            <circle cx="20" cy="2" r="${isSel ? "2.2" : "1.4"}" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.8"/>
         </svg>`;
     }
 
@@ -5686,10 +5675,10 @@ bootSumoulApp();
         };
     }
 
-    function mountUltraDenseFrostTree() {
+    function mountUnifiedLushCanopyTree() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountUltraDenseFrostTree, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountUnifiedLushCanopyTree, 200); return; }
 
         topDoc.getElementById("smt-page-memory_tree")?.remove();
         topDoc.getElementById("smt-real-tree-overlay")?.remove();
@@ -5698,20 +5687,20 @@ bootSumoulApp();
         const st = topDoc.createElement("style");
         st.id = "sumoul-memory-tree-css";
         st.innerHTML = `
-            @keyframes mtLeafGentleSway { 0%, 100% { transform: translate(-50%, 0) rotate(-2deg); } 50% { transform: translate(-50%, 0) rotate(2.5deg); } }
+            @keyframes mtLeafBreath { 0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); } 50% { transform: translate(-50%, -50%) rotate(2.5deg); } }
             #seoul-mini-theater-modal #smt-real-tree-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: linear-gradient(170deg, #E8ECF5 0%, #F2F5FA 48%, #FFFFFF 100%) !important;
+                background: linear-gradient(180deg, #E4E8F2 0%, #EEF1F7 52%, #FFFFFF 100%) !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
             #seoul-mini-theater-modal #smt-real-tree-overlay.open { display: flex !important; }
             #seoul-mini-theater-modal #mt-ancient-canvas { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; display: block !important; pointer-events: none !important; z-index: 1 !important; }
             #seoul-mini-theater-modal #mt-leaves-stage { position: absolute !important; inset: 0 !important; z-index: 6 !important; overflow: hidden !important; pointer-events: none !important; }
-            #seoul-mini-theater-modal .mt-hanging-leaf { position: absolute !important; transform-origin: top center !important; display: flex !important; flex-direction: column !important; align-items: center !important; cursor: grab !important; touch-action: none !important; pointer-events: auto !important; z-index: 12 !important; animation: mtLeafGentleSway 4.8s ease-in-out infinite !important; }
-            #seoul-mini-theater-modal .mt-hanging-leaf.dragging { cursor: grabbing !important; animation: none !important; transform: translate(-50%, 0) scale(1.18) !important; z-index: 60 !important; }
+            #seoul-mini-theater-modal .mt-hanging-leaf { position: absolute !important; display: flex !important; flex-direction: column !important; align-items: center !important; cursor: grab !important; touch-action: none !important; pointer-events: auto !important; z-index: 12 !important; animation: mtLeafBreath 4.5s ease-in-out infinite !important; }
+            #seoul-mini-theater-modal .mt-hanging-leaf.dragging { cursor: grabbing !important; animation: none !important; transform: translate(-50%, -50%) scale(1.2) !important; z-index: 60 !important; }
             #seoul-mini-theater-modal .mt-hanging-leaf.selected-leaf { z-index: 45 !important; }
-            #seoul-mini-theater-modal .mt-leaf-label { margin-top: 2px !important; padding: 1.5px 6px !important; border-radius: 99px !important; font-size: 7.5px !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(20,22,30,0.14), 0 0 0 1px #FFFFFF !important; white-space: nowrap !important; pointer-events: none !important; }
+            #seoul-mini-theater-modal .mt-leaf-label { margin-top: 2px !important; padding: 1.5px 6px !important; border-radius: 99px !important; font-size: 7.5px !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(20,22,30,0.12) !important; white-space: nowrap !important; pointer-events: none !important; }
             #seoul-mini-theater-modal .mt-glass-pill { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; height: 28px !important; padding: 0 11px !important; border-radius: 999px !important; background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important; border: 1px solid #E2E5EE !important; font-size: 9.2px !important; font-weight: 700 !important; color: #3A3D46 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 20, 30, 0.04) !important; }
             #seoul-mini-theater-modal .mt-glass-pill.dark { background: #3A3D46 !important; border-color: #3A3D46 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
             #seoul-mini-theater-modal .mt-float-card { background: rgba(255, 255, 255, 0.94) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important; border: 1px solid #E2E5EE !important; border-radius: 18px !important; padding: 12px 14px !important; box-shadow: 0 12px 36px rgba(20, 20, 35, 0.08) !important; }
@@ -5733,7 +5722,6 @@ bootSumoulApp();
             <canvas id="mt-ancient-canvas"></canvas>
             <div id="mt-leaves-stage"></div>
 
-            <!-- 顶部极简导航条（已彻底去掉右侧碍事的介绍卡片！） -->
             <div style="position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:max(14px,env(safe-area-inset-top,14px)) 14px 0 14px;pointer-events:none;">
                 <span class="mt-glass-pill" id="mt-close-btn" style="pointer-events:auto;">${MT_ICO.back}<span>返回主页</span></span>
                 <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
@@ -5742,13 +5730,12 @@ bootSumoulApp();
                 </div>
             </div>
 
-            <!-- 底部：回忆详情标本卡 + 操作浮岛 -->
             <div style="position:relative;z-index:35;margin-top:auto;padding:0 14px max(18px,env(safe-area-inset-bottom,18px)) 14px;display:flex;flex-direction:column;gap:8px;pointer-events:none;">
                 <div id="mt-leaf-card-wrap" style="pointer-events:auto;"></div>
 
                 <div id="mt-add-modal" class="mt-float-card" style="display:none;pointer-events:auto;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#3A3D46;">亲手挂上一片新记忆叶（无上限 · 挂后可自由拖拽）</span>
+                        <span style="font-size:10px;font-weight:800;color:#3A3D46;">挂上一片新记忆叶（挂后可自由拖到树冠任意位置）</span>
                         <span id="mt-add-close" style="cursor:pointer;color:#8E8E98;">${MT_ICO.close}</span>
                     </div>
                     <input type="text" id="mt-new-title" placeholder="回忆标题 (如：初雪揣进口袋的手)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E6E8F0;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#3A3D46;box-sizing:border-box;outline:none;margin-bottom:6px;" />
@@ -5756,10 +5743,10 @@ bootSumoulApp();
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
                         <span style="font-size:9px;font-weight:700;color:#585C6A;">开心程度(决定叶色深浅)：</span>
                         <input type="range" id="mt-new-joy" min="5" max="100" value="92" style="flex:1;accent-color:#484C58;" />
-                        <span id="mt-new-joy-lbl" style="font-size:8.5px;font-weight:800;color:#3A3D46;min-width:105px;text-align:right;">极开心 92% · 冰魄霜白叶</span>
+                        <span id="mt-new-joy-lbl" style="font-size:8.5px;font-weight:800;color:#3A3D46;min-width:85px;text-align:right;">极开心 92%</span>
                     </div>
                     <div style="display:flex;justify-content:flex-end;">
-                        <span class="mt-glass-pill dark" id="mt-add-submit" style="height:28px!important;">挂上巨木并让TA批注</span>
+                        <span class="mt-glass-pill dark" id="mt-add-submit" style="height:28px!important;">挂上树冠并让TA批注</span>
                     </div>
                 </div>
 
@@ -5781,145 +5768,75 @@ bootSumoulApp();
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 🌳 4500片超浓密离屏预渲染树冠华盖 + 粗壮千年霜白树身（彻底封死枝干空隙，100% 浓密厚重！）
+        // 🌳 核心重构：去掉所有丑陋的假分叉树枝棍子！
+        // 用「你认可的粗壮千年霜白树干」+「100%色调统一的满铺蓬松霜白树冠云海（5500片同色系纯净柔白叶片紧密簇拥）」！
         // ══════════════════════════════════════════════════════════════════════════
         const canvas = topDoc.getElementById("mt-ancient-canvas");
         const ctx2d = canvas.getContext("2d");
-        let animId = null, W = 390, H = 780;
-        let offBackCanopy = null, offFrontCanopy = null, subBranchesCache = [], iceVinesCache = [], fallingPetals = [];
+        let animId = null, W = 390, H = 780, offCanopy = null;
 
-        function drawLeafOnCtx(c, x, y, sz, rot, fill, stroke) {
-            c.save();
-            c.translate(x, y);
-            c.rotate(rot);
-            c.beginPath();
-            c.moveTo(0, 0);
-            c.bezierCurveTo(-sz * 0.56, -sz * 0.35, -sz * 0.48, -sz * 1.05, 0, -sz * 1.48);
-            c.bezierCurveTo(sz * 0.48, -sz * 1.05, sz * 0.56, -sz * 0.35, 0, 0);
-            c.closePath();
-            c.fillStyle = fill;
-            c.fill();
-            if (stroke) {
-                c.strokeStyle = stroke;
-                c.lineWidth = 0.6;
-                c.stroke();
-            }
-            c.restore();
-        }
-
-        function buildUltraDenseCanopy(w, h) {
-            const rng = mulberry32(20261225);
+        function buildPureUnifiedCanopy(w, h) {
+            const rng = mulberry32(20260520);
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
+            offCanopy = topDoc.createElement("canvas");
+            offCanopy.width = w * dpr; offCanopy.height = h * dpr;
+            const c = offCanopy.getContext("2d");
+            c.scale(dpr, dpr);
 
-            offBackCanopy = topDoc.createElement("canvas");
-            offBackCanopy.width = w * dpr; offBackCanopy.height = h * dpr;
-            const bCtx = offBackCanopy.getContext("2d");
-            bCtx.scale(dpr, dpr);
-
-            offFrontCanopy = topDoc.createElement("canvas");
-            offFrontCanopy.width = w * dpr; offFrontCanopy.height = h * dpr;
-            const fCtx = offFrontCanopy.getContext("2d");
-            fCtx.scale(dpr, dpr);
-
-            subBranchesCache = [];
-            iceVinesCache = [];
-
-            // 18 个超大型浓密树冠云团中心，铺满整个左上方与上中部天际，密不透风！
-            const domes = [
-                { x: w * 0.05, y: h * 0.12, rx: w * 0.26, ry: h * 0.13 },
-                { x: w * 0.22, y: h * 0.09, rx: w * 0.28, ry: h * 0.13 },
-                { x: w * 0.42, y: h * 0.11, rx: w * 0.28, ry: h * 0.12 },
-                { x: w * 0.62, y: h * 0.15, rx: w * 0.24, ry: h * 0.11 },
-                { x: w * 0.12, y: h * 0.24, rx: w * 0.28, ry: h * 0.13 },
-                { x: w * 0.32, y: h * 0.22, rx: w * 0.30, ry: h * 0.13 },
-                { x: w * 0.52, y: h * 0.24, rx: w * 0.26, ry: h * 0.12 },
-                { x: w * 0.70, y: h * 0.25, rx: w * 0.20, ry: h * 0.09 },
-                { x: w * 0.06, y: h * 0.36, rx: w * 0.24, ry: h * 0.11 },
-                { x: w * 0.24, y: h * 0.34, rx: w * 0.26, ry: h * 0.11 },
-                { x: w * 0.44, y: h * 0.34, rx: w * 0.24, ry: h * 0.10 },
-                { x: w * 0.60, y: h * 0.33, rx: w * 0.18, ry: h * 0.08 }
+            // 铺满整个上半屏（从左到右 0% ~ 92%，高度 4% ~ 46%）的巨型蓬松树冠团块
+            const puffs = [
+                { x: w * 0.08, y: h * 0.14, r: w * 0.28 },
+                { x: w * 0.28, y: h * 0.10, r: w * 0.32 },
+                { x: w * 0.52, y: h * 0.12, r: w * 0.30 },
+                { x: w * 0.74, y: h * 0.16, r: w * 0.25 },
+                { x: w * 0.14, y: h * 0.28, r: w * 0.30 },
+                { x: w * 0.38, y: h * 0.25, r: w * 0.32 },
+                { x: w * 0.62, y: h * 0.26, r: w * 0.28 },
+                { x: w * 0.82, y: h * 0.27, r: w * 0.20 },
+                { x: w * 0.08, y: h * 0.39, r: w * 0.24 },
+                { x: w * 0.28, y: h * 0.37, r: w * 0.26 },
+                { x: w * 0.50, y: h * 0.36, r: w * 0.24 },
+                { x: w * 0.70, y: h * 0.35, r: w * 0.18 }
             ];
 
-            // 第一步：在底层画满厚实的深冷灰/雾银叶团柔光底衬（彻底消灭枝条间的空洞感！）
-            domes.forEach((dm) => {
-                const rad = Math.max(dm.rx, dm.ry);
-                const g1 = bCtx.createRadialGradient(dm.x, dm.y, rad * 0.1, dm.x, dm.y, rad);
-                g1.addColorStop(0, "rgba(156, 164, 182, 0.72)");
-                g1.addColorStop(0.65, "rgba(186, 194, 210, 0.45)");
-                g1.addColorStop(1, "rgba(255, 255, 255, 0)");
-                bCtx.fillStyle = g1;
-                bCtx.beginPath();
-                bCtx.arc(dm.x, dm.y, rad, 0, Math.PI * 2);
-                bCtx.fill();
-
-                // 在每个云团内密集铺满 160 片大号底层深灰/中层雾银叶片（尺寸 12~19px，层层叠压不露缝隙！）
-                for (let i = 0; i < 160; i++) {
-                    const a = rng() * Math.PI * 2, r = Math.pow(rng(), 0.65);
-                    const lx = dm.x + Math.cos(a) * dm.rx * r;
-                    const ly = dm.y + Math.sin(a) * dm.ry * r;
-                    const sz = 11.5 + rng() * 7.5, rot = (rng() - 0.5) * 3.14;
-                    const s = rng();
-                    if (s < 0.45) {
-                        drawLeafOnCtx(bCtx, lx, ly, sz, rot, "rgba(130, 138, 156, 0.78)", "rgba(98, 105, 122, 0.4)");
-                    } else {
-                        drawLeafOnCtx(bCtx, lx, ly, sz, rot, "rgba(192, 200, 216, 0.88)", "rgba(140, 148, 166, 0.45)");
-                    }
-                }
+            // 1. 先铺一层完全统一、柔和饱满的纯白霜雾云团基底（100% 遮住树干顶端交界，绝不露丑树枝！）
+            puffs.forEach((pf) => {
+                const g = c.createRadialGradient(pf.x, pf.y - pf.r * 0.15, pf.r * 0.1, pf.x, pf.y, pf.r);
+                g.addColorStop(0, "rgba(255, 255, 255, 0.98)");
+                g.addColorStop(0.65, "rgba(240, 243, 250, 0.92)");
+                g.addColorStop(1, "rgba(232, 236, 245, 0)");
+                c.fillStyle = g;
+                c.beginPath();
+                c.arc(pf.x, pf.y, pf.r, 0, Math.PI * 2);
+                c.fill();
             });
 
-            // 第二步：递归生成穿插在叶海中的粗壮主枝与分形细枝，并在前景铺满 2400 片纯白霜雪/浅银高光大叶片！
-            function growBranches(x1, y1, len, ang, w1, depth) {
-                const w2 = Math.max(1.0, w1 * 0.68);
-                const bend = (rng() - 0.46) * 0.18;
-                const cx = x1 + Math.cos(ang + bend) * (len * 0.52);
-                const cy = y1 + Math.sin(ang + bend) * (len * 0.52);
-                const x2 = x1 + Math.cos(ang) * len;
-                const y2 = y1 + Math.sin(ang) * len;
+            // 2. 在蓬松云冠上密集绘制 5200 片色调 100% 统一纯净的霜白叶片纹理（不再有黑灰杂色斑点！）
+            puffs.forEach((pf) => {
+                for (let i = 0; i < 430; i++) {
+                    const a = rng() * Math.PI * 2, d = Math.pow(rng(), 0.58) * pf.r * 0.92;
+                    const lx = pf.x + Math.cos(a) * d;
+                    const ly = pf.y + Math.sin(a) * (d * 0.78);
+                    const sz = 11 + rng() * 6;
+                    const rot = (rng() - 0.5) * 1.8;
 
-                subBranchesCache.push({ x1, y1, cx, cy, x2, y2, w1, w2, depth });
-
-                if (depth <= 4) {
-                    const leafCount = depth === 1 ? 52 : (depth === 2 ? 38 : 26);
-                    const radX = 28 + depth * 12, radY = 20 + depth * 9;
-                    for (let k = 0; k < leafCount; k++) {
-                        const a = rng() * Math.PI * 2, r = Math.pow(rng(), 0.62);
-                        const lx = x2 + Math.cos(a) * radX * r;
-                        const ly = y2 + Math.sin(a) * radY * r;
-                        const sz = 11 + rng() * 8, rot = (rng() - 0.5) * 3.14, s = rng();
-                        if (s < 0.38) {
-                            drawLeafOnCtx(fCtx, lx, ly, sz, rot, "rgba(222, 228, 240, 0.92)", "rgba(155, 162, 180, 0.55)");
-                        } else {
-                            drawLeafOnCtx(fCtx, lx, ly, sz, rot, "rgba(255, 255, 255, 0.97)", "rgba(172, 178, 195, 0.6)");
-                        }
-                    }
-                    if (depth === 2 && rng() > 0.25) {
-                        iceVinesCache.push({ x: x2, y: y2, len: 55 + rng() * 85, phase: rng() * 6.28 });
-                    }
+                    c.save();
+                    c.translate(lx, ly);
+                    c.rotate(rot);
+                    c.beginPath();
+                    c.moveTo(0, 0);
+                    c.bezierCurveTo(-sz * 0.5, -sz * 0.35, -sz * 0.45, -sz, 0, -sz * 1.42);
+                    c.bezierCurveTo(sz * 0.45, -sz, sz * 0.5, -sz * 0.35, 0, 0);
+                    c.closePath();
+                    // 全部采用统一的纯净柔白与极浅霜银微差，视觉极其干净高级！
+                    c.fillStyle = rng() > 0.3 ? "rgba(255, 255, 255, 0.95)" : "rgba(242, 245, 252, 0.90)";
+                    c.fill();
+                    c.strokeStyle = "rgba(205, 210, 224, 0.42)";
+                    c.lineWidth = 0.55;
+                    c.stroke();
+                    c.restore();
                 }
-                if (depth <= 1) return;
-
-                const subCnt = depth >= 4 ? 3 : 2;
-                for (let i = 0; i < subCnt; i++) {
-                    const sp = subCnt === 2 ? (i === 0 ? -0.38 : 0.34) : (i - 1) * 0.36;
-                    growBranches(x2, y2, len * (0.76 + rng() * 0.10), ang + sp + (rng() - 0.5) * 0.12, w2, depth - 1);
-                }
-            }
-
-            const mainBoughs = [
-                { x: w * 0.10, y: h * 0.36, len: h * 0.15, ang: -Math.PI * 0.62, w: 22 },
-                { x: w * 0.16, y: h * 0.30, len: h * 0.16, ang: -Math.PI * 0.50, w: 26 },
-                { x: w * 0.24, y: h * 0.26, len: h * 0.17, ang: -Math.PI * 0.38, w: 25 },
-                { x: w * 0.32, y: h * 0.31, len: h * 0.17, ang: -Math.PI * 0.25, w: 24 },
-                { x: w * 0.42, y: h * 0.35, len: h * 0.16, ang: -Math.PI * 0.14, w: 20 },
-                { x: w * 0.08, y: h * 0.45, len: h * 0.12, ang: -Math.PI * 0.72, w: 16 }
-            ];
-            mainBoughs.forEach((mb) => growBranches(mb.x, mb.y, mb.len, mb.ang, mb.w, 5));
-
-            // 随风飘舞的 18 片实时动态飞叶
-            fallingPetals = Array.from({ length: 18 }, (_, i) => ({
-                x: w * (0.08 + rng() * 0.82), y: h * (0.12 + rng() * 0.65),
-                sz: 9 + rng() * 5, spX: 7 + rng() * 9, spY: 11 + rng() * 12, rotSp: (rng() - 0.5) * 1.4, ph: i
-            }));
+            });
         }
 
         function resizeCanvas() {
@@ -5927,30 +5844,26 @@ bootSumoulApp();
             W = rect.width || topWin.innerWidth || 390;
             H = rect.height || topWin.innerHeight || 780;
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
+            canvas.width = W * dpr; canvas.height = H * dpr;
             ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-            buildUltraDenseCanopy(W, H);
+            buildPureUnifiedCanopy(W, H);
         }
 
+        // 你认可的粗壮千年霜白树身（顶端直接深入浓密树冠云海，不画任何难看的细碎假树枝！）
         function drawColossalFrostTrunk(w, h, wind) {
             ctx2d.save();
             const barkGrd = ctx2d.createLinearGradient(0, h * 0.55, w * 0.42, h * 0.55);
-            barkGrd.addColorStop(0, "#646A7C");
-            barkGrd.addColorStop(0.38, "#9098AA");
-            barkGrd.addColorStop(0.75, "#CFD5E2");
+            barkGrd.addColorStop(0, "#686E80");
+            barkGrd.addColorStop(0.38, "#949CAE");
+            barkGrd.addColorStop(0.75, "#D2D7E4");
             barkGrd.addColorStop(1, "#FFFFFF");
 
             ctx2d.fillStyle = barkGrd;
             ctx2d.beginPath();
             ctx2d.moveTo(-w * 0.06, h * 0.94);
-            ctx2d.bezierCurveTo(w * 0.03, h * 0.80, w * 0.04, h * 0.58, w * 0.02, h * 0.42);
-            ctx2d.bezierCurveTo(w * 0.01, h * 0.34, w * 0.06, h * 0.28, w * 0.12 + wind * 0.2, h * 0.34);
-            ctx2d.lineTo(w * 0.20 + wind * 0.2, h * 0.28);
-            ctx2d.lineTo(w * 0.24 + wind * 0.2, h * 0.24);
-            ctx2d.lineTo(w * 0.32 + wind * 0.2, h * 0.31);
-            ctx2d.lineTo(w * 0.44 + wind * 0.2, h * 0.35);
-            ctx2d.bezierCurveTo(w * 0.34, h * 0.42, w * 0.27, h * 0.52, w * 0.28, h * 0.66);
+            ctx2d.bezierCurveTo(w * 0.03, h * 0.80, w * 0.04, h * 0.58, w * 0.02, h * 0.40);
+            ctx2d.lineTo(w * 0.40 + wind * 0.15, h * 0.34);
+            ctx2d.bezierCurveTo(w * 0.32, h * 0.44, w * 0.27, h * 0.54, w * 0.28, h * 0.66);
             ctx2d.bezierCurveTo(w * 0.29, h * 0.78, w * 0.38, h * 0.86, w * 0.52, h * 0.93);
             ctx2d.quadraticCurveTo(w * 0.36, h * 0.90, w * 0.28, h * 0.95);
             ctx2d.quadraticCurveTo(w * 0.16, h * 0.89, w * 0.08, h * 0.95);
@@ -5961,8 +5874,8 @@ bootSumoulApp();
                 const rx = w * (0.01 + i * 0.027);
                 ctx2d.beginPath();
                 ctx2d.moveTo(rx + w * 0.05, h * 0.91);
-                ctx2d.bezierCurveTo(rx - w * 0.02, h * 0.74, rx + w * 0.03, h * 0.55, rx + w * 0.04, h * 0.34);
-                ctx2d.strokeStyle = i % 2 === 0 ? "rgba(76, 82, 98, 0.40)" : "rgba(255, 255, 255, 0.70)";
+                ctx2d.bezierCurveTo(rx - w * 0.02, h * 0.74, rx + w * 0.03, h * 0.55, rx + w * 0.04, h * 0.36);
+                ctx2d.strokeStyle = i % 2 === 0 ? "rgba(76, 82, 98, 0.38)" : "rgba(255, 255, 255, 0.70)";
                 ctx2d.lineWidth = i % 3 === 0 ? 2.2 : 1.2;
                 ctx2d.lineCap = "round";
                 ctx2d.stroke();
@@ -5970,7 +5883,7 @@ bootSumoulApp();
 
             ctx2d.beginPath();
             ctx2d.ellipse(w * 0.16, h * 0.64, 11, 24, -0.06, 0, Math.PI * 2);
-            ctx2d.fillStyle = "rgba(72, 78, 92, 0.58)";
+            ctx2d.fillStyle = "rgba(72, 78, 92, 0.55)";
             ctx2d.fill();
             ctx2d.strokeStyle = "rgba(255, 255, 255, 0.75)";
             ctx2d.lineWidth = 1.2;
@@ -5978,70 +5891,24 @@ bootSumoulApp();
             ctx2d.restore();
         }
 
-        function drawSubBranch(b, wind) {
-            const dx = b.x2 - b.x1, dy = b.y2 - b.y1, len = Math.hypot(dx, dy) || 1;
-            const nx = -dy / len, ny = dx / len;
-            const sw = wind * (6 - b.depth) * 0.32;
-            const x1 = b.x1 + sw * 0.6, y1 = b.y1, x2 = b.x2 + sw, y2 = b.y2, cx = b.cx + sw * 0.8, cy = b.cy;
-
-            ctx2d.beginPath();
-            ctx2d.moveTo(x1 + nx * b.w1 * 0.5, y1 + ny * b.w1 * 0.5);
-            ctx2d.quadraticCurveTo(cx, cy, x2 + nx * b.w2 * 0.5, y2 + ny * b.w2 * 0.5);
-            ctx2d.lineTo(x2 - nx * b.w2 * 0.5, y2 - ny * b.w2 * 0.5);
-            ctx2d.quadraticCurveTo(cx, cy, x1 - nx * b.w1 * 0.5, y1 - ny * b.w1 * 0.5);
-            ctx2d.closePath();
-
-            const grd = ctx2d.createLinearGradient(x1 - b.w1, y1, x1 + b.w1, y1);
-            grd.addColorStop(0, "#6E7588");
-            grd.addColorStop(0.55, "#B2B9C8");
-            grd.addColorStop(1, "#FFFFFF");
-            ctx2d.fillStyle = grd;
-            ctx2d.fill();
-        }
-
         function renderCanvasLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
-            if (!offBackCanopy) resizeCanvas();
-            const t = ts * 0.001, wind = Math.sin(t * 1.05) * 2.6;
+            if (!offCanopy) resizeCanvas();
+            const t = ts * 0.001, wind = Math.sin(t * 0.9) * 2.2;
 
             ctx2d.clearRect(0, 0, W, H);
 
-            // 1. 绘制底层超浓密远景叶海图层
-            ctx2d.drawImage(offBackCanopy, wind * 0.6, Math.sin(t * 0.8) * 1.5, W, H);
-
-            // 2. 绘制粗壮千年霜白树身 + 全部大跨度伸展的主枝与分枝
+            // 1. 先画粗壮千年树身
             drawColossalFrostTrunk(W, H, wind);
-            subBranchesCache.forEach((sb) => drawSubBranch(sb, wind));
 
-            // 3. 绘制垂落的冰丝气根
-            iceVinesCache.forEach((iv) => {
-                const sw = Math.sin(t * 1.5 + iv.phase) * 6.5 + wind;
-                const g = ctx2d.createLinearGradient(iv.x, iv.y, iv.x, iv.y + iv.len);
-                g.addColorStop(0, "rgba(145, 152, 170, 0.68)");
-                g.addColorStop(1, "rgba(255, 255, 255, 0)");
-                ctx2d.beginPath();
-                ctx2d.moveTo(iv.x, iv.y);
-                ctx2d.quadraticCurveTo(iv.x + sw * 0.4, iv.y + iv.len * 0.5, iv.x + sw, iv.y + iv.len);
-                ctx2d.strokeStyle = g;
-                ctx2d.lineWidth = 1.05;
-                ctx2d.stroke();
-            });
+            // 2. 直接盖上满铺整个上半屏、色调 100% 统一纯净的 5200 片蓬松霜白树冠华盖（彻底遮住树干顶端，饱满而茂密！）
+            ctx2d.drawImage(offCanopy, wind * 0.8, Math.sin(t * 1.1) * 1.5, W, H);
 
-            // 4. 绘制顶层超浓密纯白霜雪/雾银前景叶海图层（与底层叶海交错摆动，浓密厚重感拉满！）
-            ctx2d.drawImage(offFrontCanopy, wind * 1.35, Math.cos(t * 1.1) * 2.0, W, H);
-
-            // 5. 绘制随风飘落的动态霜叶
-            fallingPetals.forEach((fp) => {
-                const px = (fp.x + t * fp.spX) % W;
-                const py = ((fp.y + t * fp.spY) % (H * 0.78)) + H * 0.08;
-                drawLeafOnCtx(ctx2d, px, py, fp.sz, t * fp.rotSp + fp.ph, "rgba(255,255,255,0.92)", "rgba(150,156,174,0.5)");
-            });
-
-            // 6. 树根底部仙气冷雾消融层
+            // 3. 树根底部仙气冷雾消融层
             const mistGrd = ctx2d.createLinearGradient(0, H * 0.82, 0, H);
-            mistGrd.addColorStop(0, "rgba(235, 238, 245, 0)");
-            mistGrd.addColorStop(0.6, "rgba(242, 244, 249, 0.85)");
-            mistGrd.addColorStop(1, "#EEF1F7");
+            mistGrd.addColorStop(0, "rgba(238, 241, 247, 0)");
+            mistGrd.addColorStop(0.6, "rgba(244, 246, 251, 0.85)");
+            mistGrd.addColorStop(1, "#FFFFFF");
             ctx2d.fillStyle = mistGrd;
             ctx2d.fillRect(0, H * 0.82, W, H * 0.18);
 
@@ -6049,10 +5916,10 @@ bootSumoulApp();
         }
 
         function getAutoPos(idx) {
-            const g = idx * 2.39996, r = 7 + (idx % 6) * 3.8;
+            const g = idx * 2.39996, r = 8 + (idx % 6) * 4.2;
             return {
-                xPct: Math.max(12, Math.min(64, Math.round(34 + Math.cos(g) * r * 1.35))),
-                yPct: Math.max(15, Math.min(38, Math.round(25 + Math.sin(g) * r * 0.75)))
+                xPct: Math.max(12, Math.min(78, Math.round(42 + Math.cos(g) * r * 1.5))),
+                yPct: Math.max(12, Math.min(36, Math.round(23 + Math.sin(g) * r * 0.7)))
             };
         }
 
@@ -6067,10 +5934,9 @@ bootSumoulApp();
                 const pos = (lf.xPct && lf.yPct) ? { xPct: lf.xPct, yPct: lf.yPct } : getAutoPos(idx);
                 const isSel = Number(lf.id) === Number(data.activeId);
                 const delay = ((idx * 0.41) % 3.6).toFixed(2);
-                const lblText = isSel ? `${lf.title.slice(0, 7)} · ${lf.date}` : lf.title.slice(0, 3);
                 return `<div class="mt-hanging-leaf ${isSel ? "selected-leaf" : ""}" data-lid="${lf.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;">
-                    ${renderRealisticLeafSvg(lf.id, lf.joy, isSel, idx)}
-                    <div class="mt-leaf-label" style="background:${isSel ? "#2C2E38" : "rgba(255,255,255,0.92)"};color:${isSel ? "#FFFFFF" : "#3A3D46"};">${lblText.replace(/</g, "&lt;")}</div>
+                    ${renderUnifiedLeafSvg(lf.joy, isSel)}
+                    ${isSel ? `<div class="mt-leaf-label" style="background:#3A3D46;color:#FFFFFF;">${lf.title.slice(0, 8).replace(/</g, "&lt;")}</div>` : ""}
                 </div>`;
             }).join("");
 
@@ -6083,8 +5949,8 @@ bootSumoulApp();
                     if (Math.hypot(cx - sx, cy - sy) > 6) {
                         moved = true;
                         const rect = stage.getBoundingClientRect();
-                        node.style.left = `${Math.max(8, Math.min(88, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
-                        node.style.top = `${Math.max(12, Math.min(62, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
+                        node.style.left = `${Math.max(8, Math.min(90, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
+                        node.style.top = `${Math.max(10, Math.min(55, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
                     }
                 };
                 const onEnd = () => {
@@ -6093,14 +5959,9 @@ bootSumoulApp();
                     const d = loadTree();
                     if (moved) {
                         const target = d.leaves.find((x) => Number(x.id) === lid);
-                        if (target) {
-                            target.xPct = parseFloat(node.style.left);
-                            target.yPct = parseFloat(node.style.top);
-                        }
+                        if (target) { target.xPct = parseFloat(node.style.left); target.yPct = parseFloat(node.style.top); }
                     }
-                    d.activeId = lid;
-                    saveTree(d);
-                    renderLeavesAndUI();
+                    d.activeId = lid; saveTree(d); renderLeavesAndUI();
                 };
                 node.addEventListener("mousedown", (e) => { e.stopPropagation(); onStart(e.clientX, e.clientY); });
                 topDoc.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY));
@@ -6118,7 +5979,7 @@ bootSumoulApp();
                 const stInfo = getLeafStyleByJoy(cur.joy);
                 wrap.innerHTML = `<div class="mt-float-card">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                        <div style="display:flex;align-items:center;gap:6px;min-width:0;"><span style="width:9px;height:9px;border-radius:50%;background:${stInfo.grad1};border:1.2px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:11.5px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span></div>
+                        <div style="display:flex;align-items:center;gap:6px;min-width:0;"><span style="width:9px;height:9px;border-radius:50%;background:${stInfo.fill};border:1.2px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:11.5px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span></div>
                         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><span style="font-size:7.8px;font-weight:700;color:#585C6A;background:#F2F4F8;padding:2px 7px;border-radius:99px;">${stInfo.label}</span><span id="mt-del-leaf" style="cursor:pointer;display:inline-flex;">${MT_ICO.trash}</span><span id="mt-hide-card" style="cursor:pointer;color:#8E8E98;display:inline-flex;">${MT_ICO.close}</span></div>
                     </div>
                     <div style="font-size:8px;color:#7E8494;font-weight:700;margin-bottom:4px;">挂叶人：${cur.author} · 结叶日期：${cur.date}</div>
@@ -6135,7 +5996,7 @@ bootSumoulApp();
             const listBody = topDoc.getElementById("mt-all-list-body");
             listBody.innerHTML = data.leaves.map((lf) => {
                 const stInfo = getLeafStyleByJoy(lf.joy);
-                return `<div data-pickid="${lf.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(lf.id) === Number(data.activeId) ? "#484C58" : "#EFEFF5"};background:#FFFFFF;cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;min-width:0;"><span style="width:8px;height:8px;border-radius:50%;background:${stInfo.grad1};border:1px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:10px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lf.title.replace(/</g, "&lt;")}</span></div><span style="font-size:8px;color:#8E8E98;flex-shrink:0;margin-left:8px;">开心${lf.joy ?? 85}% · ${lf.date}</span></div>`;
+                return `<div data-pickid="${lf.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(lf.id) === Number(data.activeId) ? "#484C58" : "#EFEFF5"};background:#FFFFFF;cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;min-width:0;"><span style="width:8px;height:8px;border-radius:50%;background:${stInfo.fill};border:1px solid ${stInfo.stroke};flex-shrink:0;"></span><span style="font-size:10px;font-weight:800;color:#3A3D46;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lf.title.replace(/</g, "&lt;")}</span></div><span style="font-size:8px;color:#8E8E98;flex-shrink:0;margin-left:8px;">开心${lf.joy ?? 85}% · ${lf.date}</span></div>`;
             }).join("");
             listBody.querySelectorAll("[data-pickid]").forEach((row) => row.onclick = () => {
                 const d = loadTree(); d.activeId = Number(row.getAttribute("data-pickid")); saveTree(d);
@@ -6206,8 +6067,5 @@ bootSumoulApp();
         };
     }
 
-    mountUltraDenseFrostTree();
+    mountUnifiedLushCanopyTree();
 })();
-
-
-
