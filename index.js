@@ -5561,7 +5561,7 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// 🌿 【Sumoul App 有情树 · 真正植物学级手绘古木（零假圆圈！5级自然曲折分枝 + 3200片顺枝簇生细叶 + 自由拖拽脉络记忆叶）】
+// 🌿 【Sumoul App 有情树 · 合抱级千年苍劲真树干 + 6800片三层立体光影超浓密真叶海终极版（完整无截断）】
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
@@ -5571,7 +5571,7 @@ bootSumoulApp();
 
     const MT_ICO = {
         appIcon: svgIco(`<path d="M12 22v-7l-2-2"/><path d="M17 8v.8A6 6 0 0 1 13.8 20v0H10v0A6.5 6.5 0 0 1 7 8h0a5 5 0 0 1 10 0Z"/><path d="m14 14-2 2"/>`, 22, "#3A3A40"),
-        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#3A3D46", "1.8"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2E38", "1.8"),
         plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
         spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
         leaf: svgIco(`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`, 13),
@@ -5606,17 +5606,17 @@ bootSumoulApp();
         return { userName, charName, safeScope, charDesc, recentChat };
     }
 
-    function getTreeKey() { return `sumoul_v16_botanical_tree__${getCtx().safeScope}`; }
+    function getTreeKey() { return `sumoul_v16_majestic_tree__${getCtx().safeScope}`; }
 
     function createDefaultTree(charName, userName) {
         return {
             activeId: 101,
             leaves: [
-                { id: 101, title: "初雪揣进口袋的指尖", date: "12.04", author: charName, joy: 96, xPct: 24, yPct: 18, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
-                { id: 102, title: "凌晨三点的秒回", date: "11.28", author: userName, joy: 88, xPct: 46, yPct: 14, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
-                { id: 103, title: "耳机分你一半的午后", date: "11.20", author: charName, joy: 78, xPct: 66, yPct: 21, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
-                { id: 104, title: "微雨夜屋檐下的对视", date: "11.15", author: charName, joy: 62, xPct: 33, yPct: 29, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
-                { id: 105, title: "吃醋时别扭的沉默", date: "11.09", author: userName, joy: 42, xPct: 54, yPct: 31, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
+                { id: 101, title: "初雪揣进口袋的指尖", date: "12.04", author: charName, joy: 96, xPct: 22, yPct: 18, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
+                { id: 102, title: "凌晨三点的秒回", date: "11.28", author: userName, joy: 88, xPct: 45, yPct: 15, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
+                { id: 103, title: "耳机分你一半的午后", date: "11.20", author: charName, joy: 78, xPct: 68, yPct: 20, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
+                { id: 104, title: "微雨夜屋檐下的对视", date: "11.15", author: charName, joy: 62, xPct: 32, yPct: 29, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
+                { id: 105, title: "吃醋时别扭的沉默", date: "11.09", author: userName, joy: 42, xPct: 55, yPct: 30, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
                 { id: 106, title: "短暂分别时的酸涩", date: "11.02", author: charName, joy: 18, xPct: 16, yPct: 34, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
             ]
         };
@@ -5634,22 +5634,22 @@ bootSumoulApp();
 
     function getLeafStyleByJoy(joy = 85) {
         const j = Math.max(0, Math.min(100, Number(joy) || 85));
-        const light = Math.round(26 + (j / 100) * 74);
+        const light = Math.round(24 + (j / 100) * 76);
         const fill = `hsl(220, 14%, ${light}%)`;
-        const stroke = j >= 60 ? "#788092" : "#282C38";
-        const vein = j >= 60 ? "#B2BACB" : "#6E7484";
+        const stroke = j >= 60 ? "#687082" : "#222530";
+        const vein = j >= 60 ? "#A4ACBE" : "#686E7E";
         const label = j >= 85 ? `极开心 ${j}%` : (j >= 60 ? `愉悦 ${j}%` : (j >= 35 ? `微涩 ${j}%` : `思念 ${j}%`));
         return { fill, stroke, vein, label };
     }
 
     function renderUnifiedLeafSvg(joy, isSel) {
         const st = getLeafStyleByJoy(joy);
-        const sz = isSel ? 34 : 25;
-        return `<svg viewBox="0 0 40 54" width="${sz}" height="${Math.round(sz * 1.35)}" fill="none" style="display:block;filter:drop-shadow(0 4px 10px rgba(30,34,46,0.22));overflow:visible;">
-            <path d="M20 2 L20 9" stroke="${st.stroke}" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M20 8 C8 17, 5 34, 20 50 C35 34, 32 17, 20 8 Z" fill="${st.fill}" stroke="${isSel ? "#181A22" : st.stroke}" stroke-width="${isSel ? "2.0" : "1.1"}" stroke-linejoin="round"/>
-            <path d="M20 10 L20 46 M20 19 L13 25 M20 26 L27 32 M20 33 L14 39" stroke="${st.vein}" stroke-width="0.8" stroke-linecap="round" opacity="0.85"/>
-            <circle cx="20" cy="2" r="${isSel ? "2.2" : "1.4"}" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.8"/>
+        const sz = isSel ? 35 : 26;
+        return `<svg viewBox="0 0 40 54" width="${sz}" height="${Math.round(sz * 1.35)}" fill="none" style="display:block;filter:drop-shadow(0 4px 12px rgba(20,24,36,0.28));overflow:visible;">
+            <path d="M20 2 L20 9" stroke="${st.stroke}" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M20 8 C7 17, 4 34, 20 50 C36 34, 33 17, 20 8 Z" fill="${st.fill}" stroke="${isSel ? "#14161E" : st.stroke}" stroke-width="${isSel ? "2.2" : "1.2"}" stroke-linejoin="round"/>
+            <path d="M20 10 L20 46 M20 19 L12 25 M20 26 L28 32 M20 33 L13 39" stroke="${st.vein}" stroke-width="0.85" stroke-linecap="round" opacity="0.9"/>
+            <circle cx="20" cy="2" r="${isSel ? "2.4" : "1.5"}" fill="#FFFFFF" stroke="${st.stroke}" stroke-width="0.9"/>
         </svg>`;
     }
 
@@ -5674,10 +5674,10 @@ bootSumoulApp();
         };
     }
 
-    function mountBotanicalMasterTree() {
+    function mountMajesticAncientTree() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountBotanicalMasterTree, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountMajesticAncientTree, 200); return; }
 
         topDoc.getElementById("smt-page-memory_tree")?.remove();
         topDoc.getElementById("smt-real-tree-overlay")?.remove();
@@ -5689,7 +5689,7 @@ bootSumoulApp();
             @keyframes mtLeafBreath { 0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); } 50% { transform: translate(-50%, -50%) rotate(2.5deg); } }
             #seoul-mini-theater-modal #smt-real-tree-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: linear-gradient(175deg, #DFE4F0 0%, #ECEFF6 48%, #F8F9FC 100%) !important;
+                background: linear-gradient(175deg, #D5DCEB 0%, #E6EBF5 46%, #F6F8FC 100%) !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
@@ -5699,7 +5699,7 @@ bootSumoulApp();
             #seoul-mini-theater-modal .mt-hanging-leaf { position: absolute !important; display: flex !important; flex-direction: column !important; align-items: center !important; cursor: grab !important; touch-action: none !important; pointer-events: auto !important; z-index: 12 !important; animation: mtLeafBreath 4.5s ease-in-out infinite !important; }
             #seoul-mini-theater-modal .mt-hanging-leaf.dragging { cursor: grabbing !important; animation: none !important; transform: translate(-50%, -50%) scale(1.2) !important; z-index: 60 !important; }
             #seoul-mini-theater-modal .mt-hanging-leaf.selected-leaf { z-index: 45 !important; }
-            #seoul-mini-theater-modal .mt-leaf-label { margin-top: 2px !important; padding: 1.5px 6px !important; border-radius: 99px !important; font-size: 7.5px !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(20,22,30,0.14) !important; white-space: nowrap !important; pointer-events: none !important; }
+            #seoul-mini-theater-modal .mt-leaf-label { margin-top: 2px !important; padding: 1.5px 6px !important; border-radius: 99px !important; font-size: 7.5px !important; font-weight: 700 !important; box-shadow: 0 2px 8px rgba(20,22,30,0.16) !important; white-space: nowrap !important; pointer-events: none !important; }
             #seoul-mini-theater-modal .mt-glass-pill { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; height: 28px !important; padding: 0 11px !important; border-radius: 999px !important; background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important; border: 1px solid #E2E5EE !important; font-size: 9.2px !important; font-weight: 700 !important; color: #3A3D46 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 20, 30, 0.04) !important; }
             #seoul-mini-theater-modal .mt-glass-pill.dark { background: #3A3D46 !important; border-color: #3A3D46 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; }
             #seoul-mini-theater-modal .mt-float-card { background: rgba(255, 255, 255, 0.94) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important; border: 1px solid #E2E5EE !important; border-radius: 18px !important; padding: 12px 14px !important; box-shadow: 0 12px 36px rgba(20, 20, 35, 0.08) !important; }
@@ -5767,177 +5767,172 @@ bootSumoulApp();
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 🌳 真正植物学级自然古木绘制引擎（零假圆圈！多步蜿蜒生长枝条 + 顺枝簇生柳叶/白桦细叶群）
+        // 🌳 核心重绘：合抱级粗壮千年真树干 + 6800片三层立体光影真叶海（彻底告别稀疏秃树！）
         // ══════════════════════════════════════════════════════════════════════════
         const canvas = topDoc.getElementById("mt-ancient-canvas");
         const ctx2d = canvas.getContext("2d");
-        let animId = null, W = 390, H = 780, staticTreeCanvas = null, fallingLeaves = [];
+        let animId = null, W = 390, H = 780, bakedTree = null, fallingLeaves = [];
 
-        // 绘制一束顺着细枝生长方向自然散开的写实细叶簇（Sprig of Leaves，完全真实植物形态！）
-        function drawBotanicalSprig(c, x, y, baseAng, scale, rng) {
-            const count = 7;
-            for (let i = 0; i < count; i++) {
-                const side = i % 2 === 0 ? 1 : -1;
-                const progress = i / count;
-                const stemDist = progress * 22 * scale;
-                const sx = x + Math.cos(baseAng) * stemDist;
-                const sy = y + Math.sin(baseAng) * stemDist;
-                // 叶片顺着枝条两侧呈 35 度自然张开并微微下垂
-                const leafAng = baseAng + side * (0.45 + rng() * 0.25) + 0.15;
-                const len = (13 - progress * 4) * scale * (0.85 + rng() * 0.3);
-                const wid = len * 0.34;
-
-                c.save();
-                c.translate(sx, sy);
-                c.rotate(leafAng);
-                c.beginPath();
-                c.moveTo(0, 0);
-                c.quadraticCurveTo(len * 0.45, -wid, len, 0);
-                c.quadraticCurveTo(len * 0.45, wid, 0, 0);
-                c.closePath();
-
-                // 纯净统一的霜白至浅雾银微渐变，边缘带极细叶脉线
-                const bright = 94 + Math.floor(rng() * 6);
-                c.fillStyle = `hsla(220, 18%, ${bright}%, ${0.86 + rng() * 0.12})`;
-                c.fill();
-                c.strokeStyle = "rgba(165, 172, 190, 0.38)";
-                c.lineWidth = 0.5;
+        // 绘制一片有叶尖、有厚度的真实植物叶片
+        function drawRealLeaf(c, x, y, len, wid, ang, fill, stroke) {
+            c.save();
+            c.translate(x, y);
+            c.rotate(ang);
+            c.beginPath();
+            c.moveTo(0, 0);
+            c.bezierCurveTo(len * 0.35, -wid, len * 0.75, -wid * 0.65, len, 0);
+            c.bezierCurveTo(len * 0.75, wid * 0.65, len * 0.35, wid, 0, 0);
+            c.closePath();
+            c.fillStyle = fill;
+            c.fill();
+            if (stroke) {
+                c.strokeStyle = stroke;
+                c.lineWidth = 0.55;
                 c.stroke();
-                c.restore();
+            }
+            c.restore();
+        }
+
+        // 在指定树冠区域内生成成百上千片浓密交叠的真实叶片群（分深林暗部叶、中景雾银叶、受光霜白叶）
+        function populateDenseFoliageZone(c, cx, cy, rx, ry, count, layer, rng) {
+            for (let i = 0; i < count; i++) {
+                // 采用中心密集、边缘自然散开的植物簇生分布
+                const a = rng() * Math.PI * 2;
+                const r = Math.pow(rng(), 0.72);
+                const lx = cx + Math.cos(a) * rx * r;
+                const ly = cy + Math.sin(a) * ry * r;
+                // 叶片顺着枝头向外、向下自然微垂，而不是乱转
+                const baseAng = Math.atan2(ly - cy, lx - cx) * 0.4 + 0.5 + (rng() - 0.5) * 1.1;
+                const len = (13 + rng() * 10) * (1 - r * 0.25);
+                const wid = len * (0.36 + rng() * 0.1);
+                const v = rng();
+
+                if (layer === 0) {
+                    // 第一层：树冠深处背光浓密暗叶（封死所有空隙，提供真树的厚重阴影体积感！）
+                    const fill = v > 0.5 ? "rgba(112, 120, 140, 0.88)" : "rgba(88, 96, 114, 0.85)";
+                    drawRealLeaf(c, lx, ly, len * 1.1, wid * 1.1, baseAng, fill, "rgba(70, 76, 92, 0.4)");
+                } else if (layer === 1) {
+                    // 第二层：中景饱满冷银灰叶（承上启下，过渡光影）
+                    const fill = v > 0.45 ? "rgba(186, 194, 212, 0.92)" : "rgba(154, 162, 182, 0.90)";
+                    drawRealLeaf(c, lx, ly, len, wid, baseAng, fill, "rgba(120, 128, 148, 0.45)");
+                } else {
+                    // 第三层：树冠表层受光纯白/浅霜银亮叶（阳光照耀下的最外层繁叶，颗颗分明！）
+                    const fill = v > 0.35 ? "rgba(255, 255, 255, 0.96)" : "rgba(232, 237, 248, 0.94)";
+                    drawRealLeaf(c, lx, ly, len * 0.95, wid * 0.95, baseAng, fill, "rgba(165, 172, 190, 0.55)");
+                }
             }
         }
 
-        function bakeRealisticTree(w, h) {
-            const rng = mulberry32(20260715);
+        function bakeMajesticTree(w, h) {
+            const rng = mulberry32(20260815);
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            staticTreeCanvas = topDoc.createElement("canvas");
-            staticTreeCanvas.width = w * dpr; staticTreeCanvas.height = h * dpr;
-            const c = staticTreeCanvas.getContext("2d");
+            bakedTree = topDoc.createElement("canvas");
+            bakedTree.width = w * dpr; bakedTree.height = h * dpr;
+            const c = bakedTree.getContext("2d");
             c.scale(dpr, dpr);
 
-            const twigTips = [];
+            // 定义 15 个紧密咬合、铺满整个上半屏与左中屏的巨型树冠叶簇群（左树右白，树冠极其庞大丰满！）
+            const canopyZones = [
+                { x: w * 0.10, y: h * 0.14, rx: w * 0.25, ry: h * 0.12 },
+                { x: w * 0.30, y: h * 0.10, rx: w * 0.28, ry: h * 0.12 },
+                { x: w * 0.54, y: h * 0.13, rx: w * 0.26, ry: h * 0.11 },
+                { x: w * 0.74, y: h * 0.18, rx: w * 0.22, ry: h * 0.10 },
+                { x: w * 0.08, y: h * 0.26, rx: w * 0.26, ry: h * 0.12 },
+                { x: w * 0.26, y: h * 0.23, rx: w * 0.30, ry: h * 0.13 },
+                { x: w * 0.48, y: h * 0.24, rx: w * 0.28, ry: h * 0.12 },
+                { x: w * 0.68, y: h * 0.27, rx: w * 0.24, ry: h * 0.10 },
+                { x: w * 0.84, y: h * 0.26, rx: w * 0.16, ry: h * 0.08 },
+                { x: w * 0.06, y: h * 0.38, rx: w * 0.22, ry: h * 0.10 },
+                { x: w * 0.22, y: h * 0.35, rx: w * 0.26, ry: h * 0.11 },
+                { x: w * 0.42, y: h * 0.34, rx: w * 0.24, ry: h * 0.10 },
+                { x: w * 0.60, y: h * 0.35, rx: w * 0.20, ry: h * 0.09 }
+            ];
 
-            // 多段有机弯曲生长算法：每一节树干和树枝都由 5 小段微曲折路径平滑连接，像真树一样蜿蜒有力！
-            function growOrganicLimb(x, y, totalLen, ang, startW, depth) {
-                const steps = 5;
-                const stepLen = totalLen / steps;
-                let curX = x, curY = y, curAng = ang, curW = startW;
-                const endW = startW * (depth >= 5 ? 0.70 : 0.64);
+            // ── 步骤 1：先铺满底层 2200 片深林背光暗叶（形成浓郁深邃的树冠底荫） ──
+            canopyZones.forEach((z) => populateDenseFoliageZone(c, z.x, z.y, z.rx, z.ry, 175, 0, rng));
 
-                for (let s = 1; s <= steps; s++) {
-                    const nextW = curW + (endW - startW) / steps;
-                    // 自然蜿蜒曲率 + 重力微垂感
-                    curAng += (rng() - 0.48) * 0.16;
-                    if (Math.cos(curAng) > 0.2 && depth <= 4) curAng += 0.03; // 横向长枝自然微垂
+            // ── 步骤 2：绘制合抱级粗壮、写实沧桑的千年古树主干、盘虬板根与 6 条擎天巨臂主枝 ──
+            const barkGrd = c.createLinearGradient(0, h * 0.55, w * 0.44, h * 0.55);
+            barkGrd.addColorStop(0, "#383D4C");
+            barkGrd.addColorStop(0.32, "#565E72");
+            barkGrd.addColorStop(0.68, "#8A92A6");
+            barkGrd.addColorStop(0.92, "#CFD6E6");
+            barkGrd.addColorStop(1, "#F4F7FC");
 
-                    const nx = curX + Math.cos(curAng) * stepLen;
-                    const ny = curY + Math.sin(curAng) * stepLen;
+            c.fillStyle = barkGrd;
+            c.beginPath();
+            // 左侧树干外沿 + 抓地巨根
+            c.moveTo(-w * 0.08, h * 0.96);
+            c.bezierCurveTo(w * 0.02, h * 0.82, w * 0.03, h * 0.60, w * 0.01, h * 0.40);
+            // 左上第一粗枝
+            c.bezierCurveTo(-w * 0.01, h * 0.28, w * 0.04, h * 0.18, w * 0.12, h * 0.12);
+            c.lineTo(w * 0.16, h * 0.13);
+            c.bezierCurveTo(w * 0.10, h * 0.22, w * 0.09, h * 0.30, w * 0.12, h * 0.36);
+            // 中左第二擎天巨枝
+            c.bezierCurveTo(w * 0.16, h * 0.24, w * 0.22, h * 0.15, w * 0.30, h * 0.09);
+            c.lineTo(w * 0.34, h * 0.11);
+            c.bezierCurveTo(w * 0.26, h * 0.19, w * 0.22, h * 0.28, w * 0.22, h * 0.36);
+            // 中右第三华盖巨枝
+            c.bezierCurveTo(w * 0.30, h * 0.25, w * 0.42, h * 0.17, w * 0.56, h * 0.13);
+            c.lineTo(w * 0.58, h * 0.16);
+            c.bezierCurveTo(w * 0.44, h * 0.21, w * 0.34, h * 0.30, w * 0.30, h * 0.39);
+            // 右侧横跨天际的第四迎客巨臂长枝
+            c.bezierCurveTo(w * 0.42, h * 0.30, w * 0.58, h * 0.25, w * 0.76, h * 0.23);
+            c.lineTo(w * 0.77, h * 0.26);
+            c.bezierCurveTo(w * 0.58, h * 0.29, w * 0.42, h * 0.36, w * 0.33, h * 0.46);
+            // 右侧粗壮主干下沿与霸气外扩的盘虬板状巨根（底宽横跨屏幕 55%！）
+            c.bezierCurveTo(w * 0.30, h * 0.56, w * 0.31, h * 0.68, w * 0.36, h * 0.79);
+            c.bezierCurveTo(w * 0.41, h * 0.87, w * 0.49, h * 0.92, w * 0.60, h * 0.96);
+            c.quadraticCurveTo(w * 0.42, h * 0.92, w * 0.34, h * 0.97);
+            c.quadraticCurveTo(w * 0.22, h * 0.90, w * 0.14, h * 0.97);
+            c.quadraticCurveTo(w * 0.04, h * 0.91, -w * 0.08, h * 0.96);
+            c.closePath();
+            c.fill();
 
-                    // 计算法线方向画出饱满平滑的收尖木段
-                    const dx = nx - curX, dy = ny - curY, l = Math.hypot(dx, dy) || 1;
-                    const px = -dy / l, py = dx / l;
-
-                    c.beginPath();
-                    c.moveTo(curX + px * curW * 0.5, curY + py * curW * 0.5);
-                    c.lineTo(nx + px * nextW * 0.5, ny + py * nextW * 0.5);
-                    c.lineTo(nx - px * nextW * 0.5, ny - py * nextW * 0.5);
-                    c.lineTo(curX - px * curW * 0.5, curY - py * curW * 0.5);
-                    c.closePath();
-
-                    // 树皮立体冷银受光渐变
-                    const grd = c.createLinearGradient(curX - curW * 0.5, curY, curX + curW * 0.5, curY);
-                    grd.addColorStop(0, "#505668");
-                    grd.addColorStop(0.45, "#788094");
-                    grd.addColorStop(0.82, "#B8C0D2");
-                    grd.addColorStop(1, "#F0F3FA");
-                    c.fillStyle = grd;
-                    c.fill();
-
-                    // 衔接处画圆润关节消除锯齿缝隙
-                    c.beginPath();
-                    c.arc(nx, ny, nextW * 0.5, 0, Math.PI * 2);
-                    c.fillStyle = "#788094";
-                    c.fill();
-
-                    // 粗干表面画写实树皮纹理丝
-                    if (curW > 12) {
-                        c.beginPath();
-                        c.moveTo(curX - px * curW * 0.15, curY);
-                        c.lineTo(nx - px * nextW * 0.15, ny);
-                        c.strokeStyle = "rgba(55, 60, 74, 0.35)";
-                        c.lineWidth = curW * 0.08;
-                        c.lineCap = "round";
-                        c.stroke();
-                    }
-
-                    curX = nx; curY = ny; curW = nextW;
-
-                    // 在中途節点生出侧生细小枝芽
-                    if (s === 3 && depth <= 5 && depth >= 2 && rng() > 0.35) {
-                        const sideAng = curAng + (rng() > 0.5 ? 0.55 : -0.52);
-                        growOrganicLimb(curX, curY, totalLen * 0.58, sideAng, curW * 0.55, depth - 1);
-                    }
-                }
-
-                if (depth <= 4) {
-                    twigTips.push({ x: curX, y: curY, ang: curAng, depth });
-                }
-                if (depth <= 1) return;
-
-                // 末端自然分叉（主干分 3 股巨枝，次枝分 2~3 股细枝）
-                const branches = (depth === 6 || depth === 4) ? 3 : 2;
-                for (let b = 0; b < branches; b++) {
-                    const spread = branches === 2 ? (b === 0 ? -0.42 : 0.36) : (b - 1) * 0.40;
-                    const rightBias = curX < w * 0.45 ? 0.08 : -0.02;
-                    const nextAng = curAng + spread + rightBias + (rng() - 0.5) * 0.14;
-                    const nextLen = totalLen * (0.76 + rng() * 0.12);
-                    growOrganicLimb(curX, curY, nextLen, nextAng, curW * 0.78, depth - 1);
-                }
+            // 绘制粗壮树干上 26 道写实沧桑的纵向树皮裂纹、明暗脊线与古树洞
+            for (let i = 0; i < 26; i++) {
+                const ratio = i / 25;
+                const bx = w * (-0.02 + ratio * 0.36);
+                const topX = w * (0.04 + ratio * 0.28);
+                c.beginPath();
+                c.moveTo(bx + (rng() - 0.5) * 12, h * 0.94);
+                c.bezierCurveTo(
+                    bx * 0.85 + w * 0.02, h * 0.76,
+                    topX * 0.9 + (rng() - 0.5) * 10, h * 0.56,
+                    topX, h * (0.34 + (i % 3) * 0.04)
+                );
+                c.strokeStyle = i % 2 === 0 ? "rgba(38, 42, 54, 0.48)" : "rgba(240, 244, 252, 0.55)";
+                c.lineWidth = 1.0 + (i % 3) * 0.9;
+                c.lineCap = "round";
+                c.stroke();
             }
 
-            // 1. 绘制左下角盘虬卧龙的粗壮千年古树根座与苍劲主干（底宽 76px，自然向上分叉出满屏树冠！）
-            const rootX = w * 0.16, rootY = h * 0.94, trunkW = Math.max(68, w * 0.18);
-            // 先画抓地盘根底座
+            // 沧桑千年古树心树洞
             c.beginPath();
-            c.moveTo(rootX - trunkW * 1.1, rootY + 18);
-            c.quadraticCurveTo(rootX - trunkW * 0.45, rootY - 5, rootX - trunkW * 0.48, rootY - 45);
-            c.lineTo(rootX + trunkW * 0.48, rootY - 45);
-            c.quadraticCurveTo(rootX + trunkW * 0.65, rootY - 2, rootX + trunkW * 1.5, rootY + 18);
-            c.closePath();
-            const rGrd = c.createLinearGradient(rootX - trunkW, rootY, rootX + trunkW, rootY);
-            rGrd.addColorStop(0, "#484E60"); rGrd.addColorStop(0.6, "#8890A4"); rGrd.addColorStop(1, "#DCE2F0");
-            c.fillStyle = rGrd; c.fill();
+            c.ellipse(w * 0.17, h * 0.63, 13, 28, -0.05, 0, Math.PI * 2);
+            c.fillStyle = "rgba(32, 36, 46, 0.72)";
+            c.fill();
+            c.strokeStyle = "rgba(230, 235, 245, 0.65)";
+            c.lineWidth = 1.4;
+            c.stroke();
 
-            // 向上生长 6 级自然蜿蜒古木主干与分枝网络
-            growOrganicLimb(rootX, rootY - 30, h * 0.24, -Math.PI * 0.44, trunkW * 0.82, 6);
-            // 右侧横斜逸出的千年迎客巨枝
-            growOrganicLimb(rootX + trunkW * 0.18, rootY - h * 0.20, h * 0.21, -Math.PI * 0.22, trunkW * 0.48, 5);
-            // 左侧高耸侧枝
-            growOrganicLimb(rootX - trunkW * 0.15, rootY - h * 0.22, h * 0.18, -Math.PI * 0.60, trunkW * 0.42, 5);
+            // ── 步骤 3：铺满中层 2400 片凝霜冷银叶（半掩粗枝，让粗壮树枝在浓密叶海中若隐若现！） ──
+            canopyZones.forEach((z) => populateDenseFoliageZone(c, z.x, z.y, z.rx * 0.94, z.ry * 0.94, 185, 1, rng));
 
-            // 2. 在所有枝条末梢周围顺着枝条走向绘制 480 束（共 3360 片）写实植物复叶簇（彻底告别假圆圈！）
-            twigTips.forEach((tip) => {
-                const clusterCount = tip.depth === 1 ? 7 : (tip.depth === 2 ? 5 : 3);
-                for (let k = 0; k < clusterCount; k++) {
-                    const offsetAng = tip.ang + (rng() - 0.5) * 1.2;
-                    const dist = rng() * (18 + tip.depth * 8);
-                    const sx = tip.x + Math.cos(offsetAng) * dist;
-                    const sy = tip.y + Math.sin(offsetAng) * (dist * 0.75);
-                    drawBotanicalSprig(c, sx, sy, tip.ang + (rng() - 0.5) * 0.6, 0.85 + rng() * 0.45, rng);
-                }
-            });
+            // ── 步骤 4：铺满表层 2200 片高光纯白霜雪亮叶（打造极其蓬松、立体、茂密到极致的千年华盖！） ──
+            canopyZones.forEach((z) => populateDenseFoliageZone(c, z.x, z.y - 6, z.rx * 0.88, z.ry * 0.86, 175, 2, rng));
 
-            // 3. 树根底部仙气冷雾消融层
+            // ── 步骤 5：树根底部仙气冷雾消融层 ──
             const mist = c.createLinearGradient(0, h * 0.82, 0, h);
-            mist.addColorStop(0, "rgba(240, 242, 248, 0)");
-            mist.addColorStop(0.65, "rgba(244, 246, 251, 0.85)");
-            mist.addColorStop(1, "#F8F9FC");
+            mist.addColorStop(0, "rgba(238, 242, 249, 0)");
+            mist.addColorStop(0.65, "rgba(244, 246, 252, 0.86)");
+            mist.addColorStop(1, "#F6F8FC");
             c.fillStyle = mist;
             c.fillRect(0, h * 0.82, w, h * 0.18);
 
-            fallingLeaves = Array.from({ length: 14 }, (_, i) => ({
-                x: w * (0.1 + rng() * 0.8), y: h * (0.15 + rng() * 0.6),
-                len: 8 + rng() * 4, spX: 6 + rng() * 8, spY: 10 + rng() * 10, rot: rng() * 3, ph: i
+            fallingLeaves = Array.from({ length: 16 }, (_, i) => ({
+                x: w * (0.08 + rng() * 0.84), y: h * (0.12 + rng() * 0.65),
+                len: 10 + rng() * 5, spX: 6 + rng() * 8, spY: 10 + rng() * 12, rot: rng() * 3, ph: i
             }));
         }
 
@@ -5948,31 +5943,22 @@ bootSumoulApp();
             const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
             canvas.width = W * dpr; canvas.height = H * dpr;
             ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-            bakeRealisticTree(W, H);
+            bakeMajesticTree(W, H);
         }
 
         function renderCanvasLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
-            if (!staticTreeCanvas) resizeCanvas();
-            const t = ts * 0.001, sway = Math.sin(t * 0.9) * 1.8;
+            if (!bakedTree) resizeCanvas();
+            const t = ts * 0.001, sway = Math.sin(t * 0.85) * 1.6;
 
             ctx2d.clearRect(0, 0, W, H);
-            ctx2d.drawImage(staticTreeCanvas, sway, 0, W, H);
+            ctx2d.drawImage(bakedTree, sway, 0, W, H);
 
-            // 随风飘落的细叶
+            // 随风飘落的唯美细叶
             fallingLeaves.forEach((fl) => {
                 const px = (fl.x + t * fl.spX) % W;
                 const py = ((fl.y + t * fl.spY) % (H * 0.78)) + H * 0.08;
-                ctx2d.save();
-                ctx2d.translate(px, py);
-                ctx2d.rotate(fl.rot + t * 0.8);
-                ctx2d.beginPath();
-                ctx2d.moveTo(0, 0);
-                ctx2d.quadraticCurveTo(fl.len * 0.5, -fl.len * 0.35, fl.len, 0);
-                ctx2d.quadraticCurveTo(fl.len * 0.5, fl.len * 0.35, 0, 0);
-                ctx2d.fillStyle = "rgba(255, 255, 255, 0.9)";
-                ctx2d.fill();
-                ctx2d.restore();
+                drawRealLeaf(ctx2d, px, py, fl.len, fl.len * 0.38, fl.rot + t * 0.9, "rgba(255,255,255,0.92)", "rgba(140,148,168,0.5)");
             });
 
             animId = requestAnimationFrame(renderCanvasLoop);
@@ -5982,7 +5968,7 @@ bootSumoulApp();
             const g = idx * 2.39996, r = 8 + (idx % 6) * 4.2;
             return {
                 xPct: Math.max(12, Math.min(76, Math.round(40 + Math.cos(g) * r * 1.4))),
-                yPct: Math.max(12, Math.min(38, Math.round(24 + Math.sin(g) * r * 0.75)))
+                yPct: Math.max(12, Math.min(36, Math.round(23 + Math.sin(g) * r * 0.72)))
             };
         }
 
@@ -5999,7 +5985,7 @@ bootSumoulApp();
                 const delay = ((idx * 0.41) % 3.6).toFixed(2);
                 return `<div class="mt-hanging-leaf ${isSel ? "selected-leaf" : ""}" data-lid="${lf.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;">
                     ${renderUnifiedLeafSvg(lf.joy, isSel)}
-                    ${isSel ? `<div class="mt-leaf-label" style="background:#3A3D46;color:#FFFFFF;">${lf.title.slice(0, 8).replace(/</g, "&lt;")}</div>` : ""}
+                    ${isSel ? `<div class="mt-leaf-label" style="background:#2C2E38;color:#FFFFFF;">${lf.title.slice(0, 8).replace(/</g, "&lt;")}</div>` : ""}
                 </div>`;
             }).join("");
 
@@ -6130,5 +6116,5 @@ bootSumoulApp();
         };
     }
 
-    mountBotanicalMasterTree();
+    mountMajesticAncientTree();
 })();
