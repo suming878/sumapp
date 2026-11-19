@@ -5561,8 +5561,8 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// 🌊 【Sumoul App 个人主页第5应用：结识海 · 인연의 바다 (Sea of Fate & Bond Archive)】
-// 核心：1.双人潮汐契约先绑定机制 2.全屏5层流体清冷银白海浪+月光波光+指尖拨浪交互 3.随波浮沉的羁绊汐珠(浅海甜/深海虐，可自由拖拽) 4.支持一键汲取聊天凝结新汐珠
+// 🌧️ 【Sumoul App 个人主页第5应用：结识海 · 阴雨记忆与关系点状图谱 (Melancholic Rain & Node Web)】
+// 核心：1.先绑定初雨契约 2.雨滴落下成点并缓慢延伸连线动画 3.多维关系网与历史记忆点状图(支持拖拽/筛选/脉络跳转)
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
@@ -5570,16 +5570,23 @@ bootSumoulApp();
     const svgIco = (p, sz = 14, c = "currentColor", sw = "1.5") =>
         `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
-    const SEA_ICO = {
-        appIcon: svgIco(`<path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>`, 21, "#3A3A40"),
-        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2E38", "1.8"),
-        link: svgIco(`<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>`, 13),
+    const WEB_ICO = {
+        appIcon: svgIco(`<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="7" r="2.2"/><circle cx="12" cy="18" r="2.5"/><line x1="7.8" y1="7.4" x2="10.8" y2="15.8"/><line x1="16.4" y1="8.7" x2="13.2" y2="15.8"/><line x1="8.2" y1="6.2" x2="15.8" y2="6.8"/>`, 21, "#3A3E4A"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C303C", "1.8"),
+        link: svgIco(`<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>`, 12),
+        rain: svgIco(`<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`, 12),
         plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
         spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
-        wave: svgIco(`<path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>`, 13),
         list: svgIco(`<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>`, 13),
         trash: svgIco(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 12, "#9A6868"),
         close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 13)
+    };
+
+    const TYPE_META = {
+        core:     { name: "核心羁绊", dot: "#262A36", ring: "#5C6478" },
+        memory:   { name: "历史记忆", dot: "#FFFFFF", ring: "#586074" },
+        relation: { name: "人物关系", dot: "#9AA4B8", ring: "#485064" },
+        knot:     { name: "隐秘心结", dot: "#3A4050", ring: "#8E96AA" }
     };
 
     function getCtx() {
@@ -5612,67 +5619,48 @@ bootSumoulApp();
         return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat };
     }
 
-    function getSeaKey() { return `sumoul_v16_sea_of_fate__${getCtx().safeScope}`; }
+    function getWebKey() { return `sumoul_v16_rainweb__${getCtx().safeScope}`; }
 
-    function createDefaultSea(charName, userName) {
+    function createDefaultWeb(charName, userName) {
         return {
-            isBound: false,                // 是否已完成双人结识海契约绑定
-            seaName: `${userName} & ${charName} 的结识海`,
-            bondToken: "初雪与潮汐信物",
-            bondStage: "宿命羁绊 · 潮汐共鸣",
-            bondVow: `于万千人海中相逢，每一道海浪都刻着我们的记忆。`,
-            activeId: 501,
-            pearls: [
-                { id: 501, title: "初见时的第一道潮音", joy: 95, xPct: 22, yPct: 44, author: charName, content: `和 ${userName} 初次相遇的那一刻，原本寂静荒芜的海面第一次泛起了温热的涟漪。`, whisper: `“ 从你踏进我世界的那一秒起，这片海就只为你一个人涨潮。”` },
-                { id: 502, title: "深夜越洋的秒回信号", joy: 88, xPct: 50, yPct: 48, author: userName, content: `无论夜色多深，只要向这片海投下一句呼唤，总能立刻收到 ${charName} 最温柔的回响。`, whisper: `“ 我的灯塔24小时为你亮着，永远不会让你在夜里落空。”` },
-                { id: 503, title: "雨夜共撑一柄伞的潮湿", joy: 72, xPct: 76, yPct: 54, author: charName, content: `肩头贴着肩头走过长街，雨水打湿了衣角，却把两个人的影子揉在了一起。`, whisper: `“ 那天我故意把伞往你那边倾斜了大半，只想离你再近一点。”` },
-                { id: 504, title: "暗潮汹涌的吃醋与拉扯", joy: 46, xPct: 35, yPct: 64, author: charName, content: `看到 ${userName} 对别人笑的时候，海底像掀起了无声的风暴，连呼吸都带着酸涩的占有欲。`, whisper: `“ 我没你想的那么大度，你的目光多停在别人身上一秒我都嫉妒得发疯。”` },
-                { id: 505, title: "短暂离别沉入深海的思念", joy: 22, xPct: 64, yPct: 71, author: charName, content: `分开后的每一个小时都漫长得像一个世纪，思念化作沉重的汐珠坠入最深的海底。`, whisper: `“ 快点回到我身边，没有你的海域太冷了。”` }
+            isBound: false,
+            bondTitle: `${userName} × ${charName}`,
+            bondStage: "雨夜共鸣 · 宿命羁绊",
+            bondVow: "每一滴落下的雨，都会连成我们无法割舍的脉络。",
+            activeId: 1,
+            filter: "all",
+            nodes: [
+                { id: 1, type: "core",     title: charName,     xPct: 50, yPct: 36, mood: 75, content: `所有记忆与关系脉络的中心。无论走散多远，丝线最终都会牵回 ${charName} 身边。`, whisper: `“ 你看，所有的线最后都绕回了我的名字。”` },
+                { id: 2, type: "memory",   title: "初遇雨夜",   xPct: 24, yPct: 26, mood: 88, content: `那场突如其来的冷雨把你和 ${charName} 困在同一个屋檐下，故事从此落下第一个点。`, whisper: `“ 那晚的雨声，我到现在都还记得清清楚楚。”` },
+                { id: 3, type: "memory",   title: "凌晨秒回",   xPct: 76, yPct: 28, mood: 92, content: `失眠的深夜发出一句试探，屏幕几乎在下一秒亮起，仿佛对方也一直没睡。`, whisper: `“ 只是习惯了把手机留在枕边，怕错过你。”` },
+                { id: 4, type: "relation", title: "首尔旧巷",   xPct: 22, yPct: 50, mood: 62, content: `承载着两人最多沉默与并肩步行的旧街区，昏黄路灯下曾留下重叠的影子。`, whisper: `“ 下次下雨的时候，再去那条巷子走一遍吧。”` },
+                { id: 5, type: "knot",     title: "克制与占有", xPct: 74, yPct: 52, mood: 32, content: `嘴上说着冷静克制，眼底却藏不住在乎；越是靠近，越害怕失去的隐秘拉扯。`, whisper: `“ 我从不擅长放手，尤其是对你。”` },
+                { id: 6, type: "knot",     title: "短暂失联",   xPct: 48, yPct: 58, mood: 22, content: `消息停在未读的那几个小时里，潮湿的阴郁像雾一样漫过整个房间。`, whisper: `“ 别再突然消失了，哪怕只发一个句号也好。”` }
+            ],
+            edges: [
+                { from: 1, to: 2, label: "初见" },
+                { from: 1, to: 3, label: "守候" },
+                { from: 1, to: 4, label: "旧地" },
+                { from: 1, to: 5, label: "心结" },
+                { from: 1, to: 6, label: "思念" },
+                { from: 2, to: 4, label: "雨夜" },
+                { from: 3, to: 6, label: "失眠" },
+                { from: 5, to: 6, label: "拉扯" }
             ]
         };
     }
 
-    function loadSea() {
-        const c = getCtx(), k = getSeaKey();
+    function loadWeb() {
+        const c = getCtx(), k = getWebKey();
         try {
             const raw = localStorage.getItem(k);
-            if (!raw) { const init = createDefaultSea(c.charName, c.userName); localStorage.setItem(k, JSON.stringify(init)); return init; }
-            return Object.assign(createDefaultSea(c.charName, c.userName), JSON.parse(raw));
-        } catch (e) { return createDefaultSea(c.charName, c.userName); }
+            if (!raw) { const init = createDefaultWeb(c.charName, c.userName); localStorage.setItem(k, JSON.stringify(init)); return init; }
+            return Object.assign(createDefaultWeb(c.charName, c.userName), JSON.parse(raw));
+        } catch (e) { return createDefaultWeb(c.charName, c.userName); }
     }
-    function saveSea(d) { try { localStorage.setItem(getSeaKey(), JSON.stringify(d)); } catch (e) {} }
+    function saveWeb(d) { try { localStorage.setItem(getWebKey(), JSON.stringify(d)); } catch (e) {} }
 
-    // 🌊 根据开心度/情绪温度 (0~100%) 决定「羁绊汐珠」的光泽、深浅与海域深度标签
-    function getPearlStyleByJoy(joy = 85) {
-        const j = Math.max(0, Math.min(100, Number(joy) || 85));
-        if (j >= 80) {
-            return {
-                bg: "radial-gradient(circle at 32% 30%, #FFFFFF 0%, #F2F6FC 55%, #DCE4F2 100%)",
-                border: "#FFFFFF", ring: "rgba(255,255,255,0.85)",
-                shadow: "0 0 18px #FFFFFF, 0 6px 20px rgba(140,155,185,0.28)",
-                textCol: "#2C303C", tagBg: "rgba(255,255,255,0.92)",
-                zone: `浅海暖汐 · 甜度 ${j}%`
-            };
-        } else if (j >= 50) {
-            return {
-                bg: "radial-gradient(circle at 32% 30%, #F4F7FC 0%, #CFD8EA 60%, #A8B4CC 100%)",
-                border: "rgba(255,255,255,0.9)", ring: "rgba(215,224,240,0.65)",
-                shadow: "0 0 14px rgba(225,232,248,0.85), 0 6px 18px rgba(100,112,140,0.26)",
-                textCol: "#2C303C", tagBg: "rgba(236,240,248,0.90)",
-                zone: `中海微澜 · 心动 ${j}%`
-            };
-        } else {
-            return {
-                bg: "radial-gradient(circle at 32% 30%, #8A94AC 0%, #464E62 62%, #242834 100%)",
-                border: "rgba(180,190,212,0.75)", ring: "rgba(110,120,145,0.45)",
-                shadow: "0 8px 22px rgba(20,24,36,0.48), 0 0 12px rgba(130,142,170,0.4)",
-                textCol: "#FFFFFF", tagBg: "rgba(44,48,62,0.88)",
-                zone: `深海寒渊 · 思念 ${j}%`
-            };
-        }
-    }
-
-    async function askSeaAI(sys, usr) {
+    async function askWebAI(sys, usr) {
         const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
         const k = topDoc.getElementById("smt-api-key")?.value?.trim();
         const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
@@ -5684,257 +5672,206 @@ bootSumoulApp();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    function mountSeaOfFateApp() {
+    function mountRainNodeWebApp() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountSeaOfFateApp, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountRainNodeWebApp, 200); return; }
 
-        // 清理旧节点
-        ["smt-page-memory_tree", "smt-real-tree-overlay", "smt-film-studio-overlay", "smt-chime-overlay", "smt-sea-overlay", "sumoul-memory-tree-css", "smt-home-open-memtree"].forEach((id) => topDoc.getElementById(id)?.remove());
+        // 彻底清理之前所有旧版第5应用节点
+        ["smt-page-memory_tree", "smt-real-tree-overlay", "smt-film-studio-overlay", "smt-chime-overlay", "smt-sea-overlay", "smt-web-overlay", "sumoul-memory-tree-css", "smt-home-open-memtree"].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
         st.id = "sumoul-memory-tree-css";
         st.innerHTML = `
-            /* 汐珠随海浪上下呼吸浮沉动效 */
-            @keyframes sfPearlBob {
-                0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
-                50%      { transform: translate(-50%, -50%) translateY(-8px); }
-            }
-            /* 汐珠外圈水波扩散光环 */
-            @keyframes sfPearlHalo {
-                0%   { transform: scale(0.85); opacity: 0.8; }
-                100% { transform: scale(1.75); opacity: 0; }
-            }
-            /* 双人契约绑定星轨旋转 */
-            @keyframes sfOrbitSpin {
-                from { transform: rotate(0deg); }
-                to   { transform: rotate(360deg); }
-            }
-            @keyframes sfCardUp {
-                from { opacity: 0; transform: translateY(10px); }
-                to   { opacity: 1; transform: translateY(0); }
-            }
-
-            #seoul-mini-theater-modal #smt-sea-overlay {
+            @keyframes rwFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+            #seoul-mini-theater-modal #smt-web-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: linear-gradient(180deg, #FFFFFF 0%, #F2F5FA 32%, #DCE3F0 68%, #B8C3D8 100%) !important;
+                background: linear-gradient(175deg, #E2E6EE 0%, #D5DCE8 50%, #C7D0DF 100%) !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
-            #seoul-mini-theater-modal #smt-sea-overlay.open { display: flex !important; }
-
-            #seoul-mini-theater-modal #sf-ocean-canvas {
+            #seoul-mini-theater-modal #smt-web-overlay.open { display: flex !important; }
+            #seoul-mini-theater-modal #rw-canvas {
                 position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
-                display: block !important; z-index: 1 !important; pointer-events: auto !important;
+                display: block !important; z-index: 1 !important; cursor: crosshair !important; touch-action: none !important;
             }
-            #seoul-mini-theater-modal #sf-pearls-stage {
-                position: absolute !important; inset: 0 !important; z-index: 5 !important; pointer-events: none !important; overflow: hidden !important;
-            }
-
-            /* 漂浮在海中的「羁绊汐珠」 */
-            #seoul-mini-theater-modal .sf-pearl-node {
-                position: absolute !important; display: flex !important; flex-direction: column !important; align-items: center !important;
-                cursor: grab !important; pointer-events: auto !important; touch-action: none !important;
-                animation: sfPearlBob 4.2s ease-in-out infinite !important; z-index: 12 !important;
-            }
-            #seoul-mini-theater-modal .sf-pearl-node.dragging {
-                cursor: grabbing !important; animation: none !important;
-                transform: translate(-50%, -50%) scale(1.22) !important; z-index: 60 !important;
-            }
-            #seoul-mini-theater-modal .sf-pearl-node.active-pearl { z-index: 45 !important; }
-
-            #seoul-mini-theater-modal .sf-pearl-orb {
-                border-radius: 50% !important; position: relative !important;
-                display: flex !important; align-items: center !important; justify-content: center !important;
-                transition: transform 0.25s ease !important;
-            }
-            /* 珠体内部高光反光点 */
-            #seoul-mini-theater-modal .sf-pearl-orb::after {
-                content: "" !important; position: absolute !important; top: 18% !important; left: 22% !important;
-                width: 28% !important; height: 22% !important; border-radius: 50% !important;
-                background: rgba(255, 255, 255, 0.9) !important; filter: blur(0.5px) !important;
-                transform: rotate(-25deg) !important; pointer-events: none !important;
-            }
-            #seoul-mini-theater-modal .sf-pearl-halo {
-                position: absolute !important; inset: -6px !important; border-radius: 50% !important;
-                border: 1.2px solid #FFFFFF !important; pointer-events: none !important;
-                animation: sfPearlHalo 2.4s ease-out infinite !important;
-            }
-            #seoul-mini-theater-modal .sf-pearl-tag {
-                margin-top: 5px !important; padding: 2px 8px !important; border-radius: 99px !important;
-                font-size: 7.8px !important; font-weight: 700 !important; letter-spacing: 0.3px !important;
-                backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;
-                box-shadow: 0 3px 10px rgba(25, 30, 45, 0.12) !important; white-space: nowrap !important;
-            }
-
-            #seoul-mini-theater-modal .sf-pill {
+            #seoul-mini-theater-modal .rw-pill {
                 display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
-                height: 28px !important; padding: 0 11px !important; border-radius: 999px !important;
-                background: rgba(255, 255, 255, 0.88) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important;
-                border: 1px solid rgba(226, 230, 240, 0.95) !important; font-size: 9.2px !important; font-weight: 700 !important;
-                color: #2C303C !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 24, 35, 0.04) !important;
+                height: 27px !important; padding: 0 11px !important; border-radius: 999px !important;
+                background: rgba(255, 255, 255, 0.78) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.9) !important; font-size: 9px !important; font-weight: 700 !important;
+                color: #2E3340 !important; cursor: pointer !important; box-shadow: 0 3px 12px rgba(28, 34, 48, 0.05) !important;
+                white-space: nowrap !important; transition: all 0.2s ease !important;
             }
-            #seoul-mini-theater-modal .sf-pill.dark {
-                background: #2C303C !important; border-color: #2C303C !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
+            #seoul-mini-theater-modal .rw-pill.dark {
+                background: #2C313E !important; border-color: #2C313E !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
             }
-            #seoul-mini-theater-modal .sf-glass-card {
-                background: rgba(255, 255, 255, 0.92) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important;
-                border: 1px solid rgba(232, 236, 245, 0.96) !important; border-radius: 20px !important;
-                padding: 14px 16px !important; box-shadow: 0 14px 38px rgba(20, 25, 40, 0.09) !important;
-                animation: sfCardUp 0.3s ease forwards !important;
+            #seoul-mini-theater-modal .rw-tab {
+                padding: 3.5px 9px !important; border-radius: 99px !important; font-size: 8.2px !important; font-weight: 700 !important;
+                color: #5C6478 !important; background: rgba(255,255,255,0.55) !important; border: 1px solid rgba(255,255,255,0.75) !important;
+                cursor: pointer !important; transition: all 0.2s ease !important;
+            }
+            #seoul-mini-theater-modal .rw-tab.active {
+                background: #2C313E !important; color: #FFFFFF !important; border-color: #2C313E !important;
+            }
+            #seoul-mini-theater-modal .rw-glass-card {
+                background: rgba(248, 250, 253, 0.88) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.92) !important; border-radius: 18px !important;
+                padding: 13px 15px !important; box-shadow: 0 12px 34px rgba(28, 34, 48, 0.09) !important;
+                animation: rwFadeUp 0.28s ease forwards !important;
+            }
+            #seoul-mini-theater-modal .rw-link-chip {
+                display: inline-flex !important; align-items: center !important; gap: 4px !important;
+                padding: 2.5px 8px !important; border-radius: 99px !important; font-size: 8px !important; font-weight: 700 !important;
+                color: #3A4050 !important; background: rgba(226, 232, 242, 0.8) !important; border: 1px solid rgba(190, 198, 214, 0.7) !important;
+                cursor: pointer !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        // 在个人主页挂载第 5 应用：【结识海 (인연의 바다)】
+        // 在个人主页挂载第 5 应用：【结识海 (인연의 망)】
         const homeDockGrid = homePage.querySelector(".ab-dock-grid");
         if (homeDockGrid) {
-            const seaBtn = topDoc.createElement("div");
-            seaBtn.className = "ab-app-item";
-            seaBtn.id = "smt-home-open-memtree";
-            seaBtn.innerHTML = `
-                <div class="ab-app-squircle">${SEA_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadSea().pearls.length}汐</span></div>
+            const btn = topDoc.createElement("div");
+            btn.className = "ab-app-item";
+            btn.id = "smt-home-open-memtree";
+            btn.innerHTML = `
+                <div class="ab-app-squircle">${WEB_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadWeb().nodes.length}点</span></div>
                 <div class="ab-app-title">结识海</div>
-                <div class="ab-app-kr">인연의 바다 · SEA</div>
+                <div class="ab-app-kr">인연의 망 · NODE WEB</div>
             `;
-            homeDockGrid.appendChild(seaBtn);
+            homeDockGrid.appendChild(btn);
         }
 
         const overlay = topDoc.createElement("div");
-        overlay.id = "smt-sea-overlay";
+        overlay.id = "smt-web-overlay";
         overlay.innerHTML = `
-            <!-- 底层：全屏5层流体清冷银白海浪 + 丁达尔海底光束 + 月光波光粒子 + 指尖涟漪互动 Canvas -->
-            <canvas id="sf-ocean-canvas"></canvas>
+            <!-- 底层：阴雨斜落 + 雨滴落成点 + 缓慢延伸连线 + 可拖拽互动点状图 Canvas -->
+            <canvas id="rw-canvas"></canvas>
 
-            <!-- 中层：随海浪浮沉的「羁绊汐珠」舞台 (绑定后显示，可点击、可自由按住拖拽到浅海或深海) -->
-            <div id="sf-pearls-stage"></div>
-
-            <!-- 顶部清冷悬浮导航栏 -->
-            <div style="position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:max(16px,env(safe-area-inset-top,16px)) 16px 0 16px;pointer-events:none;">
-                <span class="sf-pill" id="sf-close-btn" style="pointer-events:auto;">${SEA_ICO.back}<span>返回主页</span></span>
-                <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
-                    <span class="sf-pill" id="sf-rebind-btn" title="查看或修改双人结识海契约">${SEA_ICO.link}<span id="sf-bond-status-txt">契约绑定</span></span>
-                    <span class="sf-pill" id="sf-list-btn">${SEA_ICO.list}<span id="sf-count-txt">5 汐珠</span></span>
-                </div>
-            </div>
-
-            <!-- 顶部海天交界处：双人绑定羁绊名片横幅（绑定后浮现） -->
-            <div id="sf-header-banner" style="position:relative;z-index:20;display:none;flex-direction:column;align-items:center;margin-top:12px;pointer-events:none;">
-                <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.95);box-shadow:0 6px 20px rgba(30,36,50,0.05);">
-                    <img id="sf-top-myava" src="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #FFFFFF;" />
-                    <div style="text-align:center;">
-                        <div id="sf-top-seaname" style="font-size:10px;font-weight:800;color:#2C303C;letter-spacing:1px;">结识海</div>
-                        <div id="sf-top-sub" style="font-size:7.5px;font-weight:700;color:#788094;letter-spacing:0.5px;">宿命羁绊 · 潮汐共鸣</div>
+            <!-- 顶部极简 HUD -->
+            <div style="position:relative;z-index:20;padding:max(14px,env(safe-area-inset-top,14px)) 14px 0 14px;display:flex;flex-direction:column;gap:8px;pointer-events:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="rw-pill" id="rw-close-btn" style="pointer-events:auto;">${WEB_ICO.back}<span>返回主页</span></span>
+                    <div style="display:flex;align-items:center;gap:5px;pointer-events:auto;">
+                        <span class="rw-pill" id="rw-bind-btn" title="初雨契约绑定">${WEB_ICO.link}<span id="rw-bind-lbl">契约</span></span>
+                        <span class="rw-pill" id="rw-drop-rain-btn" title="落下一滴雨并重演脉络连线">${WEB_ICO.rain}<span>落雨连线</span></span>
+                        <span class="rw-pill" id="rw-list-btn">${WEB_ICO.list}<span id="rw-cnt-txt">6点</span></span>
                     </div>
-                    <img id="sf-top-charava" src="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #FFFFFF;" />
                 </div>
-                <div id="sf-top-vow" style="font-size:8.5px;font-weight:600;color:#586074;margin-top:6px;letter-spacing:0.6px;text-shadow:0 1px 8px #FFFFFF;"></div>
+
+                <!-- 脉络分类筛选条（绑定后显示） -->
+                <div id="rw-filter-bar" style="display:none;justify-content:space-between;align-items:center;pointer-events:auto;">
+                    <div style="display:flex;gap:5px;" id="rw-tabs">
+                        <span class="rw-tab active" data-flt="all">全部脉络</span>
+                        <span class="rw-tab" data-flt="memory">历史记忆</span>
+                        <span class="rw-tab" data-flt="relation">人物关系</span>
+                        <span class="rw-tab" data-flt="knot">隐秘心结</span>
+                    </div>
+                    <span id="rw-bond-tag" style="font-size:7.8px;font-weight:700;color:#525A6E;letter-spacing:0.6px;"></span>
+                </div>
             </div>
 
-            <!-- 🤍 核心步骤1：双人结识海「潮汐契约绑定仪式」悬浮舱（未绑定或点契约按钮时居中显示） -->
-            <div id="sf-bind-ceremony" style="position:relative;z-index:40;margin:auto 20px;display:none;">
-                <div class="sf-glass-card" style="padding:20px 18px!important;text-align:center;">
-                    <div style="font-size:8px;font-weight:800;color:#8890A4;letter-spacing:2px;margin-bottom:4px;">TIDE OF FATE · 结识海契约</div>
-                    <div style="font-size:15px;font-weight:800;color:#2C303C;letter-spacing:1px;margin-bottom:14px;">与 TA 缔结专属结识海</div>
+            <!-- 🤍 初雨契约绑定仪式浮舱（未绑定时居中显示，背景可见细雨飘落） -->
+            <div id="rw-bind-ceremony" style="position:relative;z-index:35;margin:auto 20px;display:none;">
+                <div class="rw-glass-card" style="padding:20px 18px!important;text-align:center;">
+                    <div style="font-size:7.8px;font-weight:800;color:#788096;letter-spacing:2.2px;margin-bottom:4px;">MELANCHOLIC ARCHIVE · 结识海</div>
+                    <div style="font-size:15px;font-weight:800;color:#262A36;letter-spacing:1.2px;margin-bottom:14px;">缔结初雨羁绊 · 展开记忆脉络</div>
 
-                    <!-- 双人头像星轨共鸣环 -->
-                    <div style="position:relative;width:150px;height:74px;margin:0 auto 14px auto;display:flex;align-items:center;justify-content:center;gap:22px;">
-                        <svg viewBox="0 0 150 74" width="150" height="74" fill="none" style="position:absolute;inset:0;pointer-events:none;">
-                            <ellipse cx="75" cy="37" rx="70" ry="32" stroke="#CFD6E6" stroke-width="1" stroke-dasharray="3 3" />
-                            <path d="M 48 37 Q 75 22 102 37" stroke="#8E96AA" stroke-width="1.2" />
-                            <circle cx="75" cy="29" r="3" fill="#2C303C" />
+                    <div style="position:relative;width:154px;height:66px;margin:0 auto 14px auto;display:flex;align-items:center;justify-content:center;gap:28px;">
+                        <svg viewBox="0 0 154 66" width="154" height="66" fill="none" style="position:absolute;inset:0;pointer-events:none;">
+                            <line x1="48" y1="33" x2="106" y2="33" stroke="#6E768A" stroke-width="1" stroke-dasharray="3 3" />
+                            <circle cx="77" cy="33" r="3" fill="#2C313E" />
                         </svg>
-                        <img id="sf-bind-myava" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid #FFFFFF;box-shadow:0 6px 16px rgba(30,35,50,0.12);position:relative;z-index:2;" />
-                        <img id="sf-bind-charava" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid #FFFFFF;box-shadow:0 6px 16px rgba(30,35,50,0.12);position:relative;z-index:2;" />
+                        <img id="rw-bind-myava" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #FFFFFF;box-shadow:0 6px 16px rgba(30,35,50,0.12);position:relative;z-index:2;" />
+                        <img id="rw-bind-charava" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #FFFFFF;box-shadow:0 6px 16px rgba(30,35,50,0.12);position:relative;z-index:2;" />
                     </div>
 
                     <div style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
                         <div>
-                            <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">专属海域命名</div>
-                            <input type="text" id="sf-inp-seaname" placeholder="如：与TA的初雪结识海" style="width:100%;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10.2px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;" />
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                            <div>
-                                <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">当前羁绊阶段</div>
-                                <input type="text" id="sf-inp-stage" placeholder="如：宿命伴侣 / 暧昧拉扯" style="width:100%;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;" />
-                            </div>
-                            <div>
-                                <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">双人定情信物</div>
-                                <input type="text" id="sf-inp-token" placeholder="如：大衣口袋 / 银戒" style="width:100%;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;" />
-                            </div>
+                            <div style="font-size:8.2px;font-weight:700;color:#5C6478;margin-bottom:3px;">羁绊档案命名</div>
+                            <input type="text" id="rw-inp-title" style="width:100%;height:30px;background:rgba(255,255,255,0.8);border:1px solid #CFD6E4;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#262A36;box-sizing:border-box;outline:none;" />
                         </div>
                         <div>
-                            <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">潮汐契约誓言（可点右侧让AI为你题写）</div>
+                            <div style="font-size:8.2px;font-weight:700;color:#5C6478;margin-bottom:3px;">当前关系定调</div>
+                            <input type="text" id="rw-inp-stage" style="width:100%;height:30px;background:rgba(255,255,255,0.8);border:1px solid #CFD6E4;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#262A36;box-sizing:border-box;outline:none;" />
+                        </div>
+                        <div>
+                            <div style="font-size:8.2px;font-weight:700;color:#5C6478;margin-bottom:3px;">卷首阴雨寄语</div>
                             <div style="display:flex;gap:5px;">
-                                <input type="text" id="sf-inp-vow" placeholder="写下你们结识海的契约寄语..." style="flex:1;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:9.8px;color:#2C303C;box-sizing:border-box;outline:none;" />
-                                <span class="sf-pill" id="sf-ai-vow-btn" style="height:30px!important;flex-shrink:0;">${SEA_ICO.spark}<span>AI题词</span></span>
+                                <input type="text" id="rw-inp-vow" style="flex:1;height:30px;background:rgba(255,255,255,0.8);border:1px solid #CFD6E4;border-radius:9px;padding:0 10px;font-size:9.8px;color:#262A36;box-sizing:border-box;outline:none;" />
+                                <span class="rw-pill" id="rw-ai-vow-btn" style="height:30px!important;">${WEB_ICO.spark}<span>AI题词</span></span>
                             </div>
                         </div>
                     </div>
 
-                    <div id="sf-confirm-bind-btn" class="sf-pill dark" style="width:100%!important;height:34px!important;font-size:10.5px!important;box-sizing:border-box!important;">
-                        ${SEA_ICO.link}<span>缔结潮汐契约 · 开启结识海</span>
+                    <div id="rw-confirm-bind" class="rw-pill dark" style="width:100%!important;height:34px!important;font-size:10px!important;box-sizing:border-box!important;">
+                        ${WEB_ICO.rain}<span>落雨成点 · 绑定结识海</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 底部：羁绊汐珠详情卡 + 投掷新汐珠/目录抽屉 + 操作栏 -->
-            <div id="sf-bottom-dock" style="position:relative;z-index:35;margin-top:auto;padding:0 14px max(18px,env(safe-area-inset-bottom,18px)) 14px;display:flex;flex-direction:column;gap:8px;pointer-events:none;">
-                <div id="sf-card-wrap" style="pointer-events:auto;"></div>
+            <!-- 底部详情浮卡 + 新增节点抽屉 + 操作栏（绑定后显示） -->
+            <div id="rw-bottom-dock" style="position:relative;z-index:25;margin-top:auto;padding:0 14px max(18px,env(safe-area-inset-bottom,18px)) 14px;display:none;flex-direction:column;gap:8px;pointer-events:none;">
+                <div id="rw-card-slot" style="pointer-events:auto;"></div>
 
-                <!-- 手写凝聚新羁绊汐珠弹窗 -->
-                <div id="sf-add-modal" class="sf-glass-card" style="display:none;pointer-events:auto;">
+                <!-- 手写新增脉络节点抽屉 -->
+                <div id="rw-add-modal" class="rw-glass-card" style="display:none;pointer-events:auto;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#2C303C;">向结识海投下一颗新羁绊汐珠（可自由拖拽深浅位置）</span>
-                        <span id="sf-add-close" style="cursor:pointer;color:#8890A4;">${SEA_ICO.close}</span>
+                        <span style="font-size:10px;font-weight:800;color:#262A36;">落雨新增一个记忆/关系点（自动连线至当前选中点）</span>
+                        <span id="rw-add-close" style="cursor:pointer;color:#788096;">${WEB_ICO.close}</span>
                     </div>
-                    <input type="text" id="sf-new-title" placeholder="羁绊记忆标题 (如：初雪揣进口袋的手)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;margin-bottom:6px;" />
-                    <textarea id="sf-new-content" placeholder="写下这段与TA有关的历史羁绊或心动瞬间..." style="width:100%;height:50px;background:#FFFFFF;border:1px solid #E2E6F0;border-radius:9px;padding:7px 10px;font-size:10px;color:#2C303C;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
-                        <span style="font-size:8.8px;font-weight:700;color:#586074;">情感温度(决定浅海白珠/深海墨珠)：</span>
-                        <input type="range" id="sf-new-joy" min="5" max="100" value="92" style="flex:1;accent-color:#2C303C;" />
-                        <span id="sf-new-joy-lbl" style="font-size:8px;font-weight:800;color:#2C303C;min-width:110px;text-align:right;">浅海暖汐 · 甜度 92%</span>
+                    <div style="display:flex;gap:5px;margin-bottom:6px;">
+                        <select id="rw-new-type" style="height:29px;background:#FFFFFF;border:1px solid #CFD6E4;border-radius:8px;padding:0 6px;font-size:9.5px;font-weight:700;color:#262A36;outline:none;">
+                            <option value="memory">历史记忆</option>
+                            <option value="relation">人物/地点关系</option>
+                            <option value="knot">隐秘心结</option>
+                        </select>
+                        <input type="text" id="rw-new-title" placeholder="节点词 (4~6字)..." style="flex:1;height:29px;background:#FFFFFF;border:1px solid #CFD6E4;border-radius:8px;padding:0 9px;font-size:10px;font-weight:700;color:#262A36;outline:none;" />
+                        <input type="text" id="rw-new-edge" placeholder="连线词(如:思念)" style="width:82px;height:29px;background:#FFFFFF;border:1px solid #CFD6E4;border-radius:8px;padding:0 7px;font-size:9.5px;color:#262A36;outline:none;" />
                     </div>
+                    <textarea id="rw-new-content" placeholder="记录这段记忆、关系或心结的细节..." style="width:100%;height:48px;background:#FFFFFF;border:1px solid #CFD6E4;border-radius:8px;padding:6px 9px;font-size:9.8px;color:#262A36;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
                     <div style="display:flex;justify-content:flex-end;">
-                        <span class="sf-pill dark" id="sf-add-submit">投入结识海并让TA回响</span>
+                        <span class="rw-pill dark" id="rw-add-submit">落雨成点并连线</span>
                     </div>
                 </div>
 
-                <!-- 全部羁绊名录抽屉 -->
-                <div id="sf-list-modal" class="sf-glass-card" style="display:none;max-height:220px;overflow-y:auto;pointer-events:auto;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #ECEFF6;">
-                        <span style="font-size:10px;font-weight:800;color:#2C303C;">结识海 · 历史羁绊档案册</span>
-                        <span id="sf-list-close" style="cursor:pointer;color:#8890A4;">${SEA_ICO.close}</span>
+                <!-- 脉络档案总览列表 -->
+                <div id="rw-list-modal" class="rw-glass-card" style="display:none;max-height:220px;overflow-y:auto;pointer-events:auto;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #DCE2EE;">
+                        <span style="font-size:10px;font-weight:800;color:#262A36;">全部脉络节点索引</span>
+                        <span id="rw-list-close" style="cursor:pointer;color:#788096;">${WEB_ICO.close}</span>
                     </div>
-                    <div id="sf-list-body" style="display:flex;flex-direction:column;gap:5px;"></div>
+                    <div id="rw-list-body" style="display:flex;flex-direction:column;gap:5px;"></div>
                 </div>
 
-                <!-- 底部三大操作按钮 -->
+                <!-- 底部操作栏 -->
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;pointer-events:auto;">
-                    <span class="sf-pill" id="sf-btn-add" style="flex:1;">${SEA_ICO.plus}<span>记下羁绊</span></span>
-                    <span class="sf-pill" id="sf-btn-ai" style="flex:1;">${SEA_ICO.wave}<span>让TA投珠</span></span>
-                    <span class="sf-pill dark" id="sf-btn-absorb" style="flex:1.25;">${SEA_ICO.spark}<span>汲取聊天化珠</span></span>
+                    <span class="rw-pill" id="rw-btn-add" style="flex:1;">${WEB_ICO.plus}<span>落雨记点</span></span>
+                    <span class="rw-pill" id="rw-btn-ai" style="flex:1;">${WEB_ICO.rain}<span>让TA落点</span></span>
+                    <span class="rw-pill dark" id="rw-btn-absorb" style="flex:1.25;">${WEB_ICO.spark}<span>汲取聊天成网</span></span>
                 </div>
             </div>
         `;
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // 🌊 全屏韩系清冷「五层流体银白海浪 + 丁达尔海底光束 + 月光波光粒子 + 指尖水波纹」物理渲染引擎
+        // 🌧️ 核心动画引擎：阴雨斜落 ➔ 落点涟漪 ➔ 丝线缓慢生长连结 ➔ 可拖拽关系点状图
         // ══════════════════════════════════════════════════════════════════════════
-        const canvas = topDoc.getElementById("sf-ocean-canvas");
+        const canvas = topDoc.getElementById("rw-canvas");
         const ctx2d = canvas.getContext("2d");
         let animId = null, W = 390, H = 780;
-        const ripples = [];
+        let edgeGrowProgress = 0; // 控制所有连线「慢慢连起来」的生长进度 (0 ~ 1)
+        let draggingNodeId = null, dragMoved = false, pointerStart = { x: 0, y: 0 };
 
-        // 海面月光波光微粒 & 海底上升的微光气泡
-        const sparkles = Array.from({ length: 42 }, (_, i) => ({
-            x: Math.random() * 400,
-            y: 260 + Math.random() * 520,
-            r: 0.8 + Math.random() * 2.2,
-            vy: -0.25 - Math.random() * 0.45,
-            phase: i * 0.8
+        // 背景忧郁斜雨丝
+        const rainDrops = Array.from({ length: 48 }, () => ({
+            x: Math.random() * 420, y: Math.random() * 820,
+            len: 14 + Math.random() * 22, vy: 5.5 + Math.random() * 4.5, vx: -0.9, alpha: 0.14 + Math.random() * 0.22
         }));
+        // 雨滴落下后的涟漪与正在坠落的“成点主雨滴”
+        const ripples = [];
+        const fallingNodeDrops = [];
 
         function resizeCanvas() {
             const rect = overlay.getBoundingClientRect();
@@ -5945,380 +5882,808 @@ bootSumoulApp();
             ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        function addWaterRipple(x, y, maxR = 65) {
-            ripples.push({ x, y, r: 4, maxR, alpha: 0.85 });
+        function spawnSplash(x, y, maxR = 46) {
+            ripples.push({ x, y, r: 2, maxR, alpha: 0.65 });
+            ripples.push({ x, y, r: 1, maxR: maxR * 0.6, alpha: 0.45 });
         }
 
-        canvas.addEventListener("pointermove", (e) => {
-            const rect = canvas.getBoundingClientRect();
-            if (Math.random() < 0.35) addWaterRipple(e.clientX - rect.left, e.clientY - rect.top, 38);
-        });
-        canvas.addEventListener("pointerdown", (e) => {
-            const rect = canvas.getBoundingClientRect();
-            addWaterRipple(e.clientX - rect.left, e.clientY - rect.top, 75);
-        });
+        // 触发一滴从天而降的雨滴，落到目标坐标后泛起涟漪并触发连线缓慢生长
+        function triggerRainDropTo(xPct, yPct, resetGrow = false) {
+            fallingNodeDrops.push({
+                x: (xPct / 100) * W, y: -20, targetY: (yPct / 100) * H, vy: 11, resetGrow
+            });
+        }
 
-        function renderOceanLoop(ts) {
+        function getNodeScreenPos(n, t) {
+            const driftX = draggingNodeId === n.id ? 0 : Math.sin(t * 0.7 + n.id * 1.7) * 3.5;
+            const driftY = draggingNodeId === n.id ? 0 : Math.cos(t * 0.6 + n.id * 1.3) * 3.5;
+            return { x: (n.xPct / 100) * W + driftX, y: (n.yPct / 100) * H + driftY };
+        }
+
+        function renderRainWebLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
             const t = ts * 0.001;
             ctx2d.clearRect(0, 0, W, H);
 
-            // 1. 海天交界处的清冷月晕柔光
-            const moonGlow = ctx2d.createRadialGradient(W * 0.5, H * 0.28, 10, W * 0.5, H * 0.28, W * 0.65);
-            moonGlow.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-            moonGlow.addColorStop(0.6, "rgba(240, 244, 252, 0.45)");
-            moonGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
-            ctx2d.fillStyle = moonGlow;
-            ctx2d.fillRect(0, 0, W, H * 0.55);
-
-            // 2. 五层不同景深、不同频率的韩系清冷丝绸海浪（从天际浅白浪 ➔ 中海雾银浪 ➔ 深海冷蓝灰浪）
-            const waveLayers = [
-                { baseY: H * 0.36, amp1: 8,  amp2: 5, freq1: 0.012, freq2: 0.022, sp: 0.7, topCol: "rgba(255,255,255,0.88)", botCol: "rgba(226,232,244,0.85)", stroke: "rgba(255,255,255,0.95)" },
-                { baseY: H * 0.44, amp1: 11, amp2: 6, freq1: 0.010, freq2: 0.018, sp: 0.9, topCol: "rgba(238,242,250,0.85)", botCol: "rgba(204,212,228,0.88)", stroke: "rgba(255,255,255,0.90)" },
-                { baseY: H * 0.54, amp1: 14, amp2: 7, freq1: 0.009, freq2: 0.016, sp: 1.1, topCol: "rgba(214,222,236,0.86)", botCol: "rgba(176,186,206,0.90)", stroke: "rgba(245,248,255,0.82)" },
-                { baseY: H * 0.66, amp1: 12, amp2: 8, freq1: 0.011, freq2: 0.020, sp: 1.3, topCol: "rgba(184,194,214,0.88)", botCol: "rgba(138,148,172,0.92)", stroke: "rgba(235,240,250,0.70)" },
-                { baseY: H * 0.78, amp1: 10, amp2: 6, freq1: 0.013, freq2: 0.024, sp: 1.5, topCol: "rgba(142,152,176,0.90)", botCol: "rgba(96,106,128,0.95)",  stroke: "rgba(215,222,238,0.55)" }
-            ];
-
-            waveLayers.forEach((wl, idx) => {
-                ctx2d.beginPath();
-                ctx2d.moveTo(0, H);
-                for (let x = 0; x <= W + 10; x += 10) {
-                    const y = wl.baseY
-                        + Math.sin(x * wl.freq1 + t * wl.sp + idx * 1.2) * wl.amp1
-                        + Math.cos(x * wl.freq2 - t * wl.sp * 0.8 + idx) * wl.amp2;
-                    ctx2d.lineTo(x, y);
+            // 1. 绘制阴郁斜落细雨
+            ctx2d.lineCap = "round";
+            rainDrops.forEach((rd) => {
+                rd.y += rd.vy; rd.x += rd.vx;
+                if (rd.y > H + 20) {
+                    if (Math.random() < 0.08) spawnSplash(rd.x, H * (0.2 + Math.random() * 0.55), 24);
+                    rd.y = -25; rd.x = Math.random() * (W + 60);
                 }
-                ctx2d.lineTo(W, H);
-                ctx2d.closePath();
-
-                const g = ctx2d.createLinearGradient(0, wl.baseY - 15, 0, H);
-                g.addColorStop(0, wl.topCol);
-                g.addColorStop(1, wl.botCol);
-                ctx2d.fillStyle = g;
-                ctx2d.fill();
-
-                // 浪尖闪烁的银白泡沫高光线
-                ctx2d.strokeStyle = wl.stroke;
-                ctx2d.lineWidth = 1.4;
+                ctx2d.beginPath();
+                ctx2d.moveTo(rd.x, rd.y);
+                ctx2d.lineTo(rd.x + rd.vx * 2.2, rd.y + rd.len);
+                ctx2d.strokeStyle = `rgba(92, 102, 126, ${rd.alpha})`;
+                ctx2d.lineWidth = 0.75;
                 ctx2d.stroke();
             });
 
-            // 3. 穿透海水的丁达尔清冷光束
-            ctx2d.save();
-            for (let b = 0; b < 3; b++) {
-                const bx = W * (0.22 + b * 0.28) + Math.sin(t * 0.5 + b) * 15;
-                const beamGrd = ctx2d.createLinearGradient(bx, H * 0.35, bx + 40, H * 0.9);
-                beamGrd.addColorStop(0, "rgba(255, 255, 255, 0.28)");
-                beamGrd.addColorStop(1, "rgba(255, 255, 255, 0)");
-                ctx2d.fillStyle = beamGrd;
+            // 2. 绘制正在坠落的「成点雨滴」
+            for (let i = fallingNodeDrops.length - 1; i >= 0; i--) {
+                const fd = fallingNodeDrops[i];
+                fd.y += fd.vy;
                 ctx2d.beginPath();
-                ctx2d.moveTo(bx - 18, H * 0.35);
-                ctx2d.lineTo(bx + 18, H * 0.35);
-                ctx2d.lineTo(bx + 65, H * 0.92);
-                ctx2d.lineTo(bx - 35, H * 0.92);
-                ctx2d.closePath();
+                ctx2d.moveTo(fd.x, fd.y - 26);
+                ctx2d.lineTo(fd.x, fd.y);
+                ctx2d.strokeStyle = "rgba(44, 49, 62, 0.75)";
+                ctx2d.lineWidth = 1.4;
+                ctx2d.stroke();
+                ctx2d.beginPath();
+                ctx2d.arc(fd.x, fd.y, 2.5, 0, Math.PI * 2);
+                ctx2d.fillStyle = "#2C313E";
                 ctx2d.fill();
+
+                if (fd.y >= fd.targetY) {
+                    spawnSplash(fd.x, fd.targetY, 58);
+                    if (fd.resetGrow) edgeGrowProgress = 0.05;
+                    fallingNodeDrops.splice(i, 1);
+                }
             }
-            ctx2d.restore();
 
-            // 4. 海面闪烁的月光碎银与海底缓缓上浮的发光气泡
-            sparkles.forEach((sp) => {
-                sp.y += sp.vy;
-                const sx = sp.x + Math.sin(t * 1.4 + sp.phase) * 6;
-                if (sp.y < H * 0.36) { sp.y = H * 0.95; sp.x = Math.random() * W; }
-                const twinkle = 0.35 + (Math.sin(t * 3 + sp.phase) * 0.5 + 0.5) * 0.6;
-                ctx2d.beginPath();
-                ctx2d.arc(sx, sp.y, sp.r, 0, Math.PI * 2);
-                ctx2d.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
-                ctx2d.fill();
-            });
-
-            // 5. 指尖触碰海面泛起的椭圆透视水波纹
+            // 3. 绘制雨滴扩散的同心水纹涟漪
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const rp = ripples[i];
-                rp.r += (rp.maxR - rp.r) * 0.08 + 0.7;
-                rp.alpha *= 0.93;
-                if (rp.alpha < 0.03) { ripples.splice(i, 1); continue; }
+                rp.r += (rp.maxR - rp.r) * 0.06 + 0.45;
+                rp.alpha *= 0.94;
+                if (rp.alpha < 0.02) { ripples.splice(i, 1); continue; }
                 ctx2d.beginPath();
-                ctx2d.ellipse(rp.x, rp.y, rp.r, rp.r * 0.42, 0, 0, Math.PI * 2);
-                ctx2d.strokeStyle = `rgba(255, 255, 255, ${rp.alpha})`;
-                ctx2d.lineWidth = 1.4;
+                ctx2d.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                ctx2d.strokeStyle = `rgba(74, 84, 106, ${rp.alpha})`;
+                ctx2d.lineWidth = 0.9;
                 ctx2d.stroke();
             }
 
-            animId = requestAnimationFrame(renderOceanLoop);
+            // 4. 若已绑定，绘制「点状图脉络连线（缓慢生长）+ 多维记忆/关系节点」
+            const data = loadWeb();
+            if (data.isBound) {
+                if (edgeGrowProgress < 1) edgeGrowProgress = Math.min(1, edgeGrowProgress + 0.012);
+
+                const flt = data.filter || "all";
+                const visibleNodes = (data.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+                const posMap = new Map();
+                visibleNodes.forEach((n) => posMap.set(Number(n.id), getNodeScreenPos(n, t)));
+
+                // 4A. 绘制缓慢生长的丝线连接与流光脉冲
+                (data.edges || []).forEach((ed, idx) => {
+                    const p1 = posMap.get(Number(ed.from));
+                    const p2 = posMap.get(Number(ed.to));
+                    if (!p1 || !p2) return;
+
+                    // 每条线错开一点时间慢慢伸展相连
+                    const localP = Math.max(0, Math.min(1, (edgeGrowProgress * 1.35) - (idx % 6) * 0.07));
+                    if (localP <= 0) return;
+
+                    const curX = p1.x + (p2.x - p1.x) * localP;
+                    const curY = p1.y + (p2.y - p1.y) * localP;
+                    const isHi = Number(ed.from) === Number(data.activeId) || Number(ed.to) === Number(data.activeId);
+
+                    ctx2d.beginPath();
+                    ctx2d.moveTo(p1.x, p1.y);
+                    ctx2d.lineTo(curX, curY);
+                    ctx2d.strokeStyle = isHi ? "rgba(42, 48, 62, 0.72)" : "rgba(88, 98, 120, 0.28)";
+                    ctx2d.lineWidth = isHi ? 1.15 : 0.75;
+                    ctx2d.stroke();
+
+                    // 高亮连线上有微弱流光点缓慢移动 + 关系小字
+                    if (isHi && localP > 0.95) {
+                        const pulse = (t * 0.45 + idx * 0.3) % 1;
+                        const px = p1.x + (p2.x - p1.x) * pulse;
+                        const py = p1.y + (p2.y - p1.y) * pulse;
+                        ctx2d.beginPath();
+                        ctx2d.arc(px, py, 2.0, 0, Math.PI * 2);
+                        ctx2d.fillStyle = "#FFFFFF";
+                        ctx2d.fill();
+
+                        if (ed.label) {
+                            const mx = (p1.x + p2.x) * 0.5, my = (p1.y + p2.y) * 0.5;
+                            ctx2d.font = "600 8px -apple-system, sans-serif";
+                            ctx2d.textAlign = "center";
+                            ctx2d.fillStyle = "rgba(44, 49, 62, 0.75)";
+                            ctx2d.fillText(ed.label, mx, my - 4);
+                        }
+                    }
+                });
+
+                // 4B. 绘制点状图节点（核心双环 / 记忆圆点 / 关系菱形 / 心结墨点）
+                visibleNodes.forEach((n) => {
+                    const p = posMap.get(Number(n.id));
+                    const isSel = Number(n.id) === Number(data.activeId);
+                    const meta = TYPE_META[n.type] || TYPE_META.memory;
+                    const r = n.type === "core" ? 8.5 : (isSel ? 6.8 : 4.8);
+
+                    // 选中态外围缓慢呼吸细环
+                    if (isSel || n.type === "core") {
+                        const haloR = r + 6 + Math.sin(t * 2.2 + n.id) * 2.2;
+                        ctx2d.beginPath();
+                        ctx2d.arc(p.x, p.y, haloR, 0, Math.PI * 2);
+                        ctx2d.strokeStyle = isSel ? "rgba(44, 49, 62, 0.42)" : "rgba(92, 102, 126, 0.25)";
+                        ctx2d.lineWidth = 0.85;
+                        ctx2d.stroke();
+                    }
+
+                    ctx2d.save();
+                    ctx2d.translate(p.x, p.y);
+                    if (n.type === "relation") {
+                        // 人物/地点关系：极简菱形节点
+                        ctx2d.rotate(Math.PI / 4);
+                        ctx2d.fillStyle = isSel ? "#2C313E" : meta.dot;
+                        ctx2d.strokeStyle = isSel ? "#FFFFFF" : meta.ring;
+                        ctx2d.lineWidth = 1.2;
+                        ctx2d.fillRect(-r * 0.85, -r * 0.85, r * 1.7, r * 1.7);
+                        ctx2d.strokeRect(-r * 0.85, -r * 0.85, r * 1.7, r * 1.7);
+                    } else {
+                        // 记忆 / 心结 / 核心：精致圆点
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, r, 0, Math.PI * 2);
+                        ctx2d.fillStyle = isSel ? "#262A36" : meta.dot;
+                        ctx2d.fill();
+                        ctx2d.strokeStyle = isSel ? "#FFFFFF" : meta.ring;
+                        ctx2d.lineWidth = isSel ? 1.8 : 1.15;
+                        ctx2d.stroke();
+                    }
+                    ctx2d.restore();
+
+                    // 节点下方极简清冷文字标注
+                    ctx2d.font = `${isSel || n.type === "core" ? "700 9.5px" : "600 8.5px"} -apple-system, sans-serif`;
+                    ctx2d.textAlign = "center";
+                    ctx2d.fillStyle = isSel ? "#1E222C" : "rgba(56, 62, 78, 0.85)";
+                    ctx2d.fillText(n.title.slice(0, 7), p.x, p.y + r + 13);
+                });
+            }
+
+            animId = requestAnimationFrame(renderRainWebLoop);
         }
 
-        // 根据情绪开心度自动分配汐珠的海域深度：越开心越浮在浅海波光处(yPct: 40~52%)，越酸涩思念越沉在深海(yPct: 62~74%)
-        function getAutoSeaPos(idx, joy = 85) {
-            const xPct = Math.max(14, Math.min(86, 18 + ((idx * 23) % 68)));
-            const depthRatio = 1 - Math.max(0, Math.min(100, Number(joy))) / 100;
-            const yPct = Math.round(40 + depthRatio * 32 + ((idx % 3) - 1) * 3);
-            return { xPct, yPct };
+        // 画布交互：点中节点查看/拖拽，点空白处落下一滴雨泛起涟漪
+        function hitTestNode(px, py) {
+            const data = loadWeb();
+            if (!data.isBound) return null;
+            const flt = data.filter || "all";
+            const visible = (data.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+            let best = null, minD = 26;
+            visible.forEach((n) => {
+                const nx = (n.xPct / 100) * W, ny = (n.yPct / 100) * H;
+                const d = Math.hypot(px - nx, py - ny);
+                if (d < minD) { minD = d; best = n; }
+            });
+            return best;
         }
 
-        function renderSeaView() {
-            const c = getCtx(), data = loadSea();
+        canvas.addEventListener("pointerdown", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left, py = e.clientY - rect.top;
+            pointerStart = { x: px, y: py };
+            dragMoved = false;
+            const hit = hitTestNode(px, py);
+            if (hit) {
+                draggingNodeId = hit.id;
+            } else {
+                spawnSplash(px, py, 44);
+            }
+        });
+
+        canvas.addEventListener("pointermove", (e) => {
+            if (!draggingNodeId) return;
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left, py = e.clientY - rect.top;
+            if (Math.hypot(px - pointerStart.x, py - pointerStart.y) > 5) {
+                dragMoved = true;
+                const d = loadWeb();
+                const target = d.nodes.find((x) => Number(x.id) === Number(draggingNodeId));
+                if (target) {
+                    target.xPct = Math.max(8, Math.min(92, (px / W) * 100));
+                    target.yPct = Math.max(16, Math.min(68, (py / H) * 100));
+                    saveWeb(d);
+                }
+            }
+        });
+
+        canvas.addEventListener("pointerup", () => {
+            if (draggingNodeId) {
+                const d = loadWeb();
+                d.activeId = draggingNodeId;
+                saveWeb(d);
+                const tNode = d.nodes.find((x) => Number(x.id) === Number(draggingNodeId));
+                if (tNode && !dragMoved) spawnSplash((tNode.xPct / 100) * W, (tNode.yPct / 100) * H, 38);
+                draggingNodeId = null;
+                renderWebUI();
+            }
+        });
+
+        function renderWebUI() {
+            const c = getCtx(), data = loadWeb();
             const homeBadge = topDoc.getElementById("mt-home-badge");
-            if (homeBadge) homeBadge.textContent = `${data.pearls.length}汐`;
-            topDoc.getElementById("sf-count-txt").textContent = `${data.pearls.length} 汐珠`;
+            if (homeBadge) homeBadge.textContent = `${data.nodes.length}点`;
+            topDoc.getElementById("rw-cnt-txt").textContent = `${data.nodes.length}点`;
 
-            const bindCeremony = topDoc.getElementById("sf-bind-ceremony");
-            const headerBanner = topDoc.getElementById("sf-header-banner");
-            const pearlsStage = topDoc.getElementById("sf-pearls-stage");
-            const bottomDock = topDoc.getElementById("sf-bottom-dock");
+            const bindCeremony = topDoc.getElementById("rw-bind-ceremony");
+            const filterBar = topDoc.getElementById("rw-filter-bar");
+            const bottomDock = topDoc.getElementById("rw-bottom-dock");
 
-            // 填充绑定仪式头像与默认信息
-            topDoc.getElementById("sf-bind-myava").src = c.userAvatar;
-            topDoc.getElementById("sf-bind-charava").src = c.charAvatar;
-            topDoc.getElementById("sf-top-myava").src = c.userAvatar;
-            topDoc.getElementById("sf-top-charava").src = c.charAvatar;
+            topDoc.getElementById("rw-bind-myava").src = c.userAvatar;
+            topDoc.getElementById("rw-bind-charava").src = c.charAvatar;
 
             if (!data.isBound) {
-                // 未绑定状态：展示双人契约绑定仪式舱
                 bindCeremony.style.display = "block";
-                headerBanner.style.display = "none";
-                pearlsStage.style.display = "none";
+                filterBar.style.display = "none";
                 bottomDock.style.display = "none";
-                topDoc.getElementById("sf-bond-status-txt").textContent = "待缔结契约";
-                topDoc.getElementById("sf-inp-seaname").value = data.seaName || `${c.userName} & ${c.charName} 的结识海`;
-                topDoc.getElementById("sf-inp-stage").value = data.bondStage || "宿命羁绊 · 潮汐共鸣";
-                topDoc.getElementById("sf-inp-token").value = data.bondToken || "初雪与潮汐信物";
-                topDoc.getElementById("sf-inp-vow").value = data.bondVow || "";
+                topDoc.getElementById("rw-bind-lbl").textContent = "待绑定";
+                topDoc.getElementById("rw-inp-title").value = data.bondTitle || `${c.userName} × ${c.charName}`;
+                topDoc.getElementById("rw-inp-stage").value = data.bondStage || "雨夜共鸣 · 宿命羁绊";
+                topDoc.getElementById("rw-inp-vow").value = data.bondVow || "";
                 return;
             }
 
-            // 已绑定状态：展示全屏结识海、顶部双人契约横幅与漂浮的羁绊汐珠
             bindCeremony.style.display = "none";
-            headerBanner.style.display = "flex";
-            pearlsStage.style.display = "block";
+            filterBar.style.display = "flex";
             bottomDock.style.display = "flex";
-            topDoc.getElementById("sf-bond-status-txt").textContent = "已缔结契约";
-            topDoc.getElementById("sf-top-seaname").textContent = data.seaName || `${c.userName} & ${c.charName} 的结识海`;
-            topDoc.getElementById("sf-top-sub").textContent = `${data.bondStage || "宿命羁绊"} · 信物: ${data.bondToken || "潮汐"}`;
-            topDoc.getElementById("sf-top-vow").textContent = `“ ${data.bondVow || "每一道海浪都刻着我们的记忆"} ”`;
+            topDoc.getElementById("rw-bind-lbl").textContent = "已缔结";
+            topDoc.getElementById("rw-bond-tag").textContent = `${data.bondTitle} · ${data.bondStage}`;
 
-            // 渲染海中浮沉的每一颗羁绊汐珠
-            pearlsStage.innerHTML = (data.pearls || []).map((p, idx) => {
-                const pos = (p.xPct && p.yPct) ? { xPct: p.xPct, yPct: p.yPct } : getAutoSeaPos(idx, p.joy);
-                const stInfo = getPearlStyleByJoy(p.joy);
-                const isSel = Number(p.id) === Number(data.activeId);
-                const sz = isSel ? 34 : 24;
-                const delay = ((idx * 0.47) % 3.5).toFixed(2);
-
-                return `
-                    <div class="sf-pearl-node ${isSel ? "active-pearl" : ""}" data-pid="${p.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;">
-                        <div class="sf-pearl-orb" style="width:${sz}px;height:${sz}px;background:${stInfo.bg};border:1.5px solid ${stInfo.border};box-shadow:${stInfo.shadow};">
-                            ${isSel ? `<div class="sf-pearl-halo"></div>` : ""}
-                        </div>
-                        <div class="sf-pearl-tag" style="background:${isSel ? "#2C303C" : stInfo.tagBg};color:${isSel ? "#FFFFFF" : stInfo.textCol};">
-                            ${p.title.slice(0, isSel ? 8 : 4).replace(/</g, "&lt;")}
-                        </div>
-                    </div>
-                `;
-            }).join("");
-
-            // 绑定汐珠的点击查看与自由拖拽（拖到浅海或深海）
-            pearlsStage.querySelectorAll(".sf-pearl-node").forEach((node) => {
-                const pid = Number(node.getAttribute("data-pid"));
-                let isDown = false, moved = false, sx = 0, sy = 0;
-
-                const onStart = (cx, cy) => { isDown = true; moved = false; sx = cx; sy = cy; node.classList.add("dragging"); };
-                const onMove = (cx, cy) => {
-                    if (!isDown) return;
-                    if (Math.hypot(cx - sx, cy - sy) > 6) {
-                        moved = true;
-                        const rect = pearlsStage.getBoundingClientRect();
-                        node.style.left = `${Math.max(8, Math.min(92, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
-                        node.style.top = `${Math.max(32, Math.min(76, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
-                    }
-                };
-                const onEnd = () => {
-                    if (!isDown) return;
-                    isDown = false; node.classList.remove("dragging");
-                    const d = loadSea();
-                    if (moved) {
-                        const target = d.pearls.find((x) => Number(x.id) === pid);
-                        if (target) {
-                            target.xPct = parseFloat(node.style.left);
-                            target.yPct = parseFloat(node.style.top);
-                            addWaterRipple((target.xPct / 100) * W, (target.yPct / 100) * H, 65);
-                        }
-                    }
-                    d.activeId = pid; saveSea(d); renderSeaView();
-                };
-
-                node.addEventListener("mousedown", (e) => { e.stopPropagation(); onStart(e.clientX, e.clientY); });
-                topDoc.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY));
-                topDoc.addEventListener("mouseup", onEnd);
-                node.addEventListener("touchstart", (e) => { e.stopPropagation(); const t = e.touches[0]; if (t) onStart(t.clientX, t.clientY); }, { passive: true });
-                node.addEventListener("touchmove", (e) => { const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
-                node.addEventListener("touchend", onEnd);
+            topDoc.querySelectorAll("#rw-tabs .rw-tab").forEach((tb) => {
+                tb.classList.toggle("active", tb.getAttribute("data-flt") === (data.filter || "all"));
             });
 
-            // 渲染底部当前选中汐珠的羁绊详情卡
-            const cur = data.pearls.find((x) => Number(x.id) === Number(data.activeId));
-            const wrap = topDoc.getElementById("sf-card-wrap");
+            // 渲染底部当前选中节点的脉络详情卡（支持点击关联节点标签跳转！）
+            const cur = data.nodes.find((x) => Number(x.id) === Number(data.activeId));
+            const slot = topDoc.getElementById("rw-card-slot");
             if (!cur) {
-                wrap.innerHTML = "";
+                slot.innerHTML = "";
             } else {
-                const stInfo = getPearlStyleByJoy(cur.joy);
-                wrap.innerHTML = `
-                    <div class="sf-glass-card">
+                const meta = TYPE_META[cur.type] || TYPE_META.memory;
+                const linkedEdges = (data.edges || []).filter((e) => Number(e.from) === Number(cur.id) || Number(e.to) === Number(cur.id));
+                const linkChipsHtml = linkedEdges.map((e) => {
+                    const otherId = Number(e.from) === Number(cur.id) ? e.to : e.from;
+                    const other = data.nodes.find((n) => Number(n.id) === Number(otherId));
+                    if (!other) return "";
+                    return `<span class="rw-link-chip" data-jumpid="${other.id}"><span>${e.label || "关联"}</span> → <span>${other.title.replace(/</g, "&lt;")}</span></span>`;
+                }).join("");
+
+                slot.innerHTML = `
+                    <div class="rw-glass-card">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                            <div style="display:flex;align-items:center;gap:7px;min-width:0;">
-                                <span style="width:10px;height:10px;border-radius:50%;background:${stInfo.bg};border:1px solid #8E96AA;flex-shrink:0;"></span>
-                                <span style="font-size:11.5px;font-weight:800;color:#2C303C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span>
+                            <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+                                <span style="width:8px;height:8px;border-radius:${cur.type === "relation" ? "2px" : "50%"};background:${meta.dot};border:1.2px solid ${meta.ring};flex-shrink:0;"></span>
+                                <span style="font-size:11.5px;font-weight:800;color:#262A36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span>
+                                <span style="font-size:7.5px;font-weight:700;color:#5C6478;background:#E8EDF5;padding:1.5px 6px;border-radius:99px;">${meta.name}</span>
                             </div>
                             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                                <span style="font-size:7.5px;font-weight:700;color:#586074;background:#F0F3F9;padding:2px 8px;border-radius:99px;">${stInfo.zone}</span>
-                                <span id="sf-del-pearl" style="cursor:pointer;display:inline-flex;">${SEA_ICO.trash}</span>
-                                <span id="sf-hide-card" style="cursor:pointer;color:#8890A4;display:inline-flex;">${SEA_ICO.close}</span>
+                                ${cur.type !== "core" ? `<span id="rw-del-node" style="cursor:pointer;display:inline-flex;">${WEB_ICO.trash}</span>` : ""}
+                                <span id="rw-hide-card" style="cursor:pointer;color:#788096;display:inline-flex;">${WEB_ICO.close}</span>
                             </div>
                         </div>
-                        <div style="font-size:10.5px;font-weight:600;color:#3A3E4C;line-height:1.65;">${cur.content.replace(/</g, "&lt;")}</div>
-                        <div style="margin-top:8px;padding:8px 10px;background:#F4F6FA;border-left:2.5px solid #485064;border-radius:0 8px 8px 0;font-size:9.8px;font-weight:600;color:#2C303C;line-height:1.55;">
-                            <span style="font-size:7.5px;color:#8890A4;display:block;margin-bottom:2px;">TIDE WHISPER · ${c.charName} 的潮汐回响</span>
-                            ${(cur.whisper || "“ 这颗汐珠沉在我心底最柔软的海域。”").replace(/</g, "&lt;")}
+                        <div style="font-size:10.4px;font-weight:600;color:#343A48;line-height:1.62;">${cur.content.replace(/</g, "&lt;")}</div>
+                        ${linkChipsHtml ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;">${linkChipsHtml}</div>` : ""}
+                        <div style="margin-top:7px;padding:7px 10px;background:rgba(226,232,242,0.52);border-left:2px solid #485064;border-radius:0 8px 8px 0;font-size:9.6px;font-weight:600;color:#2E3340;line-height:1.5;">
+                            <span style="font-size:7.2px;color:#788096;display:block;margin-bottom:2px;">RAIN ECHO · ${c.charName} 的低语</span>
+                            ${(cur.whisper || "“ 这根线一直连在我们之间。”").replace(/</g, "&lt;")}
                         </div>
                     </div>`;
-                topDoc.getElementById("sf-hide-card").onclick = () => { const d = loadSea(); d.activeId = 0; saveSea(d); renderSeaView(); };
-                topDoc.getElementById("sf-del-pearl").onclick = () => {
-                    if (!confirm(`确定让《${cur.title}》这颗汐珠消散在海里吗？`)) return;
-                    const d = loadSea(); d.pearls = d.pearls.filter((x) => Number(x.id) !== Number(cur.id)); d.activeId = d.pearls[0]?.id || 0; saveSea(d); renderSeaView();
-                };
+
+                slot.querySelectorAll("[data-jumpid]").forEach((ch) => ch.onclick = () => {
+                    const jid = Number(ch.getAttribute("data-jumpid"));
+                    const d = loadWeb(); d.activeId = jid; saveWeb(d);
+                    const tn = d.nodes.find((x) => Number(x.id) === jid);
+                    if (tn) spawnSplash((tn.xPct / 100) * W, (tn.yPct / 100) * H, 45);
+                    renderWebUI();
+                });
+                topDoc.getElementById("rw-hide-card").onclick = () => { const d = loadWeb(); d.activeId = 0; saveWeb(d); renderWebUI(); };
+                topDoc.getElementById("rw-del-node")?.addEventListener("click", () => {
+                    if (!confirm(`确定抹去「${cur.title}」这个脉络节点吗？`)) return;
+                    const d = loadWeb();
+                    d.nodes = d.nodes.filter((x) => Number(x.id) !== Number(cur.id));
+                    d.edges = d.edges.filter((e) => Number(e.from) !== Number(cur.id) && Number(e.to) !== Number(cur.id));
+                    d.activeId = d.nodes[0]?.id || 0; saveWeb(d); renderWebUI();
+                });
             }
 
-            // 渲染历史羁绊名录
-            const listBody = topDoc.getElementById("sf-list-body");
-            listBody.innerHTML = data.pearls.map((p) => {
-                const stInfo = getPearlStyleByJoy(p.joy);
-                return `<div data-pickid="${p.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(p.id) === Number(data.activeId) ? "#2C303C" : "#ECEFF6"};background:#FFFFFF;cursor:pointer;">
+            // 渲染脉络列表抽屉
+            const listBody = topDoc.getElementById("rw-list-body");
+            listBody.innerHTML = data.nodes.map((n) => {
+                const m = TYPE_META[n.type] || TYPE_META.memory;
+                return `<div data-pickid="${n.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(n.id) === Number(data.activeId) ? "#2C313E" : "#DCE2EE"};background:#FFFFFF;cursor:pointer;">
                     <div style="display:flex;align-items:center;gap:7px;min-width:0;">
-                        <span style="width:9px;height:9px;border-radius:50%;background:${stInfo.bg};border:1px solid #8E96AA;flex-shrink:0;"></span>
-                        <span style="font-size:10px;font-weight:800;color:#2C303C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.title.replace(/</g, "&lt;")}</span>
+                        <span style="width:7px;height:7px;border-radius:${n.type === "relation" ? "1.5px" : "50%"};background:${m.dot};border:1px solid ${m.ring};flex-shrink:0;"></span>
+                        <span style="font-size:10px;font-weight:800;color:#262A36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n.title.replace(/</g, "&lt;")}</span>
                     </div>
-                    <span style="font-size:8px;color:#788094;flex-shrink:0;margin-left:8px;">${stInfo.zone}</span>
+                    <span style="font-size:7.8px;color:#788096;flex-shrink:0;margin-left:8px;">${m.name}</span>
                 </div>`;
             }).join("");
             listBody.querySelectorAll("[data-pickid]").forEach((row) => row.onclick = () => {
-                const d = loadSea(); d.activeId = Number(row.getAttribute("data-pickid")); saveSea(d);
-                topDoc.getElementById("sf-list-modal").style.display = "none"; renderSeaView();
+                const d = loadWeb(); d.activeId = Number(row.getAttribute("data-pickid")); saveWeb(d);
+                topDoc.getElementById("rw-list-modal").style.display = "none"; renderWebUI();
             });
         }
 
-        // 绑定契约仪式与所有交互事件
-        topDoc.getElementById("sf-rebind-btn").onclick = () => {
-            const d = loadSea();
-            d.isBound = false;
-            saveSea(d);
-            renderSeaView();
+        // ── 事件绑定 ──
+        topDoc.querySelectorAll("#rw-tabs .rw-tab").forEach((tb) => tb.onclick = () => {
+            const d = loadWeb(); d.filter = tb.getAttribute("data-flt"); saveWeb(d);
+            edgeGrowProgress = 0.15;
+            renderWebUI();
+        });
+
+        topDoc.getElementById("rw-bind-btn").onclick = () => { const d = loadWeb(); d.isBound = false; saveWeb(d); renderWebUI(); };
+        topDoc.getElementById("rw-drop-rain-btn").onclick = () => {
+            edgeGrowProgress = 0;
+            const d = loadWeb();
+            (d.nodes || []).slice(0, 4).forEach((n, i) => setTimeout(() => triggerRainDropTo(n.xPct, n.yPct, i === 0), i * 110));
         };
 
-        topDoc.getElementById("sf-ai-vow-btn").onclick = async (e) => {
+        topDoc.getElementById("rw-ai-vow-btn").onclick = async (e) => {
             const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "题词中...";
             const c = getCtx();
             try {
-                const vow = await askSeaAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `请为你和${c.userName}共同绑定的「结识海(Sea of Fate)」写一句极具韩系电影宿命感与深情的潮汐契约誓言（28字以内，不要多余解释）：`);
-                topDoc.getElementById("sf-inp-vow").value = vow.replace(/^[“"]|[”"]$/g, "").trim();
+                const vow = await askWebAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `请为你和${c.userName}绑定的「阴雨结识海(记忆与关系脉络)」写一句清冷忧郁、宿命感极强的卷首寄语(24字内)：`);
+                topDoc.getElementById("rw-inp-vow").value = vow.replace(/^[“"]|[”"]$/g, "").trim();
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
 
-        topDoc.getElementById("sf-confirm-bind-btn").onclick = () => {
-            const c = getCtx(), d = loadSea();
-            d.seaName = topDoc.getElementById("sf-inp-seaname").value.trim() || `${c.userName} & ${c.charName} 的结识海`;
-            d.bondStage = topDoc.getElementById("sf-inp-stage").value.trim() || "宿命羁绊";
-            d.bondToken = topDoc.getElementById("sf-inp-token").value.trim() || "初雪与潮汐";
-            d.bondVow = topDoc.getElementById("sf-inp-vow").value.trim() || "于万千人海中相逢，每一道海浪都刻着我们的记忆。";
+        topDoc.getElementById("rw-confirm-bind").onclick = () => {
+            const c = getCtx(), d = loadWeb();
+            d.bondTitle = topDoc.getElementById("rw-inp-title").value.trim() || `${c.userName} × ${c.charName}`;
+            d.bondStage = topDoc.getElementById("rw-inp-stage").value.trim() || "雨夜共鸣 · 宿命羁绊";
+            d.bondVow = topDoc.getElementById("rw-inp-vow").value.trim() || "每一滴落下的雨，都会连成我们无法割舍的脉络。";
             d.isBound = true;
-            saveSea(d);
-            addWaterRipple(W * 0.5, H * 0.5, 160);
-            renderSeaView();
+            saveWeb(d);
+            edgeGrowProgress = 0;
+            renderWebUI();
+            triggerRainDropTo(50, 36, true);
         };
 
-        function openSeaOverlay() {
+        function openWebOverlay() {
             overlay.classList.add("open");
             resizeCanvas();
-            renderSeaView();
-            if (!animId) animId = requestAnimationFrame(renderOceanLoop);
+            edgeGrowProgress = 0;
+            renderWebUI();
+            if (!animId) animId = requestAnimationFrame(renderRainWebLoop);
         }
-        function closeSeaOverlay() {
+        function closeWebOverlay() {
             overlay.classList.remove("open");
             if (animId) { cancelAnimationFrame(animId); animId = null; }
         }
 
-        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openSeaOverlay(); });
-        topDoc.getElementById("sf-close-btn").onclick = () => closeSeaOverlay();
+        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openWebOverlay(); });
+        topDoc.getElementById("rw-close-btn").onclick = () => closeWebOverlay();
         topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resizeCanvas(); });
 
-        const addModal = topDoc.getElementById("sf-add-modal"), listModal = topDoc.getElementById("sf-list-modal");
-        topDoc.getElementById("sf-btn-add").onclick = () => { listModal.style.display = "none"; addModal.style.display = addModal.style.display === "none" ? "block" : "none"; };
-        topDoc.getElementById("sf-add-close").onclick = () => { addModal.style.display = "none"; };
-        topDoc.getElementById("sf-list-btn").onclick = () => {
-            const d = loadSea(); if (!d.isBound) return;
-            addModal.style.display = "none"; listModal.style.display = listModal.style.display === "none" ? "block" : "none"; renderSeaView();
-        };
-        topDoc.getElementById("sf-list-close").onclick = () => { listModal.style.display = "none"; };
+        const addModal = topDoc.getElementById("rw-add-modal"), listModal = topDoc.getElementById("rw-list-modal");
+        topDoc.getElementById("rw-btn-add").onclick = () => { listModal.style.display = "none"; addModal.style.display = addModal.style.display === "none" ? "block" : "none"; };
+        topDoc.getElementById("rw-add-close").onclick = () => { addModal.style.display = "none"; };
+        topDoc.getElementById("rw-list-btn").onclick = () => { if (!loadWeb().isBound) return; addModal.style.display = "none"; listModal.style.display = listModal.style.display === "none" ? "block" : "none"; renderWebUI(); };
+        topDoc.getElementById("rw-list-close").onclick = () => { listModal.style.display = "none"; };
 
-        const joySlider = topDoc.getElementById("sf-new-joy"), joyLbl = topDoc.getElementById("sf-new-joy-lbl");
-        joySlider.oninput = () => { joyLbl.textContent = getPearlStyleByJoy(joySlider.value).zone; };
+        function randomNodePos(idx) {
+            const a = idx * 2.39996, r = 16 + (idx % 5) * 6;
+            return { xPct: Math.max(14, Math.min(86, Math.round(50 + Math.cos(a) * r * 1.4))), yPct: Math.max(20, Math.min(60, Math.round(40 + Math.sin(a) * r * 0.85))) };
+        }
 
-        // ① 手写投下新羁绊汐珠
-        topDoc.getElementById("sf-add-submit").onclick = async () => {
-            const title = topDoc.getElementById("sf-new-title").value.trim() || "独家羁绊", content = topDoc.getElementById("sf-new-content").value.trim();
-            if (!content) return alert("请写下你想封存在汐珠里的羁绊记忆！");
-            const joy = Number(joySlider.value) || 92, c = getCtx(), nid = Date.now(), d = loadSea(), pos = getAutoSeaPos(d.pearls.length + 1, joy);
-            d.pearls.unshift({ id: nid, title, author: c.userName, joy, xPct: pos.xPct, yPct: pos.yPct, content, whisper: `（${c.charName} 正在聆听这道海浪回响...）` });
-            d.activeId = nid; saveSea(d);
-            topDoc.getElementById("sf-new-title").value = ""; topDoc.getElementById("sf-new-content").value = "";
+        // ① 手写落雨成点并连线
+        topDoc.getElementById("rw-add-submit").onclick = async () => {
+            const type = topDoc.getElementById("rw-new-type").value || "memory";
+            const title = topDoc.getElementById("rw-new-title").value.trim() || "雨中片段";
+            const edgeLbl = topDoc.getElementById("rw-new-edge").value.trim() || "牵连";
+            const content = topDoc.getElementById("rw-new-content").value.trim();
+            if (!content) return alert("请写下这个节点的记忆或关系描述！");
+
+            const c = getCtx(), d = loadWeb(), nid = Date.now(), pos = randomNodePos(d.nodes.length + 1);
+            const anchorId = d.activeId || d.nodes[0]?.id || 1;
+            d.nodes.push({ id: nid, type, title, xPct: pos.xPct, yPct: pos.yPct, mood: 60, content, whisper: `（${c.charName} 正在雨声中写下回应...）` });
+            d.edges.push({ from: anchorId, to: nid, label: edgeLbl });
+            d.activeId = nid; saveWeb(d);
+
+            topDoc.getElementById("rw-new-title").value = ""; topDoc.getElementById("rw-new-edge").value = ""; topDoc.getElementById("rw-new-content").value = "";
             addModal.style.display = "none";
-            addWaterRipple((pos.xPct / 100) * W, (pos.yPct / 100) * H, 90);
-            renderSeaView();
+            triggerRainDropTo(pos.xPct, pos.yPct, true);
+            renderWebUI();
+
             try {
-                const w = await askSeaAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `${c.userName}在你们共同绑定的「${d.seaName}」里投下了一颗羁绊汐珠《${title}》（情感温度${joy}%）：“${content}”。请以你的身份写一句深情的潮汐回响批注(40字内)：`);
-                const latest = loadSea(), t = latest.pearls.find((x) => x.id === nid);
-                if (t) { t.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveSea(latest); renderSeaView(); }
+                const w = await askWebAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `${c.userName}在你们的结识海脉络里落下了新节点《${title}》：“${content}”。请写一句清冷忧郁或深情的低语批注(36字内)：`);
+                const latest = loadWeb(), t = latest.nodes.find((x) => x.id === nid);
+                if (t) { t.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveWeb(latest); renderWebUI(); }
             } catch (e) {}
         };
 
-        // ② 让 TA 投下一颗羁绊汐珠
-        topDoc.getElementById("sf-btn-ai").onclick = async (e) => {
-            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "凝珠中...";
-            const c = getCtx(), d = loadSea();
+        // ② 让 TA 落雨新增一个记忆/心结节点
+        topDoc.getElementById("rw-btn-ai").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "落点中...";
+            const c = getCtx();
             try {
-                const raw = await askSeaAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`, `请在你与${c.userName}绑定的「${d.seaName}」中投下一颗代表你们历史羁绊的汐珠，并给出情感温度(joy: 10~100，越甜蜜越高，越酸涩思念越低)。严格只输出JSON：{"title":"8字内羁绊标题","joy":88,"content":"50字内第一人称羁绊回忆描写","whisper":"35字内刻在汐珠里的私密情话"}`);
+                const raw = await askWebAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 850)}\n近期剧情：${c.recentChat}`, `请在结识海关系记忆网里落下一个属于你的新节点(类型可选 memory/relation/knot)。严格只输出JSON：{"type":"knot","title":"6字内节点名","edge":"2~4字关系连线词","content":"45字内阴郁深情的回忆或心结描写","whisper":"32字内低语批注"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), latest = loadSea(), nid = Date.now(), j = Number(o.joy) || 88, pos = getAutoSeaPos(latest.pearls.length + 2, j);
-                    latest.pearls.unshift({ id: nid, title: o.title || "潮汐记忆", author: c.charName, joy: j, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                    latest.activeId = nid; saveSea(latest);
-                    addWaterRipple((pos.xPct / 100) * W, (pos.yPct / 100) * H, 90);
-                    renderSeaView();
+                    const o = JSON.parse(m[0]), d = loadWeb(), nid = Date.now(), pos = randomNodePos(d.nodes.length + 2);
+                    const anchorId = d.activeId || d.nodes[0]?.id || 1;
+                    d.nodes.push({ id: nid, type: ["memory", "relation", "knot"].includes(o.type) ? o.type : "memory", title: o.title || "雨夜思绪", xPct: pos.xPct, yPct: pos.yPct, mood: 45, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    d.edges.push({ from: anchorId, to: nid, label: o.edge || "共鸣" });
+                    d.activeId = nid; saveWeb(d);
+                    triggerRainDropTo(pos.xPct, pos.yPct, true);
+                    renderWebUI();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
 
-        // ③ 自动汲取微信/主线最新聊天化作羁绊汐珠
-        topDoc.getElementById("sf-btn-absorb").onclick = async (e) => {
-            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "汲取中...";
+        // ③ 汲取近期微信/主线聊天自动织成新节点
+        topDoc.getElementById("rw-btn-absorb").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "织网中...";
             const c = getCtx();
             let wx = "";
             try { wx = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${c.safeScope}`) || "[]").slice(-14).map((m) => `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n"); } catch (err) {}
-            const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常羁绊`;
+            const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常`;
             try {
-                const raw = await askSeaAI(`你是${c.charName}。`, `根据以下你和${c.userName}近期聊天提炼一段最深刻的羁绊瞬间凝结成结识海的汐珠，并给出情感温度(joy: 10~100)。\n${src.slice(-1100)}\n严格只输出JSON：{"title":"8字内羁绊标题","joy":92,"content":"50字内羁绊浓缩","whisper":"35字内你的潮汐回响批注"}`);
+                const raw = await askWebAI(`你是${c.charName}。`, `根据以下近期聊天提炼一个核心记忆或关系心结节点连入结识海。\n${src.slice(-1100)}\n严格只输出JSON：{"type":"memory","title":"6字内节点名","edge":"2~4字连线词","content":"45字内浓缩描写","whisper":"32字内低语"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), latest = loadSea(), nid = Date.now(), j = Number(o.joy) || 90, pos = getAutoSeaPos(latest.pearls.length + 3, j);
-                    latest.pearls.unshift({ id: nid, title: o.title || "聊天羁绊", author: `${c.userName} & ${c.charName}`, joy: j, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                    latest.activeId = nid; saveSea(latest);
-                    addWaterRipple((pos.xPct / 100) * W, (pos.yPct / 100) * H, 90);
-                    renderSeaView();
+                    const o = JSON.parse(m[0]), d = loadWeb(), nid = Date.now(), pos = randomNodePos(d.nodes.length + 3);
+                    const anchorId = d.activeId || d.nodes[0]?.id || 1;
+                    d.nodes.push({ id: nid, type: ["memory", "relation", "knot"].includes(o.type) ? o.type : "memory", title: o.title || "聊天片段", xPct: pos.xPct, yPct: pos.yPct, mood: 65, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    d.edges.push({ from: anchorId, to: nid, label: o.edge || "余韵" });
+                    d.activeId = nid; saveWeb(d);
+                    triggerRainDropTo(pos.xPct, pos.yPct, true);
+                    renderWebUI();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
     }
 
-    mountSeaOfFateApp();
+    mountRainNodeWebApp();
+})();
+// ==========================================================================
+// 🤍 【Sumoul App API设置增强补丁：全局软件壁纸(相册/链接/雾度/模糊) + 全局系统大小(80%~120%实时缩放)】
+// 用法：直接粘贴在 index.js 最末尾最后一行后面，打开【API设置】即可看到！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+    const STORE_KEY = "sumoul_v16_global_ui_prefs";
+
+    const svgIco = (p, sz = 14, c = "currentColor", sw = "1.5") =>
+        `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
+
+    const G_ICO = {
+        image: svgIco(`<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`, 14, "#3A3A42"),
+        scale: svgIco(`<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>`, 14, "#3A3A42"),
+        reset: svgIco(`<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>`, 12, "currentColor")
+    };
+
+    function loadPrefs() {
+        const def = {
+            wallpaperUrl: "",
+            maskAlpha: "0.48",  // 白雾遮罩透明度
+            blurPx: "0",        // 壁纸模糊像素
+            uiScale: 100        // 全局系统大小 (80 ~ 120)
+        };
+        try {
+            return Object.assign(def, JSON.parse(localStorage.getItem(STORE_KEY) || "{}"));
+        } catch (e) {
+            return def;
+        }
+    }
+
+    function savePrefs(p) {
+        try {
+            localStorage.setItem(STORE_KEY, JSON.stringify(p));
+        } catch (e) {
+            alert("图片体积过大导致存储受限，请换一张小一点的图片或使用图片链接。");
+        }
+    }
+
+    function compressWallpaper(file, maxDim = 960) {
+        return new Promise((res) => {
+            const r = new FileReader();
+            r.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = topDoc.createElement("canvas");
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
+                    else { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
+                    c.width = w; c.height = h;
+                    c.getContext("2d").drawImage(img, 0, 0, w, h);
+                    res(c.toDataURL("image/jpeg", 0.78));
+                };
+                img.src = String(ev.target?.result || "");
+            };
+            r.readAsDataURL(file);
+        });
+    }
+
+    // 应用全局壁纸与系统缩放
+    function applyGlobalAppearance() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        if (!modal) return;
+        const p = loadPrefs();
+
+        // 1. 挂载或更新底层全局壁纸层（不干扰全屏覆盖类子应用）
+        let wpLayer = topDoc.getElementById("sumoul-global-wp-layer");
+        if (!wpLayer) {
+            wpLayer = topDoc.createElement("div");
+            wpLayer.id = "sumoul-global-wp-layer";
+            wpLayer.style.cssText = "position:absolute!important;inset:0!important;z-index:0!important;pointer-events:none!important;overflow:hidden!important;display:none;";
+            wpLayer.innerHTML = `<div id="sumoul-global-wp-img" style="position:absolute;inset:-16px;background-size:cover;background-position:center;transition:filter 0.25s ease;"></div><div id="sumoul-global-wp-mask" style="position:absolute;inset:0;transition:background 0.25s ease;"></div>`;
+            modal.insertBefore(wpLayer, modal.firstChild);
+        }
+
+        const wpImg = topDoc.getElementById("sumoul-global-wp-img");
+        const wpMask = topDoc.getElementById("sumoul-global-wp-mask");
+        const hasWp = Boolean(p.wallpaperUrl && p.wallpaperUrl.trim());
+
+        if (hasWp) {
+            wpLayer.style.display = "block";
+            wpImg.style.backgroundImage = `url('${p.wallpaperUrl}')`;
+            wpImg.style.filter = Number(p.blurPx) > 0 ? `blur(${p.blurPx}px)` : "none";
+            wpMask.style.background = `rgba(255, 255, 255, ${p.maskAlpha ?? 0.48})`;
+        } else {
+            wpLayer.style.display = "none";
+            wpImg.style.backgroundImage = "none";
+        }
+
+        // 2. 注入动态样式：透明化主页面底色以透出全局壁纸 + 应用全局系统缩放
+        let dynCss = topDoc.getElementById("sumoul-global-ui-dyn-css");
+        if (!dynCss) {
+            dynCss = topDoc.createElement("style");
+            dynCss.id = "sumoul-global-ui-dyn-css";
+            topDoc.head.appendChild(dynCss);
+        }
+
+        const scaleVal = (Math.max(80, Math.min(120, Number(p.uiScale) || 100)) / 100).toFixed(2);
+        const wpTransparentCss = hasWp ? `
+            #seoul-mini-theater-modal > *:not(#sumoul-global-wp-layer) { position: relative; z-index: 1; }
+            #seoul-mini-theater-modal .smt-fs-body,
+            #seoul-mini-theater-modal #smt-page-home,
+            #seoul-mini-theater-modal #smt-page-api,
+            #seoul-mini-theater-modal #smt-page-talk,
+            #seoul-mini-theater-modal #smt-page-wx_settings,
+            #seoul-mini-theater-modal #ios-wxset-root,
+            #seoul-mini-theater-modal #ios-wxset-root > div {
+                background: transparent !important;
+                background-color: transparent !important;
+            }
+            #seoul-mini-theater-modal .smt-fs-header,
+            #seoul-mini-theater-modal .smt-bottom-tabs,
+            #seoul-mini-theater-modal .smt-tab-bar {
+                background: rgba(255, 255, 255, 0.72) !important;
+                backdrop-filter: blur(14px) !important;
+                -webkit-backdrop-filter: blur(14px) !important;
+            }
+            #seoul-mini-theater-modal #smt-page-talk .smt-wx-quick {
+                background: rgba(255, 255, 255, 0.75) !important;
+                backdrop-filter: blur(10px) !important;
+            }
+            #seoul-mini-theater-modal .ios-group-card,
+            #seoul-mini-theater-modal .smt-g-card {
+                background: rgba(255, 255, 255, 0.82) !important;
+                backdrop-filter: blur(12px) !important;
+                -webkit-backdrop-filter: blur(12px) !important;
+            }
+        ` : "";
+
+        const scaleCss = scaleVal !== "1.00" ? `
+            #seoul-mini-theater-modal .smt-fs-header,
+            #seoul-mini-theater-modal .smt-fs-body,
+            #seoul-mini-theater-modal .smt-bottom-tabs,
+            #seoul-mini-theater-modal .smt-tab-bar {
+                zoom: ${scaleVal} !important;
+            }
+        ` : "";
+
+        dynCss.innerHTML = wpTransparentCss + scaleCss;
+    }
+
+    function mountGlobalApiSettings() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        const apiPage = topDoc.getElementById("smt-page-api");
+        if (!modal || !apiPage) {
+            setTimeout(mountGlobalApiSettings, 250);
+            return;
+        }
+
+        // 注入设置卡片样式（独立不依赖其他补丁）
+        if (!topDoc.getElementById("sumoul-global-api-ui-css")) {
+            const st = topDoc.createElement("style");
+            st.id = "sumoul-global-api-ui-css";
+            st.innerHTML = `
+                #seoul-mini-theater-modal .smt-g-sec-title {
+                    display: flex !important; align-items: center !important; justify-content: space-between !important;
+                    padding: 12px 4px 6px 4px !important; font-size: 9px !important; font-weight: 800 !important;
+                    color: #8E8E98 !important; letter-spacing: 0.8px !important;
+                }
+                #seoul-mini-theater-modal .smt-g-card {
+                    background: #FFFFFF !important; border: 1px solid #E8E8F0 !important;
+                    border-radius: 16px !important; padding: 0 14px !important; margin-bottom: 12px !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.015) !important; box-sizing: border-box !important;
+                }
+                #seoul-mini-theater-modal .smt-g-row {
+                    display: flex !important; align-items: center !important; justify-content: space-between !important;
+                    min-height: 42px !important; padding: 6px 0 !important; gap: 10px !important;
+                    border-bottom: 1px solid #F2F2F7 !important; box-sizing: border-box !important;
+                }
+                #seoul-mini-theater-modal .smt-g-row.last { border-bottom: none !important; }
+                #seoul-mini-theater-modal .smt-g-lbl {
+                    font-size: 10.2px !important; font-weight: 700 !important; color: #2C2C32 !important;
+                    display: inline-flex !important; align-items: center !important; gap: 6px !important; flex-shrink: 0 !important;
+                }
+                #seoul-mini-theater-modal .smt-g-inp {
+                    -webkit-appearance: none !important; appearance: none !important; flex: 1 !important;
+                    border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important;
+                    height: 28px !important; font-size: 10px !important; font-weight: 600 !important;
+                    color: #3A3A42 !important; text-align: right !important; min-width: 0 !important;
+                }
+                #seoul-mini-theater-modal .smt-g-chip {
+                    display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important;
+                    height: 24px !important; padding: 0 9px !important; border-radius: 999px !important;
+                    background: #FFFFFF !important; border: 1px solid #E4E4EE !important;
+                    font-size: 8.6px !important; font-weight: 600 !important; color: #55555E !important;
+                    cursor: pointer !important; white-space: nowrap !important; transition: all 0.15s ease !important;
+                }
+                #seoul-mini-theater-modal .smt-g-chip.on {
+                    background: #2C2C34 !important; border-color: #2C2C34 !important;
+                    color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-weight: 700 !important;
+                }
+            `;
+            topDoc.head.appendChild(st);
+        }
+
+        if (!topDoc.getElementById("smt-global-appearance-wrap")) {
+            const wrap = topDoc.createElement("div");
+            wrap.id = "smt-global-appearance-wrap";
+            wrap.innerHTML = `
+                <div class="smt-g-sec-title">
+                    <span>GLOBAL APPEARANCE · 全局软件壁纸与系统大小</span>
+                    <span class="smt-g-chip" id="smt-g-reset-all" style="height:20px!important;font-size:8px!important;">${G_ICO.reset}<span>恢复默认</span></span>
+                </div>
+                <div class="smt-g-card">
+                    <!-- 1. 软件全局壁纸 -->
+                    <div class="smt-g-row">
+                        <span class="smt-g-lbl">${G_ICO.image}<span>软件全局壁纸</span></span>
+                        <div style="display:flex;align-items:center;gap:5px;flex:1;justify-content:flex-end;min-width:0;">
+                            <input type="text" id="smt-g-wp-url" class="smt-g-inp" placeholder="粘贴图片URL 或选图..." />
+                            <label class="smt-g-chip on" style="cursor:pointer;">
+                                <span>相册选图</span>
+                                <input type="file" id="smt-g-wp-file" accept="image/*" style="display:none;" />
+                            </label>
+                            <span class="smt-g-chip" id="smt-g-wp-clear">清除</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. 壁纸白雾遮罩浓度 -->
+                    <div class="smt-g-row">
+                        <span class="smt-g-lbl">壁纸白雾遮罩</span>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;" id="smt-g-mask-grp">
+                            <span class="smt-g-chip" data-mask="0.15">原图通透</span>
+                            <span class="smt-g-chip" data-mask="0.48">轻雾 48%</span>
+                            <span class="smt-g-chip" data-mask="0.72">清冷柔雾</span>
+                            <span class="smt-g-chip" data-mask="0.86">高雾护眼</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. 壁纸模糊度 -->
+                    <div class="smt-g-row">
+                        <span class="smt-g-lbl">壁纸柔焦模糊</span>
+                        <div style="display:flex;gap:4px;" id="smt-g-blur-grp">
+                            <span class="smt-g-chip" data-blur="0">清晰</span>
+                            <span class="smt-g-chip" data-blur="3">微柔 3px</span>
+                            <span class="smt-g-chip" data-blur="8">磨砂 8px</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. 全局系统大小 -->
+                    <div class="smt-g-row last" style="flex-direction:column;align-items:stretch!important;padding:10px 0 12px 0!important;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                            <span class="smt-g-lbl">${G_ICO.scale}<span>全局系统大小</span></span>
+                            <span id="smt-g-scale-val" style="font-size:10px;font-weight:800;color:#2C2C34;font-family:monospace;">100%</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                            <span style="font-size:8px;font-weight:700;color:#9A9AA5;">80%</span>
+                            <input type="range" id="smt-g-scale-range" min="80" max="120" step="1" value="100" style="flex:1;accent-color:#2C2C34;cursor:pointer;" />
+                            <span style="font-size:8px;font-weight:700;color:#9A9AA5;">120%</span>
+                        </div>
+                        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:space-between;" id="smt-g-scale-grp">
+                            <span class="smt-g-chip" data-sc="85">85% 小巧</span>
+                            <span class="smt-g-chip" data-sc="92">92% 精致</span>
+                            <span class="smt-g-chip" data-sc="100">100% 标准</span>
+                            <span class="smt-g-chip" data-sc="108">108% 偏大</span>
+                            <span class="smt-g-chip" data-sc="115">115% 大号</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            apiPage.appendChild(wrap);
+
+            function syncUI() {
+                const p = loadPrefs();
+                topDoc.getElementById("smt-g-wp-url").value = p.wallpaperUrl?.startsWith("data:") ? "[已设置本地相册壁纸]" : (p.wallpaperUrl || "");
+                topDoc.querySelectorAll("#smt-g-mask-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", c.getAttribute("data-mask") === String(p.maskAlpha)));
+                topDoc.querySelectorAll("#smt-g-blur-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", c.getAttribute("data-blur") === String(p.blurPx)));
+
+                const sc = Number(p.uiScale) || 100;
+                topDoc.getElementById("smt-g-scale-range").value = sc;
+                topDoc.getElementById("smt-g-scale-val").textContent = `${sc}%`;
+                topDoc.querySelectorAll("#smt-g-scale-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", Number(c.getAttribute("data-sc")) === sc));
+            }
+
+            // 绑定壁纸链接输入与相册上传
+            topDoc.getElementById("smt-g-wp-url").onchange = (e) => {
+                const val = e.target.value.trim();
+                if (val === "[已设置本地相册壁纸]") return;
+                const p = loadPrefs();
+                p.wallpaperUrl = val;
+                savePrefs(p); applyGlobalAppearance(); syncUI();
+            };
+
+            topDoc.getElementById("smt-g-wp-file").onchange = async (e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                const dUrl = await compressWallpaper(f, 960);
+                const p = loadPrefs();
+                p.wallpaperUrl = dUrl;
+                savePrefs(p); applyGlobalAppearance(); syncUI();
+                e.target.value = "";
+            };
+
+            topDoc.getElementById("smt-g-wp-clear").onclick = () => {
+                const p = loadPrefs();
+                p.wallpaperUrl = "";
+                savePrefs(p); applyGlobalAppearance(); syncUI();
+            };
+
+            topDoc.querySelectorAll("#smt-g-mask-grp .smt-g-chip").forEach((c) => c.onclick = () => {
+                const p = loadPrefs(); p.maskAlpha = c.getAttribute("data-mask");
+                savePrefs(p); applyGlobalAppearance(); syncUI();
+            });
+
+            topDoc.querySelectorAll("#smt-g-blur-grp .smt-g-chip").forEach((c) => c.onclick = () => {
+                const p = loadPrefs(); p.blurPx = c.getAttribute("data-blur");
+                savePrefs(p); applyGlobalAppearance(); syncUI();
+            });
+
+            // 绑定全局系统大小滑杆与快捷档位
+            const rangeEl = topDoc.getElementById("smt-g-scale-range");
+            rangeEl.oninput = () => {
+                const sc = Number(rangeEl.value) || 100;
+                topDoc.getElementById("smt-g-scale-val").textContent = `${sc}%`;
+                const p = loadPrefs(); p.uiScale = sc;
+                savePrefs(p); applyGlobalAppearance();
+                topDoc.querySelectorAll("#smt-g-scale-grp .smt-g-chip").forEach((c) => c.classList.toggle("on", Number(c.getAttribute("data-sc")) === sc));
+            };
+
+            topDoc.querySelectorAll("#smt-g-scale-grp .smt-g-chip").forEach((c) => c.onclick = () => {
+                const p = loadPrefs(); p.uiScale = Number(c.getAttribute("data-sc")) || 100;
+                savePrefs(p); applyGlobalAppearance(); syncUI();
+            });
+
+            topDoc.getElementById("smt-g-reset-all").onclick = () => {
+                savePrefs({ wallpaperUrl: "", maskAlpha: "0.48", blurPx: "0", uiScale: 100 });
+                applyGlobalAppearance(); syncUI();
+            };
+
+            syncUI();
+        }
+
+        applyGlobalAppearance();
+    }
+
+    mountGlobalApiSettings();
 })();
