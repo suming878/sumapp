@@ -6641,488 +6641,312 @@ bootSumoulApp();
 
 
 
-// ==========================================================================
-// 🤍 【结识海 · 完整细节恢复精修版：100%恢复全网连线/关系词/三层涟漪/微溅水珠 + 升级清透冷银泪滴雨珠】
-// 用法：直接替换 index.js 最末尾刚才那段 mountUltraCleanSilverRainWeb 补丁代码！
+// ==========================================================================// ==========================================================================
+// 🤍 【结识海 · 「酒馆主线记忆(ST) ⇄ 微信线上记忆(WX)」双轨物理隔离与切换补丁】
+// 核心：1.顶栏嵌入韩系双轨切换胶囊 2.底层存储Key彻底分离互不互通 3.汲取聊天时严格按当前轨道分流读取
+// 用法：直接粘贴在 index.js 最末尾最后一行后面即可生效！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
+    const MODE_KEY = "sumoul_v16_ksea_memory_channel"; // 'st' (酒馆记忆) | 'wx' (微信记忆)
 
-    function getSafeScope() {
-        let scope = "PARTNER";
+    function getChannel() {
+        return localStorage.getItem(MODE_KEY) === "wx" ? "wx" : "st";
+    }
+    function setChannel(ch) {
+        localStorage.setItem(MODE_KEY, ch === "wx" ? "wx" : "st");
+    }
+
+    function getCtxInfo() {
+        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "", stChat = "";
         try {
             const st = topWin.SillyTavern?.getContext?.();
             if (st) {
+                userName = st.name1 || userName;
                 if (st.characterId !== undefined && st.characters?.[st.characterId]) {
                     const c = st.characters[st.characterId];
+                    charName = c.name || st.name2 || charName;
                     scope = c.avatar || c.name || String(st.characterId);
+                    charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
                 } else if (st.name2) {
-                    scope = st.name2;
+                    charName = st.name2; scope = st.name2;
+                }
+                if (Array.isArray(st.chat) && st.chat.length) {
+                    stChat = st.chat.slice(-12).map((m) => `${m.is_user ? userName : charName}: ${m.mes}`).join("\n");
                 }
             }
         } catch (e) {}
-        return String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
-    }
-
-    function loadWebData() {
+        const safeScope = String(scope).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5\uac00-\ud7af-]/g, "_");
         try {
-            return JSON.parse(localStorage.getItem(`sumoul_v16_ksea_5tabs__${getSafeScope()}`) || "null");
-        } catch (e) { return null; }
+            const wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || "{}");
+            if (wCfg.myNick) userName = wCfg.myNick;
+            if (wCfg.remark) charName = wCfg.remark;
+        } catch (e) {}
+        let wxChat = "";
+        try {
+            wxChat = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${safeScope}`) || "[]")
+                .slice(-16)
+                .map((m) => `${m.role === "user" ? userName : charName}: ${m.text}`)
+                .join("\n");
+        } catch (e) {}
+        return { userName, charName, safeScope, charDesc, stChat, wxChat };
     }
 
-    function saveWebData(d) {
-        try { localStorage.setItem(`sumoul_v16_ksea_5tabs__${getSafeScope()}`, JSON.stringify(d)); } catch (e) {}
+    // 为「微信记忆轨」生成专属的线上聊天初始默认脉络（与酒馆线下剧情彻底区分！）
+    function createWxDefaultData(charName, userName) {
+        return {
+            isBound: false,
+            activeTab: "map",
+            filter: "all",
+            activeNodeId: 1,
+            pact: {
+                seaTitle: `${userName} × ${charName} · 微信记忆海`,
+                stage: "线上高频共鸣 · 置顶唯一",
+                meetDate: "加上好友的第一天",
+                tokenName: "置顶聊天框与秒回提示音",
+                vow: "隔着屏幕的每一条消息，都是坠入心海的雨滴。",
+                tokens: [
+                    { name: "专属特别关心提示音", desc: `只为 ${userName} 一个人开启的夜间消息提醒` },
+                    { name: "凌晨三点的对话框", desc: `聊到睡着也舍不得退出的微信界面` },
+                    { name: "偷偷收藏的语音条", desc: `反复点开听过无数遍的低沉嗓音` }
+                ]
+            },
+            radar: {
+                intimacy: 95, possess: 93, depend: 94, destiny: 96, trust: 91, temp: "38.5°C",
+                analysis: `在微信线上聊天中，${charName} 展现出比现实里更强的倾诉欲与秒回执念，时刻关注着你的在线状态。`
+            },
+            nodes: [
+                { id: 1, type: "core",     title: `${charName}(微信)`, xPct: 50, yPct: 36, content: `微信置顶对话框里的核心原点。无论什么时候发消息，永远能在第一时间收到回应。`, whisper: `“ 我的置顶位置，从始至终只有你一个。”` },
+                { id: 2, type: "memory",   title: "第一条好友验证", xPct: 22, yPct: 24, content: `通过好友申请的那一秒，线上羁绊的第一滴雨正式落下。`, whisper: `“ 其实盯着你的头像看了很久，才按下通过。”` },
+                { id: 3, type: "memory",   title: "深夜语音哄睡",   xPct: 78, yPct: 25, content: `隔着听筒传来的浅浅呼吸声与低语，伴着电流声一直陪你到天亮。`, whisper: `“ 听见你呼吸变均匀了，我也没舍得挂断。”` },
+                { id: 4, type: "relation", title: "专属备注昵称",   xPct: 23, yPct: 50, content: `在彼此微信里拥有独一无二的备注名，是只属于两个人的暗号。`, whisper: `“ 每次看到屏幕跳出这个名字，心情就会变好。”` },
+                { id: 5, type: "knot",     title: "正在输入中…",   xPct: 76, yPct: 51, content: `看到对方反复显示“正在输入…”却只发来简短几字时的微妙拉扯与试探。`, whisper: `“ 删删减减了好几遍，怕说太多吓到你。”` },
+                { id: 6, type: "knot",     title: "未读消息焦虑",   xPct: 50, yPct: 59, content: `消息发出去迟迟没有收到回复时，频频点亮手机屏幕的隐秘焦躁。`, whisper: `“ 忙完了记得回我一下，别让我对着聊天框胡思乱想。”` }
+            ],
+            edges: [
+                { from: 1, to: 2, label: "初加" },
+                { from: 1, to: 3, label: "语音" },
+                { from: 1, to: 4, label: "置顶" },
+                { from: 1, to: 5, label: "试探" },
+                { from: 1, to: 6, label: "未读" },
+                { from: 2, to: 4, label: "备注" },
+                { from: 3, to: 6, label: "守候" },
+                { from: 5, to: 6, label: "拉扯" }
+            ],
+            timeline: [
+                { id: 101, chapter: "WECHAT 01 · 破冰", title: "加上微信后的第一场夜聊", content: `从礼貌克制的寒暄到不知不觉聊过零点，对话框里的距离被迅速拉近。`, note: `“ 那晚看着屏幕一直在笑。”` },
+                { id: 102, chapter: "WECHAT 02 · 习惯", title: "早安与晚安的固定打卡", content: `每天醒来第一件事和睡前最后一件事，都变成了点开与你的聊天窗口。`, note: `“ 已经彻底习惯有你的消息提醒了。”` }
+            ],
+            knots: [
+                { id: 201, title: "看到朋友圈互动时的暗自吃味", status: "持续发酵 92%", progress: 92, trigger: "看到你在朋友圈给别人点赞或评论却没回消息", truth: `会默默点进那人的主页看半天，然后冷着脸给你发消息刷存在感。` },
+                { id: 202, title: "欲言又止的撤回消息", status: "已洞察 80%", progress: 80, trigger: "深夜聊天氛围暧昧时突然撤回了一条消息", truth: `其实撤回的是一句没克制住的直白情话，怕你装傻才又收了回来。` }
+            ]
+        };
     }
 
-    function mountRestoredCrystalRainWeb() {
+    // 1. 拦截 localStorage，将原结识海的单一存储 Key 自动按当前轨道路由到 `__st__` 或 `__wx__` 两个完全隔离的仓库！
+    function installStorageRouter() {
+        if (topWin.__sumoul_ksea_dual_router_installed) return;
+        topWin.__sumoul_ksea_dual_router_installed = true;
+
+        const rawGet = Storage.prototype.getItem;
+        const rawSet = Storage.prototype.setItem;
+
+        function mapKey(key) {
+            if (typeof key === "string" && key.startsWith("sumoul_v16_ksea_5tabs__")) {
+                const ch = rawGet.call(localStorage, MODE_KEY) === "wx" ? "wx" : "st";
+                return key.replace("sumoul_v16_ksea_5tabs__", `sumoul_v16_ksea_5tabs_${ch}__`);
+            }
+            return key;
+        }
+
+        Storage.prototype.getItem = function (key) {
+            const realKey = mapKey(key);
+            let val = rawGet.call(this, realKey);
+            // 若切换到「微信记忆轨」且尚无初始数据，自动初始化微信专属默认记忆库
+            if (!val && typeof key === "string" && key.startsWith("sumoul_v16_ksea_5tabs__") && getChannel() === "wx") {
+                const c = getCtxInfo();
+                const initWx = createWxDefaultData(c.charName, c.userName);
+                val = JSON.stringify(initWx);
+                rawSet.call(this, realKey, val);
+            }
+            return val;
+        };
+
+        Storage.prototype.setItem = function (key, value) {
+            return rawSet.call(this, mapKey(key), value);
+        };
+    }
+
+    async function askChannelAI(sys, usr) {
+        const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
+        const k = topDoc.getElementById("smt-api-key")?.value?.trim();
+        const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
+        if (!u || !k) { topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click(); throw new Error("请先在【API设置】填写独立 API 地址与 Key"); }
+        const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
+        const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] }) });
+        if (!r.ok) throw new Error(`API HTTP ${r.status}`);
+        const d = await r.json();
+        return d?.choices?.[0]?.message?.content?.trim() || "";
+    }
+
+    function mountDualMemorySwitcherUI() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
-        const oldCanvas = topDoc.getElementById("ks-bg-canvas");
-        if (!overlay || !oldCanvas) {
-            setTimeout(mountRestoredCrystalRainWeb, 200);
+        const titleEl = topDoc.getElementById("ks-top-title");
+        if (!overlay || !titleEl) {
+            setTimeout(mountDualMemorySwitcherUI, 200);
             return;
         }
 
-        // 清理旧节点
-        ["ks-v2-canvas", "ks-v2-visual-css", "ks-v3-stage", "ks-v4-chord-stage", "ks-droplet-canvas", "ks-pure-canvas"].forEach((id) => topDoc.getElementById(id)?.remove());
-
-        oldCanvas.width = 1;
-        oldCanvas.height = 1;
-
-        // 1. 保持 100% 纯白干净背景 (#FFFFFF)
+        // 注入顶栏韩系极简双轨分段切换器样式
+        topDoc.getElementById("ks-dual-channel-css")?.remove();
         const st = topDoc.createElement("style");
-        st.id = "ks-v2-visual-css";
+        st.id = "ks-dual-channel-css";
         st.innerHTML = `
-            #seoul-mini-theater-modal #smt-ksea-overlay {
-                background: #FFFFFF !important;
+            #seoul-mini-theater-modal .ks-dual-switch {
+                display: inline-flex !important; align-items: center !important;
+                background: #F0F2F7 !important; border: 1px solid #E4E7F0 !important;
+                border-radius: 999px !important; padding: 2px !important; gap: 2px !important;
             }
-            #seoul-mini-theater-modal #ks-bg-canvas { display: none !important; }
-            #seoul-mini-theater-modal #ks-pure-canvas {
-                position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
-                display: block !important; z-index: 2 !important; touch-action: none !important; background: #FFFFFF !important;
+            #seoul-mini-theater-modal .ks-dual-opt {
+                padding: 3.5px 10px !important; border-radius: 999px !important;
+                font-size: 8.5px !important; font-weight: 700 !important; letter-spacing: 0.4px !important;
+                color: #7E8494 !important; cursor: pointer !important;
+                transition: all 0.2s ease !important; white-space: nowrap !important;
             }
-            #seoul-mini-theater-modal .ks-card {
-                background: rgba(255, 255, 255, 0.94) !important;
-                border: 1px solid #ECEEF4 !important;
-                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.03) !important;
-            }
-            #seoul-mini-theater-modal .ks-dock-bar {
-                background: #FFFFFF !important;
-                border-top: 1px solid #F0F2F7 !important;
-            }
-            #seoul-mini-theater-modal .ks-flt {
-                background: #FFFFFF !important;
-                border: 1px solid #E6E8F0 !important;
-                color: #7E8494 !important;
-            }
-            #seoul-mini-theater-modal .ks-flt.on {
-                background: #1E2028 !important;
-                border-color: #1E2028 !important;
-                color: #FFFFFF !important;
+            #seoul-mini-theater-modal .ks-dual-opt.active {
+                background: #1E2028 !important; color: #FFFFFF !important;
+                box-shadow: 0 2px 8px rgba(20, 22, 30, 0.14) !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        const canvas = topDoc.createElement("canvas");
-        canvas.id = "ks-pure-canvas";
-        oldCanvas.insertAdjacentElement("afterend", canvas);
-
-        const ctx = canvas.getContext("2d");
-        let animId = null, W = 390, H = 780;
-        let dragNodeId = null, dragMoved = false, pStart = { x: 0, y: 0 };
-
-        // 完整恢复四大动态池：清透泪滴雨珠 + 触水微溅水珠 + 三层渐次水纹 + 凝点慢连丝线
-        const fallingDrops = [];
-        const splashBeads = [];
-        const ripples = [];
-        const landedNodeMap = new Map();
-        let lineGrow = 0;
-
-        function resize() {
-            const rect = overlay.getBoundingClientRect();
-            W = rect.width || topWin.innerWidth || 390;
-            H = rect.height || topWin.innerHeight || 780;
-            const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        // 将顶栏中央标题区改造为「酒馆记忆 ⇄ 微信记忆」双轨独立切换器
+        const centerBox = titleEl.parentElement;
+        if (centerBox && !topDoc.getElementById("ks-dual-switch-bar")) {
+            centerBox.innerHTML = `
+                <div class="ks-dual-switch" id="ks-dual-switch-bar">
+                    <span class="ks-dual-opt" data-ch="st">酒馆记忆 · ST</span>
+                    <span class="ks-dual-opt" data-ch="wx">微信记忆 · WX</span>
+                </div>
+                <div id="ks-dual-sub-hint" style="font-size:6.8px;font-weight:700;color:#98A0B2;letter-spacing:1px;margin-top:2px;">
+                    TAVERN STORY ARCHIVE · 独立不互通
+                </div>
+            `;
         }
 
-        // 完整恢复：三层渐次荡开的同心涟漪 + 触水瞬间向上轻微弹起的晶莹微水珠
-        function triggerImpactSplash(x, y, isNodeImpact = true) {
-            const maxR = isNodeImpact ? 48 : 32;
-            // 第1圈主水纹
-            ripples.push({ x, y, r: 1.5, maxR, alpha: isNodeImpact ? 0.52 : 0.32, lw: 0.8 });
-            // 第2圈次水纹
-            setTimeout(() => {
-                ripples.push({ x, y, r: 1, maxR: maxR * 0.70, alpha: isNodeImpact ? 0.35 : 0.20, lw: 0.6 });
-            }, 130);
-            // 第3圈余波微纹
-            if (isNodeImpact) {
-                setTimeout(() => {
-                    ripples.push({ x, y, r: 1, maxR: maxR * 0.44, alpha: 0.22, lw: 0.45 });
-                }, 260);
-            }
-
-            // 触水回弹的清冷微水珠（改用柔和冷银色，不再是黑沫子）
-            const count = isNodeImpact ? 3 : 2;
-            for (let i = 0; i < count; i++) {
-                const ang = -Math.PI * (0.28 + (i / (count - 1 || 1)) * 0.44) + (Math.random() - 0.5) * 0.15;
-                const spd = (isNodeImpact ? 1.5 : 1.0) + Math.random() * 0.8;
-                splashBeads.push({
-                    x,
-                    y,
-                    vx: Math.cos(ang) * spd,
-                    vy: Math.sin(ang) * spd - 0.7,
-                    baseY: y,
-                    r: isNodeImpact ? 1.1 : 0.85,
-                    alpha: 0.65
-                });
-            }
-        }
-
-        function spawnFallingRaindrop(tx, ty, targetNodeId = null, delayMs = 0) {
-            setTimeout(() => {
-                fallingDrops.push({
-                    x: tx,
-                    y: Math.max(-30, ty - (150 + Math.random() * 60)),
-                    startY: Math.max(-30, ty - 170),
-                    targetY: ty,
-                    vy: 3.0,
-                    gravity: 0.38,
-                    tailLen: 36,
-                    targetNodeId
-                });
-            }, delayMs);
-        }
-
-        function playRainToWebSequence() {
-            const d = loadWebData();
-            if (!d || !d.isBound) return;
-            fallingDrops.length = 0;
-            landedNodeMap.clear();
-            lineGrow = 0;
-
-            const flt = d.filter || "all";
-            const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-
-            visNodes.forEach((n, idx) => {
-                const tx = (n.xPct / 100) * W;
-                const ty = (n.yPct / 100) * H;
-                spawnFallingRaindrop(tx, ty, Number(n.id), idx * 130);
+        function refreshChannelUI() {
+            const ch = getChannel();
+            topDoc.querySelectorAll("#ks-dual-switch-bar .ks-dual-opt").forEach((el) => {
+                el.classList.toggle("active", el.getAttribute("data-ch") === ch);
             });
+            const subHint = topDoc.getElementById("ks-dual-sub-hint");
+            if (subHint) {
+                subHint.textContent = ch === "st"
+                    ? "TAVERN STORY · 酒馆主线独立脉络"
+                    : "WECHAT DAILY · 微信线上独立脉络";
+            }
+
+            // 更新主页角标与当前激活的 Tab 视图
+            const c = getCtxInfo();
+            const curData = JSON.parse(localStorage.getItem(`sumoul_v16_ksea_5tabs__${c.safeScope}`) || "{}");
+            const homeBadge = topDoc.getElementById("mt-home-badge");
+            if (homeBadge && Array.isArray(curData.nodes)) {
+                homeBadge.textContent = `${curData.nodes.length}点`;
+            }
+
+            const curTab = curData.activeTab || "map";
+            const dockItem = topDoc.querySelector(`#ks-bottom-dock .ks-dock-item[data-kstab="${curTab}"]`)
+                || topDoc.querySelector(`#ks-bottom-dock .ks-dock-item[data-kstab="map"]`);
+            if (dockItem) dockItem.click();
+
+            // 触发落雨重演动画
+            const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
+            if (replayBtn) replayBtn.click();
         }
 
-        // ✨ 升级版雨滴：保留优雅的泪滴形态 + 渐隐尾迹，但改为「清透冷银玻璃渐变 + 细银边 + 白高光点」（告别死黑水滴头！）
-        function drawCrystalTeardrop(fd) {
-            ctx.save();
-            // 1. 雨珠上方渐隐的极细银丝尾迹
-            const tailY = Math.max(fd.startY, fd.y - fd.tailLen);
-            const grad = ctx.createLinearGradient(fd.x, tailY, fd.x, fd.y - 4);
-            grad.addColorStop(0, "rgba(140, 148, 166, 0)");
-            grad.addColorStop(0.65, "rgba(140, 148, 166, 0.25)");
-            grad.addColorStop(1, "rgba(90, 98, 116, 0.55)");
-
-            ctx.beginPath();
-            ctx.moveTo(fd.x, tailY);
-            ctx.lineTo(fd.x, fd.y - 4);
-            ctx.strokeStyle = grad;
-            ctx.lineWidth = 0.75;
-            ctx.lineCap = "round";
-            ctx.stroke();
-
-            // 2. 清透玻璃感泪滴形雨珠本体（上尖下圆，内部纯白到冷银渐变）
-            ctx.beginPath();
-            ctx.moveTo(fd.x, fd.y - 6.2);
-            ctx.bezierCurveTo(fd.x + 2.3, fd.y - 1.8, fd.x + 2.1, fd.y + 1.6, fd.x, fd.y + 2.0);
-            ctx.bezierCurveTo(fd.x - 2.1, fd.y + 1.6, fd.x - 2.3, fd.y - 1.8, fd.x, fd.y - 6.2);
-            ctx.closePath();
-
-            const dropGrd = ctx.createLinearGradient(fd.x, fd.y - 6, fd.x, fd.y + 2);
-            dropGrd.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-            dropGrd.addColorStop(0.6, "rgba(195, 204, 220, 0.85)");
-            dropGrd.addColorStop(1, "rgba(105, 114, 134, 0.90)");
-            ctx.fillStyle = dropGrd;
-            ctx.fill();
-
-            ctx.strokeStyle = "rgba(82, 90, 108, 0.65)";
-            ctx.lineWidth = 0.7;
-            ctx.stroke();
-
-            // 雨珠内部微小纯白反光点
-            ctx.beginPath();
-            ctx.arc(fd.x - 0.6, fd.y - 0.4, 0.65, 0, Math.PI * 2);
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fill();
-
-            ctx.restore();
-        }
-
-        function getPos(n, t) {
-            const fx = dragNodeId === n.id ? 0 : Math.sin(t * 0.55 + n.id * 1.7) * 1.6;
-            const fy = dragNodeId === n.id ? 0 : Math.cos(t * 0.48 + n.id * 1.3) * 1.6;
-            return { x: (n.xPct / 100) * W + fx, y: (n.yPct / 100) * H + fy };
-        }
-
-        function renderLoop(ts) {
-            if (!overlay.classList.contains("open")) { animId = null; return; }
-            const t = ts * 0.001;
-            ctx.clearRect(0, 0, W, H);
-
-            // 背景氛围：每隔约 3.5 秒在空白处静静落下一滴清透微雨（频率减半，既灵动又不乱）
-            if (Math.random() < 0.005 && fallingDrops.length < 2) {
-                spawnFallingRaindrop(W * (0.14 + Math.random() * 0.72), H * (0.18 + Math.random() * 0.46), null, 0);
-            }
-
-            // 1. 绘制正在空中坠落的清透冰晶雨滴
-            for (let i = fallingDrops.length - 1; i >= 0; i--) {
-                const fd = fallingDrops[i];
-                fd.vy += fd.gravity;
-                fd.y += fd.vy;
-                drawCrystalTeardrop(fd);
-
-                if (fd.y >= fd.targetY) {
-                    triggerImpactSplash(fd.x, fd.targetY, fd.targetNodeId !== null);
-                    if (fd.targetNodeId !== null) {
-                        landedNodeMap.set(Number(fd.targetNodeId), 0.06);
-                    }
-                    fallingDrops.splice(i, 1);
-                }
-            }
-
-            // 2. 绘制触水飞溅回弹的冷银微水珠
-            for (let i = splashBeads.length - 1; i >= 0; i--) {
-                const sb = splashBeads[i];
-                sb.x += sb.vx;
-                sb.y += sb.vy;
-                sb.vy += 0.16;
-                sb.alpha *= 0.93;
-                if (sb.y > sb.baseY + 2 || sb.alpha < 0.04) {
-                    splashBeads.splice(i, 1);
-                    continue;
-                }
-                ctx.beginPath();
-                ctx.arc(sb.x, sb.y, sb.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(105, 114, 134, ${sb.alpha})`;
-                ctx.fill();
-            }
-
-            // 3. 绘制三层渐次扩散的同心水波涟漪
-            for (let i = ripples.length - 1; i >= 0; i--) {
-                const rp = ripples[i];
-                rp.r += (rp.maxR - rp.r) * 0.055 + 0.25;
-                rp.alpha *= 0.95;
-                if (rp.alpha < 0.015) { ripples.splice(i, 1); continue; }
-                ctx.beginPath();
-                ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(120, 128, 146, ${rp.alpha})`;
-                ctx.lineWidth = rp.lw || 0.65;
-                ctx.stroke();
-            }
-
-            // 4. 完整恢复：全网游丝连线 + 关系小字 + 双形态 4px 极简微点
-            const d = loadWebData();
-            if (d && d.isBound && d.activeTab === "map") {
-                const flt = d.filter || "all";
-                const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-                const posMap = new Map();
-
-                let landedCount = 0;
-                visNodes.forEach((n) => {
-                    const nid = Number(n.id);
-                    posMap.set(nid, getPos(n, t));
-                    if (!landedNodeMap.has(nid) && fallingDrops.length === 0) {
-                        landedNodeMap.set(nid, 1);
-                    }
-                    if (landedNodeMap.has(nid)) {
-                        landedCount++;
-                        const curA = landedNodeMap.get(nid);
-                        if (curA < 1) landedNodeMap.set(nid, Math.min(1, curA + 0.045));
-                    }
-                });
-
-                if (landedCount >= 2 && lineGrow < 1) {
-                    lineGrow = Math.min(1, lineGrow + 0.013);
-                }
-                const ease = 1 - Math.pow(1 - lineGrow, 3);
-
-                // 4A. 完整绘制所有连线（主线与副线全部恢复！通过精细透明度拉开层次，既丰富又不乱）
-                (d.edges || []).forEach((ed, idx) => {
-                    const id1 = Number(ed.from), id2 = Number(ed.to);
-                    if (!landedNodeMap.has(id1) || !landedNodeMap.has(id2)) return;
-
-                    const p1 = posMap.get(id1), p2 = posMap.get(id2);
-                    if (!p1 || !p2) return;
-
-                    const prog = Math.max(0, Math.min(1, ease * 1.35 - (idx % 5) * 0.06));
-                    if (prog <= 0) return;
-
-                    const cx = p1.x + (p2.x - p1.x) * prog;
-                    const cy = p1.y + (p2.y - p1.y) * prog;
-                    const isHi = id1 === Number(d.activeNodeId) || id2 === Number(d.activeNodeId);
-
-                    ctx.beginPath();
-                    ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(cx, cy);
-                    ctx.strokeStyle = isHi ? "rgba(30, 32, 40, 0.65)" : "rgba(195, 200, 212, 0.48)";
-                    ctx.lineWidth = isHi ? 0.9 : 0.58;
-                    ctx.stroke();
-
-                    // 恢复高亮连线中央的关系小字
-                    if (isHi && prog > 0.95 && ed.label) {
-                        const mx = (p1.x + p2.x) * 0.5, my = (p1.y + p2.y) * 0.5;
-                        ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
-                        ctx.fillRect(mx - 14, my - 6, 28, 12);
-                        ctx.font = "500 7.5px -apple-system, sans-serif";
-                        ctx.textAlign = "center";
-                        ctx.fillStyle = "#7E8494";
-                        ctx.fillText(ed.label, mx, my + 2.5);
-                    }
-                });
-
-                // 4B. 完整恢复：核心/选中呼吸细环 + 实心/空心双形态 4px 微点
-                visNodes.forEach((n) => {
-                    const nid = Number(n.id);
-                    const reveal = landedNodeMap.get(nid) || 0;
-                    if (reveal <= 0) return;
-
-                    const p = posMap.get(nid);
-                    const isSel = nid === Number(d.activeNodeId);
-                    const isCore = n.type === "core";
-                    const dotR = (isCore ? 4.5 : (isSel ? 4.0 : 3.0)) * reveal;
-
-                    ctx.save();
-                    ctx.globalAlpha = reveal;
-
-                    // 6px 白色留白隔离圈（让连线在靠近圆点处优雅留白断开）
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, dotR + 5.5, 0, Math.PI * 2);
-                    ctx.fillStyle = "#FFFFFF";
-                    ctx.fill();
-
-                    // 恢复核心点与选中点的 0.65px 极细呼吸圆环
-                    if (isSel || isCore) {
-                        const ringR = dotR + 5.5 + Math.sin(t * 2 + nid) * 1.2;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, ringR, 0, Math.PI * 2);
-                        ctx.strokeStyle = isSel ? "rgba(30, 32, 40, 0.45)" : "rgba(150, 156, 170, 0.40)";
-                        ctx.lineWidth = 0.65;
-                        ctx.stroke();
-                    }
-
-                    // 恢复双形态微点（记忆为空心白点，核心/心结为深炭实心点）
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
-                    if (n.type === "memory" && !isSel) {
-                        ctx.fillStyle = "#FFFFFF";
-                        ctx.fill();
-                        ctx.strokeStyle = "#585E70";
-                        ctx.lineWidth = 1.2;
-                        ctx.stroke();
-                    } else {
-                        ctx.fillStyle = isSel || isCore ? "#1E2028" : "#7E8494";
-                        ctx.fill();
-                    }
-
-                    // 节点下方极简无衬线文字（加上纯白柔光护航，防止线条穿过文字显得乱）
-                    ctx.font = `${isSel || isCore ? "700 9.5px" : "500 8.5px"} -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
-                    ctx.textAlign = "center";
-                    ctx.shadowColor = "#FFFFFF";
-                    ctx.shadowBlur = 6;
-                    ctx.fillStyle = isSel || isCore ? "#1E2028" : "#8E94A4";
-                    ctx.fillText(n.title.slice(0, 7), p.x, p.y + dotR + 14);
-
-                    ctx.restore();
-                });
-            }
-
-            animId = requestAnimationFrame(renderLoop);
-        }
-
-        function hitTest(px, py) {
-            const d = loadWebData();
-            if (!d || !d.isBound || d.activeTab !== "map") return null;
-            const flt = d.filter || "all";
-            const vis = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-            let best = null, minD = 26;
-            vis.forEach((n) => {
-                const dist = Math.hypot(px - (n.xPct / 100) * W, py - (n.yPct / 100) * H);
-                if (dist < minD) { minD = dist; best = n; }
-            });
-            return best;
-        }
-
-        function refreshCard() {
-            const mapTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="map"]');
-            if (mapTab) mapTab.click();
-        }
-
-        canvas.addEventListener("pointerdown", (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const px = e.clientX - rect.left, py = e.clientY - rect.top;
-            pStart = { x: px, y: py };
-            dragMoved = false;
-            const hit = hitTest(px, py);
-            if (hit) {
-                dragNodeId = hit.id;
-            } else {
-                spawnFallingRaindrop(px, py, null, 0);
-            }
-        });
-
-        canvas.addEventListener("pointermove", (e) => {
-            if (!dragNodeId) return;
-            const rect = canvas.getBoundingClientRect();
-            const px = e.clientX - rect.left, py = e.clientY - rect.top;
-            if (Math.hypot(px - pStart.x, py - pStart.y) > 4) {
-                dragMoved = true;
-                const d = loadWebData();
-                const tn = d?.nodes?.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tn) {
-                    tn.xPct = Math.max(10, Math.min(90, (px / W) * 100));
-                    tn.yPct = Math.max(16, Math.min(62, (py / H) * 100));
-                    saveWebData(d);
-                }
-            }
-        });
-
-        canvas.addEventListener("pointerup", () => {
-            if (!dragNodeId) return;
-            const d = loadWebData();
-            if (d) {
-                d.activeNodeId = dragNodeId;
-                saveWebData(d);
-                const tn = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tn) triggerImpactSplash((tn.xPct / 100) * W, (tn.yPct / 100) * H, true);
-            }
-            dragNodeId = null;
-            refreshCard();
-        });
-
-        const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
-        if (replayBtn) {
-            replayBtn.onclick = (e) => {
+        topDoc.querySelectorAll("#ks-dual-switch-bar .ks-dual-opt").forEach((opt) => {
+            opt.onclick = (e) => {
                 e.stopPropagation();
-                playRainToWebSequence();
+                const targetCh = opt.getAttribute("data-ch");
+                if (targetCh === getChannel()) return;
+                setChannel(targetCh);
+                refreshChannelUI();
             };
+        });
+
+        // 拦截「汲取聊天连网」按钮：严格区分【仅读取酒馆主线】与【仅读取微信聊天】，绝不混用！
+        const vp = topDoc.getElementById("ks-main-viewport");
+        if (vp && !vp.__dualAbsorbBound) {
+            vp.__dualAbsorbBound = true;
+            vp.addEventListener("click", async (e) => {
+                const absorbBtn = e.target.closest("#ks-absorb-node");
+                if (!absorbBtn) return;
+
+                // 阻止原本混合读取的旧逻辑，改用严格分流读取
+                e.stopImmediatePropagation();
+                e.preventDefault();
+
+                const ch = getChannel();
+                const c = getCtxInfo();
+                const sourceText = ch === "st" ? c.stChat : c.wxChat;
+                const chLabel = ch === "st" ? "酒馆主线剧情" : "微信线上聊天";
+
+                if (!sourceText || !sourceText.trim()) {
+                    alert(`当前【${chLabel}】暂无可汲取的聊天记录，请先在${ch === "st" ? "酒馆主界面" : "手机微信"}聊几句再来汲取！`);
+                    return;
+                }
+
+                const origHtml = absorbBtn.innerHTML;
+                absorbBtn.textContent = ch === "st" ? "汲取酒馆中..." : "汲取微信中...";
+
+                try {
+                    const raw = await askChannelAI(
+                        `你是${c.charName}。人设：${c.charDesc.slice(0, 700)}`,
+                        `请严格仅根据以下【${chLabel}】记录，提炼一个核心记忆或关系心结节点连入「${chLabel}专属结识海」。\n${sourceText.slice(-1100)}\n严格只输出JSON：{"type":"memory","title":"6字内标题","edge":"2~4字连线词","content":"45字内浓缩描写","whisper":"30字内低语"}`
+                    );
+                    const m = raw.match(/\{[\s\S]*\}/);
+                    if (m) {
+                        const o = JSON.parse(m[0]);
+                        const latest = JSON.parse(localStorage.getItem(`sumoul_v16_ksea_5tabs__${c.safeScope}`) || "{}");
+                        const nid = Date.now();
+                        const idx = (latest.nodes?.length || 6) + 2;
+                        const xPct = Math.max(15, Math.min(85, Math.round(50 + Math.cos(idx * 2.4) * (18 + (idx % 4) * 6))));
+                        const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(idx * 2.4) * (14 + (idx % 4) * 5))));
+                        const fromId = latest.activeNodeId || latest.nodes?.[0]?.id || 1;
+
+                        latest.nodes = latest.nodes || [];
+                        latest.edges = latest.edges || [];
+                        latest.nodes.push({
+                            id: nid,
+                            type: ["memory", "relation", "knot"].includes(o.type) ? o.type : "memory",
+                            title: o.title || (ch === "st" ? "酒馆刻痕" : "微信片段"),
+                            xPct, yPct,
+                            content: o.content || "",
+                            whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”`
+                        });
+                        latest.edges.push({ from: fromId, to: nid, label: o.edge || "余韵" });
+                        latest.activeNodeId = nid;
+
+                        localStorage.setItem(`sumoul_v16_ksea_5tabs__${c.safeScope}`, JSON.stringify(latest));
+                        refreshChannelUI();
+                    }
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    absorbBtn.innerHTML = origHtml;
+                }
+            }, true);
         }
 
-        function checkOpen() {
-            if (overlay.classList.contains("open")) {
-                resize();
-                playRainToWebSequence();
-                if (!animId) animId = requestAnimationFrame(renderLoop);
-            } else if (animId) {
-                cancelAnimationFrame(animId);
-                animId = null;
-            }
-        }
-
-        const obs = new MutationObserver(checkOpen);
-        obs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
-        topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resize(); });
-        checkOpen();
+        // 初始化同步一次当前轨道状态
+        const ch = getChannel();
+        topDoc.querySelectorAll("#ks-dual-switch-bar .ks-dual-opt").forEach((el) => {
+            el.classList.toggle("active", el.getAttribute("data-ch") === ch);
+        });
     }
 
-    mountRestoredCrystalRainWeb();
+    installStorageRouter();
+    mountDualMemorySwitcherUI();
 })();
