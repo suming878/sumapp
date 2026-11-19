@@ -6640,9 +6640,8 @@ bootSumoulApp();
 
 
 // ==========================================================================
-// 🤍 【结识海 · 彻底抛弃蜘蛛网！韩系杂志级「垂直雨弦 · 留白同心水波画卷」终极重塑补丁】
-// 美学：砍掉杂乱斜线与胶囊框！采用「唯一垂直0.5px银丝雨弦 + 巨型极细同心水波环 + 裸感电影级留白排印」
-// 用法：直接替换 index.js 最末尾刚才那段 mountEditorialGlassConstellation 补丁代码！
+// 🌧️ 【结识海 · 方案A：首尔雨窗水滴脉络网 (真实玻璃折射立体水珠 + 零胶囊框 + 水痕慢连柔弧银丝 + 物理流体拖拽)】
+// 用法：直接替换 index.js 最末尾刚才那段 mountMinimalistRainChord 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -6674,294 +6673,489 @@ bootSumoulApp();
         try { localStorage.setItem(`sumoul_v16_ksea_5tabs__${getSafeScope()}`, JSON.stringify(d)); } catch (e) {}
     }
 
-    const TYPE_KR = {
-        core:     "CORE ORIGIN · 핵심",
-        memory:   "RAIN MEMORY · 기억",
-        relation: "FATE THREAD · 인연",
-        knot:     "HIDDEN KNOT · 심결"
-    };
-
-    function mountMinimalistRainChord() {
+    function mountRainWindowDropletWeb() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
         const oldCanvas = topDoc.getElementById("ks-bg-canvas");
         if (!overlay || !oldCanvas) {
-            setTimeout(mountMinimalistRainChord, 220);
+            setTimeout(mountRainWindowDropletWeb, 220);
             return;
         }
 
-        // 清理旧版蜘蛛网星图节点
-        topDoc.getElementById("ks-v2-canvas")?.remove();
-        topDoc.getElementById("ks-v2-visual-css")?.remove();
-        topDoc.getElementById("ks-v3-stage")?.remove();
-        topDoc.getElementById("ks-v4-chord-stage")?.remove();
+        // 清理之前旧版本星图残留节点
+        ["ks-v2-canvas", "ks-v2-visual-css", "ks-v3-stage", "ks-v4-chord-stage", "ks-droplet-canvas"].forEach((id) => topDoc.getElementById(id)?.remove());
 
         oldCanvas.width = 1;
         oldCanvas.height = 1;
 
+        // 1. 注入首尔阴雨天冷雾玻璃窗质感 CSS（#EEF1F6 -> #DCE2EC 忧郁清冷灰白）
         const st = topDoc.createElement("style");
         st.id = "ks-v2-visual-css";
         st.innerHTML = `
-            /* 1. 雨滴顺着唯一垂直银丝滑落的流光动画 */
-            @keyframes ksRainSlideDown {
-                0%   { top: -15%; opacity: 0; }
-                20%  { opacity: 1; }
-                80%  { opacity: 1; }
-                100% { top: 105%; opacity: 0; }
-            }
-            /* 2. 巨型极细同心水波环缓慢呼吸扩散 */
-            @keyframes ksWaterRingPulse {
-                0%   { transform: translate(-50%, -50%) scale(0.35); opacity: 0.85; }
-                100% { transform: translate(-50%, -50%) scale(1.85); opacity: 0; }
-            }
-            /* 3. 静态大水波环微幅荡漾 */
-            @keyframes ksRingBreathe {
-                0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.38; }
-                50%      { transform: translate(-50%, -50%) scale(1.06); opacity: 0.65; }
-            }
-
             #seoul-mini-theater-modal #smt-ksea-overlay {
-                background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFD 52%, #F1F4F9 100%) !important;
+                background: radial-gradient(circle at 50% 18%, #F6F8FC 0%, #E8EDF5 52%, #D8E0EC 100%) !important;
             }
             #seoul-mini-theater-modal #ks-bg-canvas { display: none !important; }
-
-            #seoul-mini-theater-modal #ks-v4-chord-stage {
-                position: absolute !important; inset: 52px 0 60px 0 !important; z-index: 4 !important;
-                overflow-y: auto !important; overflow-x: hidden !important;
-                display: none; scroll-behavior: smooth !important;
-                scrollbar-width: none !important;
+            #seoul-mini-theater-modal #ks-droplet-canvas {
+                position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+                display: block !important; z-index: 2 !important; touch-action: none !important;
             }
-            #seoul-mini-theater-modal #ks-v4-chord-stage::-webkit-scrollbar { display: none !important; }
-            #seoul-mini-theater-modal #ks-v4-chord-stage.active-mode { display: block !important; }
-
-            /* 贯穿天地的唯一 0.5px 极细垂直雨弦 */
-            #seoul-mini-theater-modal .ks4-vertical-chord {
-                position: absolute !important; left: 24% !important; top: 0 !important; bottom: 0 !important;
-                width: 1px !important;
-                background: linear-gradient(180deg, transparent 0%, rgba(160,170,190,0.45) 8%, rgba(140,150,172,0.55) 92%, transparent 100%) !important;
-                pointer-events: none !important; z-index: 1 !important;
+            /* 让星图页底部详情卡更轻薄清透，不抢上方水滴脉络网的视觉重心 */
+            #seoul-mini-theater-modal .ks-card {
+                background: rgba(255, 255, 255, 0.76) !important;
+                backdrop-filter: blur(24px) !important; -webkit-backdrop-filter: blur(24px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.90) !important;
+                box-shadow: 0 10px 32px rgba(45, 54, 72, 0.06) !important;
             }
-            /* 顺着雨弦滑落的晶莹雨滴光丝 */
-            #seoul-mini-theater-modal .ks4-sliding-drop {
-                position: absolute !important; left: 24% !important; transform: translateX(-50%) !important;
-                width: 1.5px !important; height: 56px !important;
-                background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #525A6E 85%, #1E2028 100%) !important;
-                animation: ksRainSlideDown 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
-                pointer-events: none !important; z-index: 2 !important;
+            #seoul-mini-theater-modal .ks-dock-bar {
+                background: rgba(248, 250, 254, 0.82) !important;
+                backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.85) !important;
             }
-            #seoul-mini-theater-modal .ks4-sliding-drop::after {
-                content: "" !important; position: absolute !important; bottom: -2px !important; left: 50% !important;
-                transform: translateX(-50%) !important; width: 4px !important; height: 4px !important;
-                border-radius: 50% !important; background: #1E2028 !important;
-                box-shadow: 0 0 8px rgba(30,32,40,0.4) !important;
+            #seoul-mini-theater-modal .ks-flt {
+                background: rgba(255, 255, 255, 0.58) !important;
+                border: 1px solid rgba(255, 255, 255, 0.85) !important;
+                color: #5C6478 !important; backdrop-filter: blur(10px) !important;
             }
-
-            /* 每一个落雨涟漪节点行（左波纹 + 右留白杂志排版） */
-            #seoul-mini-theater-modal .ks4-ripple-row {
-                position: relative !important; width: 100% !important; min-height: 118px !important;
-                display: flex !important; align-items: center !important;
-                cursor: pointer !important; box-sizing: border-box !important;
-                padding: 18px 22px 18px 0 !important;
-                transition: opacity 0.3s ease !important;
-            }
-
-            /* 左侧 24% 处的同心水波圆心 */
-            #seoul-mini-theater-modal .ks4-wave-anchor {
-                position: absolute !important; left: 24% !important; top: 50% !important;
-                width: 0 !important; height: 0 !important; pointer-events: none !important;
-            }
-            /* 中心露珠原点 */
-            #seoul-mini-theater-modal .ks4-dew-point {
-                position: absolute !important; left: 0 !important; top: 0 !important;
-                transform: translate(-50%, -50%) !important;
-                width: 5px !important; height: 5px !important; border-radius: 50% !important;
-                background: #8E96A8 !important;
-                box-shadow: 0 0 0 3px #FFFFFF !important;
-                transition: all 0.3s ease !important; z-index: 5 !important;
-            }
-            #seoul-mini-theater-modal .ks4-ripple-row.is-selected .ks4-dew-point {
-                width: 7px !important; height: 7px !important;
-                background: #1E2028 !important;
-                box-shadow: 0 0 0 4px #FFFFFF, 0 0 0 5px rgba(30,32,40,0.25) !important;
-            }
-
-            /* 极细几何同心水波圆环（大留白艺术感的核心！） */
-            #seoul-mini-theater-modal .ks4-circle-static {
-                position: absolute !important; left: 0 !important; top: 0 !important;
-                border-radius: 50% !important;
-                border: 0.7px solid rgba(150, 160, 180, 0.28) !important;
-                animation: ksRingBreathe 5s ease-in-out infinite !important;
-                pointer-events: none !important;
-            }
-            #seoul-mini-theater-modal .ks4-ripple-row.is-selected .ks4-circle-static {
-                border-color: rgba(40, 44, 56, 0.32) !important;
-            }
-            #seoul-mini-theater-modal .ks4-circle-pulse {
-                position: absolute !important; left: 0 !important; top: 0 !important;
-                width: 96px !important; height: 96px !important; border-radius: 50% !important;
-                border: 0.8px solid rgba(50, 56, 72, 0.45) !important;
-                animation: ksWaterRingPulse 3.4s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
-                pointer-events: none !important;
-            }
-
-            /* 从圆心伸向右侧文字的极细水平牵引刻度丝 */
-            #seoul-mini-theater-modal .ks4-guide-tick {
-                position: absolute !important; left: 24% !important; top: 50% !important;
-                width: 28px !important; height: 0.7px !important;
-                background: linear-gradient(90deg, rgba(140,150,172,0.5), rgba(140,150,172,0.1)) !important;
-                pointer-events: none !important; transition: all 0.3s ease !important;
-            }
-            #seoul-mini-theater-modal .ks4-ripple-row.is-selected .ks4-guide-tick {
-                width: 36px !important;
-                background: linear-gradient(90deg, #1E2028, rgba(30,32,40,0.15)) !important;
-            }
-
-            /* 左侧留白区的极简序号与连线词 */
-            #seoul-mini-theater-modal .ks4-left-meta {
-                width: 24% !important; padding-right: 18px !important; box-sizing: border-box !important;
-                text-align: right !important; flex-shrink: 0 !important;
-            }
-            /* 右侧留白区的裸感韩系杂志排印（无死板背景框！） */
-            #seoul-mini-theater-modal .ks4-right-editorial {
-                flex: 1 !important; padding-left: 42px !important; min-width: 0 !important;
+            #seoul-mini-theater-modal .ks-flt.on {
+                background: rgba(46, 52, 66, 0.88) !important;
+                border-color: rgba(46, 52, 66, 0.88) !important;
+                color: #FFFFFF !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        // 创建全新的「垂直雨弦 · 同心水波画卷」容器
-        const chordStage = topDoc.createElement("div");
-        chordStage.id = "ks-v4-chord-stage";
-        oldCanvas.insertAdjacentElement("afterend", chordStage);
+        // 2. 创建雨窗水滴脉络专属 Canvas
+        const canvas = topDoc.createElement("canvas");
+        canvas.id = "ks-droplet-canvas";
+        oldCanvas.insertAdjacentElement("afterend", canvas);
 
-        function renderRainChordView() {
+        const ctx = canvas.getContext("2d");
+        let animId = null, W = 390, H = 780;
+        let dragNodeId = null, dragMoved = false, pStart = { x: 0, y: 0 };
+
+        // 控制「雨滴先落下 -> 砸出涟漪 -> 水珠浮现 -> 水丝慢慢洇开连接」的时序状态
+        let nodeRevealProgress = 0; // 0 ~ 1
+        let threadGrowProgress = 0; // 0 ~ 1
+        const fallingRainToNodes = [];
+        const windowRipples = [];
+
+        // 背景雨窗上极细微的滑落水痕与微雨丝（克制、安静、忧郁）
+        const bgMistStreaks = Array.from({ length: 28 }, (_, i) => ({
+            x: Math.random() * 420,
+            y: Math.random() * 820,
+            len: 28 + Math.random() * 36,
+            vy: 1.2 + Math.random() * 1.6,
+            alpha: 0.08 + Math.random() * 0.14,
+            microBeads: Math.random() > 0.5
+        }));
+
+        // 玻璃窗上静止的微米级小水雾珠（增加真实雨窗质感）
+        const microCondensation = Array.from({ length: 45 }, () => ({
+            rx: Math.random(),
+            ry: 0.12 + Math.random() * 0.58,
+            r: 0.8 + Math.random() * 1.5,
+            alpha: 0.25 + Math.random() * 0.35
+        }));
+
+        function resize() {
+            const rect = overlay.getBoundingClientRect();
+            W = rect.width || topWin.innerWidth || 390;
+            H = rect.height || topWin.innerHeight || 780;
+            const dpr = Math.min(topWin.devicePixelRatio || 1, 2);
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function addRipple(x, y, maxR = 42) {
+            windowRipples.push({ x, y, r: 3, maxR, alpha: 0.65, lw: 0.9 });
+            windowRipples.push({ x, y, r: 1, maxR: maxR * 0.58, alpha: 0.42, lw: 0.6 });
+        }
+
+        // 触发全屏「落雨成点 -> 慢慢连线」完整序列
+        function triggerRainSequence() {
             const d = loadWebData();
-            const vp = topDoc.getElementById("ks-main-viewport");
-            if (!d || !d.isBound || d.activeTab !== "map") {
-                chordStage.classList.remove("active-mode");
-                if (vp) vp.style.pointerEvents = "none";
-                return;
-            }
+            if (!d || !d.isBound) return;
+            nodeRevealProgress = 0.15;
+            threadGrowProgress = 0;
+            fallingRainToNodes.length = 0;
 
-            chordStage.classList.add("active-mode");
             const flt = d.filter || "all";
             const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
-
-            // 查找每个节点与核心点之间的连线词
-            const edgeMap = new Map();
-            (d.edges || []).forEach((e) => {
-                edgeMap.set(Number(e.to), e.label || "共鸣");
-                if (!edgeMap.has(Number(e.from))) edgeMap.set(Number(e.from), e.label || "原点");
-            });
-
-            const rowsHtml = visNodes.map((n, idx) => {
-                const isSel = Number(n.id) === Number(d.activeNodeId);
-                const isCore = n.type === "core";
-                const krType = TYPE_KR[n.type] || TYPE_KR.memory;
-                const edgeWord = isCore ? "ORIGIN" : (edgeMap.get(Number(n.id)) || "涟漪");
-                // 每个节点的水波环大小错落有致，形成极美的几何同心圆构图
-                const r1 = isCore ? 88 : (56 + (idx % 3) * 18);
-                const r2 = r1 * 1.55;
-
-                return `
-                    <div class="ks4-ripple-row ${isSel ? "is-selected" : ""}" data-rnid="${n.id}">
-                        <!-- 左侧：微距序号与连线关系词 -->
-                        <div class="ks4-left-meta">
-                            <div style="font-size:8px;font-weight:700;color:${isSel ? "#1E2028" : "#98A0B2"};font-family:monospace;letter-spacing:1px;">
-                                ${String(idx + 1).padStart(2, "0")}
-                            </div>
-                            <div style="font-size:7.5px;font-weight:600;color:#8E96A8;margin-top:2px;letter-spacing:0.5px;">
-                                ${edgeWord.replace(/</g, "&lt;")}
-                            </div>
-                        </div>
-
-                        <!-- 24% 轴线处：雨滴落点与巨型同心水波环 -->
-                        <div class="ks4-wave-anchor">
-                            <div class="ks4-circle-static" style="width:${r1}px;height:${r1}px;animation-delay:${(idx * 0.4).toFixed(1)}s;"></div>
-                            <div class="ks4-circle-static" style="width:${r2.toFixed(0)}px;height:${r2.toFixed(0)}px;opacity:0.18;animation-delay:${(idx * 0.4 + 0.8).toFixed(1)}s;"></div>
-                            ${isSel || isCore ? `<div class="ks4-circle-pulse"></div>` : ""}
-                            <div class="ks4-dew-point"></div>
-                        </div>
-                        <div class="ks4-guide-tick"></div>
-
-                        <!-- 右侧：韩系高定裸感文字排版（点击直接展开完整回忆与回响） -->
-                        <div class="ks4-right-editorial">
-                            <div style="font-size:7px;font-weight:700;color:#98A0B2;letter-spacing:1.8px;margin-bottom:3px;">
-                                ${krType}
-                            </div>
-                            <div style="font-size:${isSel ? "14px" : "12.5px"};font-weight:${isSel ? "800" : "700"};color:${isSel ? "#181A20" : "#3A3E4C"};letter-spacing:0.6px;transition:all 0.2s ease;">
-                                ${n.title.replace(/</g, "&lt;")}
-                            </div>
-                            <div style="font-size:9.8px;font-weight:500;color:${isSel ? "#484E5E" : "#7E8698"};line-height:1.65;margin-top:4px;display:${isSel ? "block" : "-webkit-box"};-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-                                ${n.content.replace(/</g, "&lt;")}
-                            </div>
-                            ${isSel ? `
-                                <div style="margin-top:8px;padding-left:9px;border-left:1.5px solid #262830;font-size:9.2px;font-weight:600;color:#262830;line-height:1.55;">
-                                    ${(n.whisper || "“ 每一滴落下的雨，都有回音。”").replace(/</g, "&lt;")}
-                                </div>
-                            ` : ""}
-                        </div>
-                    </div>
-                `;
-            }).join("");
-
-            // 计算画卷总高度，保证垂直雨弦贯穿到底，底部留出空间给操作按钮
-            const minH = Math.max(680, visNodes.length * 125 + 220);
-            chordStage.innerHTML = `
-                <div style="position:relative;width:100%;min-height:${minH}px;padding:16px 0 180px 0;box-sizing:border-box;">
-                    <!-- 唯一贯穿天地的极细垂直雨弦 + 两滴缓缓滑落的流光雨珠 -->
-                    <div class="ks4-vertical-chord"></div>
-                    <div class="ks4-sliding-drop" style="animation-delay:0s;"></div>
-                    <div class="ks4-sliding-drop" style="animation-delay:2.1s;"></div>
-
-                    <!-- 错落排布的同心水波记忆节点 -->
-                    ${rowsHtml}
-                </div>
-            `;
-
-            // 隐藏原星图页底部重复的详情大白卡（因为文字已经直接优雅地排印在每个水波右侧了，只保留顶部分类筛选与底部3个操作按钮！）
-            if (vp) {
-                const cards = vp.querySelectorAll(".ks-card");
-                cards.forEach((cEl) => {
-                    if (cEl.id !== "ks-add-node-box") cEl.style.display = "none";
+            visNodes.forEach((n, idx) => {
+                const tx = (n.xPct / 100) * W;
+                const ty = (n.yPct / 100) * H;
+                fallingRainToNodes.push({
+                    x: tx,
+                    y: -20 - idx * 38,
+                    ty,
+                    vy: 9.5 + (idx % 3) * 1.2,
+                    landed: false
                 });
-            }
-
-            // 点击任意水波行切换选中态，展开完整低语与动态脉冲水纹
-            chordStage.querySelectorAll(".ks4-ripple-row").forEach((row) => {
-                row.onclick = () => {
-                    const nid = Number(row.getAttribute("data-rnid"));
-                    const curData = loadWebData();
-                    if (curData) {
-                        curData.activeNodeId = nid;
-                        saveWebData(curData);
-                        renderRainChordView();
-                    }
-                };
             });
         }
 
-        // 顶栏「落雨」按钮：平滑滚动回最顶端第一滴雨，并重新触发水波扩散
+        // 💧 核心绘制函数：在玻璃窗上画一颗 100% 写实清透的「立体折射水珠 (Glass Water Droplet)」
+        function drawRealisticWaterDroplet(x, y, radius, type, isSel, t, id) {
+            const breathe = Math.sin(t * 2.0 + id * 1.3) * 0.6;
+            const r = radius + breathe;
+
+            ctx.save();
+
+            // 1. 水珠外围极淡的呼吸水雾涟漪环（仅核心点或选中点有双层扩散水环）
+            if (isSel || type === "core") {
+                const waveR1 = r + 5 + ((t * 8 + id) % 14);
+                const waveAlpha1 = Math.max(0, 0.45 * (1 - ((t * 8 + id) % 14) / 14));
+                ctx.beginPath();
+                ctx.arc(x, y, waveR1, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(90, 104, 130, ${waveAlpha1})`;
+                ctx.lineWidth = 0.75;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(x, y, r + 3.2, 0, Math.PI * 2);
+                ctx.strokeStyle = isSel ? "rgba(62, 74, 98, 0.52)" : "rgba(110, 124, 150, 0.35)";
+                ctx.lineWidth = 0.7;
+                ctx.stroke();
+            }
+
+            // 2. 水珠在玻璃下方的柔和投影（赋予水珠立体凸起厚度！）
+            ctx.beginPath();
+            ctx.arc(x + 0.8, y + 2.2, r, 0, Math.PI * 2);
+            ctx.fillStyle = type === "knot" ? "rgba(42, 50, 68, 0.28)" : "rgba(78, 90, 115, 0.18)";
+            ctx.fill();
+
+            // 3. 水珠主体折射内部渐变（左上受光半透明，右下汇聚晶莹反光/或心结深冷灰蓝）
+            const bodyGrad = ctx.createRadialGradient(x - r * 0.32, y - r * 0.32, r * 0.08, x + r * 0.2, y + r * 0.25, r * 1.15);
+            if (type === "knot") {
+                // 隐秘心结：忧郁冷灰蓝深水珠
+                bodyGrad.addColorStop(0, "rgba(210, 220, 238, 0.92)");
+                bodyGrad.addColorStop(0.55, "rgba(112, 126, 154, 0.85)");
+                bodyGrad.addColorStop(1, "rgba(58, 68, 88, 0.92)");
+            } else if (type === "core" || isSel) {
+                // 核心或选中水珠：极清透的冰晶亮水珠
+                bodyGrad.addColorStop(0, "rgba(255, 255, 255, 0.98)");
+                bodyGrad.addColorStop(0.5, "rgba(224, 234, 248, 0.82)");
+                bodyGrad.addColorStop(0.85, "rgba(158, 174, 202, 0.78)");
+                bodyGrad.addColorStop(1, "rgba(255, 255, 255, 0.95)");
+            } else {
+                // 普通记忆/关系水珠：清冷雨露质感
+                bodyGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+                bodyGrad.addColorStop(0.6, "rgba(212, 222, 238, 0.72)");
+                bodyGrad.addColorStop(1, "rgba(148, 162, 188, 0.75)");
+            }
+
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = bodyGrad;
+            ctx.fill();
+
+            // 4. 水珠边缘张力极细银白轮廓线
+            ctx.strokeStyle = isSel ? "rgba(54, 64, 86, 0.75)" : "rgba(255, 255, 255, 0.88)";
+            ctx.lineWidth = isSel ? 1.1 : 0.8;
+            ctx.stroke();
+
+            // 5. 水珠左上方月牙形高光点（让水珠瞬间活过来的点睛之笔！）
+            ctx.beginPath();
+            ctx.ellipse(x - r * 0.34, y - r * 0.34, r * 0.28, r * 0.16, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.96)";
+            ctx.fill();
+
+            // 6. 水珠右下方微弱底部二次反光弧
+            ctx.beginPath();
+            ctx.arc(x, y, r * 0.76, Math.PI * 0.12, Math.PI * 0.42);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+            ctx.lineWidth = 0.9;
+            ctx.lineCap = "round";
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // 计算两颗水珠之间自然微垂的柔弧水痕控制点
+        function getWaterThreadCtrl(p1, p2, idx) {
+            const mx = (p1.x + p2.x) * 0.5;
+            const my = (p1.y + p2.y) * 0.5;
+            const dx = p2.x - p1.x, dy = p2.y - p1.y;
+            const dist = Math.hypot(dx, dy) || 1;
+            // 水丝受重力影响自然向下方微微弯曲垂落
+            const sag = Math.min(22, dist * 0.14);
+            const side = idx % 2 === 0 ? 1 : -0.7;
+            return { cx: mx - (dy / dist) * sag * side * 0.4, cy: my + Math.abs(sag) };
+        }
+
+        function evalBezier(p1, c, p2, u) {
+            const m = 1 - u;
+            return {
+                x: m * m * p1.x + 2 * m * u * c.cx + u * u * p2.x,
+                y: m * m * p1.y + 2 * m * u * c.cy + u * u * p2.y
+            };
+        }
+
+        function getScreenPos(n, t) {
+            const fx = dragNodeId === n.id ? 0 : Math.sin(t * 0.65 + n.id * 1.7) * 2.6;
+            const fy = dragNodeId === n.id ? 0 : Math.cos(t * 0.55 + n.id * 1.3) * 2.6;
+            return { x: (n.xPct / 100) * W + fx, y: (n.yPct / 100) * H + fy };
+        }
+
+        function renderDropletWebLoop(ts) {
+            if (!overlay.classList.contains("open")) { animId = null; return; }
+            const t = ts * 0.001;
+            ctx.clearRect(0, 0, W, H);
+
+            // 1. 绘制玻璃窗静止微米级小水雾珠
+            microCondensation.forEach((mc) => {
+                ctx.beginPath();
+                ctx.arc(mc.rx * W, mc.ry * H, mc.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${mc.alpha})`;
+                ctx.fill();
+            });
+
+            // 2. 绘制雨窗背景缓慢滑落的极细透明水痕
+            bgMistStreaks.forEach((st) => {
+                st.y += st.vy;
+                if (st.y > H + 40) { st.y = -40; st.x = Math.random() * W; }
+                const g = ctx.createLinearGradient(st.x, st.y - st.len, st.x, st.y);
+                g.addColorStop(0, "rgba(255, 255, 255, 0)");
+                g.addColorStop(1, `rgba(255, 255, 255, ${st.alpha * 1.8})`);
+                ctx.beginPath();
+                ctx.moveTo(st.x, st.y - st.len);
+                ctx.lineTo(st.x, st.y);
+                ctx.strokeStyle = g;
+                ctx.lineWidth = 0.75;
+                ctx.stroke();
+                if (st.microBeads) {
+                    ctx.beginPath();
+                    ctx.arc(st.x, st.y, 1.1, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${st.alpha * 2.2})`;
+                    ctx.fill();
+                }
+            });
+
+            // 3. 绘制正在坠落凝结成节点的主雨滴
+            let allLanded = true;
+            for (let i = fallingRainToNodes.length - 1; i >= 0; i--) {
+                const fd = fallingRainToNodes[i];
+                if (!fd.landed) {
+                    allLanded = false;
+                    fd.y += fd.vy;
+                    const g = ctx.createLinearGradient(fd.x, fd.y - 32, fd.x, fd.y);
+                    g.addColorStop(0, "rgba(255, 255, 255, 0)");
+                    g.addColorStop(1, "rgba(95, 110, 138, 0.68)");
+                    ctx.beginPath();
+                    ctx.moveTo(fd.x, fd.y - 32);
+                    ctx.lineTo(fd.x, fd.y);
+                    ctx.strokeStyle = g;
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(fd.x, fd.y, 2.2, 0, Math.PI * 2);
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fill();
+
+                    if (fd.y >= fd.ty) {
+                        fd.landed = true;
+                        addRipple(fd.x, fd.ty, 46);
+                    }
+                }
+            }
+            if (allLanded && fallingRainToNodes.length > 0) {
+                fallingRainToNodes.length = 0;
+            }
+
+            // 4. 绘制扩散的同心水波涟漪
+            for (let i = windowRipples.length - 1; i >= 0; i--) {
+                const rp = windowRipples[i];
+                rp.r += (rp.maxR - rp.r) * 0.065 + 0.35;
+                rp.alpha *= 0.94;
+                if (rp.alpha < 0.02) { windowRipples.splice(i, 1); continue; }
+                ctx.beginPath();
+                ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${rp.alpha})`;
+                ctx.lineWidth = rp.lw;
+                ctx.stroke();
+            }
+
+            // 5. 当处于「星图脉络 (map)」页且已绑定时，绘制「水痕慢连柔弧银丝 + 立体玻璃水珠节点」
+            const d = loadWebData();
+            if (d && d.isBound && d.activeTab === "map") {
+                if (nodeRevealProgress < 1) nodeRevealProgress = Math.min(1, nodeRevealProgress + 0.025);
+                if (nodeRevealProgress > 0.45 && threadGrowProgress < 1) {
+                    threadGrowProgress = Math.min(1, threadGrowProgress + 0.012);
+                }
+                const easeThread = 1 - Math.pow(1 - threadGrowProgress, 3);
+
+                const flt = d.filter || "all";
+                const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+                const posMap = new Map();
+                visNodes.forEach((n) => posMap.set(Number(n.id), getScreenPos(n, t)));
+
+                // 5A. 绘制水珠之间慢慢洇开连接的 0.65px 柔弧水丝
+                (d.edges || []).forEach((ed, idx) => {
+                    const p1 = posMap.get(Number(ed.from));
+                    const p2 = posMap.get(Number(ed.to));
+                    if (!p1 || !p2) return;
+
+                    const localP = Math.max(0, Math.min(1, easeThread * 1.35 - (idx % 6) * 0.06));
+                    if (localP <= 0) return;
+
+                    const ctrl = getWaterThreadCtrl(p1, p2, idx);
+                    const isHi = Number(ed.from) === Number(d.activeNodeId) || Number(ed.to) === Number(d.activeNodeId);
+
+                    const segs = 22;
+                    const maxS = Math.max(1, Math.floor(segs * localP));
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    for (let s = 1; s <= maxS; s++) {
+                        const pt = evalBezier(p1, ctrl, p2, s / segs);
+                        ctx.lineTo(pt.x, pt.y);
+                    }
+
+                    // 水丝采用半透明白与冷银双层描边，模拟玻璃上的水痕折射
+                    ctx.strokeStyle = isHi ? "rgba(68, 80, 106, 0.58)" : "rgba(122, 136, 162, 0.28)";
+                    ctx.lineWidth = isHi ? 1.05 : 0.65;
+                    ctx.stroke();
+
+                    // 水丝上沿叠加 0.5px 纯白反光细丝
+                    if (isHi) {
+                        ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+
+                    // 水丝上挂着2颗微小静止露珠 + 极细悬浮关系小字（无白框！）
+                    if (localP > 0.95) {
+                        const b1 = evalBezier(p1, ctrl, p2, 0.33);
+                        const b2 = evalBezier(p1, ctrl, p2, 0.68);
+                        ctx.fillStyle = isHi ? "rgba(255, 255, 255, 0.92)" : "rgba(255, 255, 255, 0.55)";
+                        ctx.beginPath(); ctx.arc(b1.x, b1.y, 1.3, 0, Math.PI * 2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(b2.x, b2.y, 1.1, 0, Math.PI * 2); ctx.fill();
+
+                        if (isHi && ed.label) {
+                            const mid = evalBezier(p1, ctrl, p2, 0.5);
+                            ctx.save();
+                            ctx.font = "600 8px -apple-system, 'Apple SD Gothic Neo', sans-serif";
+                            ctx.textAlign = "center";
+                            ctx.shadowColor = "rgba(255, 255, 255, 0.95)";
+                            ctx.shadowBlur = 6;
+                            ctx.fillStyle = "#4A546A";
+                            ctx.fillText(ed.label, mid.x, mid.y - 5);
+                            ctx.restore();
+                        }
+                    }
+                });
+
+                // 5B. 绘制每一颗立体折射水珠节点 + 裸感清冷小字（绝无黑底胶囊框！）
+                visNodes.forEach((n) => {
+                    const p = posMap.get(Number(n.id));
+                    const isSel = Number(n.id) === Number(d.activeNodeId);
+                    const isCore = n.type === "core";
+                    const baseR = isCore ? 10.5 : (isSel ? 9.0 : 6.8);
+
+                    drawRealisticWaterDroplet(p.x, p.y, baseR * nodeRevealProgress, n.type, isSel, t, n.id);
+
+                    // 裸感韩系极细文字：直接轻浮在水珠正下方，带柔和白雾光晕护眼
+                    ctx.save();
+                    ctx.font = `${isSel || isCore ? "700 9.8px" : "500 8.8px"} -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
+                    ctx.textAlign = "center";
+                    ctx.shadowColor = "rgba(255, 255, 255, 0.96)";
+                    ctx.shadowBlur = 8;
+                    ctx.fillStyle = isSel || isCore ? "#242A36" : "#566076";
+                    ctx.fillText(n.title.slice(0, 7), p.x, p.y + baseR + 14);
+                    ctx.restore();
+                });
+            }
+
+            animId = requestAnimationFrame(renderDropletWebLoop);
+        }
+
+        // 命中检测：点选或按住拖拽水珠
+        function hitTestDroplet(px, py) {
+            const d = loadWebData();
+            if (!d || !d.isBound || d.activeTab !== "map") return null;
+            const flt = d.filter || "all";
+            const vis = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+            let best = null, minD = 28;
+            vis.forEach((n) => {
+                const dist = Math.hypot(px - (n.xPct / 100) * W, py - (n.yPct / 100) * H);
+                if (dist < minD) { minD = dist; best = n; }
+            });
+            return best;
+        }
+
+        function refreshMapBottomCard() {
+            const mapTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="map"]');
+            if (mapTab) mapTab.click();
+        }
+
+        canvas.addEventListener("pointerdown", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left, py = e.clientY - rect.top;
+            pStart = { x: px, y: py };
+            dragMoved = false;
+            const hit = hitTestDroplet(px, py);
+            if (hit) {
+                dragNodeId = hit.id;
+            } else {
+                addRipple(px, py, 44);
+            }
+        });
+
+        canvas.addEventListener("pointermove", (e) => {
+            if (!dragNodeId) return;
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left, py = e.clientY - rect.top;
+            if (Math.hypot(px - pStart.x, py - pStart.y) > 4) {
+                dragMoved = true;
+                const d = loadWebData();
+                const tn = d?.nodes?.find((x) => Number(x.id) === Number(dragNodeId));
+                if (tn) {
+                    tn.xPct = Math.max(10, Math.min(90, (px / W) * 100));
+                    tn.yPct = Math.max(16, Math.min(62, (py / H) * 100));
+                    saveWebData(d);
+                }
+            }
+        });
+
+        canvas.addEventListener("pointerup", () => {
+            if (!dragNodeId) return;
+            const d = loadWebData();
+            if (d) {
+                d.activeNodeId = dragNodeId;
+                saveWebData(d);
+                const tn = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
+                if (tn) addRipple((tn.xPct / 100) * W, (tn.yPct / 100) * H, 40);
+            }
+            dragNodeId = null;
+            refreshMapBottomCard();
+        });
+
+        // 顶栏「落雨」按钮：重演雨滴落下成水珠、再慢慢连成水丝网的全过程
         const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
         if (replayBtn) {
             replayBtn.onclick = (e) => {
                 e.stopPropagation();
-                chordStage.scrollTo({ top: 0, behavior: "smooth" });
-                renderRainChordView();
+                triggerRainSequence();
             };
         }
 
-        const vp = topDoc.getElementById("ks-main-viewport");
-        if (vp) {
-            const vpObs = new MutationObserver(() => renderRainChordView());
-            vpObs.observe(vp, { childList: true });
+        function checkOverlayOpen() {
+            if (overlay.classList.contains("open")) {
+                resize();
+                triggerRainSequence();
+                if (!animId) animId = requestAnimationFrame(renderDropletWebLoop);
+            } else if (animId) {
+                cancelAnimationFrame(animId);
+                animId = null;
+            }
         }
 
-        const openObs = new MutationObserver(() => {
-            if (overlay.classList.contains("open")) renderRainChordView();
-        });
-        openObs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
-
-        renderRainChordView();
+        const obs = new MutationObserver(checkOverlayOpen);
+        obs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
+        topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resize(); });
+        checkOverlayOpen();
     }
 
-    mountMinimalistRainChord();
+    mountRainWindowDropletWeb();
 })();
