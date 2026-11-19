@@ -6639,9 +6639,11 @@ bootSumoulApp();
 })();
 
 
+
+
 // ==========================================================================
-// 🤍 【结识海 · 100%纯白背景 + 俯视雨落同心涟漪(无竖条乱雨) + 4px极简高冷微点脉络网】
-// 用法：直接替换 index.js 最末尾刚才那段 mountRainWindowDropletWeb 补丁代码！
+// 🤍 【结识海 · 纯白极简微点脉络网 + 电影慢镜头级「真实水滴坠落 -> 微水珠飞溅 -> 三层水纹 -> 凝点连线」终极版】
+// 用法：直接替换 index.js 最末尾刚才那段 mountPureWhiteMinimalWeb 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -6673,21 +6675,21 @@ bootSumoulApp();
         try { localStorage.setItem(`sumoul_v16_ksea_5tabs__${getSafeScope()}`, JSON.stringify(d)); } catch (e) {}
     }
 
-    function mountPureWhiteMinimalWeb() {
+    function mountPureWhiteRaindropWeb() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
         const oldCanvas = topDoc.getElementById("ks-bg-canvas");
         if (!overlay || !oldCanvas) {
-            setTimeout(mountPureWhiteMinimalWeb, 200);
+            setTimeout(mountPureWhiteRaindropWeb, 200);
             return;
         }
 
-        // 清理之前所有残留画布与样式
+        // 清理旧节点
         ["ks-v2-canvas", "ks-v2-visual-css", "ks-v3-stage", "ks-v4-chord-stage", "ks-droplet-canvas", "ks-pure-canvas"].forEach((id) => topDoc.getElementById(id)?.remove());
 
         oldCanvas.width = 1;
         oldCanvas.height = 1;
 
-        // 1. 强制 100% 纯白背景 (#FFFFFF)，去掉一切灰脏渐变
+        // 1. 保持 100% 纯白干净背景 (#FFFFFF)
         const st = topDoc.createElement("style");
         st.id = "ks-v2-visual-css";
         st.innerHTML = `
@@ -6721,7 +6723,6 @@ bootSumoulApp();
         `;
         topDoc.head.appendChild(st);
 
-        // 2. 创建纯白极简画布
         const canvas = topDoc.createElement("canvas");
         canvas.id = "ks-pure-canvas";
         oldCanvas.insertAdjacentElement("afterend", canvas);
@@ -6730,8 +6731,12 @@ bootSumoulApp();
         let animId = null, W = 390, H = 780;
         let dragNodeId = null, dragMoved = false, pStart = { x: 0, y: 0 };
 
-        let lineGrow = 0; // 连线由 0 -> 1 缓慢延伸
-        const ripples = []; // 俯视雨落水波（纯同心细圆环，绝无难看的竖条雨线！）
+        // 物理落雨核心状态池
+        const fallingDrops = [];     // 正在从空中加速坠落的真实水滴
+        const splashBeads = [];      // 触水瞬间向上弹起的小水珠
+        const ripples = [];          // 荡开的三层同心水波纹
+        const landedNodeMap = new Map(); // 记录每个节点是否已被雨滴砸中显现 (nodeId -> revealAlpha 0~1)
+        let lineGrow = 0;            // 所有雨滴落定后，连线由 0 -> 1 缓慢生长
 
         function resize() {
             const rect = overlay.getBoundingClientRect();
@@ -6743,26 +6748,102 @@ bootSumoulApp();
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        // 在 (x, y) 处落下一滴无形微雨，荡开两圈极细同心圆涟漪
-        function spawnRainRipple(x, y, maxR = 48) {
-            ripples.push({ x, y, r: 1, maxR, alpha: 0.45 });
+        // 在 (x, y) 处触发触水微溅与三层渐次荡开的真实水纹
+        function triggerImpactSplash(x, y, isNodeImpact = true) {
+            const maxR = isNodeImpact ? 52 : 34;
+            // 第1圈主水纹
+            ripples.push({ x, y, r: 1.5, maxR, alpha: isNodeImpact ? 0.58 : 0.35, lw: 0.85 });
+            // 第2圈次水纹（延迟扩散）
             setTimeout(() => {
-                ripples.push({ x, y, r: 1, maxR: maxR * 0.65, alpha: 0.28 });
-            }, 160);
+                ripples.push({ x, y, r: 1, maxR: maxR * 0.72, alpha: isNodeImpact ? 0.38 : 0.22, lw: 0.6 });
+            }, 130);
+            // 第3圈余波微纹
+            if (isNodeImpact) {
+                setTimeout(() => {
+                    ripples.push({ x, y, r: 1, maxR: maxR * 0.45, alpha: 0.24, lw: 0.45 });
+                }, 260);
+            }
+
+            // 触水瞬间向上轻微溅起 4 颗微米级小水珠（皇冠回弹效应）
+            const count = isNodeImpact ? 4 : 2;
+            for (let i = 0; i < count; i++) {
+                const ang = -Math.PI * (0.25 + (i / (count - 1 || 1)) * 0.5) + (Math.random() - 0.5) * 0.2;
+                const spd = (isNodeImpact ? 1.8 : 1.2) + Math.random() * 1.1;
+                splashBeads.push({
+                    x,
+                    y,
+                    vx: Math.cos(ang) * spd,
+                    vy: Math.sin(ang) * spd - 0.8,
+                    baseY: y,
+                    r: isNodeImpact ? 1.2 : 0.9,
+                    alpha: 0.75
+                });
+            }
         }
 
-        // 触发所有节点依次落雨泛起涟漪，随后丝线慢慢连起
-        function triggerRippleSequence() {
+        // 发射一滴从空中垂直加速落向 (tx, ty) 的真实水滴
+        function spawnFallingRaindrop(tx, ty, targetNodeId = null, delayMs = 0) {
+            setTimeout(() => {
+                fallingDrops.push({
+                    x: tx,
+                    y: Math.max(-30, ty - (160 + Math.random() * 80)),
+                    startY: Math.max(-30, ty - 180),
+                    targetY: ty,
+                    vy: 3.2,
+                    gravity: 0.42,
+                    tailLen: 38,
+                    targetNodeId
+                });
+            }, delayMs);
+        }
+
+        // 触发全屏「雨滴依次落下 -> 砸出节点 -> 慢慢连成关系网」完整仪式
+        function playRainToWebSequence() {
             const d = loadWebData();
             if (!d || !d.isBound) return;
+            fallingDrops.length = 0;
+            landedNodeMap.clear();
             lineGrow = 0;
+
             const flt = d.filter || "all";
             const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
+
             visNodes.forEach((n, idx) => {
-                setTimeout(() => {
-                    spawnRainRipple((n.xPct / 100) * W, (n.yPct / 100) * H, 46);
-                }, idx * 90);
+                const tx = (n.xPct / 100) * W;
+                const ty = (n.yPct / 100) * H;
+                // 核心原点第一滴落下，其余记忆点错落降下
+                spawnFallingRaindrop(tx, ty, Number(n.id), idx * 140);
             });
+        }
+
+        // 绘制正在空中下落的「真实泪滴形雨珠 + 极细银丝尾迹」
+        function drawFallingTeardrop(fd) {
+            ctx.save();
+            // 1. 雨珠上方渐隐的极细水丝尾迹
+            const tailY = Math.max(fd.startY, fd.y - fd.tailLen);
+            const grad = ctx.createLinearGradient(fd.x, tailY, fd.x, fd.y);
+            grad.addColorStop(0, "rgba(30, 32, 40, 0)");
+            grad.addColorStop(0.7, "rgba(120, 128, 146, 0.28)");
+            grad.addColorStop(1, "rgba(30, 32, 40, 0.75)");
+
+            ctx.beginPath();
+            ctx.moveTo(fd.x, tailY);
+            ctx.lineTo(fd.x, fd.y);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 0.85;
+            ctx.lineCap = "round";
+            ctx.stroke();
+
+            // 2. 雨珠前端饱满的泪滴形水珠头
+            ctx.beginPath();
+            ctx.moveTo(fd.x, fd.y - 5.5);
+            ctx.bezierCurveTo(fd.x + 2.4, fd.y - 1.5, fd.x + 2.2, fd.y + 1.8, fd.x, fd.y + 2.0);
+            ctx.bezierCurveTo(fd.x - 2.2, fd.y + 1.8, fd.x - 2.4, fd.y - 1.5, fd.x, fd.y - 5.5);
+            ctx.closePath();
+            ctx.fillStyle = "#1E2028";
+            ctx.fill();
+
+            ctx.restore();
         }
 
         function getPos(n, t) {
@@ -6776,12 +6857,46 @@ bootSumoulApp();
             const t = ts * 0.001;
             ctx.clearRect(0, 0, W, H);
 
-            // 偶尔在纯白背景随机位置自然落下一滴极淡的水纹（模拟静谧雨落水面）
-            if (Math.random() < 0.018) {
-                spawnRainRipple(W * (0.12 + Math.random() * 0.76), H * (0.16 + Math.random() * 0.48), 32);
+            // 背景氛围：每隔约 2.5 秒在留白处静静落下一滴透明微雨，保持画面的鲜活落雨感
+            if (Math.random() < 0.009 && fallingDrops.length < 3) {
+                spawnFallingRaindrop(W * (0.12 + Math.random() * 0.76), H * (0.16 + Math.random() * 0.50), null, 0);
             }
 
-            // 1. 绘制俯视雨落同心圆涟漪（0.6px 极细冷灰圆环，扩散后自然消散）
+            // 1. 更新并绘制正在空中加速坠落的雨滴
+            for (let i = fallingDrops.length - 1; i >= 0; i--) {
+                const fd = fallingDrops[i];
+                fd.vy += fd.gravity;
+                fd.y += fd.vy;
+                drawFallingTeardrop(fd);
+
+                // 当雨滴触达目标水面高度时：炸开微溅水珠与涟漪，并唤醒该位置的记忆节点！
+                if (fd.y >= fd.targetY) {
+                    triggerImpactSplash(fd.x, fd.targetY, fd.targetNodeId !== null);
+                    if (fd.targetNodeId !== null) {
+                        landedNodeMap.set(Number(fd.targetNodeId), 0.05);
+                    }
+                    fallingDrops.splice(i, 1);
+                }
+            }
+
+            // 2. 更新并绘制触水瞬间飞溅回弹的微米级小水珠
+            for (let i = splashBeads.length - 1; i >= 0; i--) {
+                const sb = splashBeads[i];
+                sb.x += sb.vx;
+                sb.y += sb.vy;
+                sb.vy += 0.18; // 重力回落
+                sb.alpha *= 0.93;
+                if (sb.y > sb.baseY + 2 || sb.alpha < 0.05) {
+                    splashBeads.splice(i, 1);
+                    continue;
+                }
+                ctx.beginPath();
+                ctx.arc(sb.x, sb.y, sb.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(45, 50, 62, ${sb.alpha})`;
+                ctx.fill();
+            }
+
+            // 3. 更新并绘制荡开的同心圆水波涟漪
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const rp = ripples[i];
                 rp.r += (rp.maxR - rp.r) * 0.055 + 0.25;
@@ -6789,40 +6904,59 @@ bootSumoulApp();
                 if (rp.alpha < 0.015) { ripples.splice(i, 1); continue; }
                 ctx.beginPath();
                 ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(140, 146, 160, ${rp.alpha})`;
-                ctx.lineWidth = 0.65;
+                ctx.strokeStyle = `rgba(110, 118, 136, ${rp.alpha})`;
+                ctx.lineWidth = rp.lw || 0.65;
                 ctx.stroke();
             }
 
-            // 2. 绘制极简点状图（0.6px 极细连线 + 4px 纯粹微点）
+            // 4. 绘制「雨落凝结的 4px 极简微点 + 缓慢延伸的 0.6px 游丝连线」
             const d = loadWebData();
             if (d && d.isBound && d.activeTab === "map") {
-                if (lineGrow < 1) lineGrow = Math.min(1, lineGrow + 0.014);
-                const ease = 1 - Math.pow(1 - lineGrow, 3);
-
                 const flt = d.filter || "all";
                 const visNodes = (d.nodes || []).filter((n) => flt === "all" || n.type === "core" || n.type === flt);
                 const posMap = new Map();
-                visNodes.forEach((n) => posMap.set(Number(n.id), getPos(n, t)));
 
-                // 2A. 极细直线游丝（缓慢从起点延伸到终点，无任何杂乱小球！）
+                let landedCount = 0;
+                visNodes.forEach((n) => {
+                    const nid = Number(n.id);
+                    posMap.set(nid, getPos(n, t));
+                    // 如果没有触发动画（例如从其他Tab切回来），默认直接显示
+                    if (!landedNodeMap.has(nid) && fallingDrops.length === 0) {
+                        landedNodeMap.set(nid, 1);
+                    }
+                    if (landedNodeMap.has(nid)) {
+                        landedCount++;
+                        const curA = landedNodeMap.get(nid);
+                        if (curA < 1) landedNodeMap.set(nid, Math.min(1, curA + 0.04));
+                    }
+                });
+
+                // 当至少 2 滴雨落定成点后，丝线开始慢慢延伸连接
+                if (landedCount >= 2 && lineGrow < 1) {
+                    lineGrow = Math.min(1, lineGrow + 0.012);
+                }
+                const ease = 1 - Math.pow(1 - lineGrow, 3);
+
+                // 4A. 绘制慢慢延伸连接的极细直线游丝（仅当两端雨滴都已落定成点时才开始拉线！）
                 (d.edges || []).forEach((ed, idx) => {
-                    const p1 = posMap.get(Number(ed.from));
-                    const p2 = posMap.get(Number(ed.to));
+                    const id1 = Number(ed.from), id2 = Number(ed.to);
+                    if (!landedNodeMap.has(id1) || !landedNodeMap.has(id2)) return;
+
+                    const p1 = posMap.get(id1), p2 = posMap.get(id2);
                     if (!p1 || !p2) return;
 
-                    const prog = Math.max(0, Math.min(1, ease * 1.3 - (idx % 5) * 0.06));
+                    const prog = Math.max(0, Math.min(1, ease * 1.35 - (idx % 5) * 0.06));
                     if (prog <= 0) return;
 
                     const cx = p1.x + (p2.x - p1.x) * prog;
                     const cy = p1.y + (p2.y - p1.y) * prog;
-                    const isHi = Number(ed.from) === Number(d.activeNodeId) || Number(ed.to) === Number(d.activeNodeId);
+                    const isHi = id1 === Number(d.activeNodeId) || id2 === Number(d.activeNodeId);
 
                     ctx.beginPath();
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(cx, cy);
-                    ctx.strokeStyle = isHi ? "rgba(30, 32, 40, 0.65)" : "rgba(190, 195, 208, 0.55)";
-                    ctx.lineWidth = isHi ? 0.9 : 0.6;
+                    ctx.strokeStyle = isHi ? "rgba(30, 32, 40, 0.68)" : "rgba(185, 190, 204, 0.55)";
+                    ctx.lineWidth = isHi ? 0.95 : 0.6;
                     ctx.stroke();
 
                     if (isHi && prog > 0.95 && ed.label) {
@@ -6836,22 +6970,29 @@ bootSumoulApp();
                     }
                 });
 
-                // 2B. 极简主义 4px 微点（外圈白底隔断连线 + 极简小实心点/空心点 + 干净细字）
+                // 4B. 绘制已落雨凝结的 4px 极简微点
                 visNodes.forEach((n) => {
-                    const p = posMap.get(Number(n.id));
-                    const isSel = Number(n.id) === Number(d.activeNodeId);
-                    const isCore = n.type === "core";
-                    const dotR = isCore ? 4.5 : (isSel ? 4.0 : 3.0);
+                    const nid = Number(n.id);
+                    const reveal = landedNodeMap.get(nid) || 0;
+                    if (reveal <= 0) return;
 
-                    // 白色呼吸留白圈（让连线在靠近圆点处自然留白断开，极具设计感！）
+                    const p = posMap.get(nid);
+                    const isSel = nid === Number(d.activeNodeId);
+                    const isCore = n.type === "core";
+                    const dotR = (isCore ? 4.5 : (isSel ? 4.0 : 3.0)) * reveal;
+
+                    ctx.save();
+                    ctx.globalAlpha = reveal;
+
+                    // 白色留白呼吸圈（隔断连线）
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, dotR + 4.5, 0, Math.PI * 2);
                     ctx.fillStyle = "#FFFFFF";
                     ctx.fill();
 
-                    // 选中或核心点：外围一圈 0.6px 极细静谧圆环
+                    // 选中或核心点：外围 0.6px 极细静谧圆环
                     if (isSel || isCore) {
-                        const ringR = dotR + 5.5 + Math.sin(t * 2 + n.id) * 1.2;
+                        const ringR = dotR + 5.5 + Math.sin(t * 2 + nid) * 1.2;
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, ringR, 0, Math.PI * 2);
                         ctx.strokeStyle = isSel ? "rgba(30, 32, 40, 0.45)" : "rgba(150, 156, 170, 0.4)";
@@ -6863,14 +7004,12 @@ bootSumoulApp();
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
                     if (n.type === "memory" && !isSel) {
-                        // 记忆点：白心细灰边小圆点
                         ctx.fillStyle = "#FFFFFF";
                         ctx.fill();
                         ctx.strokeStyle = "#585E70";
                         ctx.lineWidth = 1.2;
                         ctx.stroke();
                     } else {
-                        // 核心/选中/心结：纯粹深炭小点
                         ctx.fillStyle = isSel || isCore ? "#1E2028" : "#7E8494";
                         ctx.fill();
                     }
@@ -6880,6 +7019,8 @@ bootSumoulApp();
                     ctx.textAlign = "center";
                     ctx.fillStyle = isSel || isCore ? "#1E2028" : "#8E94A4";
                     ctx.fillText(n.title.slice(0, 7), p.x, p.y + dotR + 14);
+
+                    ctx.restore();
                 });
             }
 
@@ -6913,7 +7054,8 @@ bootSumoulApp();
             if (hit) {
                 dragNodeId = hit.id;
             } else {
-                spawnRainRipple(px, py, 42);
+                // 点击空白处：直接从上方落下一滴真实雨珠砸在手指点击的位置！
+                spawnFallingRaindrop(px, py, null, 0);
             }
         });
 
@@ -6940,24 +7082,25 @@ bootSumoulApp();
                 d.activeNodeId = dragNodeId;
                 saveWebData(d);
                 const tn = d.nodes.find((x) => Number(x.id) === Number(dragNodeId));
-                if (tn) spawnRainRipple((tn.xPct / 100) * W, (tn.yPct / 100) * H, 42);
+                if (tn) triggerImpactSplash((tn.xPct / 100) * W, (tn.yPct / 100) * H, true);
             }
             dragNodeId = null;
             refreshCard();
         });
 
+        // 顶栏「落雨」按钮：完整重演「雨滴落下 -> 触水飞溅 -> 凝点 -> 连线」全过程
         const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
         if (replayBtn) {
             replayBtn.onclick = (e) => {
                 e.stopPropagation();
-                triggerRippleSequence();
+                playRainToWebSequence();
             };
         }
 
         function checkOpen() {
             if (overlay.classList.contains("open")) {
                 resize();
-                triggerRippleSequence();
+                playRainToWebSequence();
                 if (!animId) animId = requestAnimationFrame(renderPureLoop);
             } else if (animId) {
                 cancelAnimationFrame(animId);
@@ -6971,5 +7114,5 @@ bootSumoulApp();
         checkOpen();
     }
 
-    mountPureWhiteMinimalWeb();
+    mountPureWhiteRaindropWeb();
 })();
