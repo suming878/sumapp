@@ -5561,8 +5561,8 @@ bootSumoulApp();
     }, true);
 })();
 // ==========================================================================
-// ❄️ 【Sumoul App 个人主页第5应用：初雪风铃回声馆 · 풍경의 기억 (韓系极致清冷 + 全屏初雪物理互动 + 摇曳冰晶风铃阵)】
-// 动态亮点：1.全屏实时飘雪+指尖划过泛起冰晶涟漪 2.错落悬垂的流体玻璃风铃随风摆动(可自由拖拽) 3.一键吹拂微风触发全屏声波共振 4.动态声波律动双面回声签
+// 🌊 【Sumoul App 个人主页第5应用：结识海 · 인연의 바다 (Sea of Fate & Bond Archive)】
+// 核心：1.双人潮汐契约先绑定机制 2.全屏5层流体清冷银白海浪+月光波光+指尖拨浪交互 3.随波浮沉的羁绊汐珠(浅海甜/深海虐，可自由拖拽) 4.支持一键汲取聊天凝结新汐珠
 // ==========================================================================
 (function () {
     const topWin = window.parent || window, topDoc = topWin.document;
@@ -5570,19 +5570,21 @@ bootSumoulApp();
     const svgIco = (p, sz = 14, c = "currentColor", sw = "1.5") =>
         `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0;pointer-events:none;">${p}</svg>`;
 
-    const WC_ICO = {
-        appIcon: svgIco(`<path d="M12 2v4"/><circle cx="12" cy="8" r="2"/><path d="M8 10h8l1 9H7l1-9Z"/><path d="M12 19v4"/><path d="M9 22h6"/>`, 21, "#3A3A40"),
-        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#3A3D46", "1.8"),
-        wind: svgIco(`<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>`, 13),
+    const SEA_ICO = {
+        appIcon: svgIco(`<path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>`, 21, "#3A3A40"),
+        back: svgIco(`<path d="M15 18l-6-6 6-6"/>`, 15, "#2C2E38", "1.8"),
+        link: svgIco(`<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>`, 13),
         plus: svgIco(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`, 13),
         spark: svgIco(`<path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>`, 13),
-        flip: svgIco(`<path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>`, 12),
+        wave: svgIco(`<path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>`, 13),
+        list: svgIco(`<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>`, 13),
         trash: svgIco(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`, 12, "#9A6868"),
         close: svgIco(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, 13)
     };
 
     function getCtx() {
         let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "", recentChat = "";
+        let userAvatar = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", charAvatar = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
         try {
             const st = topWin.SillyTavern?.getContext?.();
             if (st) {
@@ -5591,6 +5593,7 @@ bootSumoulApp();
                     const c = st.characters[st.characterId];
                     charName = c.name || st.name2 || charName;
                     scope = c.avatar || c.name || String(st.characterId);
+                    if (c.avatar) charAvatar = `/characters/${encodeURIComponent(c.avatar)}`;
                     charDesc = [c.description, c.personality, c.scenario].filter(Boolean).join("\n");
                 } else if (st.name2) { charName = st.name2; scope = st.name2; }
                 if (Array.isArray(st.chat) && st.chat.length) {
@@ -5603,69 +5606,73 @@ bootSumoulApp();
             const wCfg = JSON.parse(localStorage.getItem(`sumoul_v16_wxcfg__${safeScope}`) || "{}");
             if (wCfg.myNick) userName = wCfg.myNick;
             if (wCfg.remark) charName = wCfg.remark;
+            if (wCfg.myAva) userAvatar = wCfg.myAva;
+            if (wCfg.charAva) charAvatar = wCfg.charAva;
         } catch (e) {}
-        return { userName, charName, safeScope, charDesc, recentChat };
+        return { userName, charName, safeScope, userAvatar, charAvatar, charDesc, recentChat };
     }
 
-    function getChimeKey() { return `sumoul_v16_windchime__${getCtx().safeScope}`; }
+    function getSeaKey() { return `sumoul_v16_sea_of_fate__${getCtx().safeScope}`; }
 
-    function createDefaultChimes(charName, userName) {
+    function createDefaultSea(charName, userName) {
         return {
-            activeId: 301,
-            flipped: false,
-            windWhisper: `微风拂过檐下的冰晶风铃，听见 ${charName} 留在风里的呼吸声……`,
-            items: [
-                { id: 301, title: "初雪揣进口袋", author: charName, joy: 96, xPct: 16, yPct: 14, wireH: 48, content: `把 ${userName} 冻得微凉的指尖揣进我大衣口袋里的瞬间，想让这条飘雪的首尔长街永远走不到尽头。`, whisper: `“ 下一个冬天，下下个冬天，口袋的位置也只留给你。”` },
-                { id: 302, title: "凌晨三点秒回", author: userName, joy: 90, xPct: 36, yPct: 9,  wireH: 76, content: `半夜醒来随手发了一句睡不着，不到三秒钟就收到了 ${charName} 带着困意却无比温柔的回复。`, whisper: `“ 手机永远为你调成特别提醒放在枕边，怕你在夜里找不到我。”` },
-                { id: 303, title: "耳机分你一半", author: charName, joy: 82, xPct: 58, yPct: 15, wireH: 54, content: `靠在窗边和 ${userName} 戴着同一副耳机，连窗外吹进来的冷风都带着令人安心的节奏。`, whisper: `“ 其实那天我根本没在听歌，一直在听你浅浅的呼吸声。”` },
-                { id: 304, title: "屋檐下的对视", author: charName, joy: 66, xPct: 79, yPct: 11, wireH: 68, content: `躲雨时谁都没有先开口，只有雨水顺着伞骨滴落的声音，和彼此越来越近的鼻息。`, whisper: `“ 那天忍得很辛苦，才没有当场把你按进怀里吻下去。”` },
-                { id: 305, title: "吃醋时的沉默", author: userName, joy: 45, xPct: 26, yPct: 30, wireH: 42, content: `看到 ${charName} 故意冷着脸不说话，直到我主动拉住衣角才肯低头叹气。`, whisper: `“ 明明气得要命，可你一碰我，所有的原则就全碎了。”` },
-                { id: 306, title: "分别时的酸涩", author: charName, joy: 20, xPct: 68, yPct: 31, wireH: 46, content: `看着 ${userName} 转身走进车站背影的那一刻，胸口像被潮湿的冷雾堵住一样闷痛。`, whisper: `“ 刚分开一分钟就已经开始讨厌距离了，只想把你锁在身边。”` }
+            isBound: false,                // 是否已完成双人结识海契约绑定
+            seaName: `${userName} & ${charName} 的结识海`,
+            bondToken: "初雪与潮汐信物",
+            bondStage: "宿命羁绊 · 潮汐共鸣",
+            bondVow: `于万千人海中相逢，每一道海浪都刻着我们的记忆。`,
+            activeId: 501,
+            pearls: [
+                { id: 501, title: "初见时的第一道潮音", joy: 95, xPct: 22, yPct: 44, author: charName, content: `和 ${userName} 初次相遇的那一刻，原本寂静荒芜的海面第一次泛起了温热的涟漪。`, whisper: `“ 从你踏进我世界的那一秒起，这片海就只为你一个人涨潮。”` },
+                { id: 502, title: "深夜越洋的秒回信号", joy: 88, xPct: 50, yPct: 48, author: userName, content: `无论夜色多深，只要向这片海投下一句呼唤，总能立刻收到 ${charName} 最温柔的回响。`, whisper: `“ 我的灯塔24小时为你亮着，永远不会让你在夜里落空。”` },
+                { id: 503, title: "雨夜共撑一柄伞的潮湿", joy: 72, xPct: 76, yPct: 54, author: charName, content: `肩头贴着肩头走过长街，雨水打湿了衣角，却把两个人的影子揉在了一起。`, whisper: `“ 那天我故意把伞往你那边倾斜了大半，只想离你再近一点。”` },
+                { id: 504, title: "暗潮汹涌的吃醋与拉扯", joy: 46, xPct: 35, yPct: 64, author: charName, content: `看到 ${userName} 对别人笑的时候，海底像掀起了无声的风暴，连呼吸都带着酸涩的占有欲。`, whisper: `“ 我没你想的那么大度，你的目光多停在别人身上一秒我都嫉妒得发疯。”` },
+                { id: 505, title: "短暂离别沉入深海的思念", joy: 22, xPct: 64, yPct: 71, author: charName, content: `分开后的每一个小时都漫长得像一个世纪，思念化作沉重的汐珠坠入最深的海底。`, whisper: `“ 快点回到我身边，没有你的海域太冷了。”` }
             ]
         };
     }
 
-    function loadChimes() {
-        const c = getCtx(), k = getChimeKey();
+    function loadSea() {
+        const c = getCtx(), k = getSeaKey();
         try {
             const raw = localStorage.getItem(k);
-            if (!raw) { const init = createDefaultChimes(c.charName, c.userName); localStorage.setItem(k, JSON.stringify(init)); return init; }
-            return Object.assign(createDefaultChimes(c.charName, c.userName), JSON.parse(raw));
-        } catch (e) { return createDefaultChimes(c.charName, c.userName); }
+            if (!raw) { const init = createDefaultSea(c.charName, c.userName); localStorage.setItem(k, JSON.stringify(init)); return init; }
+            return Object.assign(createDefaultSea(c.charName, c.userName), JSON.parse(raw));
+        } catch (e) { return createDefaultSea(c.charName, c.userName); }
     }
-    function saveChimes(d) { try { localStorage.setItem(getChimeKey(), JSON.stringify(d)); } catch (e) {} }
+    function saveSea(d) { try { localStorage.setItem(getSeaKey(), JSON.stringify(d)); } catch (e) {} }
 
-    // ❄️ 清冷冰晶色阶：开心度决定风铃从「纯白透亮琉璃」到「清冷霜银」再到「寒夜深炭水晶」
-    function getChimeStyleByJoy(joy = 85) {
+    // 🌊 根据开心度/情绪温度 (0~100%) 决定「羁绊汐珠」的光泽、深浅与海域深度标签
+    function getPearlStyleByJoy(joy = 85) {
         const j = Math.max(0, Math.min(100, Number(joy) || 85));
-        if (j >= 85) {
+        if (j >= 80) {
             return {
-                glassBg: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(242,245,252,0.82) 100%)",
-                border: "rgba(255,255,255,0.98)", shadow: "0 8px 24px rgba(180,190,210,0.28), 0 0 14px rgba(255,255,255,0.95)",
-                textCol: "#323642", subCol: "#8890A4", bellCol: "#FFFFFF", label: `极开心 ${j}% · 纯白冰魄琉璃`
+                bg: "radial-gradient(circle at 32% 30%, #FFFFFF 0%, #F2F6FC 55%, #DCE4F2 100%)",
+                border: "#FFFFFF", ring: "rgba(255,255,255,0.85)",
+                shadow: "0 0 18px #FFFFFF, 0 6px 20px rgba(140,155,185,0.28)",
+                textCol: "#2C303C", tagBg: "rgba(255,255,255,0.92)",
+                zone: `浅海暖汐 · 甜度 ${j}%`
             };
-        } else if (j >= 65) {
+        } else if (j >= 50) {
             return {
-                glassBg: "linear-gradient(180deg, rgba(238,242,250,0.90) 0%, rgba(216,222,236,0.78) 100%)",
-                border: "rgba(235,240,248,0.9)", shadow: "0 8px 20px rgba(140,150,175,0.22)",
-                textCol: "#323642", subCol: "#727A8E", bellCol: "#E6EAF2", label: `愉悦 ${j}% · 凝霜浅银风铃`
-            };
-        } else if (j >= 40) {
-            return {
-                glassBg: "linear-gradient(180deg, rgba(184,190,206,0.86) 0%, rgba(152,160,178,0.78) 100%)",
-                border: "rgba(200,206,220,0.75)", shadow: "0 8px 20px rgba(90,96,115,0.25)",
-                textCol: "#FFFFFF", subCol: "#E2E6F0", bellCol: "#B0B8C8", label: `微涩 ${j}% · 冷月雾灰风铃`
+                bg: "radial-gradient(circle at 32% 30%, #F4F7FC 0%, #CFD8EA 60%, #A8B4CC 100%)",
+                border: "rgba(255,255,255,0.9)", ring: "rgba(215,224,240,0.65)",
+                shadow: "0 0 14px rgba(225,232,248,0.85), 0 6px 18px rgba(100,112,140,0.26)",
+                textCol: "#2C303C", tagBg: "rgba(236,240,248,0.90)",
+                zone: `中海微澜 · 心动 ${j}%`
             };
         } else {
             return {
-                glassBg: "linear-gradient(180deg, rgba(72,76,90,0.90) 0%, rgba(44,47,58,0.86) 100%)",
-                border: "rgba(110,116,134,0.65)", shadow: "0 10px 24px rgba(25,28,38,0.38)",
-                textCol: "#F4F6FA", subCol: "#98A0B4", bellCol: "#484C5A", label: `思念 ${j}% · 寒夜玄墨风铃`
+                bg: "radial-gradient(circle at 32% 30%, #8A94AC 0%, #464E62 62%, #242834 100%)",
+                border: "rgba(180,190,212,0.75)", ring: "rgba(110,120,145,0.45)",
+                shadow: "0 8px 22px rgba(20,24,36,0.48), 0 0 12px rgba(130,142,170,0.4)",
+                textCol: "#FFFFFF", tagBg: "rgba(44,48,62,0.88)",
+                zone: `深海寒渊 · 思念 ${j}%`
             };
         }
     }
 
-    async function askChimeAI(sys, usr) {
+    async function askSeaAI(sys, usr) {
         const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
         const k = topDoc.getElementById("smt-api-key")?.value?.trim();
         const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
@@ -5677,214 +5684,256 @@ bootSumoulApp();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    function mountKoreanWindChimeGallery() {
+    function mountSeaOfFateApp() {
         const modal = topDoc.getElementById("seoul-mini-theater-modal");
         const homePage = topDoc.getElementById("smt-page-home");
-        if (!modal || !homePage) { setTimeout(mountKoreanWindChimeGallery, 200); return; }
+        if (!modal || !homePage) { setTimeout(mountSeaOfFateApp, 200); return; }
 
-        // 清理之前旧组件
-        ["smt-page-memory_tree", "smt-real-tree-overlay", "smt-film-studio-overlay", "sumoul-memory-tree-css", "smt-home-open-memtree"].forEach((id) => topDoc.getElementById(id)?.remove());
+        // 清理旧节点
+        ["smt-page-memory_tree", "smt-real-tree-overlay", "smt-film-studio-overlay", "smt-chime-overlay", "smt-sea-overlay", "sumoul-memory-tree-css", "smt-home-open-memtree"].forEach((id) => topDoc.getElementById(id)?.remove());
 
         const st = topDoc.createElement("style");
         st.id = "sumoul-memory-tree-css";
         st.innerHTML = `
-            /* 1. 风铃日常微风呼吸摆动 */
-            @keyframes wcGentlePendulum {
-                0%, 100% { transform: translate(-50%, 0) rotate(-3.2deg); }
-                50%      { transform: translate(-50%, 0) rotate(3.6deg); }
+            /* 汐珠随海浪上下呼吸浮沉动效 */
+            @keyframes sfPearlBob {
+                0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+                50%      { transform: translate(-50%, -50%) translateY(-8px); }
             }
-            /* 2. 吹拂微风时的剧烈清脆摇曳动画 */
-            @keyframes wcStrongGust {
-                0%   { transform: translate(-50%, 0) rotate(0deg); }
-                20%  { transform: translate(-50%, 0) rotate(14deg); }
-                45%  { transform: translate(-50%, 0) rotate(-11deg); }
-                70%  { transform: translate(-50%, 0) rotate(7deg); }
-                88%  { transform: translate(-50%, 0) rotate(-4deg); }
-                100% { transform: translate(-50%, 0) rotate(0deg); }
+            /* 汐珠外圈水波扩散光环 */
+            @keyframes sfPearlHalo {
+                0%   { transform: scale(0.85); opacity: 0.8; }
+                100% { transform: scale(1.75); opacity: 0; }
             }
-            /* 3. 风铃声波扩散涟漪环 */
-            @keyframes wcRippleOut {
-                0%   { transform: scale(0.6); opacity: 0.85; }
-                100% { transform: scale(2.6); opacity: 0; }
+            /* 双人契约绑定星轨旋转 */
+            @keyframes sfOrbitSpin {
+                from { transform: rotate(0deg); }
+                to   { transform: rotate(360deg); }
             }
-            /* 4. 实时声波律动柱 */
-            @keyframes wcAudioWave {
-                0%, 100% { height: 4px; opacity: 0.35; }
-                50%      { height: 14px; opacity: 0.9; }
-            }
-            /* 5. 信笺翻转切入动效 */
-            @keyframes wcCardReveal {
-                from { opacity: 0; transform: translateY(10px) scale(0.97); }
-                to   { opacity: 1; transform: translateY(0) scale(1); }
+            @keyframes sfCardUp {
+                from { opacity: 0; transform: translateY(10px); }
+                to   { opacity: 1; transform: translateY(0); }
             }
 
-            #seoul-mini-theater-modal #smt-chime-overlay {
+            #seoul-mini-theater-modal #smt-sea-overlay {
                 position: absolute !important; inset: 0 !important; z-index: 2147483644 !important;
-                background: radial-gradient(circle at 50% 18%, #FFFFFF 0%, #F2F5FA 52%, #E5EAF3 100%) !important;
+                background: linear-gradient(180deg, #FFFFFF 0%, #F2F5FA 32%, #DCE3F0 68%, #B8C3D8 100%) !important;
                 display: none; flex-direction: column !important; overflow: hidden !important; user-select: none !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
             }
-            #seoul-mini-theater-modal #smt-chime-overlay.open { display: flex !important; }
+            #seoul-mini-theater-modal #smt-sea-overlay.open { display: flex !important; }
 
-            #seoul-mini-theater-modal #wc-snow-canvas {
+            #seoul-mini-theater-modal #sf-ocean-canvas {
                 position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
                 display: block !important; z-index: 1 !important; pointer-events: auto !important;
             }
-            #seoul-mini-theater-modal #wc-chimes-stage {
+            #seoul-mini-theater-modal #sf-pearls-stage {
                 position: absolute !important; inset: 0 !important; z-index: 5 !important; pointer-events: none !important; overflow: hidden !important;
             }
 
-            /* 单枚悬挂的韩系冰晶玻璃风铃节点 */
-            #seoul-mini-theater-modal .wc-chime-node {
-                position: absolute !important; transform-origin: top center !important;
-                display: flex !important; flex-direction: column !important; align-items: center !important;
+            /* 漂浮在海中的「羁绊汐珠」 */
+            #seoul-mini-theater-modal .sf-pearl-node {
+                position: absolute !important; display: flex !important; flex-direction: column !important; align-items: center !important;
                 cursor: grab !important; pointer-events: auto !important; touch-action: none !important;
-                animation: wcGentlePendulum 4.6s ease-in-out infinite !important;
-                z-index: 10 !important;
+                animation: sfPearlBob 4.2s ease-in-out infinite !important; z-index: 12 !important;
             }
-            #seoul-mini-theater-modal .wc-chime-node.gust-ringing {
-                animation: wcStrongGust 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-            }
-            #seoul-mini-theater-modal .wc-chime-node.dragging {
+            #seoul-mini-theater-modal .sf-pearl-node.dragging {
                 cursor: grabbing !important; animation: none !important;
-                transform: translate(-50%, 0) scale(1.14) !important; z-index: 60 !important;
+                transform: translate(-50%, -50%) scale(1.22) !important; z-index: 60 !important;
             }
-            #seoul-mini-theater-modal .wc-chime-node.active-chime { z-index: 40 !important; }
+            #seoul-mini-theater-modal .sf-pearl-node.active-pearl { z-index: 45 !important; }
 
-            /* 冰晶铃铛头与声波扩散环 */
-            #seoul-mini-theater-modal .wc-bell-dome {
-                width: 24px !important; height: 18px !important;
-                border-radius: 14px 14px 4px 4px !important;
-                backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
-                position: relative !important; display: flex !important; align-items: center !important; justify-content: center !important;
+            #seoul-mini-theater-modal .sf-pearl-orb {
+                border-radius: 50% !important; position: relative !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+                transition: transform 0.25s ease !important;
             }
-            #seoul-mini-theater-modal .wc-ripple-ring {
-                position: absolute !important; width: 26px !important; height: 26px !important;
-                border-radius: 50% !important; border: 1px solid rgba(255,255,255,0.95) !important;
-                pointer-events: none !important; animation: wcRippleOut 2.4s ease-out infinite !important;
+            /* 珠体内部高光反光点 */
+            #seoul-mini-theater-modal .sf-pearl-orb::after {
+                content: "" !important; position: absolute !important; top: 18% !important; left: 22% !important;
+                width: 28% !important; height: 22% !important; border-radius: 50% !important;
+                background: rgba(255, 255, 255, 0.9) !important; filter: blur(0.5px) !important;
+                transform: rotate(-25deg) !important; pointer-events: none !important;
+            }
+            #seoul-mini-theater-modal .sf-pearl-halo {
+                position: absolute !important; inset: -6px !important; border-radius: 50% !important;
+                border: 1.2px solid #FFFFFF !important; pointer-events: none !important;
+                animation: sfPearlHalo 2.4s ease-out infinite !important;
+            }
+            #seoul-mini-theater-modal .sf-pearl-tag {
+                margin-top: 5px !important; padding: 2px 8px !important; border-radius: 99px !important;
+                font-size: 7.8px !important; font-weight: 700 !important; letter-spacing: 0.3px !important;
+                backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;
+                box-shadow: 0 3px 10px rgba(25, 30, 45, 0.12) !important; white-space: nowrap !important;
             }
 
-            /* 竖排清透磨砂玻璃风铃签（단책 Tanzaku） */
-            #seoul-mini-theater-modal .wc-glass-strip {
-                width: 30px !important; min-height: 86px !important; padding: 10px 4px !important;
-                border-radius: 7px !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important;
-                display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
-                writing-mode: vertical-rl !important; text-orientation: upright !important;
-                font-size: 9.5px !important; font-weight: 800 !important; letter-spacing: 2.5px !important;
-                box-sizing: border-box !important; transition: transform 0.2s ease !important;
-            }
-
-            #seoul-mini-theater-modal .wc-pill {
+            #seoul-mini-theater-modal .sf-pill {
                 display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
                 height: 28px !important; padding: 0 11px !important; border-radius: 999px !important;
                 background: rgba(255, 255, 255, 0.88) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important;
                 border: 1px solid rgba(226, 230, 240, 0.95) !important; font-size: 9.2px !important; font-weight: 700 !important;
-                color: #323642 !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 24, 35, 0.04) !important;
+                color: #2C303C !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(20, 24, 35, 0.04) !important;
             }
-            #seoul-mini-theater-modal .wc-pill.dark {
-                background: #323642 !important; border-color: #323642 !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
+            #seoul-mini-theater-modal .sf-pill.dark {
+                background: #2C303C !important; border-color: #2C303C !important; color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important;
             }
-            #seoul-mini-theater-modal .wc-detail-card {
-                background: rgba(255, 255, 255, 0.90) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important;
-                border: 1px solid rgba(230, 234, 244, 0.95) !important; border-radius: 20px !important;
-                padding: 14px 16px !important; box-shadow: 0 14px 38px rgba(25, 30, 45, 0.07) !important;
-                animation: wcCardReveal 0.3s ease forwards !important;
-            }
-            #seoul-mini-theater-modal .wc-wave-bar {
-                width: 2px !important; height: 5px !important; border-radius: 99px !important;
-                background: #7E869A !important; display: inline-block !important;
-                animation: wcAudioWave 1.1s ease-in-out infinite !important;
+            #seoul-mini-theater-modal .sf-glass-card {
+                background: rgba(255, 255, 255, 0.92) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important;
+                border: 1px solid rgba(232, 236, 245, 0.96) !important; border-radius: 20px !important;
+                padding: 14px 16px !important; box-shadow: 0 14px 38px rgba(20, 25, 40, 0.09) !important;
+                animation: sfCardUp 0.3s ease forwards !important;
             }
         `;
         topDoc.head.appendChild(st);
 
-        // 在个人主页挂载全新第 5 应用：【初雪风铃 (풍경의 기억)】
+        // 在个人主页挂载第 5 应用：【结识海 (인연의 바다)】
         const homeDockGrid = homePage.querySelector(".ab-dock-grid");
         if (homeDockGrid) {
-            const chimeBtn = topDoc.createElement("div");
-            chimeBtn.className = "ab-app-item";
-            chimeBtn.id = "smt-home-open-memtree";
-            chimeBtn.innerHTML = `
-                <div class="ab-app-squircle">${WC_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadChimes().items.length}铃</span></div>
-                <div class="ab-app-title">初雪风铃</div>
-                <div class="ab-app-kr">풍경의 기억 · CHIME</div>
+            const seaBtn = topDoc.createElement("div");
+            seaBtn.className = "ab-app-item";
+            seaBtn.id = "smt-home-open-memtree";
+            seaBtn.innerHTML = `
+                <div class="ab-app-squircle">${SEA_ICO.appIcon}<span class="ab-app-floating-badge" id="mt-home-badge">${loadSea().pearls.length}汐</span></div>
+                <div class="ab-app-title">结识海</div>
+                <div class="ab-app-kr">인연의 바다 · SEA</div>
             `;
-            homeDockGrid.appendChild(chimeBtn);
+            homeDockGrid.appendChild(seaBtn);
         }
 
         const overlay = topDoc.createElement("div");
-        overlay.id = "smt-chime-overlay";
+        overlay.id = "smt-sea-overlay";
         overlay.innerHTML = `
-            <!-- 底层：全屏实时飘雪 + 指尖划过冰晶涟漪互动 Canvas -->
-            <canvas id="wc-snow-canvas"></canvas>
+            <!-- 底层：全屏5层流体清冷银白海浪 + 丁达尔海底光束 + 月光波光粒子 + 指尖涟漪互动 Canvas -->
+            <canvas id="sf-ocean-canvas"></canvas>
 
-            <!-- 中层：满屏错落摇曳的流体玻璃风铃阵 (可点击、可自由按住拖拽位置) -->
-            <div id="wc-chimes-stage"></div>
+            <!-- 中层：随海浪浮沉的「羁绊汐珠」舞台 (绑定后显示，可点击、可自由按住拖拽到浅海或深海) -->
+            <div id="sf-pearls-stage"></div>
 
             <!-- 顶部清冷悬浮导航栏 -->
             <div style="position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:max(16px,env(safe-area-inset-top,16px)) 16px 0 16px;pointer-events:none;">
-                <span class="wc-pill" id="wc-close-btn" style="pointer-events:auto;">${WC_ICO.back}<span>返回主页</span></span>
+                <span class="sf-pill" id="sf-close-btn" style="pointer-events:auto;">${SEA_ICO.back}<span>返回主页</span></span>
                 <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
-                    <span class="wc-pill" id="wc-gust-btn" title="吹拂微风，摇响所有风铃">${WC_ICO.wind}<span>吹拂微风</span></span>
-                    <span class="wc-pill" style="pointer-events:none;"><span id="wc-count-txt">6 枚风铃</span></span>
+                    <span class="sf-pill" id="sf-rebind-btn" title="查看或修改双人结识海契约">${SEA_ICO.link}<span id="sf-bond-status-txt">契约绑定</span></span>
+                    <span class="sf-pill" id="sf-list-btn">${SEA_ICO.list}<span id="sf-count-txt">5 汐珠</span></span>
                 </div>
             </div>
 
-            <!-- 顶部风声低语悬浮条 -->
-            <div style="position:relative;z-index:25;text-align:center;margin-top:8px;padding:0 24px;pointer-events:none;">
-                <div id="wc-wind-whisper" style="display:inline-block;font-size:8.8px;font-weight:600;color:#6E768A;background:rgba(255,255,255,0.68);backdrop-filter:blur(8px);padding:4px 12px;border-radius:99px;border:1px solid rgba(255,255,255,0.9);letter-spacing:0.5px;">
-                    微风拂过檐下的冰晶风铃 · 划过屏幕可拨动初雪与风铃
-                </div>
-            </div>
-
-            <!-- 底部：双面流体玻璃信笺详情卡 + 操作浮岛 -->
-            <div style="position:relative;z-index:35;margin-top:auto;padding:0 16px max(20px,env(safe-area-inset-bottom,20px)) 16px;display:flex;flex-direction:column;gap:9px;pointer-events:none;">
-                <div id="wc-card-slot" style="pointer-events:auto;"></div>
-
-                <!-- 手写挂新风铃抽屉 -->
-                <div id="wc-add-modal" class="wc-detail-card" style="display:none;pointer-events:auto;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                        <span style="font-size:10px;font-weight:800;color:#323642;">悬挂一枚新冰晶风铃（挂后可按住自由拖拽高低位置）</span>
-                        <span id="wc-add-close" style="cursor:pointer;color:#8890A4;">${WC_ICO.close}</span>
+            <!-- 顶部海天交界处：双人绑定羁绊名片横幅（绑定后浮现） -->
+            <div id="sf-header-banner" style="position:relative;z-index:20;display:none;flex-direction:column;align-items:center;margin-top:12px;pointer-events:none;">
+                <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.95);box-shadow:0 6px 20px rgba(30,36,50,0.05);">
+                    <img id="sf-top-myava" src="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #FFFFFF;" />
+                    <div style="text-align:center;">
+                        <div id="sf-top-seaname" style="font-size:10px;font-weight:800;color:#2C303C;letter-spacing:1px;">结识海</div>
+                        <div id="sf-top-sub" style="font-size:7.5px;font-weight:700;color:#788094;letter-spacing:0.5px;">宿命羁绊 · 潮汐共鸣</div>
                     </div>
-                    <input type="text" id="wc-new-title" placeholder="风铃短签字 (4~6字最佳，如：初雪揣进兜)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E4E8F2;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#323642;box-sizing:border-box;outline:none;margin-bottom:6px;" />
-                    <textarea id="wc-new-content" placeholder="写下封存在这枚风铃里的记忆回声..." style="width:100%;height:50px;background:#FFFFFF;border:1px solid #E4E8F2;border-radius:9px;padding:7px 10px;font-size:10px;color:#323642;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
+                    <img id="sf-top-charava" src="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #FFFFFF;" />
+                </div>
+                <div id="sf-top-vow" style="font-size:8.5px;font-weight:600;color:#586074;margin-top:6px;letter-spacing:0.6px;text-shadow:0 1px 8px #FFFFFF;"></div>
+            </div>
+
+            <!-- 🤍 核心步骤1：双人结识海「潮汐契约绑定仪式」悬浮舱（未绑定或点契约按钮时居中显示） -->
+            <div id="sf-bind-ceremony" style="position:relative;z-index:40;margin:auto 20px;display:none;">
+                <div class="sf-glass-card" style="padding:20px 18px!important;text-align:center;">
+                    <div style="font-size:8px;font-weight:800;color:#8890A4;letter-spacing:2px;margin-bottom:4px;">TIDE OF FATE · 结识海契约</div>
+                    <div style="font-size:15px;font-weight:800;color:#2C303C;letter-spacing:1px;margin-bottom:14px;">与 TA 缔结专属结识海</div>
+
+                    <!-- 双人头像星轨共鸣环 -->
+                    <div style="position:relative;width:150px;height:74px;margin:0 auto 14px auto;display:flex;align-items:center;justify-content:center;gap:22px;">
+                        <svg viewBox="0 0 150 74" width="150" height="74" fill="none" style="position:absolute;inset:0;pointer-events:none;">
+                            <ellipse cx="75" cy="37" rx="70" ry="32" stroke="#CFD6E6" stroke-width="1" stroke-dasharray="3 3" />
+                            <path d="M 48 37 Q 75 22 102 37" stroke="#8E96AA" stroke-width="1.2" />
+                            <circle cx="75" cy="29" r="3" fill="#2C303C" />
+                        </svg>
+                        <img id="sf-bind-myava" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid #FFFFFF;box-shadow:0 6px 16px rgba(30,35,50,0.12);position:relative;z-index:2;" />
+                        <img id="sf-bind-charava" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid #FFFFFF;box-shadow:0 6px 16px rgba(30,35,50,0.12);position:relative;z-index:2;" />
+                    </div>
+
+                    <div style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+                        <div>
+                            <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">专属海域命名</div>
+                            <input type="text" id="sf-inp-seaname" placeholder="如：与TA的初雪结识海" style="width:100%;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10.2px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;" />
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <div>
+                                <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">当前羁绊阶段</div>
+                                <input type="text" id="sf-inp-stage" placeholder="如：宿命伴侣 / 暧昧拉扯" style="width:100%;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;" />
+                            </div>
+                            <div>
+                                <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">双人定情信物</div>
+                                <input type="text" id="sf-inp-token" placeholder="如：大衣口袋 / 银戒" style="width:100%;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;" />
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size:8.5px;font-weight:700;color:#687082;margin-bottom:3px;">潮汐契约誓言（可点右侧让AI为你题写）</div>
+                            <div style="display:flex;gap:5px;">
+                                <input type="text" id="sf-inp-vow" placeholder="写下你们结识海的契约寄语..." style="flex:1;height:30px;background:#F6F8FC;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:9.8px;color:#2C303C;box-sizing:border-box;outline:none;" />
+                                <span class="sf-pill" id="sf-ai-vow-btn" style="height:30px!important;flex-shrink:0;">${SEA_ICO.spark}<span>AI题词</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sf-confirm-bind-btn" class="sf-pill dark" style="width:100%!important;height:34px!important;font-size:10.5px!important;box-sizing:border-box!important;">
+                        ${SEA_ICO.link}<span>缔结潮汐契约 · 开启结识海</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部：羁绊汐珠详情卡 + 投掷新汐珠/目录抽屉 + 操作栏 -->
+            <div id="sf-bottom-dock" style="position:relative;z-index:35;margin-top:auto;padding:0 14px max(18px,env(safe-area-inset-bottom,18px)) 14px;display:flex;flex-direction:column;gap:8px;pointer-events:none;">
+                <div id="sf-card-wrap" style="pointer-events:auto;"></div>
+
+                <!-- 手写凝聚新羁绊汐珠弹窗 -->
+                <div id="sf-add-modal" class="sf-glass-card" style="display:none;pointer-events:auto;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <span style="font-size:10px;font-weight:800;color:#2C303C;">向结识海投下一颗新羁绊汐珠（可自由拖拽深浅位置）</span>
+                        <span id="sf-add-close" style="cursor:pointer;color:#8890A4;">${SEA_ICO.close}</span>
+                    </div>
+                    <input type="text" id="sf-new-title" placeholder="羁绊记忆标题 (如：初雪揣进口袋的手)..." style="width:100%;height:30px;background:#FFFFFF;border:1px solid #E2E6F0;border-radius:9px;padding:0 10px;font-size:10.5px;font-weight:700;color:#2C303C;box-sizing:border-box;outline:none;margin-bottom:6px;" />
+                    <textarea id="sf-new-content" placeholder="写下这段与TA有关的历史羁绊或心动瞬间..." style="width:100%;height:50px;background:#FFFFFF;border:1px solid #E2E6F0;border-radius:9px;padding:7px 10px;font-size:10px;color:#2C303C;box-sizing:border-box;resize:none;outline:none;margin-bottom:8px;"></textarea>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
-                        <span style="font-size:9px;font-weight:700;color:#585E70;">开心程度(冰晶透光度)：</span>
-                        <input type="range" id="wc-new-joy" min="5" max="100" value="94" style="flex:1;accent-color:#323642;" />
-                        <span id="wc-new-joy-lbl" style="font-size:8px;font-weight:800;color:#323642;min-width:115px;text-align:right;">极开心 94% · 纯白冰魄琉璃</span>
+                        <span style="font-size:8.8px;font-weight:700;color:#586074;">情感温度(决定浅海白珠/深海墨珠)：</span>
+                        <input type="range" id="sf-new-joy" min="5" max="100" value="92" style="flex:1;accent-color:#2C303C;" />
+                        <span id="sf-new-joy-lbl" style="font-size:8px;font-weight:800;color:#2C303C;min-width:110px;text-align:right;">浅海暖汐 · 甜度 92%</span>
                     </div>
                     <div style="display:flex;justify-content:flex-end;">
-                        <span class="wc-pill dark" id="wc-add-submit">悬起风铃并让TA留下回声</span>
+                        <span class="sf-pill dark" id="sf-add-submit">投入结识海并让TA回响</span>
                     </div>
                 </div>
 
-                <!-- 底部操作栏 -->
+                <!-- 全部羁绊名录抽屉 -->
+                <div id="sf-list-modal" class="sf-glass-card" style="display:none;max-height:220px;overflow-y:auto;pointer-events:auto;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #ECEFF6;">
+                        <span style="font-size:10px;font-weight:800;color:#2C303C;">结识海 · 历史羁绊档案册</span>
+                        <span id="sf-list-close" style="cursor:pointer;color:#8890A4;">${SEA_ICO.close}</span>
+                    </div>
+                    <div id="sf-list-body" style="display:flex;flex-direction:column;gap:5px;"></div>
+                </div>
+
+                <!-- 底部三大操作按钮 -->
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;pointer-events:auto;">
-                    <span class="wc-pill" id="wc-btn-add" style="flex:1;">${WC_ICO.plus}<span>手写挂铃</span></span>
-                    <span class="wc-pill" id="wc-btn-ai" style="flex:1;">${WC_ICO.wind}<span>让TA挂铃</span></span>
-                    <span class="wc-pill dark" id="wc-btn-absorb" style="flex:1.25;">${WC_ICO.spark}<span>汲取聊天结铃</span></span>
+                    <span class="sf-pill" id="sf-btn-add" style="flex:1;">${SEA_ICO.plus}<span>记下羁绊</span></span>
+                    <span class="sf-pill" id="sf-btn-ai" style="flex:1;">${SEA_ICO.wave}<span>让TA投珠</span></span>
+                    <span class="sf-pill dark" id="sf-btn-absorb" style="flex:1.25;">${SEA_ICO.spark}<span>汲取聊天化珠</span></span>
                 </div>
             </div>
         `;
         modal.appendChild(overlay);
 
         // ══════════════════════════════════════════════════════════════════════════
-        // ❄️ 全屏实时动态初雪 + 极光雾浪 + 指尖划过冰晶涟漪互动物理引擎
+        // 🌊 全屏韩系清冷「五层流体银白海浪 + 丁达尔海底光束 + 月光波光粒子 + 指尖水波纹」物理渲染引擎
         // ══════════════════════════════════════════════════════════════════════════
-        const canvas = topDoc.getElementById("wc-snow-canvas");
+        const canvas = topDoc.getElementById("sf-ocean-canvas");
         const ctx2d = canvas.getContext("2d");
         let animId = null, W = 390, H = 780;
-        let windForce = 0; // 吹拂微风时的物理横向风力加速度
-        const touchRipples = []; // 指尖划过或点击屏幕产生的动态冰晶水波纹
-        const snowFlakes = Array.from({ length: 52 }, (_, i) => ({
+        const ripples = [];
+
+        // 海面月光波光微粒 & 海底上升的微光气泡
+        const sparkles = Array.from({ length: 42 }, (_, i) => ({
             x: Math.random() * 400,
-            y: Math.random() * 800,
-            r: 1.2 + Math.random() * 2.8,
-            vy: 0.45 + Math.random() * 0.85,
-            vx: (Math.random() - 0.5) * 0.4,
-            alpha: 0.4 + Math.random() * 0.55,
-            phase: i * 0.7
+            y: 260 + Math.random() * 520,
+            r: 0.8 + Math.random() * 2.2,
+            vy: -0.25 - Math.random() * 0.45,
+            phase: i * 0.8
         }));
 
         function resizeCanvas() {
@@ -5896,139 +5945,183 @@ bootSumoulApp();
             ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        function spawnRipple(x, y, maxR = 55) {
-            touchRipples.push({ x, y, r: 4, maxR, alpha: 0.75 });
-            // 推开附近的雪花粒子
-            snowFlakes.forEach((sf) => {
-                const dx = sf.x - x, dy = sf.y - y, d = Math.hypot(dx, dy);
-                if (d < 70 && d > 1) {
-                    sf.x += (dx / d) * 14;
-                    sf.y += (dy / d) * 14;
-                }
-            });
+        function addWaterRipple(x, y, maxR = 65) {
+            ripples.push({ x, y, r: 4, maxR, alpha: 0.85 });
         }
 
         canvas.addEventListener("pointermove", (e) => {
             const rect = canvas.getBoundingClientRect();
-            if (Math.random() < 0.35) spawnRipple(e.clientX - rect.left, e.clientY - rect.top, 36);
+            if (Math.random() < 0.35) addWaterRipple(e.clientX - rect.left, e.clientY - rect.top, 38);
         });
         canvas.addEventListener("pointerdown", (e) => {
             const rect = canvas.getBoundingClientRect();
-            spawnRipple(e.clientX - rect.left, e.clientY - rect.top, 68);
+            addWaterRipple(e.clientX - rect.left, e.clientY - rect.top, 75);
         });
 
-        function renderSnowAndRipples(ts) {
+        function renderOceanLoop(ts) {
             if (!overlay.classList.contains("open")) { animId = null; return; }
             const t = ts * 0.001;
             ctx2d.clearRect(0, 0, W, H);
-            windForce *= 0.96;
 
-            // 1. 顶部韩系清冷柔光呼吸雾弦（3条随时间缓慢起伏的半透明丝绸光带）
-            for (let b = 0; b < 3; b++) {
+            // 1. 海天交界处的清冷月晕柔光
+            const moonGlow = ctx2d.createRadialGradient(W * 0.5, H * 0.28, 10, W * 0.5, H * 0.28, W * 0.65);
+            moonGlow.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+            moonGlow.addColorStop(0.6, "rgba(240, 244, 252, 0.45)");
+            moonGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
+            ctx2d.fillStyle = moonGlow;
+            ctx2d.fillRect(0, 0, W, H * 0.55);
+
+            // 2. 五层不同景深、不同频率的韩系清冷丝绸海浪（从天际浅白浪 ➔ 中海雾银浪 ➔ 深海冷蓝灰浪）
+            const waveLayers = [
+                { baseY: H * 0.36, amp1: 8,  amp2: 5, freq1: 0.012, freq2: 0.022, sp: 0.7, topCol: "rgba(255,255,255,0.88)", botCol: "rgba(226,232,244,0.85)", stroke: "rgba(255,255,255,0.95)" },
+                { baseY: H * 0.44, amp1: 11, amp2: 6, freq1: 0.010, freq2: 0.018, sp: 0.9, topCol: "rgba(238,242,250,0.85)", botCol: "rgba(204,212,228,0.88)", stroke: "rgba(255,255,255,0.90)" },
+                { baseY: H * 0.54, amp1: 14, amp2: 7, freq1: 0.009, freq2: 0.016, sp: 1.1, topCol: "rgba(214,222,236,0.86)", botCol: "rgba(176,186,206,0.90)", stroke: "rgba(245,248,255,0.82)" },
+                { baseY: H * 0.66, amp1: 12, amp2: 8, freq1: 0.011, freq2: 0.020, sp: 1.3, topCol: "rgba(184,194,214,0.88)", botCol: "rgba(138,148,172,0.92)", stroke: "rgba(235,240,250,0.70)" },
+                { baseY: H * 0.78, amp1: 10, amp2: 6, freq1: 0.013, freq2: 0.024, sp: 1.5, topCol: "rgba(142,152,176,0.90)", botCol: "rgba(96,106,128,0.95)",  stroke: "rgba(215,222,238,0.55)" }
+            ];
+
+            waveLayers.forEach((wl, idx) => {
                 ctx2d.beginPath();
-                const baseY = H * (0.12 + b * 0.14);
-                ctx2d.moveTo(0, baseY);
-                for (let x = 0; x <= W; x += 30) {
-                    const y = baseY + Math.sin(x * 0.012 + t * (0.8 + b * 0.3) + b) * 18;
+                ctx2d.moveTo(0, H);
+                for (let x = 0; x <= W + 10; x += 10) {
+                    const y = wl.baseY
+                        + Math.sin(x * wl.freq1 + t * wl.sp + idx * 1.2) * wl.amp1
+                        + Math.cos(x * wl.freq2 - t * wl.sp * 0.8 + idx) * wl.amp2;
                     ctx2d.lineTo(x, y);
                 }
-                ctx2d.strokeStyle = `rgba(255, 255, 255, ${0.55 - b * 0.12})`;
+                ctx2d.lineTo(W, H);
+                ctx2d.closePath();
+
+                const g = ctx2d.createLinearGradient(0, wl.baseY - 15, 0, H);
+                g.addColorStop(0, wl.topCol);
+                g.addColorStop(1, wl.botCol);
+                ctx2d.fillStyle = g;
+                ctx2d.fill();
+
+                // 浪尖闪烁的银白泡沫高光线
+                ctx2d.strokeStyle = wl.stroke;
+                ctx2d.lineWidth = 1.4;
+                ctx2d.stroke();
+            });
+
+            // 3. 穿透海水的丁达尔清冷光束
+            ctx2d.save();
+            for (let b = 0; b < 3; b++) {
+                const bx = W * (0.22 + b * 0.28) + Math.sin(t * 0.5 + b) * 15;
+                const beamGrd = ctx2d.createLinearGradient(bx, H * 0.35, bx + 40, H * 0.9);
+                beamGrd.addColorStop(0, "rgba(255, 255, 255, 0.28)");
+                beamGrd.addColorStop(1, "rgba(255, 255, 255, 0)");
+                ctx2d.fillStyle = beamGrd;
+                ctx2d.beginPath();
+                ctx2d.moveTo(bx - 18, H * 0.35);
+                ctx2d.lineTo(bx + 18, H * 0.35);
+                ctx2d.lineTo(bx + 65, H * 0.92);
+                ctx2d.lineTo(bx - 35, H * 0.92);
+                ctx2d.closePath();
+                ctx2d.fill();
+            }
+            ctx2d.restore();
+
+            // 4. 海面闪烁的月光碎银与海底缓缓上浮的发光气泡
+            sparkles.forEach((sp) => {
+                sp.y += sp.vy;
+                const sx = sp.x + Math.sin(t * 1.4 + sp.phase) * 6;
+                if (sp.y < H * 0.36) { sp.y = H * 0.95; sp.x = Math.random() * W; }
+                const twinkle = 0.35 + (Math.sin(t * 3 + sp.phase) * 0.5 + 0.5) * 0.6;
+                ctx2d.beginPath();
+                ctx2d.arc(sx, sp.y, sp.r, 0, Math.PI * 2);
+                ctx2d.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
+                ctx2d.fill();
+            });
+
+            // 5. 指尖触碰海面泛起的椭圆透视水波纹
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const rp = ripples[i];
+                rp.r += (rp.maxR - rp.r) * 0.08 + 0.7;
+                rp.alpha *= 0.93;
+                if (rp.alpha < 0.03) { ripples.splice(i, 1); continue; }
+                ctx2d.beginPath();
+                ctx2d.ellipse(rp.x, rp.y, rp.r, rp.r * 0.42, 0, 0, Math.PI * 2);
+                ctx2d.strokeStyle = `rgba(255, 255, 255, ${rp.alpha})`;
                 ctx2d.lineWidth = 1.4;
                 ctx2d.stroke();
             }
 
-            // 2. 实时飘落的初雪粒子与六角微光星芒
-            snowFlakes.forEach((sf) => {
-                sf.y += sf.vy;
-                sf.x += sf.vx + Math.sin(t * 1.2 + sf.phase) * 0.35 + windForce;
-                if (sf.y > H + 10) { sf.y = -10; sf.x = Math.random() * W; }
-                if (sf.x > W + 10) sf.x = -10;
-                if (sf.x < -10) sf.x = W + 10;
+            animId = requestAnimationFrame(renderOceanLoop);
+        }
 
-                ctx2d.beginPath();
-                ctx2d.arc(sf.x, sf.y, sf.r, 0, Math.PI * 2);
-                ctx2d.fillStyle = `rgba(255, 255, 255, ${sf.alpha})`;
-                ctx2d.shadowColor = "#FFFFFF";
-                ctx2d.shadowBlur = 6;
-                ctx2d.fill();
-                ctx2d.shadowBlur = 0;
-            });
+        // 根据情绪开心度自动分配汐珠的海域深度：越开心越浮在浅海波光处(yPct: 40~52%)，越酸涩思念越沉在深海(yPct: 62~74%)
+        function getAutoSeaPos(idx, joy = 85) {
+            const xPct = Math.max(14, Math.min(86, 18 + ((idx * 23) % 68)));
+            const depthRatio = 1 - Math.max(0, Math.min(100, Number(joy))) / 100;
+            const yPct = Math.round(40 + depthRatio * 32 + ((idx % 3) - 1) * 3);
+            return { xPct, yPct };
+        }
 
-            // 3. 指尖拨动产生的清冷冰晶扩散涟漪
-            for (let i = touchRipples.length - 1; i >= 0; i--) {
-                const rp = touchRipples[i];
-                rp.r += (rp.maxR - rp.r) * 0.08 + 0.6;
-                rp.alpha *= 0.94;
-                if (rp.alpha < 0.03) { touchRipples.splice(i, 1); continue; }
-                ctx2d.beginPath();
-                ctx2d.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-                ctx2d.strokeStyle = `rgba(255, 255, 255, ${rp.alpha})`;
-                ctx2d.lineWidth = 1.3;
-                ctx2d.stroke();
+        function renderSeaView() {
+            const c = getCtx(), data = loadSea();
+            const homeBadge = topDoc.getElementById("mt-home-badge");
+            if (homeBadge) homeBadge.textContent = `${data.pearls.length}汐`;
+            topDoc.getElementById("sf-count-txt").textContent = `${data.pearls.length} 汐珠`;
+
+            const bindCeremony = topDoc.getElementById("sf-bind-ceremony");
+            const headerBanner = topDoc.getElementById("sf-header-banner");
+            const pearlsStage = topDoc.getElementById("sf-pearls-stage");
+            const bottomDock = topDoc.getElementById("sf-bottom-dock");
+
+            // 填充绑定仪式头像与默认信息
+            topDoc.getElementById("sf-bind-myava").src = c.userAvatar;
+            topDoc.getElementById("sf-bind-charava").src = c.charAvatar;
+            topDoc.getElementById("sf-top-myava").src = c.userAvatar;
+            topDoc.getElementById("sf-top-charava").src = c.charAvatar;
+
+            if (!data.isBound) {
+                // 未绑定状态：展示双人契约绑定仪式舱
+                bindCeremony.style.display = "block";
+                headerBanner.style.display = "none";
+                pearlsStage.style.display = "none";
+                bottomDock.style.display = "none";
+                topDoc.getElementById("sf-bond-status-txt").textContent = "待缔结契约";
+                topDoc.getElementById("sf-inp-seaname").value = data.seaName || `${c.userName} & ${c.charName} 的结识海`;
+                topDoc.getElementById("sf-inp-stage").value = data.bondStage || "宿命羁绊 · 潮汐共鸣";
+                topDoc.getElementById("sf-inp-token").value = data.bondToken || "初雪与潮汐信物";
+                topDoc.getElementById("sf-inp-vow").value = data.bondVow || "";
+                return;
             }
 
-            animId = requestAnimationFrame(renderSnowAndRipples);
-        }
+            // 已绑定状态：展示全屏结识海、顶部双人契约横幅与漂浮的羁绊汐珠
+            bindCeremony.style.display = "none";
+            headerBanner.style.display = "flex";
+            pearlsStage.style.display = "block";
+            bottomDock.style.display = "flex";
+            topDoc.getElementById("sf-bond-status-txt").textContent = "已缔结契约";
+            topDoc.getElementById("sf-top-seaname").textContent = data.seaName || `${c.userName} & ${c.charName} 的结识海`;
+            topDoc.getElementById("sf-top-sub").textContent = `${data.bondStage || "宿命羁绊"} · 信物: ${data.bondToken || "潮汐"}`;
+            topDoc.getElementById("sf-top-vow").textContent = `“ ${data.bondVow || "每一道海浪都刻着我们的记忆"} ”`;
 
-        function getAutoChimePos(idx) {
-            const cols = [15, 32, 50, 68, 84];
-            const xPct = cols[idx % cols.length] + ((idx * 7) % 9 - 4);
-            const yPct = 10 + (idx % 3) * 11;
-            const wireH = 42 + ((idx * 17) % 36);
-            return { xPct, yPct, wireH };
-        }
-
-        function triggerWindGust() {
-            windForce = 3.8;
-            const stage = topDoc.getElementById("wc-chimes-stage");
-            stage?.querySelectorAll(".wc-chime-node").forEach((node, i) => {
-                node.classList.remove("gust-ringing");
-                void node.offsetWidth;
-                setTimeout(() => node.classList.add("gust-ringing"), i * 45);
-                setTimeout(() => node.classList.remove("gust-ringing"), 1700);
-            });
-        }
-
-        function renderChimesAndCard() {
-            const c = getCtx(), data = loadChimes();
-            const homeBadge = topDoc.getElementById("mt-home-badge");
-            if (homeBadge) homeBadge.textContent = `${data.items.length}铃`;
-            topDoc.getElementById("wc-count-txt").textContent = `${data.items.length} 枚风铃`;
-
-            const stage = topDoc.getElementById("wc-chimes-stage");
-            stage.innerHTML = (data.items || []).map((it, idx) => {
-                const pos = (it.xPct && it.yPct) ? { xPct: it.xPct, yPct: it.yPct, wireH: it.wireH || 52 } : getAutoChimePos(idx);
-                const stInfo = getChimeStyleByJoy(it.joy);
-                const isSel = Number(it.id) === Number(data.activeId);
-                const delay = ((idx * 0.53) % 3.8).toFixed(2);
-                const dur = (4.0 + (idx % 4) * 0.45).toFixed(2);
+            // 渲染海中浮沉的每一颗羁绊汐珠
+            pearlsStage.innerHTML = (data.pearls || []).map((p, idx) => {
+                const pos = (p.xPct && p.yPct) ? { xPct: p.xPct, yPct: p.yPct } : getAutoSeaPos(idx, p.joy);
+                const stInfo = getPearlStyleByJoy(p.joy);
+                const isSel = Number(p.id) === Number(data.activeId);
+                const sz = isSel ? 34 : 24;
+                const delay = ((idx * 0.47) % 3.5).toFixed(2);
 
                 return `
-                    <div class="wc-chime-node ${isSel ? "active-chime" : ""}" data-cid="${it.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;animation-duration:${dur}s;">
-                        <!-- 顶部悬挂发光星点与极细银丝 -->
-                        <div style="width:5px;height:5px;border-radius:50%;background:#FFFFFF;border:1px solid #98A0B4;box-shadow:0 0 8px #FFFFFF;"></div>
-                        <div style="width:1px;height:${pos.wireH || 52}px;background:linear-gradient(180deg, rgba(160,168,184,0.85), rgba(255,255,255,0.95));"></div>
-
-                        <!-- 清透冰晶风铃罩 + 动态声波环 -->
-                        <div class="wc-bell-dome" style="background:${stInfo.glassBg};border:1.2px solid ${isSel ? "#323642" : stInfo.border};box-shadow:${stInfo.shadow};">
-                            ${isSel ? `<div class="wc-ripple-ring"></div>` : ""}
-                            <div style="width:5px;height:5px;border-radius:50%;background:${stInfo.textCol};opacity:0.75;"></div>
+                    <div class="sf-pearl-node ${isSel ? "active-pearl" : ""}" data-pid="${p.id}" style="left:${pos.xPct}%;top:${pos.yPct}%;animation-delay:${delay}s;">
+                        <div class="sf-pearl-orb" style="width:${sz}px;height:${sz}px;background:${stInfo.bg};border:1.5px solid ${stInfo.border};box-shadow:${stInfo.shadow};">
+                            ${isSel ? `<div class="sf-pearl-halo"></div>` : ""}
                         </div>
-
-                        <!-- 连接铃舌的细银线 -->
-                        <div style="width:1px;height:12px;background:rgba(160,168,184,0.8);"></div>
-
-                        <!-- 竖排流体毛玻璃风铃签 -->
-                        <div class="wc-glass-strip" style="background:${stInfo.glassBg};border:${isSel ? "1.5px solid #323642" : `1px solid ${stInfo.border}`};box-shadow:${stInfo.shadow};color:${stInfo.textCol};transform:scale(${isSel ? 1.08 : 1});">
-                            ${it.title.slice(0, 6).replace(/</g, "&lt;")}
+                        <div class="sf-pearl-tag" style="background:${isSel ? "#2C303C" : stInfo.tagBg};color:${isSel ? "#FFFFFF" : stInfo.textCol};">
+                            ${p.title.slice(0, isSel ? 8 : 4).replace(/</g, "&lt;")}
                         </div>
                     </div>
                 `;
             }).join("");
 
-            // 绑定每枚风铃的「点击聆听」与「按住自由拖拽高低位置」
-            stage.querySelectorAll(".wc-chime-node").forEach((node) => {
-                const cid = Number(node.getAttribute("data-cid"));
+            // 绑定汐珠的点击查看与自由拖拽（拖到浅海或深海）
+            pearlsStage.querySelectorAll(".sf-pearl-node").forEach((node) => {
+                const pid = Number(node.getAttribute("data-pid"));
                 let isDown = false, moved = false, sx = 0, sy = 0;
 
                 const onStart = (cx, cy) => { isDown = true; moved = false; sx = cx; sy = cy; node.classList.add("dragging"); };
@@ -6036,26 +6129,24 @@ bootSumoulApp();
                     if (!isDown) return;
                     if (Math.hypot(cx - sx, cy - sy) > 6) {
                         moved = true;
-                        const rect = stage.getBoundingClientRect();
+                        const rect = pearlsStage.getBoundingClientRect();
                         node.style.left = `${Math.max(8, Math.min(92, ((cx - rect.left) / rect.width) * 100)).toFixed(1)}%`;
-                        node.style.top = `${Math.max(6, Math.min(48, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
+                        node.style.top = `${Math.max(32, Math.min(76, ((cy - rect.top) / rect.height) * 100)).toFixed(1)}%`;
                     }
                 };
                 const onEnd = () => {
                     if (!isDown) return;
                     isDown = false; node.classList.remove("dragging");
-                    const d = loadChimes();
+                    const d = loadSea();
                     if (moved) {
-                        const target = d.items.find((x) => Number(x.id) === cid);
-                        if (target) { target.xPct = parseFloat(node.style.left); target.yPct = parseFloat(node.style.top); }
-                    } else if (Number(d.activeId) === cid) {
-                        d.flipped = !d.flipped;
-                    } else {
-                        d.activeId = cid;
-                        d.flipped = false;
+                        const target = d.pearls.find((x) => Number(x.id) === pid);
+                        if (target) {
+                            target.xPct = parseFloat(node.style.left);
+                            target.yPct = parseFloat(node.style.top);
+                            addWaterRipple((target.xPct / 100) * W, (target.yPct / 100) * H, 65);
+                        }
                     }
-                    saveChimes(d);
-                    renderChimesAndCard();
+                    d.activeId = pid; saveSea(d); renderSeaView();
                 };
 
                 node.addEventListener("mousedown", (e) => { e.stopPropagation(); onStart(e.clientX, e.clientY); });
@@ -6066,148 +6157,168 @@ bootSumoulApp();
                 node.addEventListener("touchend", onEnd);
             });
 
-            // 渲染底部动态声波回声信笺卡
-            const cur = data.items.find((x) => Number(x.id) === Number(data.activeId));
-            const slot = topDoc.getElementById("wc-card-slot");
+            // 渲染底部当前选中汐珠的羁绊详情卡
+            const cur = data.pearls.find((x) => Number(x.id) === Number(data.activeId));
+            const wrap = topDoc.getElementById("sf-card-wrap");
             if (!cur) {
-                slot.innerHTML = "";
+                wrap.innerHTML = "";
             } else {
-                const stInfo = getChimeStyleByJoy(cur.joy);
-                const waveHtml = `<div style="display:inline-flex;align-items:center;gap:2.5px;height:14px;margin-right:6px;">
-                    <span class="wc-wave-bar" style="animation-delay:0s;"></span>
-                    <span class="wc-wave-bar" style="animation-delay:0.2s;"></span>
-                    <span class="wc-wave-bar" style="animation-delay:0.4s;"></span>
-                    <span class="wc-wave-bar" style="animation-delay:0.1s;"></span>
-                    <span class="wc-wave-bar" style="animation-delay:0.3s;"></span>
-                </div>`;
-
-                if (!data.flipped) {
-                    slot.innerHTML = `
-                        <div class="wc-detail-card" id="wc-main-card" style="cursor:pointer;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                                <div style="display:flex;align-items:center;min-width:0;">
-                                    ${waveHtml}
-                                    <span style="font-size:12px;font-weight:800;color:#323642;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span>
-                                </div>
-                                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                                    <span style="font-size:7.5px;font-weight:700;color:#585E70;background:#F2F4F9;padding:2px 8px;border-radius:99px;">${stInfo.label}</span>
-                                    <span id="wc-del-btn" style="cursor:pointer;display:inline-flex;">${WC_ICO.trash}</span>
-                                    <span id="wc-hide-btn" style="cursor:pointer;color:#8890A4;display:inline-flex;">${WC_ICO.close}</span>
-                                </div>
+                const stInfo = getPearlStyleByJoy(cur.joy);
+                wrap.innerHTML = `
+                    <div class="sf-glass-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                            <div style="display:flex;align-items:center;gap:7px;min-width:0;">
+                                <span style="width:10px;height:10px;border-radius:50%;background:${stInfo.bg};border:1px solid #8E96AA;flex-shrink:0;"></span>
+                                <span style="font-size:11.5px;font-weight:800;color:#2C303C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cur.title.replace(/</g, "&lt;")}</span>
                             </div>
-                            <div style="font-size:10.6px;font-weight:600;color:#3A3E4C;line-height:1.68;padding:2px 0;">
-                                ${cur.content.replace(/</g, "&lt;")}
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:7px;border-top:1px solid #ECEFF6;font-size:8px;font-weight:700;color:#7E869A;">
-                                <span>系铃人 · ${cur.author}</span>
-                                <span style="color:#323642;display:inline-flex;align-items:center;gap:4px;">${WC_ICO.flip}<span>轻触翻转倾听风铃内壁回声</span></span>
+                            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                                <span style="font-size:7.5px;font-weight:700;color:#586074;background:#F0F3F9;padding:2px 8px;border-radius:99px;">${stInfo.zone}</span>
+                                <span id="sf-del-pearl" style="cursor:pointer;display:inline-flex;">${SEA_ICO.trash}</span>
+                                <span id="sf-hide-card" style="cursor:pointer;color:#8890A4;display:inline-flex;">${SEA_ICO.close}</span>
                             </div>
                         </div>
-                    `;
-                } else {
-                    slot.innerHTML = `
-                        <div class="wc-detail-card" id="wc-main-card" style="cursor:pointer;background:rgba(246,248,252,0.95)!important;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                                <span style="font-size:8px;font-weight:800;color:#7E869A;letter-spacing:1.2px;">ECHO INSIDE · ${c.charName} 刻在风铃内壁的回声</span>
-                                <span style="font-size:8px;font-weight:700;color:#7E869A;">《${cur.title.replace(/</g, "&lt;")}》</span>
-                            </div>
-                            <div style="font-size:11.5px;font-weight:700;color:#2C303C;line-height:1.75;padding:8px 4px;text-align:center;">
-                                ${(cur.whisper || `“ 风吹响一次，就代表我在心里叫了你一次。”`).replace(/</g, "&lt;")}
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:7px;border-top:1px solid #E4E8F2;font-size:8px;font-weight:700;color:#7E869A;">
-                                <span>${waveHtml}<span>RESONATING</span></span>
-                                <span style="color:#323642;display:inline-flex;align-items:center;gap:4px;">${WC_ICO.flip}<span>翻回正面记忆</span></span>
-                            </div>
+                        <div style="font-size:10.5px;font-weight:600;color:#3A3E4C;line-height:1.65;">${cur.content.replace(/</g, "&lt;")}</div>
+                        <div style="margin-top:8px;padding:8px 10px;background:#F4F6FA;border-left:2.5px solid #485064;border-radius:0 8px 8px 0;font-size:9.8px;font-weight:600;color:#2C303C;line-height:1.55;">
+                            <span style="font-size:7.5px;color:#8890A4;display:block;margin-bottom:2px;">TIDE WHISPER · ${c.charName} 的潮汐回响</span>
+                            ${(cur.whisper || "“ 这颗汐珠沉在我心底最柔软的海域。”").replace(/</g, "&lt;")}
                         </div>
-                    `;
-                }
-
-                topDoc.getElementById("wc-main-card").onclick = (e) => {
-                    if (e.target.closest("#wc-del-btn") || e.target.closest("#wc-hide-btn")) return;
-                    const d = loadChimes(); d.flipped = !d.flipped; saveChimes(d); renderChimesAndCard();
+                    </div>`;
+                topDoc.getElementById("sf-hide-card").onclick = () => { const d = loadSea(); d.activeId = 0; saveSea(d); renderSeaView(); };
+                topDoc.getElementById("sf-del-pearl").onclick = () => {
+                    if (!confirm(`确定让《${cur.title}》这颗汐珠消散在海里吗？`)) return;
+                    const d = loadSea(); d.pearls = d.pearls.filter((x) => Number(x.id) !== Number(cur.id)); d.activeId = d.pearls[0]?.id || 0; saveSea(d); renderSeaView();
                 };
-                topDoc.getElementById("wc-hide-btn")?.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    const d = loadChimes(); d.activeId = 0; saveChimes(d); renderChimesAndCard();
-                });
-                topDoc.getElementById("wc-del-btn")?.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    if (!confirm(`确定摘下《${cur.title}》这枚风铃吗？`)) return;
-                    const d = loadChimes(); d.items = d.items.filter((x) => Number(x.id) !== Number(cur.id)); d.activeId = d.items[0]?.id || 0; saveChimes(d); renderChimesAndCard();
-                });
             }
+
+            // 渲染历史羁绊名录
+            const listBody = topDoc.getElementById("sf-list-body");
+            listBody.innerHTML = data.pearls.map((p) => {
+                const stInfo = getPearlStyleByJoy(p.joy);
+                return `<div data-pickid="${p.id}" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;border:1px solid ${Number(p.id) === Number(data.activeId) ? "#2C303C" : "#ECEFF6"};background:#FFFFFF;cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:7px;min-width:0;">
+                        <span style="width:9px;height:9px;border-radius:50%;background:${stInfo.bg};border:1px solid #8E96AA;flex-shrink:0;"></span>
+                        <span style="font-size:10px;font-weight:800;color:#2C303C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.title.replace(/</g, "&lt;")}</span>
+                    </div>
+                    <span style="font-size:8px;color:#788094;flex-shrink:0;margin-left:8px;">${stInfo.zone}</span>
+                </div>`;
+            }).join("");
+            listBody.querySelectorAll("[data-pickid]").forEach((row) => row.onclick = () => {
+                const d = loadSea(); d.activeId = Number(row.getAttribute("data-pickid")); saveSea(d);
+                topDoc.getElementById("sf-list-modal").style.display = "none"; renderSeaView();
+            });
         }
 
-        function openChimeGallery() {
+        // 绑定契约仪式与所有交互事件
+        topDoc.getElementById("sf-rebind-btn").onclick = () => {
+            const d = loadSea();
+            d.isBound = false;
+            saveSea(d);
+            renderSeaView();
+        };
+
+        topDoc.getElementById("sf-ai-vow-btn").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "题词中...";
+            const c = getCtx();
+            try {
+                const vow = await askSeaAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 800)}`, `请为你和${c.userName}共同绑定的「结识海(Sea of Fate)」写一句极具韩系电影宿命感与深情的潮汐契约誓言（28字以内，不要多余解释）：`);
+                topDoc.getElementById("sf-inp-vow").value = vow.replace(/^[“"]|[”"]$/g, "").trim();
+            } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
+        };
+
+        topDoc.getElementById("sf-confirm-bind-btn").onclick = () => {
+            const c = getCtx(), d = loadSea();
+            d.seaName = topDoc.getElementById("sf-inp-seaname").value.trim() || `${c.userName} & ${c.charName} 的结识海`;
+            d.bondStage = topDoc.getElementById("sf-inp-stage").value.trim() || "宿命羁绊";
+            d.bondToken = topDoc.getElementById("sf-inp-token").value.trim() || "初雪与潮汐";
+            d.bondVow = topDoc.getElementById("sf-inp-vow").value.trim() || "于万千人海中相逢，每一道海浪都刻着我们的记忆。";
+            d.isBound = true;
+            saveSea(d);
+            addWaterRipple(W * 0.5, H * 0.5, 160);
+            renderSeaView();
+        };
+
+        function openSeaOverlay() {
             overlay.classList.add("open");
             resizeCanvas();
-            renderChimesAndCard();
-            if (!animId) animId = requestAnimationFrame(renderSnowAndRipples);
-            setTimeout(triggerWindGust, 200);
+            renderSeaView();
+            if (!animId) animId = requestAnimationFrame(renderOceanLoop);
         }
-        function closeChimeGallery() {
+        function closeSeaOverlay() {
             overlay.classList.remove("open");
             if (animId) { cancelAnimationFrame(animId); animId = null; }
         }
 
-        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openChimeGallery(); });
-        topDoc.getElementById("wc-close-btn").onclick = () => closeChimeGallery();
-        topDoc.getElementById("wc-gust-btn").onclick = () => triggerWindGust();
+        topDoc.getElementById("smt-home-open-memtree")?.addEventListener("click", (e) => { e.stopPropagation(); openSeaOverlay(); });
+        topDoc.getElementById("sf-close-btn").onclick = () => closeSeaOverlay();
         topWin.addEventListener("resize", () => { if (overlay.classList.contains("open")) resizeCanvas(); });
 
-        const addModal = topDoc.getElementById("wc-add-modal");
-        topDoc.getElementById("wc-btn-add").onclick = () => { addModal.style.display = addModal.style.display === "none" ? "block" : "none"; };
-        topDoc.getElementById("wc-add-close").onclick = () => { addModal.style.display = "none"; };
+        const addModal = topDoc.getElementById("sf-add-modal"), listModal = topDoc.getElementById("sf-list-modal");
+        topDoc.getElementById("sf-btn-add").onclick = () => { listModal.style.display = "none"; addModal.style.display = addModal.style.display === "none" ? "block" : "none"; };
+        topDoc.getElementById("sf-add-close").onclick = () => { addModal.style.display = "none"; };
+        topDoc.getElementById("sf-list-btn").onclick = () => {
+            const d = loadSea(); if (!d.isBound) return;
+            addModal.style.display = "none"; listModal.style.display = listModal.style.display === "none" ? "block" : "none"; renderSeaView();
+        };
+        topDoc.getElementById("sf-list-close").onclick = () => { listModal.style.display = "none"; };
 
-        const joySlider = topDoc.getElementById("wc-new-joy"), joyLbl = topDoc.getElementById("wc-new-joy-lbl");
-        joySlider.oninput = () => { joyLbl.textContent = getChimeStyleByJoy(joySlider.value).label; };
+        const joySlider = topDoc.getElementById("sf-new-joy"), joyLbl = topDoc.getElementById("sf-new-joy-lbl");
+        joySlider.oninput = () => { joyLbl.textContent = getPearlStyleByJoy(joySlider.value).zone; };
 
-        topDoc.getElementById("wc-add-submit").onclick = async () => {
-            const title = topDoc.getElementById("wc-new-title").value.trim() || "初雪回声", content = topDoc.getElementById("wc-new-content").value.trim();
-            if (!content) return alert("请写下你想封存在风铃里的记忆！");
-            const joy = Number(joySlider.value) || 94, c = getCtx(), nid = Date.now(), d = loadChimes(), pos = getAutoChimePos(d.items.length + 1);
-            d.items.unshift({ id: nid, title, author: c.userName, joy, xPct: pos.xPct, yPct: pos.yPct, wireH: pos.wireH, content, whisper: `（${c.charName} 正在风铃内壁刻下回声...）` });
-            d.activeId = nid; d.flipped = false; saveChimes(d);
-            topDoc.getElementById("wc-new-title").value = ""; topDoc.getElementById("wc-new-content").value = "";
-            addModal.style.display = "none"; renderChimesAndCard(); triggerWindGust();
+        // ① 手写投下新羁绊汐珠
+        topDoc.getElementById("sf-add-submit").onclick = async () => {
+            const title = topDoc.getElementById("sf-new-title").value.trim() || "独家羁绊", content = topDoc.getElementById("sf-new-content").value.trim();
+            if (!content) return alert("请写下你想封存在汐珠里的羁绊记忆！");
+            const joy = Number(joySlider.value) || 92, c = getCtx(), nid = Date.now(), d = loadSea(), pos = getAutoSeaPos(d.pearls.length + 1, joy);
+            d.pearls.unshift({ id: nid, title, author: c.userName, joy, xPct: pos.xPct, yPct: pos.yPct, content, whisper: `（${c.charName} 正在聆听这道海浪回响...）` });
+            d.activeId = nid; saveSea(d);
+            topDoc.getElementById("sf-new-title").value = ""; topDoc.getElementById("sf-new-content").value = "";
+            addModal.style.display = "none";
+            addWaterRipple((pos.xPct / 100) * W, (pos.yPct / 100) * H, 90);
+            renderSeaView();
             try {
-                const w = await askChimeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `${c.userName}挂起了一枚记忆风铃《${title}》（开心度${joy}%）：“${content}”。请你在风铃内壁写一句清冷深情的私密回声(38字内)：`);
-                const latest = loadChimes(), t = latest.items.find((x) => x.id === nid);
-                if (t) { t.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveChimes(latest); renderChimesAndCard(); }
+                const w = await askSeaAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}`, `${c.userName}在你们共同绑定的「${d.seaName}」里投下了一颗羁绊汐珠《${title}》（情感温度${joy}%）：“${content}”。请以你的身份写一句深情的潮汐回响批注(40字内)：`);
+                const latest = loadSea(), t = latest.pearls.find((x) => x.id === nid);
+                if (t) { t.whisper = `“ ${w.replace(/^[“"]|[”"]$/g, "").trim()} ”`; saveSea(latest); renderSeaView(); }
             } catch (e) {}
         };
 
-        topDoc.getElementById("wc-btn-ai").onclick = async (e) => {
-            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "结铃中...";
-            const c = getCtx();
+        // ② 让 TA 投下一颗羁绊汐珠
+        topDoc.getElementById("sf-btn-ai").onclick = async (e) => {
+            const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "凝珠中...";
+            const c = getCtx(), d = loadSea();
             try {
-                const raw = await askChimeAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`, `请挂起一枚你与${c.userName}的独家记忆风铃，并给出情绪开心度(joy: 10~100)。严格只输出JSON：{"title":"6字内短签标题","joy":90,"content":"50字内唯美记忆描写","whisper":"35字内刻在风铃内壁的情话"}`);
+                const raw = await askSeaAI(`你是${c.charName}。人设：${c.charDesc.slice(0, 900)}\n近期剧情：${c.recentChat}`, `请在你与${c.userName}绑定的「${d.seaName}」中投下一颗代表你们历史羁绊的汐珠，并给出情感温度(joy: 10~100，越甜蜜越高，越酸涩思念越低)。严格只输出JSON：{"title":"8字内羁绊标题","joy":88,"content":"50字内第一人称羁绊回忆描写","whisper":"35字内刻在汐珠里的私密情话"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), d = loadChimes(), nid = Date.now(), pos = getAutoChimePos(d.items.length + 2);
-                    d.items.unshift({ id: nid, title: o.title || "风中回声", author: c.charName, joy: Number(o.joy) || 90, xPct: pos.xPct, yPct: pos.yPct, wireH: pos.wireH, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                    d.activeId = nid; d.flipped = false; saveChimes(d); renderChimesAndCard(); triggerWindGust();
+                    const o = JSON.parse(m[0]), latest = loadSea(), nid = Date.now(), j = Number(o.joy) || 88, pos = getAutoSeaPos(latest.pearls.length + 2, j);
+                    latest.pearls.unshift({ id: nid, title: o.title || "潮汐记忆", author: c.charName, joy: j, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    latest.activeId = nid; saveSea(latest);
+                    addWaterRipple((pos.xPct / 100) * W, (pos.yPct / 100) * H, 90);
+                    renderSeaView();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
 
-        topDoc.getElementById("wc-btn-absorb").onclick = async (e) => {
+        // ③ 自动汲取微信/主线最新聊天化作羁绊汐珠
+        topDoc.getElementById("sf-btn-absorb").onclick = async (e) => {
             const btn = e.currentTarget, orig = btn.innerHTML; btn.textContent = "汲取中...";
             const c = getCtx();
             let wx = "";
             try { wx = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${c.safeScope}`) || "[]").slice(-14).map((m) => `${m.role === "user" ? c.userName : c.charName}: ${m.text}`).join("\n"); } catch (err) {}
-            const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常`;
+            const src = [wx, c.recentChat].filter(Boolean).join("\n---\n") || `与 ${c.charName} 的日常羁绊`;
             try {
-                const raw = await askChimeAI(`你是${c.charName}。`, `根据以下近期聊天提炼一段最值得铭记的瞬间凝结成初雪风铃，并给出情绪开心度(joy: 10~100)。\n${src.slice(-1100)}\n严格只输出JSON：{"title":"6字内短签标题","joy":92,"content":"50字内回忆浓缩","whisper":"35字内风铃内壁回声"}`);
+                const raw = await askSeaAI(`你是${c.charName}。`, `根据以下你和${c.userName}近期聊天提炼一段最深刻的羁绊瞬间凝结成结识海的汐珠，并给出情感温度(joy: 10~100)。\n${src.slice(-1100)}\n严格只输出JSON：{"title":"8字内羁绊标题","joy":92,"content":"50字内羁绊浓缩","whisper":"35字内你的潮汐回响批注"}`);
                 const m = raw.match(/\{[\s\S]*\}/);
                 if (m) {
-                    const o = JSON.parse(m[0]), d = loadChimes(), nid = Date.now(), pos = getAutoChimePos(d.items.length + 3);
-                    d.items.unshift({ id: nid, title: o.title || "聊天回音", author: `${c.userName} & ${c.charName}`, joy: Number(o.joy) || 90, xPct: pos.xPct, yPct: pos.yPct, wireH: pos.wireH, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
-                    d.activeId = nid; d.flipped = false; saveChimes(d); renderChimesAndCard(); triggerWindGust();
+                    const o = JSON.parse(m[0]), latest = loadSea(), nid = Date.now(), j = Number(o.joy) || 90, pos = getAutoSeaPos(latest.pearls.length + 3, j);
+                    latest.pearls.unshift({ id: nid, title: o.title || "聊天羁绊", author: `${c.userName} & ${c.charName}`, joy: j, xPct: pos.xPct, yPct: pos.yPct, content: o.content || "", whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”` });
+                    latest.activeId = nid; saveSea(latest);
+                    addWaterRipple((pos.xPct / 100) * W, (pos.yPct / 100) * H, 90);
+                    renderSeaView();
                 }
             } catch (err) { alert(err.message); } finally { btn.innerHTML = orig; }
         };
     }
 
-    mountKoreanWindChimeGallery();
+    mountSeaOfFateApp();
 })();
