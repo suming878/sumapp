@@ -6840,8 +6840,8 @@ bootSumoulApp();
     mountDualMemorySeaApp();
 })();
 // ==========================================================================
-// 🤍 【结识海 · 楼层总结增强补丁：未总结楼层看板 + 依次分段批量总结 + 自定义总结字数 + 表格/文字双视图切换】
-// 用法：直接粘贴在 index.js 最末尾最后一行后面，自动接管并升级【楼层总结】页面！
+// 🤍 【结识海 · 终极增强补丁：1.总结/星图/记忆编年三位一体全自动同步 + 2.未总结看板/依次总结/自定义字数/表格文字双视图 + 3.韩系清冷初雨开屏动画】
+// 用法：直接替换 index.js 最末尾刚才那段 mountEnhancedSummaryCenter 补丁代码！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
@@ -6894,16 +6894,17 @@ bootSumoulApp();
     function saveMem(data, ch = getCh()) {
         try {
             localStorage.setItem(getStoreKey(ch), JSON.stringify(data));
-            // 同步更新底层防失忆注入
             const stCtx = topWin.SillyTavern?.getContext?.();
             if (ch === "st" && stCtx && typeof stCtx.setExtensionPrompt === "function" && data.isBound && data.autoCfg?.injectEnabled !== false) {
                 const sumLines = (data.summaries || []).slice(0, 15).map((s) => `• [${s.range}] 《${s.title}》：${s.content}${s.keyFacts ? `（核心事实：${s.keyFacts}）` : ""}`).join("\n");
+                const tlLines = (data.timeline || []).slice(0, 10).map((t) => `• [${t.chapter}] 《${t.title}》：${t.content}`).join("\n");
                 const nodeLines = (data.nodes || []).slice(0, 15).map((n) => `• [${n.title}]：${n.content}`).join("\n");
                 const promptText = [
                     "【SillyTavern 酒馆主线长期记忆库（严禁遗忘或与线上微信串戏）】",
                     `▸ 当前关系阶段：${data.pact?.stage || "深度羁绊"}`,
                     `▸ 核心锚点：${data.pact?.coreAnchor || ""}`,
                     sumLines ? `▸ 历次楼层阶段总结：\n${sumLines}` : "",
+                    tlLines ? `▸ 记忆编年史关键篇章：\n${tlLines}` : "",
                     nodeLines ? `▸ 星图记忆节点：\n${nodeLines}` : ""
                 ].filter(Boolean).join("\n");
                 topWin.__SUMOUL_ST_MEMORY_PROMPT__ = promptText;
@@ -6931,8 +6932,10 @@ bootSumoulApp();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    // 执行单段楼层总结（支持严格控制目标字数 wordCount）
-    async function executeSingleBatchSummary(ch, sFloor, eFloor, wordCount = 160, modeTag = "手动总结") {
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🧠 核心升级：一次总结同时写入【1.楼层总结 + 2.星图节点 + 3.记忆编年史】三位一体全同步！
+    // ══════════════════════════════════════════════════════════════════════════
+    async function executeUnifiedSummary(ch, sFloor, eFloor, wordCount = 160, modeTag = "自动同步") {
         const c = getCtx();
         const rawArr = ch === "st" ? c.stChatArr : c.wxChatArr;
         const chName = ch === "st" ? "酒馆主线" : "微信聊天";
@@ -6955,8 +6958,8 @@ bootSumoulApp();
         }).join("\n");
 
         const rawJson = await askSumAI(
-            `你是高精度防失忆档案官。当前轨道：【${chName}】（严禁与另一轨道串戏）。角色：${c.charName}，用户：${c.userName}。`,
-            `请将以下【${chName} 第 #${sIdx} 层 ~ 第 #${eIdx} 层】的聊天记录提炼为防失忆总结。\n要求：正文总结 (summary) 字数请控制在 **${targetWords} 字左右**，细节扎实、不漏伏笔与承诺。\n\n${sliceText.slice(-4200)}\n\n严格只输出JSON格式：\n{"sumTitle":"12字内阶段标题","summary":"约${targetWords}字的高密度剧情与情感递进总结","keyFacts":"35字内不可遗忘的核心事实铁律","nodeType":"memory","nodeTitle":"6字内星图节点名","edgeLabel":"2~4字连线词","nodeWhisper":"28字内${c.charName}的清冷内心批注"}`
+            `你是高精度防失忆档案官与编年史作家。当前轨道：【${chName}】（严禁与另一轨道串戏）。角色：${c.charName}，用户：${c.userName}。`,
+            `请将以下【${chName} 第 #${sIdx} 层 ~ 第 #${eIdx} 层】的聊天记录提炼为防失忆总结，并同步生成星图节点与记忆编年史章节。\n要求：正文总结 (summary) 字数控制在 **${targetWords} 字左右**，细节扎实。\n\n${sliceText.slice(-4200)}\n\n严格只输出JSON格式：\n{"sumTitle":"12字内阶段标题","summary":"约${targetWords}字的高密度剧情与情感递进总结","keyFacts":"35字内不可遗忘的核心事实铁律","nodeType":"memory","nodeTitle":"6字内星图节点名","edgeLabel":"2~4字连线词","nodeWhisper":"28字内${c.charName}的清冷内心批注","tlTheme":"2~4字章节主题词(如:破冰/升温/暗涌)","tlTitle":"12字内极具文学感的编年史章节名","tlContent":"65字内极具画面感的编年史叙事总结"}`
         );
 
         const match = rawJson.match(/\{[\s\S]*\}/);
@@ -6967,10 +6970,12 @@ bootSumoulApp();
         const now = new Date();
         const timeStr = `${now.getMonth() + 1}.${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
         const rangeLabel = `${ch === "st" ? "酒馆" : "微信"} #${sIdx} ~ #${eIdx}`;
+        const baseId = Date.now() + Math.floor(Math.random() * 1000);
 
+        // ① 写入【楼层总结】
         d.summaries = d.summaries || [];
         d.summaries.unshift({
-            id: Date.now() + Math.floor(Math.random() * 1000),
+            id: baseId,
             range: rangeLabel,
             sFloor: sIdx,
             eFloor: eIdx,
@@ -6981,10 +6986,10 @@ bootSumoulApp();
             time: `${modeTag} · ${timeStr}`
         });
 
-        // 同步在当前轨道的星图上新增对应记忆微点
+        // ② 同步写入【星图脉络节点】
         d.nodes = d.nodes || [];
         d.edges = d.edges || [];
-        const nid = Date.now() + Math.floor(Math.random() * 1000) + 1;
+        const nid = baseId + 1;
         const cnt = d.nodes.length + 1;
         const xPct = Math.max(14, Math.min(86, Math.round(50 + Math.cos(cnt * 2.3) * (18 + (cnt % 4) * 6))));
         const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(cnt * 2.3) * (14 + (cnt % 4) * 5))));
@@ -7001,6 +7006,20 @@ bootSumoulApp();
         d.edges.push({ from: anchorId, to: nid, label: o.edgeLabel || "刻痕" });
         d.activeNodeId = nid;
 
+        // ③ 同步写入【记忆编年史 (timeline)】！（彻底解决编年史不同步的问题！）
+        d.timeline = d.timeline || [];
+        const chapNum = String(d.timeline.length + 1).padStart(2, "0");
+        const prefix = ch === "st" ? "CHAPTER" : "WECHAT";
+        d.timeline.unshift({
+            id: baseId + 2,
+            range: rangeLabel,
+            chapter: `${prefix} ${chapNum} · ${o.tlTheme || "共鸣"} (${rangeLabel})`,
+            title: o.tlTitle || o.sumTitle || `${rangeLabel} 记忆篇章`,
+            content: o.tlContent || o.summary || "",
+            note: `“ ${(o.nodeWhisper || "已随楼层总结自动同步归档。").replace(/^[“"]|[”"]$/g, "")} ”`
+        });
+
+        // ④ 更新最新已总结楼层水位线
         d.autoCfg = d.autoCfg || {};
         if (eIdx + 1 > (Number(d.autoCfg.lastFloor) || 0)) {
             d.autoCfg.lastFloor = eIdx + 1;
@@ -7009,20 +7028,56 @@ bootSumoulApp();
         saveMem(d, ch);
     }
 
-    function mountEnhancedSummaryCenter() {
+    function mountSplashAndUnifiedSummary() {
         const overlay = topDoc.getElementById("smt-ksea-overlay");
         const vp = topDoc.getElementById("ks-main-viewport");
         if (!overlay || !vp) {
-            setTimeout(mountEnhancedSummaryCenter, 220);
+            setTimeout(mountSplashAndUnifiedSummary, 220);
             return;
         }
 
-        // 注入韩系高定「表格样式 ⇄ 文字样式」与未总结看板专属 CSS
+        // 注入开屏动画 + 表格/文字双视图 + 编年史同步 UI 样式
         topDoc.getElementById("ks-sum-pro-css")?.remove();
         const st = topDoc.createElement("style");
         st.id = "ks-sum-pro-css";
         st.innerHTML = `
-            /* 未总结楼层 3 格仪表盘 */
+            /* ── 第5应用专属：韩系清冷初雨开屏动画 (Splash Screen) ── */
+            @keyframes ksSplashDrop {
+                0%   { top: 18%; height: 0px; opacity: 0; }
+                30%  { height: 42px; opacity: 0.85; }
+                65%  { top: 47%; height: 10px; opacity: 0.9; }
+                100% { top: 48%; height: 0px; opacity: 0; }
+            }
+            @keyframes ksSplashDotPop {
+                0%, 58% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                75%     { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+                100%    { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            }
+            @keyframes ksSplashRipple {
+                0%, 60% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+                70%     { opacity: 0.65; }
+                100%    { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
+            }
+            @keyframes ksSplashTextReveal {
+                0%, 45% { opacity: 0; transform: translateY(8px); letter-spacing: 8px; }
+                100%    { opacity: 1; transform: translateY(0); letter-spacing: 4px; }
+            }
+
+            #seoul-mini-theater-modal #ks-splash-screen {
+                position: absolute !important; inset: 0 !important; z-index: 9999 !important;
+                background: #FFFFFF !important;
+                display: none; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+                transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1) !important;
+                user-select: none !important; cursor: pointer !important;
+            }
+            #seoul-mini-theater-modal #ks-splash-screen.show {
+                display: flex !important; opacity: 1 !important;
+            }
+            #seoul-mini-theater-modal #ks-splash-screen.fade-out {
+                opacity: 0 !important; pointer-events: none !important;
+            }
+
+            /* ── 未总结楼层 3 格仪表盘 ── */
             #seoul-mini-theater-modal .ks-stat-grid {
                 display: grid !important; grid-template-columns: repeat(3, 1fr) !important;
                 gap: 7px !important; margin-bottom: 10px !important;
@@ -7039,7 +7094,7 @@ bootSumoulApp();
                 letter-spacing: 0.3px !important; margin-top: 2px !important;
             }
 
-            /* 表格样式 (Table View) */
+            /* ── 表格样式 (Table View) ── */
             #seoul-mini-theater-modal .ks-sum-table-wrap {
                 width: 100% !important; overflow-x: auto !important;
                 background: #FFFFFF !important; border: 1px solid #E6E9F2 !important;
@@ -7059,9 +7114,7 @@ bootSumoulApp();
                 padding: 9px 10px !important; border-bottom: 1px solid #F0F2F7 !important;
                 color: #2C303C !important; vertical-align: top !important; line-height: 1.55 !important;
             }
-            #seoul-mini-theater-modal .ks-sum-table tr:last-child td {
-                border-bottom: none !important;
-            }
+            #seoul-mini-theater-modal .ks-sum-table tr:last-child td { border-bottom: none !important; }
             #seoul-mini-theater-modal .ks-range-badge {
                 display: inline-block !important; padding: 2px 6px !important;
                 background: #1E2028 !important; color: #FFFFFF !important;
@@ -7069,7 +7122,7 @@ bootSumoulApp();
                 font-family: monospace !important; white-space: nowrap !important;
             }
 
-            /* 文字样式 (Editorial Text View) */
+            /* ── 文字样式 (Editorial Text View) ── */
             #seoul-mini-theater-modal .ks-editorial-doc {
                 background: #FFFFFF !important; border: 1px solid #E6E9F2 !important;
                 border-radius: 16px !important; padding: 16px 16px !important;
@@ -7085,15 +7138,81 @@ bootSumoulApp();
         `;
         topDoc.head.appendChild(st);
 
-        let isRenderingSum = false;
+        // ══════════════════════════════════════════════════════════════════════════
+        // 🎬 1. 挂载第 5 应用「韩系纯白初雨开屏动画」层
+        // ══════════════════════════════════════════════════════════════════════════
+        topDoc.getElementById("ks-splash-screen")?.remove();
+        const splashEl = topDoc.createElement("div");
+        splashEl.id = "ks-splash-screen";
+        overlay.appendChild(splashEl);
+
+        let splashTimer = null;
+        function playSplashScreen() {
+            const c = getCtx();
+            const ch = getCh();
+            splashEl.classList.remove("fade-out");
+            splashEl.classList.add("show");
+            splashEl.innerHTML = `
+                <!-- 中心落雨凝点动画舞台 -->
+                <div style="position:relative;width:160px;height:160px;margin-bottom:12px;">
+                    <!-- 垂直坠落的清冷银丝雨滴 -->
+                    <div style="position:absolute;left:50%;transform:translateX(-50%);width:1px;background:linear-gradient(180deg,transparent,#1E2028);animation:ksSplashDrop 0.85s cubic-bezier(0.4,0,0.2,1) forwards;"></div>
+                    <!-- 触水荡开的三层同心水波环 -->
+                    <div style="position:absolute;left:50%;top:48%;width:38px;height:38px;border-radius:50%;border:0.8px solid rgba(30,32,40,0.55);animation:ksSplashRipple 1.35s ease-out forwards;"></div>
+                    <div style="position:absolute;left:50%;top:48%;width:38px;height:38px;border-radius:50%;border:0.6px solid rgba(130,138,156,0.45);animation:ksSplashRipple 1.35s ease-out 0.14s forwards;"></div>
+                    <div style="position:absolute;left:50%;top:48%;width:38px;height:38px;border-radius:50%;border:0.5px solid rgba(160,168,184,0.3);animation:ksSplashRipple 1.35s ease-out 0.28s forwards;"></div>
+                    <!-- 中心凝结的 5px 极简核心微点 -->
+                    <div style="position:absolute;left:50%;top:48%;width:5.5px;height:5.5px;border-radius:50%;background:#1E2028;box-shadow:0 0 0 4px #FFFFFF,0 0 0 4.8px rgba(30,32,40,0.35);animation:ksSplashDotPop 1.1s cubic-bezier(0.22,1,0.36,1) forwards;"></div>
+                </div>
+
+                <!-- 韩系杂志级留白呼吸标题 -->
+                <div style="text-align:center;animation:ksSplashTextReveal 1.1s cubic-bezier(0.22,1,0.36,1) forwards;">
+                    <div style="font-size:8px;font-weight:700;color:#98A0B2;letter-spacing:3.5px;margin-bottom:6px;">인연의 바다 · MEMORY SEA</div>
+                    <div style="font-size:17px;font-weight:800;color:#1E2028;letter-spacing:5px;padding-left:5px;">结 识 海</div>
+                    <div style="width:18px;height:1px;background:#DCDFE8;margin:10px auto;"></div>
+                    <div style="font-size:8.5px;font-weight:600;color:#6E7688;letter-spacing:1.2px;">
+                        ${c.userName} × ${c.charName} · ${ch === "st" ? "酒馆主线记忆轨" : "微信线上记忆轨"}
+                    </div>
+                </div>
+            `;
+
+            if (splashTimer) clearTimeout(splashTimer);
+            splashTimer = setTimeout(() => {
+                splashEl.classList.add("fade-out");
+                setTimeout(() => splashEl.classList.remove("show", "fade-out"), 450);
+            }, 1450);
+        }
+
+        // 点击开屏画面可立即跳过
+        splashEl.onclick = () => {
+            if (splashTimer) clearTimeout(splashTimer);
+            splashEl.classList.add("fade-out");
+            setTimeout(() => splashEl.classList.remove("show", "fade-out"), 300);
+        };
+
+        // 每次从个人主页点击打开【结识海】时，自动播放开屏动画
+        let wasOpen = overlay.classList.contains("open");
+        const openObs = new MutationObserver(() => {
+            const isOpen = overlay.classList.contains("open");
+            if (isOpen && !wasOpen) {
+                playSplashScreen();
+            }
+            wasOpen = isOpen;
+        });
+        openObs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
+
+        // ══════════════════════════════════════════════════════════════════════════
+        // 📊 2. 增强版【楼层总结 (summary)】页面渲染
+        // ══════════════════════════════════════════════════════════════════════════
+        let isRenderingUI = false;
         let isSequentialRunning = false;
 
         function renderProSummaryUI() {
             const ch = getCh();
             const d = loadMem(ch);
-            if (!d || !d.isBound || d.activeTab !== "summary" || isRenderingSum) return;
+            if (!d || !d.isBound || d.activeTab !== "summary" || isRenderingUI) return;
 
-            isRenderingSum = true;
+            isRenderingUI = true;
             const c = getCtx();
             const chLabel = ch === "st" ? "酒馆主线" : "微信线上";
             const totalLen = ch === "st" ? c.stChatArr.length : c.wxChatArr.length;
@@ -7106,11 +7225,9 @@ bootSumoulApp();
 
             const stepN = Math.max(3, Number(d.autoCfg.everyN) || 15);
             const wordLimit = Math.max(40, Number(d.autoCfg.wordLimit) || 160);
-            const viewMode = d.autoCfg.viewMode === "table" ? "table" : "text"; // 'table' | 'text'
-
+            const viewMode = d.autoCfg.viewMode === "table" ? "table" : "text";
             const sums = d.summaries || [];
 
-            // 1. 构造「表格样式 (Table View)」HTML
             const tableHtml = sums.length === 0
                 ? `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:28px;">暂无归档总结，请在上方选择楼层或点击依次总结</div>`
                 : `<div class="ks-sum-table-wrap">
@@ -7119,7 +7236,7 @@ bootSumoulApp();
                             <tr>
                                 <th style="width:78px;">楼层区间</th>
                                 <th style="width:88px;">阶段标题</th>
-                                <th>剧情与关系进展总结</th>
+                                <th>剧情与关系进展总结 (已同步编年&amp;星图)</th>
                                 <th style="width:96px;">防失忆铁律要点</th>
                                 <th style="width:28px;text-align:center;">删</th>
                             </tr>
@@ -7135,7 +7252,7 @@ bootSumoulApp();
                                     <td style="font-weight:600;color:#3A3E4C;">${(s.content || "").replace(/</g, "&lt;")}</td>
                                     <td style="font-size:8.4px;font-weight:700;color:#525868;background:#FAFBFD;">${(s.keyFacts || "—").replace(/</g, "&lt;")}</td>
                                     <td style="text-align:center;">
-                                        <span data-delsum="${s.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;" title="删除该条">×</span>
+                                        <span data-delsum="${s.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
                                     </td>
                                 </tr>
                             `).join("")}
@@ -7143,7 +7260,6 @@ bootSumoulApp();
                     </table>
                 </div>`;
 
-            // 2. 构造「文字样式 (Editorial Text View)」HTML
             const textHtml = sums.length === 0
                 ? `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:28px;">暂无归档总结，请在上方选择楼层或点击依次总结</div>`
                 : `<div class="ks-editorial-doc">
@@ -7176,7 +7292,6 @@ bootSumoulApp();
 
             vp.innerHTML = `
                 <div id="ks-pro-sum-container" style="flex:1;overflow-y:auto;padding:12px 14px 18px 14px;pointer-events:auto;">
-                    <!-- 1. 顶部实时「未总结楼层」三格监控看板 -->
                     <div class="ks-stat-grid">
                         <div class="ks-stat-box">
                             <div style="font-size:7.5px;font-weight:700;color:#8E94A4;">${chLabel}总层数</div>
@@ -7186,7 +7301,7 @@ bootSumoulApp();
                         <div class="ks-stat-box">
                             <div style="font-size:7.5px;font-weight:700;color:#8E94A4;">已总结至水位</div>
                             <div class="ks-stat-num" style="color:#1E2028;">#${Math.max(0, lastF - 1)} 层</div>
-                            <div style="font-size:6.8px;color:#98A0B2;">共 ${sums.length} 篇归档</div>
+                            <div style="font-size:6.8px;color:#98A0B2;">同步星图&amp;编年</div>
                         </div>
                         <div class="ks-stat-box highlight">
                             <div style="font-size:7.5px;font-weight:700;color:rgba(255,255,255,0.75);">当前未总结楼层</div>
@@ -7195,12 +7310,11 @@ bootSumoulApp();
                         </div>
                     </div>
 
-                    <!-- 2. 核心控制舱：全局每次总结字数 + 依次分段总结未总结层 + 全自动开关 -->
                     <div class="ks-card" style="margin-bottom:10px;padding:12px 14px!important;">
                         <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F0F2F7;">
                             <div>
-                                <div style="font-size:10.5px;font-weight:800;color:#1E2028;">每次总结字数 &amp; 分段步长设置</div>
-                                <div style="font-size:7.5px;color:#7E8494;">设定每多少层切一段、以及每段要求 AI 输出多少字</div>
+                                <div style="font-size:10.5px;font-weight:800;color:#1E2028;">每次总结字数 &amp; 自动同步设置</div>
+                                <div style="font-size:7.5px;color:#7E8494;">每次总结将自动同步生成【星图节点】与【记忆编年】</div>
                             </div>
                             <div style="display:flex;align-items:center;gap:5px;">
                                 <span style="font-size:8.5px;font-weight:700;color:#525868;">每次字数</span>
@@ -7209,19 +7323,17 @@ bootSumoulApp();
                             </div>
                         </div>
 
-                        <!-- 依次总结未总结楼层（支持排队分段执行） -->
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F0F2F7;">
                             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
                                 <span style="font-size:8.8px;font-weight:700;color:#2C303C;">按每</span>
                                 <input type="number" id="ks-pro-step-inp" class="ks-num-inp" min="3" max="200" value="${stepN}" />
-                                <span style="font-size:8.8px;font-weight:700;color:#2C303C;">层一段 · 依次总结未总结层 (${unsumRangeTxt})</span>
+                                <span style="font-size:8.8px;font-weight:700;color:#2C303C;">层一段 · 依次总结 (${unsumRangeTxt})</span>
                             </div>
                             <span class="ks-pill dark" id="ks-pro-seq-btn" style="flex-shrink:0;">
                                 <span>依次总结 (${unsumCount}层)</span>
                             </span>
                         </div>
 
-                        <!-- 后台全自动监听开关 + 手动微调已总结水位线 -->
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
                             <div style="display:flex;align-items:center;gap:5px;">
                                 <span style="font-size:8.2px;font-weight:700;color:#6E7688;">重置未总结起点为 #</span>
@@ -7229,16 +7341,14 @@ bootSumoulApp();
                                 <span class="ks-flt" id="ks-pro-cursor-set" style="padding:2px 7px!important;">设置</span>
                             </div>
                             <div style="display:flex;align-items:center;gap:5px;">
-                                <span style="font-size:8.2px;font-weight:700;color:#525868;">满${stepN}层自动总结：</span>
+                                <span style="font-size:8.2px;font-weight:700;color:#525868;">满${stepN}层自动同步总结：</span>
                                 <span class="ks-flt ${d.autoCfg?.enabled ? "on" : ""}" id="ks-pro-auto-tog">${d.autoCfg?.enabled ? "自动开启中✓" : "已关闭"}</span>
                             </div>
                         </div>
 
-                        <!-- 依次批量总结实时进度条 -->
                         <div id="ks-seq-progress-bar" style="display:none;margin-top:8px;padding:7px 10px;background:#F6F8FC;border-radius:8px;font-size:8.8px;font-weight:700;color:#1E2028;"></div>
                     </div>
 
-                    <!-- 3. 任选起止楼层精准单次总结 -->
                     <div class="ks-card" style="margin-bottom:12px;padding:10px 14px!important;">
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
                             <div style="display:flex;align-items:center;gap:4px;">
@@ -7248,11 +7358,10 @@ bootSumoulApp();
                                 <input type="number" id="ks-pro-e" class="ks-num-inp" min="0" max="${maxFloor}" value="${maxFloor}" />
                                 <span style="font-size:8.8px;font-weight:700;color:#525868;">层</span>
                             </div>
-                            <span class="ks-pill" id="ks-pro-manual-btn">单独提炼此区间</span>
+                            <span class="ks-pill" id="ks-pro-manual-btn">单独提炼并同步</span>
                         </div>
                     </div>
 
-                    <!-- 4. 归档总结列表头部 + 【表格样式 ⇄ 文字样式】双视图切换器 -->
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 2px;">
                         <span style="font-size:9px;font-weight:800;color:#7E8494;letter-spacing:0.6px;">
                             SUMMARY ARCHIVE · 已归档总结 (${sums.length}篇)
@@ -7263,12 +7372,10 @@ bootSumoulApp();
                         </div>
                     </div>
 
-                    <!-- 5. 表格视图 或 文字视图 主体 -->
                     ${viewMode === "table" ? tableHtml : textHtml}
                 </div>
             `;
 
-            // ── 绑定所有控制器事件 ──
             const saveCfgField = (field, val) => {
                 const latest = loadMem(ch);
                 latest.autoCfg = latest.autoCfg || {};
@@ -7277,23 +7384,17 @@ bootSumoulApp();
             };
 
             topDoc.getElementById("ks-pro-word-inp").onchange = (e) => {
-                const v = Math.max(40, Math.min(800, Number(e.target.value) || 160));
-                saveCfgField("wordLimit", v);
-                isRenderingSum = false; renderProSummaryUI();
+                saveCfgField("wordLimit", Math.max(40, Math.min(800, Number(e.target.value) || 160)));
+                isRenderingUI = false; renderProSummaryUI();
             };
-
             topDoc.getElementById("ks-pro-step-inp").onchange = (e) => {
-                const v = Math.max(3, Math.min(200, Number(e.target.value) || 15));
-                saveCfgField("everyN", v);
-                isRenderingSum = false; renderProSummaryUI();
+                saveCfgField("everyN", Math.max(3, Math.min(200, Number(e.target.value) || 15)));
+                isRenderingUI = false; renderProSummaryUI();
             };
-
             topDoc.getElementById("ks-pro-cursor-set").onclick = () => {
-                const v = Math.max(0, Math.min(totalLen, Number(topDoc.getElementById("ks-pro-cursor-inp").value) || 0));
-                saveCfgField("lastFloor", v);
-                isRenderingSum = false; renderProSummaryUI();
+                saveCfgField("lastFloor", Math.max(0, Math.min(totalLen, Number(topDoc.getElementById("ks-pro-cursor-inp").value) || 0)));
+                isRenderingUI = false; renderProSummaryUI();
             };
-
             topDoc.getElementById("ks-pro-auto-tog").onclick = () => {
                 const latest = loadMem(ch);
                 latest.autoCfg = latest.autoCfg || {};
@@ -7301,44 +7402,40 @@ bootSumoulApp();
                 latest.autoCfg.everyN = Math.max(3, Number(topDoc.getElementById("ks-pro-step-inp").value) || 15);
                 latest.autoCfg.wordLimit = Math.max(40, Number(topDoc.getElementById("ks-pro-word-inp").value) || 160);
                 saveMem(latest, ch);
-                isRenderingSum = false; renderProSummaryUI();
+                isRenderingUI = false; renderProSummaryUI();
             };
 
-            // 切换【表格样式 ⇄ 文字样式】
             vp.querySelectorAll("[data-vmode]").forEach((btn) => {
                 btn.onclick = () => {
                     saveCfgField("viewMode", btn.getAttribute("data-vmode"));
-                    isRenderingSum = false; renderProSummaryUI();
+                    isRenderingUI = false; renderProSummaryUI();
                 };
             });
 
-            // 删除单条总结
             vp.querySelectorAll("[data-delsum]").forEach((btn) => {
                 btn.onclick = () => {
                     const latest = loadMem(ch);
                     latest.summaries = (latest.summaries || []).filter((x) => Number(x.id) !== Number(btn.getAttribute("data-delsum")));
                     saveMem(latest, ch);
-                    isRenderingSum = false; renderProSummaryUI();
+                    isRenderingUI = false; renderProSummaryUI();
                 };
             });
 
-            // 单独提炼指定区间
             topDoc.getElementById("ks-pro-manual-btn").onclick = async (e) => {
                 const btn = e.currentTarget, orig = btn.textContent;
                 const sVal = Number(topDoc.getElementById("ks-pro-s").value) || 0;
                 const eVal = Number(topDoc.getElementById("ks-pro-e").value) || maxFloor;
                 const wVal = Number(topDoc.getElementById("ks-pro-word-inp").value) || 160;
-                btn.textContent = "提炼中...";
+                btn.textContent = "同步提炼中...";
                 try {
-                    await executeSingleBatchSummary(ch, sVal, eVal, wVal, "手动区间");
-                    isRenderingSum = false; renderProSummaryUI();
+                    await executeUnifiedSummary(ch, sVal, eVal, wVal, "手动同步");
+                    isRenderingUI = false; renderProSummaryUI();
                 } catch (err) {
                     alert(err.message);
                     btn.textContent = orig;
                 }
             };
 
-            // 核心：【依次分段总结所有未总结楼层】
             topDoc.getElementById("ks-pro-seq-btn").onclick = async () => {
                 if (isSequentialRunning) return;
                 if (totalLen === 0) return alert(`当前【${chLabel}】还没有聊天消息！`);
@@ -7349,18 +7446,12 @@ bootSumoulApp();
                 saveCfgField("wordLimit", wVal);
 
                 let curStart = Math.min(maxFloor, Number(loadMem(ch).autoCfg?.lastFloor) || 0);
-                // 若当前已全部总结完，询问是否从最后一段重新总结
-                if (curStart >= totalLen) {
-                    curStart = Math.max(0, totalLen - step);
-                }
+                if (curStart >= totalLen) curStart = Math.max(0, totalLen - step);
 
-                // 拆分批次队列
                 const batches = [];
                 for (let s = curStart; s <= maxFloor; s += step) {
-                    const e = Math.min(maxFloor, s + step - 1);
-                    batches.push([s, e]);
+                    batches.push([s, Math.min(maxFloor, s + step - 1)]);
                 }
-
                 if (batches.length === 0) return alert("当前没有未总结的楼层！");
 
                 isSequentialRunning = true;
@@ -7371,41 +7462,172 @@ bootSumoulApp();
                 try {
                     for (let i = 0; i < batches.length; i++) {
                         const [bStart, bEnd] = batches[i];
-                        if (seqBtn) seqBtn.textContent = `依次总结中 (${i + 1}/${batches.length})...`;
+                        if (seqBtn) seqBtn.textContent = `依次同步中 (${i + 1}/${batches.length})...`;
                         if (progBar) {
-                            progBar.textContent = `正在依次总结第 ${i + 1}/${batches.length} 批：楼层 #${bStart} ~ #${bEnd}（要求约 ${wVal} 字）...`;
+                            progBar.textContent = `正在依次总结并同步至编年史 (${i + 1}/${batches.length})：楼层 #${bStart} ~ #${bEnd}...`;
                         }
-                        await executeSingleBatchSummary(ch, bStart, bEnd, wVal, `依次总结(${i + 1}/${batches.length})`);
+                        await executeUnifiedSummary(ch, bStart, bEnd, wVal, `依次总结(${i + 1}/${batches.length})`);
                     }
                     isSequentialRunning = false;
-                    isRenderingSum = false;
+                    isRenderingUI = false;
                     renderProSummaryUI();
                 } catch (err) {
                     alert(`依次总结中断：${err.message}`);
                     isSequentialRunning = false;
-                    isRenderingSum = false;
+                    isRenderingUI = false;
                     renderProSummaryUI();
                 }
             };
 
-            setTimeout(() => { isRenderingSum = false; }, 60);
+            setTimeout(() => { isRenderingUI = false; }, 60);
         }
 
-        // 监听视图容器变化，只要切换到【楼层总结 (summary)】Tab 就自动渲染增强版界面
+        // ══════════════════════════════════════════════════════════════════════════
+        // 📖 3. 增强版【记忆编年 (timeline)】页面：支持与总结实时同步 + 一键AI自动提炼编年
+        // ══════════════════════════════════════════════════════════════════════════
+        function renderProTimelineUI() {
+            const ch = getCh();
+            const d = loadMem(ch);
+            if (!d || !d.isBound || d.activeTab !== "timeline" || isRenderingUI) return;
+
+            isRenderingUI = true;
+            const c = getCtx();
+            const chLabel = ch === "st" ? "酒馆主线" : "微信线上";
+            const totalLen = ch === "st" ? c.stChatArr.length : c.wxChatArr.length;
+            const maxFloor = Math.max(0, totalLen - 1);
+            const lastF = Math.min(totalLen, Math.max(0, Number(d.autoCfg?.lastFloor) || 0));
+
+            const listHtml = (d.timeline || []).map((it) => `
+                <div style="position:relative;padding-left:16px;padding-bottom:12px;border-left:1px solid #E4E8F0;">
+                    <span style="position:absolute;left:-4px;top:4px;width:7px;height:7px;border-radius:50%;background:#FFFFFF;border:1.5px solid #1E2028;"></span>
+                    <div class="ks-card" style="padding:12px 14px!important;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-size:7.5px;font-weight:800;color:#8E94A4;font-family:monospace;">${(it.chapter || "CHAPTER").replace(/</g, "&lt;")}</span>
+                            <span data-deltl="${it.id}" style="cursor:pointer;color:#9A6868;font-weight:800;font-size:11px;">×</span>
+                        </div>
+                        <div style="font-size:11.2px;font-weight:800;color:#1E2028;margin-bottom:4px;">${(it.title || "").replace(/</g, "&lt;")}</div>
+                        <div style="font-size:9.8px;font-weight:600;color:#3A3E4C;line-height:1.65;">${(it.content || "").replace(/</g, "&lt;")}</div>
+                        ${it.note ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #ECEEF4;font-size:8.8px;font-weight:600;color:#6E7688;">${it.note.replace(/</g, "&lt;")}</div>` : ""}
+                    </div>
+                </div>
+            `).join("");
+
+            vp.innerHTML = `
+                <div id="ks-pro-tl-container" style="flex:1;overflow-y:auto;padding:12px 14px 18px 14px;pointer-events:auto;">
+                    <!-- 顶部：编年史自动同步说明 + 一键操作栏 -->
+                    <div class="ks-card" style="margin-bottom:12px;padding:11px 14px!important;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <div>
+                                <div style="font-size:11.5px;font-weight:800;color:#1E2028;">【${chLabel}】记忆编年史 · 自动同步已开启✓</div>
+                                <div style="font-size:7.5px;color:#7E8494;margin-top:2px;">每次自动/手动楼层总结时，会自动在此生成对应编年篇章</div>
+                            </div>
+                            <span class="ks-flt" id="ks-tl-sync-from-sum" title="将所有已归档的楼层总结一键补齐到编年史">从总结补齐编年</span>
+                        </div>
+                        <div style="display:flex;gap:6px;">
+                            <span class="ks-pill" id="ks-tl-manual-open" style="flex:1;">+ 手写新篇章</span>
+                            <span class="ks-pill dark" id="ks-tl-ai-auto" style="flex:1.4;">AI 提炼最新楼层并同步编年</span>
+                        </div>
+                    </div>
+
+                    <div id="ks-tl-box" class="ks-card" style="display:none;margin-bottom:12px;">
+                        <input type="text" id="ks-tl-ti" placeholder="篇章标题 (如：初雪夜的越界拥抱)..." style="width:100%;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9.8px;font-weight:700;color:#1E2028;box-sizing:border-box;outline:none;margin-bottom:6px;" />
+                        <textarea id="ks-tl-ct" placeholder="写下这段重要编年事件..." style="width:100%;height:44px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:5px 8px;font-size:9.5px;color:#1E2028;box-sizing:border-box;resize:none;outline:none;margin-bottom:6px;"></textarea>
+                        <div style="display:flex;justify-content:flex-end;"><span class="ks-pill dark" id="ks-tl-save">保存篇章</span></div>
+                    </div>
+
+                    <div style="padding-left:6px;">${listHtml || `<div style="text-align:center;color:#98A0B2;font-size:10px;padding:24px;">暂无编年篇章</div>`}</div>
+                </div>
+            `;
+
+            const tlBox = topDoc.getElementById("ks-tl-box");
+            topDoc.getElementById("ks-tl-manual-open").onclick = () => {
+                tlBox.style.display = tlBox.style.display === "none" ? "block" : "none";
+            };
+            topDoc.getElementById("ks-tl-save").onclick = () => {
+                const ti = topDoc.getElementById("ks-tl-ti").value.trim() || "新篇章";
+                const ct = topDoc.getElementById("ks-tl-ct").value.trim();
+                if (!ct) return;
+                const latest = loadMem(ch);
+                latest.timeline = latest.timeline || [];
+                latest.timeline.unshift({
+                    id: Date.now(),
+                    chapter: `CHAPTER ${String(latest.timeline.length + 1).padStart(2, "0")} · 手记`,
+                    title: ti, content: ct,
+                    note: `“ 归档于${chLabel}记忆海 ”`
+                });
+                saveMem(latest, ch);
+                isRenderingUI = false; renderProTimelineUI();
+            };
+
+            // 一键将已有的【楼层总结】补齐同步到【记忆编年】
+            topDoc.getElementById("ks-tl-sync-from-sum").onclick = () => {
+                const latest = loadMem(ch);
+                latest.timeline = latest.timeline || [];
+                const existingRanges = new Set(latest.timeline.map((t) => t.range).filter(Boolean));
+                let added = 0;
+                (latest.summaries || []).forEach((s, idx) => {
+                    if (s.range && !existingRanges.has(s.range)) {
+                        latest.timeline.unshift({
+                            id: Date.now() + idx,
+                            range: s.range,
+                            chapter: `ARCHIVE · ${s.range}`,
+                            title: s.title || `${s.range} 纪要`,
+                            content: s.content || "",
+                            note: s.keyFacts ? `“ 核心要点：${s.keyFacts} ”` : `“ 同步自${s.range}楼层总结 ”`
+                        });
+                        existingRanges.add(s.range);
+                        added++;
+                    }
+                });
+                saveMem(latest, ch);
+                isRenderingUI = false; renderProTimelineUI();
+                alert(added > 0 ? `已成功将 ${added} 篇楼层总结同步至记忆编年史！` : "当前所有楼层总结均已在编年史中，无需重复补齐。");
+            };
+
+            // 在编年页直接调用 AI 提炼最新未总结楼层（同时写入总结、星图与编年）
+            topDoc.getElementById("ks-tl-ai-auto").onclick = async (e) => {
+                const btn = e.currentTarget, orig = btn.textContent;
+                if (totalLen === 0) return alert(`当前【${chLabel}】暂无聊天记录！`);
+                const sVal = lastF < totalLen ? lastF : Math.max(0, totalLen - 15);
+                const wVal = Number(d.autoCfg?.wordLimit) || 160;
+                btn.textContent = "提炼并同步中...";
+                try {
+                    await executeUnifiedSummary(ch, sVal, maxFloor, wVal, "编年同步");
+                    isRenderingUI = false; renderProTimelineUI();
+                } catch (err) {
+                    alert(err.message);
+                    btn.textContent = orig;
+                }
+            };
+
+            vp.querySelectorAll("[data-deltl]").forEach((b) => b.onclick = () => {
+                const latest = loadMem(ch);
+                latest.timeline = (latest.timeline || []).filter((x) => Number(x.id) !== Number(b.getAttribute("data-deltl")));
+                saveMem(latest, ch);
+                isRenderingUI = false; renderProTimelineUI();
+            });
+
+            setTimeout(() => { isRenderingUI = false; }, 60);
+        }
+
+        // 监听视图容器切换：当进入【楼层总结】或【记忆编年】时自动挂载增强版视图
         const obs = new MutationObserver(() => {
             const d = loadMem(getCh());
-            if (d && d.isBound && d.activeTab === "summary" && !topDoc.getElementById("ks-pro-sum-container")) {
+            if (!d || !d.isBound) return;
+            if (d.activeTab === "summary" && !topDoc.getElementById("ks-pro-sum-container")) {
                 renderProSummaryUI();
+            } else if (d.activeTab === "timeline" && !topDoc.getElementById("ks-pro-tl-container")) {
+                renderProTimelineUI();
             }
         });
         obs.observe(vp, { childList: true });
 
-        // 初始检查
         const initD = loadMem(getCh());
-        if (initD && initD.isBound && initD.activeTab === "summary") {
-            renderProSummaryUI();
+        if (initD && initD.isBound) {
+            if (initD.activeTab === "summary") renderProSummaryUI();
+            else if (initD.activeTab === "timeline") renderProTimelineUI();
         }
     }
 
-    mountEnhancedSummaryCenter();
+    mountSplashAndUnifiedSummary();
 })();
