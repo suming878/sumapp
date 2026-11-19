@@ -8257,3 +8257,377 @@ bootSumoulApp();
 
     mountMinimalColdSplashWithNames();
 })();
+// ==========================================================================
+// 🤍 【Sumoul App 全局与结识海 · 自定义字体(5款预设+URL/本地字体上传) & 自由字号放大补丁(默认115%解决字太小)】
+// 用法：直接粘贴在 index.js 最末尾最后一行后面！在【结识海->中枢设置】和【API设置】里均可随时调节！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+    const FONT_STORE_KEY = "sumoul_v16_custom_font_prefs";
+
+    // 5 款韩系高定字体预设
+    const FONT_PRESETS = [
+        {
+            id: "system",
+            name: "韩系原生无衬线",
+            family: `-apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "PingFang SC", sans-serif`,
+            cssUrl: ""
+        },
+        {
+            id: "serif",
+            name: "清冷文艺宋明体",
+            family: `"Noto Serif SC", "Nanum Myeongjo", "Songti SC", "STSong", serif`,
+            cssUrl: "https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Serif+SC:wght@400;600;700&display=swap"
+        },
+        {
+            id: "wenkai",
+            name: "清透手写文楷",
+            family: `"LXGW WenKai", "Kaiti SC", "STKaiti", serif`,
+            cssUrl: "https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css"
+        },
+        {
+            id: "round",
+            name: "温柔韩系圆体",
+            family: `"Varela Round", "YouYuan", "PingFang SC", sans-serif`,
+            cssUrl: ""
+        },
+        {
+            id: "mono",
+            name: "极简档案等宽",
+            family: `"JetBrains Mono", "SF Mono", Menlo, Consolas, "PingFang SC", monospace`,
+            cssUrl: ""
+        }
+    ];
+
+    function loadFontPrefs() {
+        const def = {
+            presetId: "system",
+            customFontUrl: "",
+            customFontName: "",
+            fontScale: 116 // 默认直接放大到 116%，彻底解决原本字太小的问题！
+        };
+        try {
+            return Object.assign(def, JSON.parse(localStorage.getItem(FONT_STORE_KEY) || "{}"));
+        } catch (e) {
+            return def;
+        }
+    }
+
+    function saveFontPrefs(p) {
+        try {
+            localStorage.setItem(FONT_STORE_KEY, JSON.stringify(p));
+        } catch (e) {
+            alert("本地字体文件体积过大，建议使用字体链接或预设字体。");
+        }
+    }
+
+    // 扫描并无损放大所有元素的行内与CSS字号（不会破坏容器布局，只放大文字！）
+    function applyFontScaleToTree(rootEl, scaleRatio) {
+        if (!rootEl) return;
+        const els = rootEl.querySelectorAll("*");
+        els.forEach((el) => {
+            // 跳过画布与SVG矢量图形内部
+            if (el.tagName === "SVG" || el.tagName === "PATH" || el.tagName === "CIRCLE" || el.tagName === "LINE" || el.tagName === "CANVAS") return;
+
+            const inlineFs = el.style?.fontSize;
+            if (inlineFs && inlineFs.endsWith("px") && !el.hasAttribute("data-orig-fs")) {
+                const rawNum = parseFloat(inlineFs);
+                if (Number.isFinite(rawNum) && rawNum > 0 && rawNum < 40) {
+                    el.setAttribute("data-orig-fs", String(rawNum));
+                }
+            }
+
+            if (el.hasAttribute("data-orig-fs")) {
+                const base = parseFloat(el.getAttribute("data-orig-fs"));
+                if (Number.isFinite(base)) {
+                    // 越小的字（比如原本7px/8px的微字）给予更高的保底放大补偿，确保清晰好读！
+                    const minBoost = base < 9.5 ? Math.max(base * scaleRatio, base + (scaleRatio - 1) * 10.5) : base * scaleRatio;
+                    el.style.setProperty("font-size", `${minBoost.toFixed(1)}px`, "important");
+                }
+            }
+        });
+    }
+
+    function applyTypographyNow() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        if (!modal) return;
+        const p = loadFontPrefs();
+        const scale = Math.max(80, Math.min(180, Number(p.fontScale) || 116));
+        const ratio = scale / 100;
+
+        // 1. 决定当前字体族并按需加载外部字体库
+        const preset = FONT_PRESETS.find((x) => x.id === p.presetId) || FONT_PRESETS[0];
+        let activeFamily = preset.family;
+
+        if (preset.cssUrl) {
+            const linkId = `sumoul-font-link-${preset.id}`;
+            if (!topDoc.getElementById(linkId)) {
+                const lk = topDoc.createElement("link");
+                lk.id = linkId;
+                lk.rel = "stylesheet";
+                lk.href = preset.cssUrl;
+                topDoc.head.appendChild(lk);
+            }
+        }
+
+        // 若用户填写了自定义字体链接 (.ttf / .woff2 / .css)
+        let customFontFaceCss = "";
+        if (p.customFontUrl && p.customFontUrl.trim()) {
+            const url = p.customFontUrl.trim();
+            if (url.endsWith(".css") || url.includes("fonts.googleapis.com")) {
+                if (!topDoc.getElementById("sumoul-user-custom-font-css")) {
+                    const lk = topDoc.createElement("link");
+                    lk.id = "sumoul-user-custom-font-css";
+                    lk.rel = "stylesheet";
+                    lk.href = url;
+                    topDoc.head.appendChild(lk);
+                } else {
+                    topDoc.getElementById("sumoul-user-custom-font-css").href = url;
+                }
+                if (p.customFontName) {
+                    activeFamily = `"${p.customFontName}", ${activeFamily}`;
+                }
+            } else {
+                customFontFaceCss = `
+                    @font-face {
+                        font-family: "SumoulUserCustomFont";
+                        src: url("${url}");
+                        font-display: swap;
+                    }
+                `;
+                activeFamily = `"SumoulUserCustomFont", ${activeFamily}`;
+            }
+        }
+
+        // 2. 注入全局字体族与 CSS 类字号放大规则
+        let styleEl = topDoc.getElementById("sumoul-typography-master-css");
+        if (!styleEl) {
+            styleEl = topDoc.createElement("style");
+            styleEl.id = "sumoul-typography-master-css";
+            topDoc.head.appendChild(styleEl);
+        }
+
+        styleEl.innerHTML = `
+            ${customFontFaceCss}
+            #seoul-mini-theater-modal,
+            #seoul-mini-theater-modal *:not(code):not(pre) {
+                font-family: ${activeFamily} !important;
+            }
+            /* 针对固定CSS类的字号按比例同步放大 */
+            #seoul-mini-theater-modal .ks-pill,
+            #seoul-mini-theater-modal .ks-dual-opt,
+            #seoul-mini-theater-modal .ks-dock-zh,
+            #seoul-mini-theater-modal .smt-g-chip {
+                font-size: ${(9.2 * ratio).toFixed(1)}px !important;
+            }
+            #seoul-mini-theater-modal .ks-flt,
+            #seoul-mini-theater-modal .ks-range-badge,
+            #seoul-mini-theater-modal .ks-sum-table th {
+                font-size: ${(8.4 * ratio).toFixed(1)}px !important;
+            }
+            #seoul-mini-theater-modal .ks-dock-kr {
+                font-size: ${(6.8 * ratio).toFixed(1)}px !important;
+            }
+            #seoul-mini-theater-modal .ks-sum-table td,
+            #seoul-mini-theater-modal .smt-g-lbl,
+            #seoul-mini-theater-modal .smt-g-inp {
+                font-size: ${(10.0 * ratio).toFixed(1)}px !important;
+            }
+            #seoul-mini-theater-modal .ab-app-title {
+                font-size: ${(10.5 * ratio).toFixed(1)}px !important;
+            }
+            #seoul-mini-theater-modal .ab-app-kr {
+                font-size: ${(7.5 * ratio).toFixed(1)}px !important;
+            }
+        `;
+
+        // 3. 实时放大所有行内 style="font-size:...px" 文字
+        applyFontScaleToTree(modal, ratio);
+    }
+
+    // 生成字体与字号设置面板 HTML（可同时嵌入【结识海->中枢设置】与【API设置】）
+    function createFontSettingCardHtml(prefix) {
+        const p = loadFontPrefs();
+        const sc = Math.max(80, Math.min(180, Number(p.fontScale) || 116));
+
+        const presetsHtml = FONT_PRESETS.map((fp) => `
+            <span class="ks-flt ${p.presetId === fp.id && !p.customFontUrl ? "on" : ""}" data-fpreset="${fp.id}" style="padding:4px 10px!important;">
+                ${fp.name}
+            </span>
+        `).join("");
+
+        return `
+            <div class="ks-card" id="${prefix}-font-card" style="margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <div>
+                        <div style="font-size:11px;font-weight:800;color:#1E2028;">自定义字体 &amp; 全局字号大小 · TYPOGRAPHY</div>
+                        <div style="font-size:7.8px;color:#7E8494;">解决字体偏小问题 · 支持一键放大字号与导入自定义字体</div>
+                    </div>
+                    <span class="ks-flt" id="${prefix}-font-reset">恢复116%舒适字号</span>
+                </div>
+
+                <!-- 1. 字体大小自由调节（数字输入 + 步进按钮 + 快捷档位） -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid #F0F2F7;border-bottom:1px solid #F0F2F7;margin-bottom:8px;">
+                    <span style="font-size:9.5px;font-weight:700;color:#2C303C;">全局字体大小比例 (80% ~ 180%)</span>
+                    <div style="display:inline-flex;align-items:center;gap:4px;">
+                        <span class="ks-flt" id="${prefix}-fs-minus" style="padding:2px 8px!important;font-weight:900!important;">-</span>
+                        <input type="number" id="${prefix}-fs-inp" class="ks-num-inp" min="80" max="180" step="2" value="${sc}" style="width:52px!important;" />
+                        <span style="font-size:9px;font-weight:700;color:#525868;">%</span>
+                        <span class="ks-flt" id="${prefix}-fs-plus" style="padding:2px 8px!important;font-weight:900!important;">+</span>
+                        <span class="ks-flt on" id="${prefix}-fs-apply" style="padding:3px 9px!important;">应用</span>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:space-between;margin-bottom:10px;">
+                    <span class="ks-flt ${sc === 100 ? "on" : ""}" data-fscale="100">100% 原始小字</span>
+                    <span class="ks-flt ${sc === 116 ? "on" : ""}" data-fscale="116">116% 舒适推荐</span>
+                    <span class="ks-flt ${sc === 128 ? "on" : ""}" data-fscale="128">128% 清晰中字</span>
+                    <span class="ks-flt ${sc === 140 ? "on" : ""}" data-fscale="140">140% 护眼大字</span>
+                </div>
+
+                <!-- 2. 5款预设字体切换 -->
+                <div style="font-size:8.5px;font-weight:700;color:#525868;margin-bottom:6px;">选择预设清冷字体：</div>
+                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
+                    ${presetsHtml}
+                </div>
+
+                <!-- 3. 自定义字体 URL 或本地字体文件上传 -->
+                <div style="display:flex;gap:5px;align-items:center;">
+                    <input type="text" id="${prefix}-custom-url" value="${p.customFontUrl?.startsWith("data:") ? "[已加载本地字体文件]" : (p.customFontUrl || "").replace(/"/g, "&quot;")}" placeholder="粘贴字体直链 (.ttf / .woff2) 或选本地字体..." style="flex:1;height:28px;background:#F8F9FC;border:1px solid #E4E8F0;border-radius:7px;padding:0 8px;font-size:9px;color:#1E2028;outline:none;" />
+                    <label class="ks-pill" style="height:28px!important;cursor:pointer;flex-shrink:0;">
+                        <span>本地字体</span>
+                        <input type="file" id="${prefix}-custom-file" accept=".ttf,.otf,.woff,.woff2" style="display:none;" />
+                    </label>
+                    <span class="ks-flt" id="${prefix}-custom-clear" style="height:26px!important;display:inline-flex;align-items:center;">清除</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function bindFontCardEvents(container, prefix, onRefresh) {
+        if (!container) return;
+
+        const updateScale = (val) => {
+            const p = loadFontPrefs();
+            p.fontScale = Math.max(80, Math.min(180, Math.round(Number(val) || 116)));
+            saveFontPrefs(p);
+            applyTypographyNow();
+            onRefresh();
+        };
+
+        const inp = topDoc.getElementById(`${prefix}-fs-inp`);
+        topDoc.getElementById(`${prefix}-fs-apply`)?.addEventListener("click", () => updateScale(inp.value));
+        inp?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); updateScale(inp.value); } });
+        topDoc.getElementById(`${prefix}-fs-minus`)?.addEventListener("click", () => updateScale((Number(inp.value) || 116) - 4));
+        topDoc.getElementById(`${prefix}-fs-plus`)?.addEventListener("click", () => updateScale((Number(inp.value) || 116) + 4));
+
+        container.querySelectorAll("[data-fscale]").forEach((b) => {
+            b.onclick = () => updateScale(b.getAttribute("data-fscale"));
+        });
+
+        container.querySelectorAll("[data-fpreset]").forEach((b) => {
+            b.onclick = () => {
+                const p = loadFontPrefs();
+                p.presetId = b.getAttribute("data-fpreset");
+                p.customFontUrl = "";
+                saveFontPrefs(p);
+                applyTypographyNow();
+                onRefresh();
+            };
+        });
+
+        topDoc.getElementById(`${prefix}-custom-url`)?.addEventListener("change", (e) => {
+            const val = e.target.value.trim();
+            if (val === "[已加载本地字体文件]") return;
+            const p = loadFontPrefs();
+            p.customFontUrl = val;
+            saveFontPrefs(p);
+            applyTypographyNow();
+            onRefresh();
+        });
+
+        topDoc.getElementById(`${prefix}-custom-file`)?.addEventListener("change", (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = (ev) => {
+                const p = loadFontPrefs();
+                p.customFontUrl = String(ev.target?.result || "");
+                saveFontPrefs(p);
+                applyTypographyNow();
+                onRefresh();
+            };
+            r.readAsDataURL(f);
+        });
+
+        topDoc.getElementById(`${prefix}-custom-clear`)?.addEventListener("click", () => {
+            const p = loadFontPrefs();
+            p.customFontUrl = "";
+            saveFontPrefs(p);
+            applyTypographyNow();
+            onRefresh();
+        });
+
+        topDoc.getElementById(`${prefix}-font-reset`)?.addEventListener("click", () => {
+            saveFontPrefs({ presetId: "system", customFontUrl: "", customFontName: "", fontScale: 116 });
+            applyTypographyNow();
+            onRefresh();
+        });
+    }
+
+    function mountTypographyEverywhere() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        if (!modal) {
+            setTimeout(mountTypographyEverywhere, 250);
+            return;
+        }
+
+        // 1. 立即执行一次默认 116% 舒适字号放大与字体应用
+        applyTypographyNow();
+
+        // 2. 挂载到【API设置】页面中
+        const apiPage = topDoc.getElementById("smt-page-api");
+        if (apiPage && !topDoc.getElementById("api-font-settings-holder")) {
+            const holder = topDoc.createElement("div");
+            holder.id = "api-font-settings-holder";
+            holder.style.marginTop = "10px";
+            apiPage.appendChild(holder);
+            const renderApiFontBox = () => {
+                holder.innerHTML = createFontSettingCardHtml("apifont");
+                bindFontCardEvents(holder, "apifont", renderApiFontBox);
+                applyTypographyNow();
+            };
+            renderApiFontBox();
+        }
+
+        // 3. 监听整个弹窗 DOM 变化：
+        //    a) 当打开【结识海 -> 中枢设置】时，自动在最顶部插入字体与字号调节卡；
+        //    b) 当任何新卡片/列表动态渲染出来时，自动对新增文字执行字号等比放大！
+        let isApplying = false;
+        const obs = new MutationObserver(() => {
+            if (isApplying) return;
+            isApplying = true;
+
+            const setContainer = topDoc.getElementById("ks-pro-set-container");
+            if (setContainer && !topDoc.getElementById("ksea-font-settings-holder")) {
+                const holder = topDoc.createElement("div");
+                holder.id = "ksea-font-settings-holder";
+                setContainer.insertBefore(holder, setContainer.firstChild);
+                const renderSeaFontBox = () => {
+                    holder.innerHTML = createFontSettingCardHtml("seafont");
+                    bindFontCardEvents(holder, "seafont", renderSeaFontBox);
+                    applyTypographyNow();
+                };
+                renderSeaFontBox();
+            }
+
+            applyTypographyNow();
+            setTimeout(() => { isApplying = false; }, 40);
+        });
+
+        obs.observe(modal, { childList: true, subtree: true });
+    }
+
+    mountTypographyEverywhere();
+})();
