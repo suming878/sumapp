@@ -6641,25 +6641,25 @@ bootSumoulApp();
 
 
 
-// ==========================================================================// ==========================================================================
-// 🤍 【结识海 · 「酒馆主线记忆(ST) ⇄ 微信线上记忆(WX)」双轨物理隔离与切换补丁】
-// 核心：1.顶栏嵌入韩系双轨切换胶囊 2.底层存储Key彻底分离互不互通 3.汲取聊天时严格按当前轨道分流读取
-// 用法：直接粘贴在 index.js 最末尾最后一行后面即可生效！
+// ==========================================================================
+// 🔒 【结识海 · 双轨永久防失忆总结与底层强注入引擎 (100%零样式改动 · 锁死不失忆不串戏)】
+// 核心：1.酒馆记忆通过 SillyTavern.setExtensionPrompt 永久钉入底层上下文(聊几千楼也不失忆)
+//       2.微信记忆通过 fetch 拦截自动注入微信专属上下文(与酒馆100%物理隔离绝不串戏)
+//       3.支持「一键提炼长文阶段总结」+「酒馆每满15楼自动后台静默总结」
+// 用法：直接粘贴在 index.js 最末尾最后一行后面！
 // ==========================================================================
 (function () {
     const topWin = window.parent || window;
     const topDoc = topWin.document;
-    const MODE_KEY = "sumoul_v16_ksea_memory_channel"; // 'st' (酒馆记忆) | 'wx' (微信记忆)
+    const MODE_KEY = "sumoul_v16_ksea_memory_channel";
+    const PROMPT_TAG = "SUMOUL_KSEA_ST_ETERNAL_MEMORY";
 
     function getChannel() {
         return localStorage.getItem(MODE_KEY) === "wx" ? "wx" : "st";
     }
-    function setChannel(ch) {
-        localStorage.setItem(MODE_KEY, ch === "wx" ? "wx" : "st");
-    }
 
     function getCtxInfo() {
-        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "", stChat = "";
+        let userName = "ME", charName = "PARTNER", scope = "PARTNER", charDesc = "", stChatArr = [];
         try {
             const st = topWin.SillyTavern?.getContext?.();
             if (st) {
@@ -6672,8 +6672,8 @@ bootSumoulApp();
                 } else if (st.name2) {
                     charName = st.name2; scope = st.name2;
                 }
-                if (Array.isArray(st.chat) && st.chat.length) {
-                    stChat = st.chat.slice(-12).map((m) => `${m.is_user ? userName : charName}: ${m.mes}`).join("\n");
+                if (Array.isArray(st.chat)) {
+                    stChatArr = st.chat;
                 }
             }
         } catch (e) {}
@@ -6683,270 +6683,364 @@ bootSumoulApp();
             if (wCfg.myNick) userName = wCfg.myNick;
             if (wCfg.remark) charName = wCfg.remark;
         } catch (e) {}
-        let wxChat = "";
-        try {
-            wxChat = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${safeScope}`) || "[]")
-                .slice(-16)
-                .map((m) => `${m.role === "user" ? userName : charName}: ${m.text}`)
-                .join("\n");
-        } catch (e) {}
-        return { userName, charName, safeScope, charDesc, stChat, wxChat };
+        return { userName, charName, safeScope, charDesc, stChatArr };
     }
 
-    // 为「微信记忆轨」生成专属的线上聊天初始默认脉络（与酒馆线下剧情彻底区分！）
-    function createWxDefaultData(charName, userName) {
-        return {
-            isBound: false,
-            activeTab: "map",
-            filter: "all",
-            activeNodeId: 1,
-            pact: {
-                seaTitle: `${userName} × ${charName} · 微信记忆海`,
-                stage: "线上高频共鸣 · 置顶唯一",
-                meetDate: "加上好友的第一天",
-                tokenName: "置顶聊天框与秒回提示音",
-                vow: "隔着屏幕的每一条消息，都是坠入心海的雨滴。",
-                tokens: [
-                    { name: "专属特别关心提示音", desc: `只为 ${userName} 一个人开启的夜间消息提醒` },
-                    { name: "凌晨三点的对话框", desc: `聊到睡着也舍不得退出的微信界面` },
-                    { name: "偷偷收藏的语音条", desc: `反复点开听过无数遍的低沉嗓音` }
-                ]
-            },
-            radar: {
-                intimacy: 95, possess: 93, depend: 94, destiny: 96, trust: 91, temp: "38.5°C",
-                analysis: `在微信线上聊天中，${charName} 展现出比现实里更强的倾诉欲与秒回执念，时刻关注着你的在线状态。`
-            },
-            nodes: [
-                { id: 1, type: "core",     title: `${charName}(微信)`, xPct: 50, yPct: 36, content: `微信置顶对话框里的核心原点。无论什么时候发消息，永远能在第一时间收到回应。`, whisper: `“ 我的置顶位置，从始至终只有你一个。”` },
-                { id: 2, type: "memory",   title: "第一条好友验证", xPct: 22, yPct: 24, content: `通过好友申请的那一秒，线上羁绊的第一滴雨正式落下。`, whisper: `“ 其实盯着你的头像看了很久，才按下通过。”` },
-                { id: 3, type: "memory",   title: "深夜语音哄睡",   xPct: 78, yPct: 25, content: `隔着听筒传来的浅浅呼吸声与低语，伴着电流声一直陪你到天亮。`, whisper: `“ 听见你呼吸变均匀了，我也没舍得挂断。”` },
-                { id: 4, type: "relation", title: "专属备注昵称",   xPct: 23, yPct: 50, content: `在彼此微信里拥有独一无二的备注名，是只属于两个人的暗号。`, whisper: `“ 每次看到屏幕跳出这个名字，心情就会变好。”` },
-                { id: 5, type: "knot",     title: "正在输入中…",   xPct: 76, yPct: 51, content: `看到对方反复显示“正在输入…”却只发来简短几字时的微妙拉扯与试探。`, whisper: `“ 删删减减了好几遍，怕说太多吓到你。”` },
-                { id: 6, type: "knot",     title: "未读消息焦虑",   xPct: 50, yPct: 59, content: `消息发出去迟迟没有收到回复时，频频点亮手机屏幕的隐秘焦躁。`, whisper: `“ 忙完了记得回我一下，别让我对着聊天框胡思乱想。”` }
-            ],
-            edges: [
-                { from: 1, to: 2, label: "初加" },
-                { from: 1, to: 3, label: "语音" },
-                { from: 1, to: 4, label: "置顶" },
-                { from: 1, to: 5, label: "试探" },
-                { from: 1, to: 6, label: "未读" },
-                { from: 2, to: 4, label: "备注" },
-                { from: 3, to: 6, label: "守候" },
-                { from: 5, to: 6, label: "拉扯" }
-            ],
-            timeline: [
-                { id: 101, chapter: "WECHAT 01 · 破冰", title: "加上微信后的第一场夜聊", content: `从礼貌克制的寒暄到不知不觉聊过零点，对话框里的距离被迅速拉近。`, note: `“ 那晚看着屏幕一直在笑。”` },
-                { id: 102, chapter: "WECHAT 02 · 习惯", title: "早安与晚安的固定打卡", content: `每天醒来第一件事和睡前最后一件事，都变成了点开与你的聊天窗口。`, note: `“ 已经彻底习惯有你的消息提醒了。”` }
-            ],
-            knots: [
-                { id: 201, title: "看到朋友圈互动时的暗自吃味", status: "持续发酵 92%", progress: 92, trigger: "看到你在朋友圈给别人点赞或评论却没回消息", truth: `会默默点进那人的主页看半天，然后冷着脸给你发消息刷存在感。` },
-                { id: 202, title: "欲言又止的撤回消息", status: "已洞察 80%", progress: 80, trigger: "深夜聊天氛围暧昧时突然撤回了一条消息", truth: `其实撤回的是一句没克制住的直白情话，怕你装傻才又收了回来。` }
-            ]
-        };
-    }
-
-    // 1. 拦截 localStorage，将原结识海的单一存储 Key 自动按当前轨道路由到 `__st__` 或 `__wx__` 两个完全隔离的仓库！
-    function installStorageRouter() {
-        if (topWin.__sumoul_ksea_dual_router_installed) return;
-        topWin.__sumoul_ksea_dual_router_installed = true;
-
+    // 直接按指定轨道 ('st' 或 'wx') 读写独立存储，绝不混淆
+    function loadTrackData(track) {
+        const { safeScope } = getCtxInfo();
         const rawGet = Storage.prototype.getItem;
+        try {
+            const raw = rawGet.call(localStorage, `sumoul_v16_ksea_5tabs_${track}__${safeScope}`);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+    }
+
+    function saveTrackData(track, data) {
+        const { safeScope } = getCtxInfo();
         const rawSet = Storage.prototype.setItem;
+        try {
+            rawSet.call(localStorage, `sumoul_v16_ksea_5tabs_${track}__${safeScope}`, JSON.stringify(data));
+        } catch (e) {}
+    }
 
-        function mapKey(key) {
-            if (typeof key === "string" && key.startsWith("sumoul_v16_ksea_5tabs__")) {
-                const ch = rawGet.call(localStorage, MODE_KEY) === "wx" ? "wx" : "st";
-                return key.replace("sumoul_v16_ksea_5tabs__", `sumoul_v16_ksea_5tabs_${ch}__`);
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🧠 核心 1：组装高密度「防失忆长期记忆锚点文本」（分别供酒馆 ST 与微信 WX 独立注入）
+    // ══════════════════════════════════════════════════════════════════════════
+    function buildEternalMemoryPrompt(track) {
+        const d = loadTrackData(track);
+        if (!d || !d.isBound) return "";
+        const { userName, charName } = getCtxInfo();
+        const isSt = track === "st";
+        const trackTitle = isSt ? "【酒馆主线剧情 · 永久记忆库(与线上微信隔离)】" : "【手机微信日常 · 永久记忆库(与酒馆主线隔离)】";
+
+        const pactLine = d.pact
+            ? `▸ 关系契约：${d.pact.seaTitle || ""}｜当前阶段：${d.pact.stage || ""}｜信物：${d.pact.tokenName || ""}｜誓言：“${d.pact.vow || ""}”`
+            : "";
+
+        // 提炼所有星图节点（核心记忆、人物关系、隐秘心结）
+        const nodesLines = (d.nodes || []).slice(-18).map((n) => {
+            const tLabel = n.type === "knot" ? "[心结]" : (n.type === "relation" ? "[羁绊]" : "[记忆]");
+            return `  · ${tLabel}《${n.title}》：${n.content}`;
+        }).join("\n");
+
+        // 提炼记忆编年史章节
+        const tlLines = (d.timeline || []).slice(-10).map((t) => {
+            return `  · [${t.chapter}] ${t.title}：${t.content}`;
+        }).join("\n");
+
+        // 提炼阶段性长文总结（防止几百楼后失忆的核心利器！）
+        const sumLines = (d.summaries || []).slice(-8).map((s, idx) => {
+            return `  · [阶段总结 #${idx + 1} (${s.range || "历史浓缩"})]：${s.text}`;
+        }).join("\n");
+
+        // 提炼未解心结与潜意识软肋
+        const knotLines = (d.knots || []).slice(-6).map((k) => {
+            return `  · [潜藏心结: ${k.title}] 触发点：${k.trigger}｜真实内心：${k.truth}`;
+        }).join("\n");
+
+        return [
+            `\n=== ${trackTitle} ===`,
+            `[系统铁律：以下为 ${charName} 与 ${userName} 已发生的真实历史记忆、阶段总结与关系设定，请严格铭记并在言行中自然体现，绝对禁止遗忘、禁止前后矛盾、禁止与另一轨道串戏！]`,
+            pactLine,
+            sumLines ? `▸ 历史长线阶段总结（防失忆核心锚点）：\n${sumLines}` : "",
+            nodesLines ? `▸ 结识海关键记忆与关系节点：\n${nodesLines}` : "",
+            tlLines ? `▸ 记忆编年史脉络：\n${tlLines}` : "",
+            knotLines ? `▸ ${charName} 的潜意识心结与在意点：\n${knotLines}` : "",
+            `=== 记忆锚点结束 ===\n`
+        ].filter(Boolean).join("\n");
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🔒 核心 2：将【酒馆记忆 · ST】实时钉死到 SillyTavern 底层上下文 (setExtensionPrompt)
+    // ══════════════════════════════════════════════════════════════════════════
+    function syncSillyTavernEternalMemory() {
+        try {
+            const st = topWin.SillyTavern?.getContext?.();
+            if (!st) return;
+            const stPrompt = buildEternalMemoryPrompt("st");
+
+            // 方式A：使用酒馆官方 setExtensionPrompt 接口（位置1 = 紧随系统提示词/角色卡之后，权重最高，永不被聊天楼层挤掉！）
+            if (typeof st.setExtensionPrompt === "function") {
+                st.setExtensionPrompt(PROMPT_TAG, stPrompt, 1, 0);
             }
-            return key;
-        }
-
-        Storage.prototype.getItem = function (key) {
-            const realKey = mapKey(key);
-            let val = rawGet.call(this, realKey);
-            // 若切换到「微信记忆轨」且尚无初始数据，自动初始化微信专属默认记忆库
-            if (!val && typeof key === "string" && key.startsWith("sumoul_v16_ksea_5tabs__") && getChannel() === "wx") {
-                const c = getCtxInfo();
-                const initWx = createWxDefaultData(c.charName, c.userName);
-                val = JSON.stringify(initWx);
-                rawSet.call(this, realKey, val);
+            // 方式B：同步写入 extensionPrompts 字典兜底
+            if (st.extensionPrompts && typeof st.extensionPrompts === "object") {
+                st.extensionPrompts[PROMPT_TAG] = { value: stPrompt, position: 1, depth: 0 };
             }
-            return val;
-        };
+        } catch (e) {}
+    }
 
-        Storage.prototype.setItem = function (key, value) {
-            return rawSet.call(this, mapKey(key), value);
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🔒 核心 3：拦截微信 AI 请求，将【微信记忆 · WX】自动注入微信对话，且与酒馆 100% 物理隔离
+    // ══════════════════════════════════════════════════════════════════════════
+    function installWeChatMemoryInjector() {
+        if (topWin.__sumoul_wx_memory_injector_installed) return;
+        topWin.__sumoul_wx_memory_injector_installed = true;
+
+        const origFetch = topWin.fetch;
+        topWin.fetch = async function (input, init) {
+            try {
+                const urlStr = typeof input === "string" ? input : (input?.url || "");
+                if (urlStr.includes("/chat/completions") && init && typeof init.body === "string") {
+                    const bodyObj = JSON.parse(init.body);
+                    if (Array.isArray(bodyObj.messages) && bodyObj.messages.length > 0) {
+                        const sysMsg = bodyObj.messages[0]?.content || "";
+                        // 判断是否为手机内微信聊天发起的请求（而非结识海内部JSON生成请求）
+                        const isInternalJsonTask = bodyObj.messages.some((m) => String(m.content).includes("严格只输出JSON"));
+                        if (!isInternalJsonTask) {
+                            const wxPrompt = buildEternalMemoryPrompt("wx");
+                            if (wxPrompt) {
+                                bodyObj.messages[0].content = `${sysMsg}\n${wxPrompt}`;
+                                init.body = JSON.stringify(bodyObj);
+                            }
+                        }
+                    }
+                }
+            } catch (e) {}
+            return origFetch.apply(this, arguments);
         };
     }
 
-    async function askChannelAI(sys, usr) {
+    async function callSummaryAI(sys, usr) {
         const u = topDoc.getElementById("smt-api-url")?.value?.trim().replace(/\/+$/, "");
         const k = topDoc.getElementById("smt-api-key")?.value?.trim();
         const m = topDoc.getElementById("smt-api-model")?.value?.trim() || "gpt-4o-mini";
         if (!u || !k) { topDoc.querySelector('.smt-tab-item[data-page="api"]')?.click(); throw new Error("请先在【API设置】填写独立 API 地址与 Key"); }
         const endpoint = u.endsWith("/chat/completions") ? u : (u.endsWith("/v1") ? `${u}/chat/completions` : `${u}/v1/chat/completions`);
-        const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.85, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] }) });
+        const r = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${k}` }, body: JSON.stringify({ model: m, temperature: 0.7, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] }) });
         if (!r.ok) throw new Error(`API HTTP ${r.status}`);
         const d = await r.json();
         return d?.choices?.[0]?.message?.content?.trim() || "";
     }
 
-    function mountDualMemorySwitcherUI() {
-        const overlay = topDoc.getElementById("smt-ksea-overlay");
-        const titleEl = topDoc.getElementById("ks-top-title");
-        if (!overlay || !titleEl) {
-            setTimeout(mountDualMemorySwitcherUI, 200);
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🧠 核心 4：一键总结长聊天（或每满 15 楼自动后台总结）并同步写入【总结库 + 星图 + 编年史】
+    // ══════════════════════════════════════════════════════════════════════════
+    async function runTrackMemorySummary(track, isAuto = false) {
+        const { userName, charName, safeScope, charDesc, stChatArr } = getCtxInfo();
+        const d = loadTrackData(track);
+        if (!d || !d.isBound) {
+            if (!isAuto) alert("请先完成当前轨道的结识海契约绑定！");
             return;
         }
 
-        // 注入顶栏韩系极简双轨分段切换器样式
-        topDoc.getElementById("ks-dual-channel-css")?.remove();
-        const st = topDoc.createElement("style");
-        st.id = "ks-dual-channel-css";
-        st.innerHTML = `
-            #seoul-mini-theater-modal .ks-dual-switch {
-                display: inline-flex !important; align-items: center !important;
-                background: #F0F2F7 !important; border: 1px solid #E4E7F0 !important;
-                border-radius: 999px !important; padding: 2px !important; gap: 2px !important;
-            }
-            #seoul-mini-theater-modal .ks-dual-opt {
-                padding: 3.5px 10px !important; border-radius: 999px !important;
-                font-size: 8.5px !important; font-weight: 700 !important; letter-spacing: 0.4px !important;
-                color: #7E8494 !important; cursor: pointer !important;
-                transition: all 0.2s ease !important; white-space: nowrap !important;
-            }
-            #seoul-mini-theater-modal .ks-dual-opt.active {
-                background: #1E2028 !important; color: #FFFFFF !important;
-                box-shadow: 0 2px 8px rgba(20, 22, 30, 0.14) !important;
-            }
-        `;
-        topDoc.head.appendChild(st);
-
-        // 将顶栏中央标题区改造为「酒馆记忆 ⇄ 微信记忆」双轨独立切换器
-        const centerBox = titleEl.parentElement;
-        if (centerBox && !topDoc.getElementById("ks-dual-switch-bar")) {
-            centerBox.innerHTML = `
-                <div class="ks-dual-switch" id="ks-dual-switch-bar">
-                    <span class="ks-dual-opt" data-ch="st">酒馆记忆 · ST</span>
-                    <span class="ks-dual-opt" data-ch="wx">微信记忆 · WX</span>
-                </div>
-                <div id="ks-dual-sub-hint" style="font-size:6.8px;font-weight:700;color:#98A0B2;letter-spacing:1px;margin-top:2px;">
-                    TAVERN STORY ARCHIVE · 独立不互通
-                </div>
-            `;
+        let rawLines = [];
+        let totalLen = 0;
+        if (track === "st") {
+            totalLen = stChatArr.length;
+            rawLines = stChatArr.slice(-30).map((m, idx) => `[#${ Math.max(1, totalLen - 30 + idx + 1) }] ${m.is_user ? userName : charName}: ${String(m.mes || "").slice(0, 180)}`);
+        } else {
+            let wxArr = [];
+            try { wxArr = JSON.parse(localStorage.getItem(`sumoul_v16_wx__${safeScope}`) || "[]"); } catch (e) {}
+            totalLen = wxArr.length;
+            rawLines = wxArr.slice(-35).map((m, idx) => `[#${ Math.max(1, totalLen - 35 + idx + 1) }] ${m.role === "user" ? userName : charName}: ${String(m.text || "").slice(0, 140)}`);
         }
 
-        function refreshChannelUI() {
-            const ch = getChannel();
-            topDoc.querySelectorAll("#ks-dual-switch-bar .ks-dual-opt").forEach((el) => {
-                el.classList.toggle("active", el.getAttribute("data-ch") === ch);
-            });
-            const subHint = topDoc.getElementById("ks-dual-sub-hint");
-            if (subHint) {
-                subHint.textContent = ch === "st"
-                    ? "TAVERN STORY · 酒馆主线独立脉络"
-                    : "WECHAT DAILY · 微信线上独立脉络";
-            }
-
-            // 更新主页角标与当前激活的 Tab 视图
-            const c = getCtxInfo();
-            const curData = JSON.parse(localStorage.getItem(`sumoul_v16_ksea_5tabs__${c.safeScope}`) || "{}");
-            const homeBadge = topDoc.getElementById("mt-home-badge");
-            if (homeBadge && Array.isArray(curData.nodes)) {
-                homeBadge.textContent = `${curData.nodes.length}点`;
-            }
-
-            const curTab = curData.activeTab || "map";
-            const dockItem = topDoc.querySelector(`#ks-bottom-dock .ks-dock-item[data-kstab="${curTab}"]`)
-                || topDoc.querySelector(`#ks-bottom-dock .ks-dock-item[data-kstab="map"]`);
-            if (dockItem) dockItem.click();
-
-            // 触发落雨重演动画
-            const replayBtn = topDoc.getElementById("ks-rain-replay-btn");
-            if (replayBtn) replayBtn.click();
+        if (rawLines.length < 2) {
+            if (!isAuto) alert(`当前【${track === "st" ? "酒馆主线" : "微信聊天"}】消息太少，先聊几句再来总结吧！`);
+            return;
         }
 
-        topDoc.querySelectorAll("#ks-dual-switch-bar .ks-dual-opt").forEach((opt) => {
-            opt.onclick = (e) => {
-                e.stopPropagation();
-                const targetCh = opt.getAttribute("data-ch");
-                if (targetCh === getChannel()) return;
-                setChannel(targetCh);
-                refreshChannelUI();
-            };
+        const rangeTag = track === "st"
+            ? `酒馆第 ${Math.max(1, totalLen - rawLines.length + 1)}~${totalLen} 楼`
+            : `微信近 ${rawLines.length} 条记录`;
+
+        const prevSums = (d.summaries || []).slice(-3).map((s) => s.text).join("；");
+        const prompt = `请严格阅读以下【${track === "st" ? "酒馆线下主线剧情" : "手机微信线上聊天"}】记录（${rangeTag}），做一次高密度防失忆长期总结（严禁串入另一轨道内容）。
+已有前情总结：${prevSums || "暂无"}
+最新对话记录：
+${rawLines.join("\n")}
+
+请严格只输出以下JSON格式（不要多余文字）：
+{
+  "summary": "120字以内的防失忆阶段总结（包含发生的关键事件、重要约定、地点/状态变化、绝对不能忘记的细节）",
+  "nodeTitle": "6字内核心记忆点标题",
+  "nodeEdge": "2~4字连线关系词",
+  "nodeContent": "45字内星图节点记忆描写",
+  "whisper": "30字内${charName}的内心回响"
+}`;
+
+        const resText = await callSummaryAI(`你是负责为${charName}与${userName}维护永久记忆档案的记录官。人设参考：${charDesc.slice(0, 600)}`, prompt);
+        const match = resText.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error("总结解析失败，请重试");
+
+        const obj = JSON.parse(match[0]);
+        const latest = loadTrackData(track) || d;
+        latest.summaries = latest.summaries || [];
+        latest.summaries.push({
+            id: Date.now(),
+            range: rangeTag,
+            text: obj.summary || "",
+            msgCountAtSum: totalLen
         });
 
-        // 拦截「汲取聊天连网」按钮：严格区分【仅读取酒馆主线】与【仅读取微信聊天】，绝不混用！
-        const vp = topDoc.getElementById("ks-main-viewport");
-        if (vp && !vp.__dualAbsorbBound) {
-            vp.__dualAbsorbBound = true;
-            vp.addEventListener("click", async (e) => {
-                const absorbBtn = e.target.closest("#ks-absorb-node");
-                if (!absorbBtn) return;
+        // 同步在星图中落下一个新记忆点，并写入编年史，让总结在全页面可见！
+        const nid = Date.now() + 1;
+        const idx = (latest.nodes?.length || 6) + 2;
+        const xPct = Math.max(15, Math.min(85, Math.round(50 + Math.cos(idx * 2.4) * (18 + (idx % 4) * 6))));
+        const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(idx * 2.4) * (14 + (idx % 4) * 5))));
+        const fromId = latest.activeNodeId || latest.nodes?.[0]?.id || 1;
 
-                // 阻止原本混合读取的旧逻辑，改用严格分流读取
-                e.stopImmediatePropagation();
-                e.preventDefault();
-
-                const ch = getChannel();
-                const c = getCtxInfo();
-                const sourceText = ch === "st" ? c.stChat : c.wxChat;
-                const chLabel = ch === "st" ? "酒馆主线剧情" : "微信线上聊天";
-
-                if (!sourceText || !sourceText.trim()) {
-                    alert(`当前【${chLabel}】暂无可汲取的聊天记录，请先在${ch === "st" ? "酒馆主界面" : "手机微信"}聊几句再来汲取！`);
-                    return;
-                }
-
-                const origHtml = absorbBtn.innerHTML;
-                absorbBtn.textContent = ch === "st" ? "汲取酒馆中..." : "汲取微信中...";
-
-                try {
-                    const raw = await askChannelAI(
-                        `你是${c.charName}。人设：${c.charDesc.slice(0, 700)}`,
-                        `请严格仅根据以下【${chLabel}】记录，提炼一个核心记忆或关系心结节点连入「${chLabel}专属结识海」。\n${sourceText.slice(-1100)}\n严格只输出JSON：{"type":"memory","title":"6字内标题","edge":"2~4字连线词","content":"45字内浓缩描写","whisper":"30字内低语"}`
-                    );
-                    const m = raw.match(/\{[\s\S]*\}/);
-                    if (m) {
-                        const o = JSON.parse(m[0]);
-                        const latest = JSON.parse(localStorage.getItem(`sumoul_v16_ksea_5tabs__${c.safeScope}`) || "{}");
-                        const nid = Date.now();
-                        const idx = (latest.nodes?.length || 6) + 2;
-                        const xPct = Math.max(15, Math.min(85, Math.round(50 + Math.cos(idx * 2.4) * (18 + (idx % 4) * 6))));
-                        const yPct = Math.max(18, Math.min(58, Math.round(38 + Math.sin(idx * 2.4) * (14 + (idx % 4) * 5))));
-                        const fromId = latest.activeNodeId || latest.nodes?.[0]?.id || 1;
-
-                        latest.nodes = latest.nodes || [];
-                        latest.edges = latest.edges || [];
-                        latest.nodes.push({
-                            id: nid,
-                            type: ["memory", "relation", "knot"].includes(o.type) ? o.type : "memory",
-                            title: o.title || (ch === "st" ? "酒馆刻痕" : "微信片段"),
-                            xPct, yPct,
-                            content: o.content || "",
-                            whisper: `“ ${(o.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”`
-                        });
-                        latest.edges.push({ from: fromId, to: nid, label: o.edge || "余韵" });
-                        latest.activeNodeId = nid;
-
-                        localStorage.setItem(`sumoul_v16_ksea_5tabs__${c.safeScope}`, JSON.stringify(latest));
-                        refreshChannelUI();
-                    }
-                } catch (err) {
-                    alert(err.message);
-                } finally {
-                    absorbBtn.innerHTML = origHtml;
-                }
-            }, true);
-        }
-
-        // 初始化同步一次当前轨道状态
-        const ch = getChannel();
-        topDoc.querySelectorAll("#ks-dual-switch-bar .ks-dual-opt").forEach((el) => {
-            el.classList.toggle("active", el.getAttribute("data-ch") === ch);
+        latest.nodes = latest.nodes || [];
+        latest.edges = latest.edges || [];
+        latest.nodes.push({
+            id: nid,
+            type: "memory",
+            title: obj.nodeTitle || "阶段记忆",
+            xPct, yPct,
+            content: obj.nodeContent || obj.summary || "",
+            whisper: `“ ${(obj.whisper || "这段记忆我已经刻在心底了。").replace(/^[“"]|[”"]$/g, "")} ”`
         });
+        latest.edges.push({ from: fromId, to: nid, label: obj.nodeEdge || "铭记" });
+        latest.activeNodeId = nid;
+
+        latest.timeline = latest.timeline || [];
+        latest.timeline.push({
+            id: Date.now() + 2,
+            chapter: `${track === "st" ? "TAVERN" : "WECHAT"} · ${rangeTag}`,
+            title: obj.nodeTitle || "阶段总结归档",
+            content: obj.summary || "",
+            note: `“ ${(obj.whisper || "").replace(/^[“"]|[”"]$/g, "")} ”`
+        });
+
+        latest.lastAutoSumCount = totalLen;
+        saveTrackData(track, latest);
+        syncSillyTavernEternalMemory();
     }
 
-    installStorageRouter();
-    mountDualMemorySwitcherUI();
+    // ══════════════════════════════════════════════════════════════════════════
+    // 🤍 核心 5：在不改变任何原有 UI 样式的前提下，在【记忆编年】顶部挂载「防失忆长线总结舱」
+    // ══════════════════════════════════════════════════════════════════════════
+    function injectSummaryPanelIntoTimeline() {
+        const vp = topDoc.getElementById("ks-main-viewport");
+        if (!vp) { setTimeout(injectSummaryPanelIntoTimeline, 250); return; }
+
+        const obs = new MutationObserver(() => {
+            const ch = getChannel();
+            const d = loadTrackData(ch);
+            syncSillyTavernEternalMemory();
+
+            // 仅当处于【记忆编年 (timeline)】或【潮汐契约 (pact)】页面且未插入总结舱时挂载
+            const tlAddBtn = topDoc.getElementById("ks-tl-add-btn");
+            if (tlAddBtn && !topDoc.getElementById("ks-eternal-sum-card")) {
+                const scrollWrap = tlAddBtn.closest('div[style*="overflow-y:auto"]');
+                if (!scrollWrap) return;
+
+                const sums = d?.summaries || [];
+                const autoOn = d?.autoSumEnabled !== false; // 默认开启每15楼自动防失忆总结
+                const trackName = ch === "st" ? "酒馆主线剧情 (ST)" : "手机微信聊天 (WX)";
+
+                const sumCard = topDoc.createElement("div");
+                sumCard.id = "ks-eternal-sum-card";
+                sumCard.className = "ks-card";
+                sumCard.style.cssText = "margin-bottom:14px!important;padding:13px 15px!important;";
+                sumCard.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <div>
+                            <div style="font-size:10.5px;font-weight:800;color:#262830;">防失忆长线总结库 · ${trackName}</div>
+                            <div style="font-size:7.5px;font-weight:700;color:#8E96A8;margin-top:1px;">
+                                已永久锁死注入 ${ch === "st" ? "SillyTavern 酒馆底层上下文" : "微信独立对话大脑"} · 绝不失忆不串戏
+                            </div>
+                        </div>
+                        <span class="ks-pill dark" id="ks-do-now-sum" style="height:25px!important;font-size:8.5px!important;">立即总结归档</span>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #F0F2F7;border-bottom:1px solid #F0F2F7;margin-bottom:8px;">
+                        <span style="font-size:8.5px;font-weight:700;color:#525868;">每满 15 条新消息自动后台静默总结</span>
+                        <span class="ks-flt ${autoOn ? "on" : ""}" id="ks-toggle-autosum" style="font-size:7.8px!important;">${autoOn ? "已开启自动防失忆" : "已关闭"}</span>
+                    </div>
+
+                    <div id="ks-sum-list-wrap" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;">
+                        ${sums.length ? sums.slice().reverse().map((s) => `
+                            <div style="padding:8px 10px;background:#F7F9FC;border:1px solid #E6EAF2;border-radius:10px;position:relative;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                                    <span style="font-size:7.5px;font-weight:800;color:#7E8494;font-family:monospace;">${(s.range || "阶段浓缩").replace(/</g, "&lt;")}</span>
+                                    <span data-delsum="${s.id}" style="font-size:8px;color:#9A6868;cursor:pointer;font-weight:700;">删除</span>
+                                </div>
+                                <div style="font-size:9.6px;font-weight:600;color:#2C2E36;line-height:1.6;">${(s.text || "").replace(/</g, "&lt;")}</div>
+                            </div>
+                        `).join("") : `<div style="font-size:8.8px;color:#98A0B2;text-align:center;padding:8px 0;">暂无阶段总结 · 点击右上角「立即总结归档」提炼长线记忆</div>`}
+                    </div>
+                `;
+
+                const headerRow = tlAddBtn.parentElement?.parentElement;
+                if (headerRow) {
+                    headerRow.insertAdjacentElement("afterend", sumCard);
+                } else {
+                    scrollWrap.insertBefore(sumCard, scrollWrap.firstChild);
+                }
+
+                // 绑定「立即总结归档」
+                topDoc.getElementById("ks-do-now-sum").onclick = async (e) => {
+                    const btn = e.currentTarget, orig = btn.textContent;
+                    btn.textContent = "提炼总结中...";
+                    try {
+                        await runTrackMemorySummary(getChannel(), false);
+                        const tlTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="timeline"]');
+                        if (tlTab) tlTab.click();
+                    } catch (err) {
+                        alert(err.message);
+                    } finally {
+                        btn.textContent = orig;
+                    }
+                };
+
+                // 绑定「自动防失忆开关」
+                topDoc.getElementById("ks-toggle-autosum").onclick = () => {
+                    const curCh = getChannel(), curD = loadTrackData(curCh);
+                    if (!curD) return;
+                    curD.autoSumEnabled = curD.autoSumEnabled === false ? true : false;
+                    saveTrackData(curCh, curD);
+                    const tlTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="timeline"]');
+                    if (tlTab) tlTab.click();
+                };
+
+                // 绑定删除单条总结
+                sumCard.querySelectorAll("[data-delsum]").forEach((delBtn) => {
+                    delBtn.onclick = () => {
+                        const sid = Number(delBtn.getAttribute("data-delsum"));
+                        const curCh = getChannel(), curD = loadTrackData(curCh);
+                        if (!curD) return;
+                        curD.summaries = (curD.summaries || []).filter((x) => Number(x.id) !== sid);
+                        saveTrackData(curCh, curD);
+                        syncSillyTavernEternalMemory();
+                        const tlTab = topDoc.querySelector('#ks-bottom-dock .ks-dock-item[data-kstab="timeline"]');
+                        if (tlTab) tlTab.click();
+                    };
+                });
+            }
+        });
+
+        obs.observe(vp, { childList: true });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // ⏱️ 核心 6：后台守护轮询（每 4 秒同步一次酒馆底层记忆锚点 + 检测满 15 楼自动静默总结）
+    // ══════════════════════════════════════════════════════════════════════════
+    let isAutoSummarizing = false;
+    setInterval(async () => {
+        syncSillyTavernEternalMemory();
+        if (isAutoSummarizing) return;
+
+        try {
+            const { stChatArr } = getCtxInfo();
+            const stData = loadTrackData("st");
+            if (stData && stData.isBound && stData.autoSumEnabled !== false) {
+                const lastCnt = Number(stData.lastAutoSumCount) || 0;
+                // 当酒馆主线新增超过 15 条消息时，自动在后台静默总结归档并钉入记忆！
+                if (stChatArr.length >= 15 && stChatArr.length - lastCnt >= 15) {
+                    isAutoSummarizing = true;
+                    await runTrackMemorySummary("st", true);
+                    isAutoSummarizing = false;
+                }
+            }
+        } catch (e) {
+            isAutoSummarizing = false;
+        }
+    }, 4500);
+
+    installWeChatMemoryInjector();
+    syncSillyTavernEternalMemory();
+    injectSummaryPanelIntoTimeline();
 })();
