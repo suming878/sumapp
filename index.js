@@ -8631,3 +8631,185 @@ bootSumoulApp();
 
     mountTypographyEverywhere();
 })();
+// ==========================================================================
+// 💎 【Sumoul App 4K视网膜级「超清锐化 · 去模糊重影」终极清晰度修复补丁】
+// 修复：1.移除导致文字发虚的backdrop-filter毛玻璃与zoom拉伸 2.解锁3倍Retina超清Canvas星图并去除文字散光重影 3.加深全局字体对比度与整数像素对齐
+// 用法：直接粘贴在 index.js 最末尾最后一行后面，刷新即可看到刀刻般清晰的画面！
+// ==========================================================================
+(function () {
+    const topWin = window.parent || window;
+    const topDoc = topWin.document;
+
+    function mountRetinaCrispEngine() {
+        const modal = topDoc.getElementById("seoul-mini-theater-modal");
+        if (!modal) {
+            setTimeout(mountRetinaCrispEngine, 200);
+            return;
+        }
+
+        // 1. 注入全局「零毛玻璃 · 高对比度 · 矢量抗锯齿锐化」CSS
+        topDoc.getElementById("sumoul-retina-crisp-css")?.remove();
+        const st = topDoc.createElement("style");
+        st.id = "sumoul-retina-crisp-css";
+        st.innerHTML = `
+            /* 全局开启最高级别字体抗锯齿与几何精度渲染，彻底干掉 zoom 拉伸模糊 */
+            #seoul-mini-theater-modal,
+            #seoul-mini-theater-modal * {
+                -webkit-font-smoothing: antialiased !important;
+                -moz-osx-font-smoothing: grayscale !important;
+                text-rendering: geometricPrecision !important;
+            }
+            #seoul-mini-theater-modal .smt-fs-header,
+            #seoul-mini-theater-modal .smt-fs-body,
+            #seoul-mini-theater-modal .smt-bottom-tabs,
+            #seoul-mini-theater-modal .smt-tab-bar {
+                zoom: 1 !important;
+            }
+
+            /* 彻底移除所有会导致浏览器图层降级发糊的 backdrop-filter: blur() 与半透明雾感 */
+            #seoul-mini-theater-modal .ks-card,
+            #seoul-mini-theater-modal .ks-pill,
+            #seoul-mini-theater-modal .ks-dock-bar,
+            #seoul-mini-theater-modal .smt-g-card,
+            #seoul-mini-theater-modal .ios-group-card,
+            #seoul-mini-theater-modal .smt-fs-header,
+            #seoul-mini-theater-modal .smt-bottom-tabs {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                filter: none !important;
+            }
+
+            /* 卡片改为 100% 纯白实色 + 清晰利落边框，字迹刀刻般锐利 */
+            #seoul-mini-theater-modal .ks-card {
+                background: #FFFFFF !important;
+                border: 1px solid #DFE3EC !important;
+                box-shadow: 0 4px 14px rgba(18, 22, 32, 0.04) !important;
+            }
+            #seoul-mini-theater-modal .ks-pill {
+                background: #FFFFFF !important;
+                border: 1px solid #D8DCE6 !important;
+                color: #14161C !important;
+            }
+            #seoul-mini-theater-modal .ks-flt {
+                background: #F6F8FC !important;
+                border: 1px solid #DCE0EA !important;
+                color: #3A4050 !important;
+                font-weight: 700 !important;
+            }
+
+            /* 全面加深浅灰字对比度，解决字色太淡显得虚的问题 */
+            #seoul-mini-theater-modal .ks-dock-item:not(.active) {
+                color: #687082 !important;
+            }
+            #seoul-mini-theater-modal .ks-dock-kr {
+                opacity: 0.9 !important;
+                color: #5C6478 !important;
+            }
+            #seoul-mini-theater-modal .ks-sum-table th {
+                color: #3A4050 !important;
+                background: #F2F4F9 !important;
+            }
+            #seoul-mini-theater-modal .ks-sum-table td {
+                color: #181A22 !important;
+            }
+        `;
+        topDoc.head.appendChild(st);
+
+        // 2. 将所有小数像素字号 (如 9.2px / 10.6px) 强制四舍五入为整数 px，消除亚像素边缘发虚！
+        function roundAllFontSizesToInteger() {
+            modal.querySelectorAll("*").forEach((el) => {
+                const fs = el.style?.fontSize;
+                if (fs && fs.endsWith("px") && fs.includes(".")) {
+                    const rounded = Math.round(parseFloat(fs));
+                    if (Number.isFinite(rounded) && rounded > 0) {
+                        el.style.setProperty("font-size", `${rounded}px`, "important");
+                    }
+                }
+            });
+        }
+        roundAllFontSizesToInteger();
+
+        // 3. 升级星图 Canvas 为原生最高 DPR（支持 3x/4x 超清视网膜屏），并拦截消除 shadowBlur 散光重影！
+        function upgradeCanvasToUltraHD() {
+            const canvas = topDoc.getElementById("ks-pure-canvas");
+            const overlay = topDoc.getElementById("smt-ksea-overlay");
+            if (!canvas || !overlay || canvas.__retinaUpgraded) return;
+            canvas.__retinaUpgraded = true;
+
+            const ctx = canvas.getContext("2d");
+            const realDpr = Math.max(2.5, topWin.devicePixelRatio || 3); // 强制至少 2.5~3 倍超清采样
+
+            function syncUltraHDSize() {
+                if (!overlay.classList.contains("open")) return;
+                const rect = overlay.getBoundingClientRect();
+                const w = Math.round(rect.width || topWin.innerWidth || 390);
+                const h = Math.round(rect.height || topWin.innerHeight || 780);
+                if (canvas.width !== Math.round(w * realDpr) || canvas.height !== Math.round(h * realDpr)) {
+                    canvas.width = Math.round(w * realDpr);
+                    canvas.height = Math.round(h * realDpr);
+                    ctx.setTransform(realDpr, 0, 0, realDpr, 0, 0);
+                }
+            }
+
+            // 拦截 ctx.setTransform，防止旧代码把分辨率降回 2 倍
+            const origSetTransform = ctx.setTransform.bind(ctx);
+            ctx.setTransform = function (a, b, c, d, e, f) {
+                if (a < realDpr && b === 0 && c === 0) {
+                    const rect = overlay.getBoundingClientRect();
+                    const w = Math.round(rect.width || topWin.innerWidth || 390);
+                    const h = Math.round(rect.height || topWin.innerHeight || 780);
+                    if (canvas.width !== Math.round(w * realDpr)) {
+                        canvas.width = Math.round(w * realDpr);
+                        canvas.height = Math.round(h * realDpr);
+                    }
+                    return origSetTransform(realDpr, 0, 0, realDpr, 0, 0);
+                }
+                return origSetTransform(a, b, c, d, e, f);
+            };
+
+            // 拦截 fillText：1.彻底关闭导致字发糊的 shadowBlur 2.将星图节点字号放大到清晰的 11px/12px 并对齐整数坐标！
+            const origFillText = ctx.fillText.bind(ctx);
+            ctx.fillText = function (text, x, y, maxWidth) {
+                this.shadowBlur = 0;
+                this.shadowColor = "transparent";
+
+                // 把原本偏小偏淡的星图文字自动提亮加深、放大字号
+                if (typeof this.font === "string") {
+                    if (this.font.includes("9.5px")) {
+                        this.font = `700 11.5px -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
+                        this.fillStyle = "#14161C";
+                    } else if (this.font.includes("8.5px")) {
+                        this.font = `600 10.5px -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
+                        this.fillStyle = "#485062";
+                    } else if (this.font.includes("7.5px")) {
+                        this.font = `600 9.5px -apple-system, "Apple SD Gothic Neo", "PingFang SC", sans-serif`;
+                        this.fillStyle = "#3A4050";
+                    }
+                }
+
+                // 先画一层纯白实心文字描边护底（替代原本发糊的 shadowBlur），再画超清实心字！
+                this.save();
+                this.strokeStyle = "#FFFFFF";
+                this.lineWidth = 3.5;
+                this.lineJoin = "round";
+                this.strokeText(text, Math.round(x), Math.round(y));
+                this.restore();
+
+                return origFillText(text, Math.round(x), Math.round(y), maxWidth);
+            };
+
+            syncUltraHDSize();
+            topWin.addEventListener("resize", syncUltraHDSize);
+        }
+
+        upgradeCanvasToUltraHD();
+
+        const obs = new MutationObserver(() => {
+            roundAllFontSizesToInteger();
+            upgradeCanvasToUltraHD();
+        });
+        obs.observe(modal, { childList: true, subtree: true });
+    }
+
+    mountRetinaCrispEngine();
+})();
