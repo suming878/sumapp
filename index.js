@@ -10654,3 +10654,135 @@ bootSumoulApp();
     // 保留酒馆顶栏 User 图标同步触发入口
     topDoc.getElementById("persona-management-button")?.addEventListener("click", () => setTimeout(openModal, 80));
 })();
+// ==========================================================================
+// 🖼️ 【User 头像直传与同步修复补丁：解决点击头像无法唤起相册 & 原生裁剪框被遮挡问题】
+// 用法：直接粘贴在 index.js 最末尾（或放入 modules 文件夹加载）即可生效！
+// ==========================================================================
+(function () {
+    let topWin = window, topDoc = document;
+    try {
+        if (window.parent && window.parent.document) { topWin = window.parent; topDoc = window.parent.document; }
+    } catch (e) {}
+
+    const AVA_OVERRIDE_KEY = "st_x10_custom_ava_map_v1";
+
+    // 1. 提升酒馆原生头像裁剪弹窗的层级，防止被 X 主页遮挡
+    topDoc.getElementById("st-x10-ava-fix-css")?.remove();
+    const fixCss = topDoc.createElement("style");
+    fixCss.id = "st-x10-ava-fix-css";
+    fixCss.innerHTML = `
+        /* 确保酒馆原生图片裁剪框、确认弹窗永远高于 X 主页 */
+        .popup, .popup-body, dialog.popup, #dialogue_popup, #cropper_modal, .cropper-container {
+            z-index: 2147483647 !important;
+        }
+    `;
+    topDoc.head.appendChild(fixCss);
+
+    function loadAvaMap() {
+        try { return JSON.parse(localStorage.getItem(AVA_OVERRIDE_KEY) || "{}"); } catch (e) { return {}; }
+    }
+    function saveAvaMap(m) {
+        try { localStorage.setItem(AVA_OVERRIDE_KEY, JSON.stringify(m)); } catch (e) {}
+    }
+
+    function getCurrentPersonaId() {
+        const sel = topDoc.querySelector("#user_avatar_block .avatar-container.selected, #user_avatar_block .avatar_container.selected, #user_avatar_block .avatar.selected");
+        const avaEl = sel?.querySelector?.(".avatar") || sel;
+        return avaEl?.getAttribute?.("imgfile") || avaEl?.getAttribute?.("data-avatar-id") || topDoc.querySelector("#your_name")?.value || "default_user";
+    }
+
+    // 压缩头像为高清正方图
+    function compressAvatar(file, size = 420) {
+        return new Promise((res) => {
+            const r = new FileReader();
+            r.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = topDoc.createElement("canvas");
+                    c.width = size; c.height = size;
+                    const ctx = c.getContext("2d");
+                    const minSide = Math.min(img.width, img.height);
+                    const sx = (img.width - minSide) / 2;
+                    const sy = (img.height - minSide) / 2;
+                    ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+                    res(c.toDataURL("image/png", 0.9));
+                };
+                img.src = String(ev.target?.result || "");
+            };
+            r.readAsDataURL(file);
+        });
+    }
+
+    // 尝试将新头像同步上传给酒馆底层原生 input[type="file"]
+    function syncToNativeTavernInput(file) {
+        try {
+            const nativeFileInp = topDoc.querySelector("#avatar_upload_file, input[type='file'][name='avatar'], #user_avatar_block input[type='file']");
+            if (nativeFileInp && file) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                nativeFileInp.files = dt.files;
+                nativeFileInp.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+        } catch (e) {}
+    }
+
+    // 实时把页面上所有当前 User 头像（含 X 主页大头像、推文小头像、酒馆原生选中头像）刷新为新头像
+    function applyCustomAvatarToDOM() {
+        const pId = getCurrentPersonaId();
+        const customUrl = loadAvaMap()[pId];
+        if (!customUrl) return;
+
+        const safe = customUrl.replace(/'/g, "\\'");
+        const mainAva = topDoc.getElementById("x10-ava-btn");
+        if (mainAva) mainAva.style.backgroundImage = `url('${safe}')`;
+
+        const emAva = topDoc.getElementById("x10-em-ava-cam");
+        if (emAva) emAva.style.backgroundImage = `url('${safe}')`;
+
+        topDoc.querySelectorAll("#st-x10-overlay .x10-tweet > div:first-child").forEach((el) => {
+            if (el.style?.backgroundImage) el.style.backgroundImage = `url('${safe}')`;
+        });
+
+        const nativeSelImg = topDoc.querySelector("#user_avatar_block .selected img, #your_avatar_button img");
+        if (nativeSelImg) nativeSelImg.src = customUrl;
+    }
+
+    // 创建真实可点击的文件上传器（100% 不会被手机浏览器拦截）
+    topDoc.getElementById("st-x10-real-ava-input")?.remove();
+    const realInp = topDoc.createElement("input");
+    realInp.type = "file";
+    realInp.id = "st-x10-real-ava-input";
+    realInp.accept = "image/*";
+    realInp.style.cssText = "position:fixed;left:-9999px;top:-9999px;opacity:0;";
+    topDoc.body.appendChild(realInp);
+
+    realInp.onchange = async (e) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        const dataUrl = await compressAvatar(f, 420);
+        const pId = getCurrentPersonaId();
+        const map = loadAvaMap();
+        map[pId] = dataUrl;
+        saveAvaMap(map);
+
+        // 1. 立即无裁剪秒换 X 主页与当前头像显示
+        applyCustomAvatarToDOM();
+        // 2. 同步塞给酒馆底层上传器
+        syncToNativeTavernInput(f);
+        e.target.value = "";
+    };
+
+    // 捕获拦截 X 主页里所有换头像按钮点击，直接拉起真实相册
+    topDoc.addEventListener("click", (e) => {
+        const t = e.target.closest("#x10-ava-btn, #x10-em-ava-cam, #x10-act-ava");
+        if (t) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            realInp.click();
+        }
+    }, true);
+
+    // 监听 X 主页每次渲染与切换人设，自动贴上对应人设的最新头像
+    const obs = new MutationObserver(() => applyCustomAvatarToDOM());
+    obs.observe(topDoc.body, { childList: true, subtree: true });
+})();
