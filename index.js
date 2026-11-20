@@ -10786,3 +10786,581 @@ bootSumoulApp();
     const obs = new MutationObserver(() => applyCustomAvatarToDOM());
     obs.observe(topDoc.body, { childList: true, subtree: true });
 })();
+// ==========================================================================
+// 🐾 【Sumoul App / 酒馆通用独立模块：输入框趴趴萌宠伴侣 (Bongo Cat & Friends)】
+// 特性：1.自动吸附趴在聊天输入框上沿 2.打字时左右小肉垫实时交替拍击 3.发呆眨眼摇尾巴/超时打呼噜 4.双击切换[白猫/垂耳兔/黑猫/粉熊] 5.支持左右自由拖动位置
+// 用法：直接粘贴在 index.js 最末尾（或放入 modules 文件夹 / 酒馆助手脚本）即可生效！
+// ==========================================================================
+(function () {
+    let topWin = window, topDoc = document;
+    try {
+        if (window.parent && window.parent.document) { topWin = window.parent; topDoc = window.parent.document; }
+    } catch (e) {}
+
+    const PET_STORE_KEY = "st_input_bongo_pet_v1";
+
+    // 清理旧节点
+    ["st-bongo-pet-css", "st-bongo-pet-root"].forEach((id) => {
+        try { topDoc.getElementById(id)?.remove(); } catch (e) {}
+    });
+
+    // 4款高颜韩系奶油风萌物配色与特征定义
+    const PET_SKINS = [
+        {
+            id: "white_cat",
+            name: "奶油白猫",
+            earType: "cat",
+            bodyFill: "#FFFFFF",
+            bodyStroke: "#3A3638",
+            innerEar: "#FFD6E0",
+            cheek: "#FFB8C9",
+            pawPad: "#FFC4D2",
+            notes: ["喵~", "今天也在认真写字呢🤍", "爪子拍拍！", "贴贴你~"]
+        },
+        {
+            id: "lop_bunny",
+            name: "糯米垂耳兔",
+            earType: "bunny",
+            bodyFill: "#FFFDFB",
+            bodyStroke: "#423B3D",
+            innerEar: "#FFCAD4",
+            cheek: "#FFAEC0",
+            pawPad: "#FFCAD4",
+            notes: ["兔兔祟祟~", "耳朵竖起来听你说话🐰", "蹦跶一下！", "最喜欢你啦"]
+        },
+        {
+            id: "kuro_cat",
+            name: "煤球黑猫",
+            earType: "cat",
+            bodyFill: "#2C2D34",
+            bodyStroke: "#18191E",
+            innerEar: "#E899A8",
+            cheek: "#FF9EB2",
+            pawPad: "#F4ACB8",
+            eyeColor: "#FFE680",
+            notes: ["呼噜呼噜…", "暗中观察你打字🐾", "本喵替你把关！", "摸摸头~"]
+        },
+        {
+            id: "pink_bear",
+            name: "草莓小熊",
+            earType: "bear",
+            bodyFill: "#FFF0F3",
+            bodyStroke: "#4A3A3E",
+            innerEar: "#FFB3C6",
+            cheek: "#FF8FA3",
+            pawPad: "#FFB3C6",
+            notes: ["熊抱一下！", "打字辛苦啦🍓", "软乎乎趴着陪你~", "甜度满分！"]
+        }
+    ];
+
+    function loadPetCfg() {
+        const def = {
+            skinIdx: 0,
+            offsetX: null, // 用户自定义水平位置百分比 (10 ~ 88)
+            tapCount: 0,
+            hidden: false
+        };
+        try { return Object.assign(def, JSON.parse(localStorage.getItem(PET_STORE_KEY) || "{}")); } catch (e) { return def; }
+    }
+    function savePetCfg(c) {
+        try { localStorage.setItem(PET_STORE_KEY, JSON.stringify(c)); } catch (e) {}
+    }
+
+    // 注入趴趴萌宠专属 CSS 动画（呼吸、眨眼、摇尾巴、左右爪拍击、睡眠气泡）
+    const st = topDoc.createElement("style");
+    st.id = "st-bongo-pet-css";
+    st.innerHTML = `
+        @keyframes bpBreathe {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50%      { transform: translateY(1px) scaleY(0.985); }
+        }
+        @keyframes bpTailWag {
+            0%, 100% { transform: rotate(-10deg); }
+            50%      { transform: rotate(14deg); }
+        }
+        @keyframes bpBlink {
+            0%, 92%, 100% { transform: scaleY(1); }
+            96%           { transform: scaleY(0.08); }
+        }
+        @keyframes bpEarTwitch {
+            0%, 88%, 100% { transform: rotate(0deg); }
+            92%           { transform: rotate(-7deg); }
+            96%           { transform: rotate(4deg); }
+        }
+        @keyframes bpFloatZ {
+            0%   { opacity: 0; transform: translate(0, 4px) scale(0.7); }
+            50%  { opacity: 1; transform: translate(5px, -5px) scale(1); }
+            100% { opacity: 0; transform: translate(10px, -14px) scale(1.1); }
+        }
+        @keyframes bpHeartPop {
+            0%   { opacity: 0; transform: translateY(4px) scale(0.5); }
+            35%  { opacity: 1; transform: translateY(-8px) scale(1.15); }
+            100% { opacity: 0; transform: translateY(-18px) scale(0.9); }
+        }
+
+        #st-bongo-pet-root {
+            position: fixed !important;
+            z-index: 2147483638 !important;
+            width: 86px !important;
+            height: 62px !important;
+            pointer-events: auto !important;
+            user-select: none !important;
+            cursor: grab !important;
+            transition: top 0.08s linear !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
+        }
+        #st-bongo-pet-root:active { cursor: grabbing !important; }
+
+        #st-bongo-pet-root .bp-svg-stage {
+            width: 100% !important;
+            height: 100% !important;
+            overflow: visible !important;
+            filter: drop-shadow(0 3px 8px rgba(20, 20, 30, 0.10)) !important;
+        }
+        #st-bongo-pet-root .bp-head-group {
+            transform-origin: 50px 38px;
+            animation: bpBreathe 2.8s ease-in-out infinite;
+        }
+        /* 打字时小脑袋跟着节奏轻轻点动 */
+        #st-bongo-pet-root.is-typing .bp-head-group {
+            transform: translateY(2px) rotate(1.2deg) !important;
+            animation: none !important;
+        }
+        #st-bongo-pet-root .bp-tail {
+            transform-origin: 76px 42px;
+            animation: bpTailWag 2.4s ease-in-out infinite;
+        }
+        #st-bongo-pet-root .bp-eyes-open {
+            transform-origin: 50px 34px;
+            animation: bpBlink 4.2s infinite;
+        }
+        #st-bongo-pet-root .bp-ear-l {
+            transform-origin: 33px 22px;
+            animation: bpEarTwitch 5.5s infinite;
+        }
+
+        /* 左右小肉垫（平时搭在输入框边缘，打字时向下拍击！） */
+        #st-bongo-pet-root .bp-paw-l,
+        #st-bongo-pet-root .bp-paw-r {
+            transition: transform 0.055s cubic-bezier(0.2, 0.9, 0.3, 1.2) !important;
+        }
+        #st-bongo-pet-root .bp-paw-l { transform-origin: 34px 46px; }
+        #st-bongo-pet-root .bp-paw-r { transform-origin: 66px 46px; }
+
+        /* 左爪拍下状态 */
+        #st-bongo-pet-root.paw-left-down .bp-paw-l {
+            transform: translateY(7.5px) rotate(-8deg) scaleY(0.92) !important;
+        }
+        /* 右爪拍下状态 */
+        #st-bongo-pet-root.paw-right-down .bp-paw-r {
+            transform: translateY(7.5px) rotate(8deg) scaleY(0.92) !important;
+        }
+        /* 拍击瞬间桌面小波纹特效 */
+        #st-bongo-pet-root .bp-hit-fx-l,
+        #st-bongo-pet-root .bp-hit-fx-r {
+            opacity: 0;
+            transition: opacity 0.05s ease;
+        }
+        #st-bongo-pet-root.paw-left-down .bp-hit-fx-l { opacity: 1; }
+        #st-bongo-pet-root.paw-right-down .bp-hit-fx-r { opacity: 1; }
+
+        /* 睡眠状态切换闭眼与 zZ 气泡 */
+        #st-bongo-pet-root .bp-eyes-sleep,
+        #st-bongo-pet-root .bp-zzz { display: none; }
+        #st-bongo-pet-root.is-sleeping .bp-eyes-open { display: none !important; }
+        #st-bongo-pet-root.is-sleeping .bp-eyes-sleep { display: block !important; }
+        #st-bongo-pet-root.is-sleeping .bp-zzz {
+            display: block !important;
+            animation: bpFloatZ 2.4s infinite;
+        }
+
+        /* 头顶软萌对话小气泡 */
+        #st-bongo-pet-root .bp-speech {
+            position: absolute !important;
+            bottom: 60px !important;
+            left: 50% !important;
+            transform: translateX(-50%) scale(0.9) !important;
+            background: rgba(255, 255, 255, 0.96) !important;
+            border: 1px solid #EAEAEA !important;
+            border-radius: 999px !important;
+            padding: 4px 10px !important;
+            font-size: 10.5px !important;
+            font-weight: 600 !important;
+            color: #262626 !important;
+            white-space: nowrap !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.07) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+        #st-bongo-pet-root .bp-speech.show {
+            opacity: 1 !important;
+            transform: translateX(-50%) scale(1) !important;
+        }
+
+        /* 发送消息时的开心小爱心 */
+        #st-bongo-pet-root .bp-heart-pop {
+            position: absolute !important;
+            top: -8px !important;
+            right: 8px !important;
+            font-size: 13px !important;
+            pointer-events: none !important;
+            opacity: 0;
+        }
+        #st-bongo-pet-root .bp-heart-pop.pop {
+            animation: bpHeartPop 0.9s ease forwards !important;
+        }
+    `;
+    topDoc.head.appendChild(st);
+
+    // 根据当前选中的萌宠皮肤绘制高定矢量 SVG
+    function buildPetSvg(skin) {
+        const fill = skin.bodyFill;
+        const stroke = skin.bodyStroke;
+        const earIn = skin.innerEar;
+        const cheek = skin.cheek;
+        const pad = skin.pawPad;
+        const eyeCol = skin.eyeColor || stroke;
+
+        let earsSvg = "";
+        if (skin.earType === "cat") {
+            // 猫咪三角软耳
+            earsSvg = `
+                <g class="bp-ear-l">
+                    <path d="M 27 27 L 22 10 Q 22 7 25 8 L 39 19 Z" fill="${fill}" stroke="${stroke}" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M 27 24 L 24 12 L 35 19 Z" fill="${earIn}"/>
+                </g>
+                <g class="bp-ear-r">
+                    <path d="M 73 27 L 78 10 Q 78 7 75 8 L 61 19 Z" fill="${fill}" stroke="${stroke}" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M 73 24 L 76 12 L 65 19 Z" fill="${earIn}"/>
+                </g>
+            `;
+        } else if (skin.earType === "bunny") {
+            // 糯米垂耳兔软趴趴长耳朵
+            earsSvg = `
+                <g class="bp-ear-l">
+                    <path d="M 32 20 C 18 16, 12 30, 16 42 C 19 47, 25 43, 27 32" fill="${fill}" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M 28 23 C 19 21, 16 31, 19 39" fill="none" stroke="${earIn}" stroke-width="3.2" stroke-linecap="round"/>
+                </g>
+                <g class="bp-ear-r">
+                    <path d="M 68 20 C 82 16, 88 30, 84 42 C 81 47, 75 43, 73 32" fill="${fill}" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M 72 23 C 81 21, 84 31, 81 39" fill="none" stroke="${earIn}" stroke-width="3.2" stroke-linecap="round"/>
+                </g>
+            `;
+        } else {
+            // 小熊圆圆耳朵
+            earsSvg = `
+                <g class="bp-ear-l">
+                    <circle cx="27" cy="17" r="8.5" fill="${fill}" stroke="${stroke}" stroke-width="2.2"/>
+                    <circle cx="27" cy="17" r="4.5" fill="${earIn}"/>
+                </g>
+                <g class="bp-ear-r">
+                    <circle cx="73" cy="17" r="8.5" fill="${fill}" stroke="${stroke}" stroke-width="2.2"/>
+                    <circle cx="73" cy="17" r="4.5" fill="${earIn}"/>
+                </g>
+            `;
+        }
+
+        return `
+            <svg class="bp-svg-stage" viewBox="0 0 100 65" xmlns="http://www.w3.org/2000/svg">
+                <!-- 身后摇摆的小尾巴 -->
+                <path class="bp-tail" d="M 75 43 Q 92 34 89 22" fill="none" stroke="${stroke}" stroke-width="4.5" stroke-linecap="round"/>
+                <path class="bp-tail" d="M 75 43 Q 92 34 89 22" fill="none" stroke="${fill}" stroke-width="2.2" stroke-linecap="round"/>
+
+                <!-- 主体软糯趴趴圆脑袋与身体 -->
+                <g class="bp-head-group">
+                    ${earsSvg}
+                    <!-- 圆滚滚的糯米团子半身，下沿压在输入框边线上 (y=48) -->
+                    <path d="M 22 48 C 19 26, 31 15, 50 15 C 69 15, 81 26, 78 48 Z" fill="${fill}" stroke="${stroke}" stroke-width="2.2" stroke-linejoin="round"/>
+
+                    <!-- 粉扑扑腮红 -->
+                    <ellipse cx="33" cy="37" rx="4.2" ry="2.3" fill="${cheek}" opacity="0.78"/>
+                    <ellipse cx="67" cy="37" rx="4.2" ry="2.3" fill="${cheek}" opacity="0.78"/>
+
+                    <!-- 睁眼状态（带高光点与呼吸眨眼） -->
+                    <g class="bp-eyes-open">
+                        <circle cx="38" cy="33" r="2.7" fill="${eyeCol}"/>
+                        <circle cx="37.2" cy="32" r="0.9" fill="#FFFFFF"/>
+                        <circle cx="62" cy="33" r="2.7" fill="${eyeCol}"/>
+                        <circle cx="61.2" cy="32" r="0.9" fill="#FFFFFF"/>
+                    </g>
+
+                    <!-- 打瞌睡闭眼弧线 -->
+                    <g class="bp-eyes-sleep">
+                        <path d="M 34.5 33.5 Q 38 36.5 41.5 33.5" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M 58.5 33.5 Q 62 36.5 65.5 33.5" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+
+                    <!-- 软萌 ω 猫猫嘴 -->
+                    <path d="M 46.2 36.5 Q 48.1 39 50 36.8 Q 51.9 39 53.8 36.5" fill="none" stroke="${stroke}" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- 脸颊小胡须 -->
+                    <line x1="16" y1="34" x2="23" y2="35" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="17" y1="39" x2="23" y2="38.5" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="84" y1="34" x2="77" y2="35" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="83" y1="39" x2="77" y2="38.5" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round"/>
+                </g>
+
+                <!-- 拍键盘时的音符/小星星波纹特效 -->
+                <g class="bp-hit-fx-l">
+                    <line x1="20" y1="53" x2="15" y2="50" stroke="${cheek}" stroke-width="1.8" stroke-linecap="round"/>
+                    <line x1="23" y1="56" x2="17" y2="57" stroke="${cheek}" stroke-width="1.8" stroke-linecap="round"/>
+                </g>
+                <g class="bp-hit-fx-r">
+                    <line x1="80" y1="53" x2="85" y2="50" stroke="${cheek}" stroke-width="1.8" stroke-linecap="round"/>
+                    <line x1="77" y1="56" x2="83" y2="57" stroke="${cheek}" stroke-width="1.8" stroke-linecap="round"/>
+                </g>
+
+                <!-- 左小爪子（平时趴在框沿 y=48，打字时往下拍到输入框里） -->
+                <g class="bp-paw-l">
+                    <ellipse cx="33" cy="48.5" rx="7.2" ry="5.2" fill="${fill}" stroke="${stroke}" stroke-width="2.1"/>
+                    <ellipse cx="33" cy="49.5" rx="3.2" ry="2.2" fill="${pad}"/>
+                </g>
+
+                <!-- 右小爪子 -->
+                <g class="bp-paw-r">
+                    <ellipse cx="67" cy="48.5" rx="7.2" ry="5.2" fill="${fill}" stroke="${stroke}" stroke-width="2.1"/>
+                    <ellipse cx="67" cy="49.5" rx="3.2" ry="2.2" fill="${pad}"/>
+                </g>
+
+                <!-- 打瞌睡 zZ 符号 -->
+                <text class="bp-zzz" x="75" y="16" font-size="10" font-weight="800" fill="${stroke}" font-family="monospace">zZ</text>
+            </svg>
+        `;
+    }
+
+    // 创建萌宠 DOM 容器
+    const petRoot = topDoc.createElement("div");
+    petRoot.id = "st-bongo-pet-root";
+    petRoot.title = "单击互动 · 双击切换萌物(白猫/垂耳兔/黑猫/粉熊) · 按住可左右拖动位置";
+    topDoc.body.appendChild(petRoot);
+
+    function renderPetSkin() {
+        const cfg = loadPetCfg();
+        const skin = PET_SKINS[cfg.skinIdx % PET_SKINS.length] || PET_SKINS[0];
+        petRoot.innerHTML = `
+            <div class="bp-speech" id="bp-speech-bubble"></div>
+            <div class="bp-heart-pop" id="bp-heart-el">🤍</div>
+            ${buildPetSvg(skin)}
+        `;
+    }
+    renderPetSkin();
+
+    let speechTimer = null;
+    function showPetSpeech(text, duration = 2200) {
+        const el = topDoc.getElementById("bp-speech-bubble");
+        if (!el) return;
+        el.textContent = text;
+        el.classList.add("show");
+        if (speechTimer) clearTimeout(speechTimer);
+        speechTimer = setTimeout(() => el.classList.remove("show"), duration);
+    }
+
+    function popHeart(symbol = "🤍") {
+        const el = topDoc.getElementById("bp-heart-el");
+        if (!el) return;
+        el.textContent = symbol;
+        el.classList.remove("pop");
+        void el.offsetWidth;
+        el.classList.add("pop");
+    }
+
+    // ── 核心1：智能寻找当前可见的输入框，让小萌宠稳稳趴在输入框上沿！ ──
+    function findActiveInputBar() {
+        // 优先检查你 Sumoul App 内部正在打开的微信/日记输入框，其次是酒馆主聊天输入框 #send_form / #send_textarea
+        const candidates = [
+            "#seoul-mini-theater-modal #wx-chat-input",
+            "#seoul-mini-theater-modal textarea:focus",
+            "#seoul-mini-theater-modal input[type='text']:focus",
+            "#send_form",
+            "#send_textarea"
+        ];
+        for (const sel of candidates) {
+            const el = topDoc.querySelector(sel);
+            if (el) {
+                const r = el.getBoundingClientRect();
+                if (r.width > 60 && r.height > 18 && r.top > 30 && r.top < topWin.innerHeight) {
+                    return { el, rect: r };
+                }
+            }
+        }
+        return null;
+    }
+
+    function syncPetPosition() {
+        const cfg = loadPetCfg();
+        if (cfg.hidden) {
+            petRoot.style.display = "none";
+            return;
+        }
+        const target = findActiveInputBar();
+        if (!target) {
+            petRoot.style.display = "none";
+            return;
+        }
+        petRoot.style.display = "block";
+        const r = target.rect;
+
+        // 让萌宠的肚子与小爪子正好搭在输入框的上边框线上（y = 48px 处对应输入框 top）
+        const petTop = Math.max(8, r.top - 45);
+        petRoot.style.top = `${petTop}px`;
+
+        // 水平位置：默认趴在输入框偏右侧 74% 处（不挡左边打字视线），也支持用户自由左右拖拽
+        let leftPx;
+        if (cfg.offsetX !== null && Number.isFinite(Number(cfg.offsetX))) {
+            leftPx = r.left + (r.width - 86) * (Math.max(2, Math.min(98, Number(cfg.offsetX))) / 100);
+        } else {
+            leftPx = r.right - 98;
+        }
+        leftPx = Math.max(6, Math.min(topWin.innerWidth - 92, leftPx));
+        petRoot.style.left = `${leftPx}px`;
+    }
+
+    // ── 核心2：打字时左右小爪子实时交替拍击动画 + 超时自动打呼噜 ──
+    let currentPaw = "left";
+    let typingReleaseTimer = null;
+    let sleepIdleTimer = null;
+
+    function resetSleepTimer() {
+        petRoot.classList.remove("is-sleeping");
+        if (sleepIdleTimer) clearTimeout(sleepIdleTimer);
+        sleepIdleTimer = setTimeout(() => {
+            petRoot.classList.remove("is-typing", "paw-left-down", "paw-right-down");
+            petRoot.classList.add("is-sleeping");
+        }, 25000); // 25秒不打字自动闭眼打瞌睡
+    }
+
+    function triggerPawSlap() {
+        resetSleepTimer();
+        petRoot.classList.add("is-typing");
+
+        // 交替切换左爪和右爪拍下
+        if (currentPaw === "left") {
+            petRoot.classList.add("paw-left-down");
+            petRoot.classList.remove("paw-right-down");
+            currentPaw = "right";
+        } else {
+            petRoot.classList.add("paw-right-down");
+            petRoot.classList.remove("paw-left-down");
+            currentPaw = "left";
+        }
+
+        const cfg = loadPetCfg();
+        cfg.tapCount = (cfg.tapCount || 0) + 1;
+        savePetCfg(cfg);
+
+        // 每敲满 100 下给一个小小鼓励气泡
+        if (cfg.tapCount % 100 === 0) {
+            const skin = PET_SKINS[cfg.skinIdx % PET_SKINS.length];
+            showPetSpeech(`已经陪你敲了 ${cfg.tapCount} 下啦！🤍`);
+            popHeart("✨");
+        }
+
+        if (typingReleaseTimer) clearTimeout(typingReleaseTimer);
+        typingReleaseTimer = setTimeout(() => {
+            petRoot.classList.remove("is-typing", "paw-left-down", "paw-right-down");
+        }, 120);
+    }
+
+    // 同时监听键盘按键与手机输入法 input 事件，手机/电脑打字 100% 灵敏触发！
+    topDoc.addEventListener("keydown", (e) => {
+        const tag = e.target?.tagName;
+        if (tag === "TEXTAREA" || tag === "INPUT" || e.target?.isContentEditable) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                popHeart("🤍");
+            } else if (!["Shift", "Control", "Alt", "Meta", "CapsLock"].includes(e.key)) {
+                triggerPawSlap();
+            }
+            syncPetPosition();
+        }
+    }, true);
+
+    topDoc.addEventListener("input", (e) => {
+        const tag = e.target?.tagName;
+        if (tag === "TEXTAREA" || tag === "INPUT") {
+            triggerPawSlap();
+            syncPetPosition();
+        }
+    }, true);
+
+    // 点击酒馆发送按钮时冒小爱心
+    topDoc.addEventListener("click", (e) => {
+        if (e.target.closest("#send_but, #wx-send-btn")) {
+            resetSleepTimer();
+            popHeart("🤍");
+            const cfg = loadPetCfg();
+            const skin = PET_SKINS[cfg.skinIdx % PET_SKINS.length];
+            showPetSpeech("发送成功啦~ ✨", 1600);
+        }
+    }, true);
+
+    // ── 核心3：支持手指/鼠标左右拖动位置 + 单击撒娇 + 双击切换 4 种萌物 ──
+    let isDragging = false, hasMoved = false, startX = 0, initLeft = 0;
+    let clickCount = 0, clickTimer = null;
+
+    petRoot.addEventListener("pointerdown", (e) => {
+        isDragging = true;
+        hasMoved = false;
+        startX = e.clientX;
+        initLeft = petRoot.getBoundingClientRect().left;
+        petRoot.setPointerCapture?.(e.pointerId);
+        resetSleepTimer();
+    });
+
+    petRoot.addEventListener("pointermove", (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 5) {
+            hasMoved = true;
+            const target = findActiveInputBar();
+            if (target) {
+                const r = target.rect;
+                const newLeft = Math.max(r.left, Math.min(r.right - 86, initLeft + dx));
+                petRoot.style.left = `${newLeft}px`;
+                const pct = ((newLeft - r.left) / Math.max(1, r.width - 86)) * 100;
+                const cfg = loadPetCfg();
+                cfg.offsetX = Math.round(pct);
+                savePetCfg(cfg);
+            }
+        }
+    });
+
+    petRoot.addEventListener("pointerup", () => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (hasMoved) return;
+
+        // 区分单击（撒娇说话）与双击（切换萌物皮肤）
+        clickCount++;
+        if (clickCount === 1) {
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+                const cfg = loadPetCfg();
+                const skin = PET_SKINS[cfg.skinIdx % PET_SKINS.length];
+                const randNote = skin.notes[Math.floor(Math.random() * skin.notes.length)];
+                triggerPawSlap();
+                popHeart("🐾");
+                showPetSpeech(`${randNote} (累计拍爪 ${cfg.tapCount || 0} 次)`);
+            }, 240);
+        } else if (clickCount >= 2) {
+            clearTimeout(clickTimer);
+            clickCount = 0;
+            const cfg = loadPetCfg();
+            cfg.skinIdx = ((cfg.skinIdx || 0) + 1) % PET_SKINS.length;
+            savePetCfg(cfg);
+            renderPetSkin();
+            const nextSkin = PET_SKINS[cfg.skinIdx];
+            popHeart("✨");
+            showPetSpeech(`变身：${nextSkin.name}！(双击可继续切换)`);
+        }
+    });
+
+    // 实时跟随输入框高度变化（比如多行文字撑高输入框、打开/关闭手机软键盘）
+    topWin.addEventListener("resize", syncPetPosition);
+    topDoc.addEventListener("scroll", syncPetPosition, true);
+    topDoc.addEventListener("focusin", () => setTimeout(syncPetPosition, 50), true);
+    setInterval(syncPetPosition, 350);
+
+    resetSleepTimer();
+    setTimeout(syncPetPosition, 100);
+})();
