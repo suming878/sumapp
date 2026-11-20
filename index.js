@@ -10787,462 +10787,269 @@ bootSumoulApp();
     obs.observe(topDoc.body, { childList: true, subtree: true });
 })();
 // ==========================================================================
-// 🐾 【Sumoul App / 酒馆通用模块：48px 拇指级麻薯团子输入框伴侣 v3.0 (超小巧可调尺寸 + 日韩低幼聚拢五官 + 隐藏式极简菜单)】
-// 用法：直接替换刚才的萌宠代码保存即可！
+// 🐾 【输入框粘附小麻薯团子 v4.2 · 极简零截断完整版】
+// 1.直接挂在 #send_form 内(bottom:100%)，打字/弹键盘永不消失 2.外显名字标 3.点击弹6格养成菜单 4.打字拍爪+关键词吐槽
 // ==========================================================================
 (function () {
     let topWin = window, topDoc = document;
-    try {
-        if (window.parent && window.parent.document) { topWin = window.parent; topDoc = window.parent.document; }
-    } catch (e) {}
+    try { if (window.parent && window.parent.document) { topWin = window.parent; topDoc = window.parent.document; } } catch (e) {}
 
-    const PET_KEY = "st_mini_mochi_pet_v3";
-
-    ["st-bongo-pet-css", "st-bongo-pet-root"].forEach((id) => {
+    const KEY = "st_mochi_v42";
+    ["st-bongo-pet-css", "st-bongo-pet-root", "st-mochi-v4-css", "st-mochi-v4-host", "st-mochi-v4-modal"].forEach((id) => {
         try { topDoc.getElementById(id)?.remove(); } catch (e) {}
     });
 
-    // 4款日韩文创级「融化小麻薯」配色（极细暖棕描边 + 低饱和奶油色）
-    const MOCHI_SKINS = [
-        {
-            id: "milk_cat",
-            species: "牛奶麻薯喵",
-            defName: "奶团",
-            type: "cat",
-            fill: "#FFFFFF",
-            stroke: "#524648",
-            ear: "#FFDCE5",
-            cheek: "#FFB5C5",
-            words: ["喵~", "啪嗒啪嗒…", "乖乖陪你打字🤍", "蹭蹭手指~"]
-        },
-        {
-            id: "malt_pup",
-            species: "线条小奶狗",
-            defName: "小豆",
-            type: "pup",
-            fill: "#FFFFFF",
-            stroke: "#524648",
-            ear: "#E5C19E",
-            cheek: "#FFB3C1",
-            words: ["汪呜~", "摇尾巴！", "最喜欢你啦🐾", "贴贴~"]
-        },
-        {
-            id: "mochi_bun",
-            species: "垂耳糯米兔",
-            defName: "雪球",
-            type: "bun",
-            fill: "#FFFDFD",
-            stroke: "#524648",
-            ear: "#FFD6E0",
-            cheek: "#FFAEC0",
-            words: ["啾啾~", "耳朵动了一下！", "软乎乎趴着~", "给你加油✨"]
-        },
-        {
-            id: "sesame_cat",
-            species: "黑芝麻小煤球",
-            defName: "芝麻",
-            type: "cat",
-            fill: "#38363A",
-            stroke: "#222024",
-            ear: "#EAA2B2",
-            cheek: "#FF9EB2",
-            eye: "#FFE885",
-            words: ["呼噜噜…", "踩奶中🐾", "暗中贴贴你~", "喵呜！"]
-        }
+    const SKINS = [
+        { id: "cat", sp: "牛奶喵", nm: "奶团", f: "#FFF", s: "#4E4244", e: "#FFD8E2", c: "#FFAEC0", w: ["喵呜~ 爪子借你按键盘🐾", "蹭蹭大拇指~", "今天会写出超甜剧情哦🤍"] },
+        { id: "pup", sp: "小奶狗", nm: "小豆", f: "#FFF", s: "#4E4244", e: "#E5C19E", c: "#FFB0C0", w: ["汪呜！尾巴摇成风扇~", "小狗永远偏向你🐶", "摸摸我充充电！"] },
+        { id: "bun", sp: "垂耳兔", nm: "雪球", f: "#FFF", s: "#4E4244", e: "#FFD4E0", c: "#FFA8BC", w: ["耳朵竖起来偷听🐰", "变成一滩兔兔饼~", "啾啾！今天也要被偏爱"] },
+        { id: "blk", sp: "黑煤球", nm: "芝麻", f: "#363438", s: "#1E1C20", e: "#EAA0B0", c: "#FF98AE", eye: "#FFE880", w: ["暗中观察你们说悄悄话👀", "输入框归本喵罩着！", "喵~ 贴贴不收钱✨"] }
     ];
+    const FOODS = ["🍓 吞掉草莓大福！甜度拉满~", "🍮 像布丁一样晃脑袋~", "🐟 咔嚓吃完小鱼干，精神百倍！", "🧋 吨吨喝完奶茶，打了个奶嗝~"];
+    const LUCKS = ["🎲 贴贴运势：SSR！TA心里全是你🤍", "🎲 触发隐藏动作：翻肚皮求挠下巴~", "🎲 灵感爆发！下一句回复绝对超甜✨", "🎲 偷偷往你口袋塞了一颗好运糖🍬"];
 
-    // 3档微缩尺寸（默认 48px 拇指大小，绝不臃肿！）
-    const SIZES = [
-        { label: "超迷你", w: 38, h: 28, topOff: 22 },
-        { label: "小巧",   w: 48, h: 35, topOff: 28 },
-        { label: "标准",   w: 58, h: 42, topOff: 34 }
-    ];
-
-    function loadCfg() {
-        const def = { skinIdx: 0, sizeIdx: 1, names: {}, offsetX: 82, taps: 0 };
-        try { return Object.assign(def, JSON.parse(localStorage.getItem(PET_KEY) || "{}")); } catch (e) { return def; }
+    function load() {
+        try { return Object.assign({ idx: 0, sz: 46, rPct: 10, nms: {}, taps: 0, feeds: 0 }, JSON.parse(localStorage.getItem(KEY) || "{}")); }
+        catch (e) { return { idx: 0, sz: 46, rPct: 10, nms: {}, taps: 0, feeds: 0 }; }
     }
-    function saveCfg(c) { try { localStorage.setItem(PET_KEY, JSON.stringify(c)); } catch (e) {} }
-    function getName(c, sk) { return (c.names && c.names[sk.id]) || sk.defName; }
+    function save(c) { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch (e) {} }
+    function getNm(c, sk) { return (c.nms && c.nms[sk.id]) || sk.nm; }
+    function getLv(c) { return Math.max(1, Math.floor(((c.taps || 0) + (c.feeds || 0) * 25) / 60) + 1); }
 
     const st = topDoc.createElement("style");
-    st.id = "st-bongo-pet-css";
+    st.id = "st-mochi-v4-css";
     st.innerHTML = `
-        @keyframes mcSquish {
-            0%, 100% { transform: translateY(0) scale(1, 1); }
-            50%      { transform: translateY(0.8px) scale(1.03, 0.96); }
+        @keyframes m4Sq { 0%,100%{transform:translateY(0) scale(1,1)} 50%{transform:translateY(0.8px) scale(1.03,0.96)} }
+        @keyframes m4Bk { 0%,92%,100%{transform:scaleY(1)} 96%{transform:scaleY(0.08)} }
+        @keyframes m4Jp { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-6px) scale(0.95,1.06)} }
+        #send_form, #form_sheld, #bottom-bar { overflow: visible !important; }
+        #st-mochi-v4-host {
+            position: absolute !important; bottom: calc(100% - 4px) !important; z-index: 2147483640 !important;
+            display: flex !important; flex-direction: column !important; align-items: center !important;
+            pointer-events: auto !important; user-select: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif !important;
         }
-        @keyframes mcBlink {
-            0%, 93%, 100% { transform: scaleY(1); }
-            96%           { transform: scaleY(0.08); }
+        #st-mochi-v4-host .m4-body { transform-origin: 50px 44px; animation: m4Sq 2.4s ease-in-out infinite; }
+        #st-mochi-v4-host.typing .m4-body { transform: translateY(1.8px) scale(1.06,0.92) !important; animation: none !important; }
+        #st-mochi-v4-host.happy .m4-body { animation: m4Jp 0.4s ease infinite !important; }
+        #st-mochi-v4-host .m4-ey-o { transform-origin: 50px 37px; animation: m4Bk 4s infinite; }
+        #st-mochi-v4-host .m4-ey-h { display: none; }
+        #st-mochi-v4-host.happy .m4-ey-o { display: none !important; }
+        #st-mochi-v4-host.happy .m4-ey-h { display: block !important; }
+        #st-mochi-v4-host .m4-pl, #st-mochi-v4-host .m4-pr { transition: transform 0.04s ease !important; }
+        #st-mochi-v4-host.paw-l .m4-pl { transform: translateY(6px) scale(1.1,0.85) !important; }
+        #st-mochi-v4-host.paw-r .m4-pr { transform: translateY(6px) scale(1.1,0.85) !important; }
+        #st-mochi-v4-host .m4-tag {
+            margin-top: -3px !important; padding: 1px 6px !important; border-radius: 99px !important;
+            background: rgba(255,255,255,0.95) !important; border: 1px solid #EAE0E3 !important;
+            font-size: 9px !important; font-weight: 700 !important; color: #4E4244 !important;
+            white-space: nowrap !important; box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important; cursor: pointer !important;
         }
-        @keyframes mcBounce {
-            0%, 100% { transform: translateY(0) scale(1, 1); }
-            40%      { transform: translateY(-4px) scale(0.95, 1.06); }
-            75%      { transform: translateY(1px) scale(1.06, 0.94); }
+        #st-mochi-v4-host .m4-bub {
+            position: absolute !important; bottom: calc(100% + 4px) !important; right: 0 !important;
+            background: rgba(255,255,255,0.97) !important; border: 1px solid #EFE4E7 !important;
+            border-radius: 11px !important; padding: 4px 9px !important; font-size: 10.5px !important;
+            font-weight: 600 !important; color: #3D3235 !important; white-space: nowrap !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; opacity: 0 !important; pointer-events: none !important;
+            transition: opacity 0.15s ease !important; z-index: 25 !important;
         }
-
-        #st-bongo-pet-root {
-            position: fixed !important;
-            z-index: 2147483642 !important;
-            pointer-events: auto !important;
-            user-select: none !important;
-            display: block !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", sans-serif !important;
+        #st-mochi-v4-host .m4-bub.show { opacity: 1 !important; }
+        #st-mochi-v4-host .m4-pan {
+            position: absolute !important; bottom: calc(100% + 6px) !important; right: 0 !important;
+            width: 158px !important; background: rgba(255,255,255,0.98) !important; border: 1px solid #EAE0E3 !important;
+            border-radius: 13px !important; padding: 7px !important; box-shadow: 0 8px 22px rgba(0,0,0,0.13) !important;
+            display: none; flex-direction: column !important; gap: 5px !important; z-index: 35 !important;
         }
-        #st-bongo-pet-root .mc-svg {
-            width: 100% !important;
-            height: 100% !important;
-            overflow: visible !important;
-            cursor: pointer !important;
-            filter: drop-shadow(0 2px 5px rgba(40, 30, 35, 0.08)) !important;
+        #st-mochi-v4-host .m4-pan.open { display: flex !important; }
+        #st-mochi-v4-host .m4-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 4px !important; }
+        #st-mochi-v4-host .m4-btn {
+            background: #FAF7F8 !important; border: 1px solid #EFE6E9 !important; border-radius: 7px !important;
+            padding: 4px 2px !important; font-size: 10px !important; font-weight: 600 !important;
+            color: #4A3E40 !important; text-align: center !important; cursor: pointer !important;
         }
-        #st-bongo-pet-root .mc-body {
-            transform-origin: 50px 44px;
-            animation: mcSquish 2.4s ease-in-out infinite;
-        }
-        /* 打字时像果冻一样软弹 */
-        #st-bongo-pet-root.typing .mc-body {
-            transform: translateY(1.5px) scale(1.05, 0.93) !important;
-            animation: none !important;
-        }
-        #st-bongo-pet-root.happy .mc-body {
-            animation: mcBounce 0.45s ease infinite !important;
-        }
-        #st-bongo-pet-root .mc-eyes-open {
-            transform-origin: 50px 38px;
-            animation: mcBlink 4.2s infinite;
-        }
-        #st-bongo-pet-root .mc-eyes-smile { display: none; }
-        #st-bongo-pet-root.happy .mc-eyes-open { display: none !important; }
-        #st-bongo-pet-root.happy .mc-eyes-smile { display: block !important; }
-
-        /* 左右小圆糯米爪拍击 */
-        #st-bongo-pet-root .mc-paw-l,
-        #st-bongo-pet-root .mc-paw-r {
-            transition: transform 0.045s ease !important;
-        }
-        #st-bongo-pet-root .mc-paw-l { transform-origin: 35px 45px; }
-        #st-bongo-pet-root .mc-paw-r { transform-origin: 65px 45px; }
-        #st-bongo-pet-root.paw-l .mc-paw-l { transform: translateY(5.5px) scale(1.08, 0.85) !important; }
-        #st-bongo-pet-root.paw-r .mc-paw-r { transform: translateY(5.5px) scale(1.08, 0.85) !important; }
-
-        /* 头顶极简微距小气泡（平时隐藏，说话时才浮现） */
-        #st-bongo-pet-root .mc-toast {
-            position: absolute !important;
-            bottom: calc(100% + 4px) !important;
-            left: 50% !important;
-            transform: translateX(-50%) scale(0.92) !important;
-            background: rgba(255, 255, 255, 0.96) !important;
-            border: 1px solid #EFE6E8 !important;
-            border-radius: 999px !important;
-            padding: 3px 9px !important;
-            font-size: 10px !important;
-            font-weight: 600 !important;
-            color: #4A3E40 !important;
-            white-space: nowrap !important;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.06) !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transition: all 0.16s ease !important;
-        }
-        #st-bongo-pet-root .mc-toast.show {
-            opacity: 1 !important;
-            transform: translateX(-50%) scale(1) !important;
-        }
-
-        /* 点击小团子才弹出的极简纯白胶囊条（平时100%隐藏，绝不占地方！） */
-        #st-bongo-pet-root .mc-popover {
-            position: absolute !important;
-            bottom: calc(100% + 6px) !important;
-            right: -4px !important;
-            background: rgba(255, 255, 255, 0.98) !important;
-            backdrop-filter: blur(8px) !important;
-            border: 1px solid #EAE2E4 !important;
-            border-radius: 12px !important;
-            padding: 6px 8px !important;
-            box-shadow: 0 6px 20px rgba(30, 20, 25, 0.10) !important;
-            display: none;
-            flex-direction: column !important;
-            gap: 5px !important;
-            min-width: 136px !important;
-            z-index: 30 !important;
-        }
-        #st-bongo-pet-root .mc-popover.open { display: flex !important; }
-        #st-bongo-pet-root .mc-pop-row {
-            display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 4px !important;
-        }
-        #st-bongo-pet-root .mc-chip {
-            background: #F9F7F8 !important; border: 1px solid #ECE4E6 !important;
-            border-radius: 7px !important; padding: 3px 6px !important;
-            font-size: 10px !important; font-weight: 600 !important; color: #4A3E40 !important;
-            cursor: pointer !important; white-space: nowrap !important; flex: 1 !important; text-align: center !important;
-        }
-        #st-bongo-pet-root .mc-chip:active { background: #F0E4E8 !important; }
+        #st-mochi-v4-host .m4-btn:active { background: #F2E4E8 !important; }
     `;
     topDoc.head.appendChild(st);
 
-    // 绘制正统日韩「融化麻薯团」：宽扁软塌身体 + 极近距低幼豆豆眼与小w嘴
-    function buildMochiSvg(skin) {
-        const f = skin.fill, s = skin.stroke, ear = skin.ear, ck = skin.cheek, eye = skin.eye || s;
-        let ears = "";
-        if (skin.type === "cat") {
-            // 圆钝小猫耳（与头顶无缝融为一体，不是生硬贴上去的尖三角）
-            ears = `
-                <path d="M 26 26 Q 23 14 31 18" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linecap="round"/>
-                <path d="M 74 26 Q 77 14 69 18" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linecap="round"/>
-                <circle cx="27.5" cy="21" r="2.2" fill="${ear}"/>
-                <circle cx="72.5" cy="21" r="2.2" fill="${ear}"/>
-            `;
-        } else if (skin.type === "pup") {
-            // 线条小狗同款软塌焦糖色小垂耳
-            ears = `
-                <path d="M 26 24 C 16 23, 14 35, 21 37 C 25 38, 26 31, 26 26 Z" fill="${ear}" stroke="${s}" stroke-width="2.3" stroke-linejoin="round"/>
-                <path d="M 74 24 C 84 23, 86 35, 79 37 C 75 38, 74 31, 74 26 Z" fill="${ear}" stroke="${s}" stroke-width="2.3" stroke-linejoin="round"/>
-            `;
-        } else {
-            // 软糯兔兔小短耳
-            ears = `
-                <ellipse cx="38" cy="15" rx="4.5" ry="9" transform="rotate(-12 38 15)" fill="${f}" stroke="${s}" stroke-width="2.3"/>
-                <ellipse cx="38" cy="15" rx="2" ry="5" transform="rotate(-12 38 15)" fill="${ear}"/>
-                <ellipse cx="62" cy="15" rx="4.5" ry="9" transform="rotate(12 62 15)" fill="${f}" stroke="${s}" stroke-width="2.3"/>
-                <ellipse cx="62" cy="15" rx="2" ry="5" transform="rotate(12 62 15)" fill="${ear}"/>
-            `;
-        }
-
-        return `
-            <svg class="mc-svg" viewBox="0 0 100 56" xmlns="http://www.w3.org/2000/svg">
-                <g class="mc-body">
-                    ${ears}
-                    <!-- 像融化年糕一样宽扁软乎乎的团子轮廓 (底边压在 y=46) -->
-                    <path d="M 21 46 C 17 28, 28 18, 50 18 C 72 18, 83 28, 79 46 Z" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-
-                    <!-- 低幼软萌五官区（全集中在 y=36~40 的黄金萌点线上！） -->
-                    <ellipse cx="33" cy="39" rx="4.2" ry="2.2" fill="${ck}" opacity="0.8"/>
-                    <ellipse cx="67" cy="39" rx="4.2" ry="2.2" fill="${ck}" opacity="0.8"/>
-
-                    <g class="mc-eyes-open">
-                        <circle cx="40" cy="36.5" r="2.4" fill="${eye}"/>
-                        <circle cx="39.3" cy="35.7" r="0.8" fill="#FFFFFF"/>
-                        <circle cx="60" cy="36.5" r="2.4" fill="${eye}"/>
-                        <circle cx="59.3" cy="35.7" r="0.8" fill="#FFFFFF"/>
-                    </g>
-
-                    <g class="mc-eyes-smile">
-                        <path d="M 37.5 37 Q 40 34 42.5 37" fill="none" stroke="${s}" stroke-width="2.1" stroke-linecap="round"/>
-                        <path d="M 57.5 37 Q 60 34 62.5 37" fill="none" stroke="${s}" stroke-width="2.1" stroke-linecap="round"/>
-                    </g>
-
-                    <!-- 夹在两眼正中间偏下一点点的超小 ω 嘴 -->
-                    <path d="M 47.2 38.2 Q 48.6 40.2 50 38.5 Q 51.4 40.2 52.8 38.2" fill="none" stroke="${s}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-                </g>
-
-                <!-- 两颗圆滚滚的糯米小手（搭在输入框线上） -->
-                <g class="mc-paw-l">
-                    <ellipse cx="35" cy="46.5" rx="5.5" ry="4" fill="${f}" stroke="${s}" stroke-width="2.2"/>
-                </g>
-                <g class="mc-paw-r">
-                    <ellipse cx="65" cy="46.5" rx="5.5" ry="4" fill="${f}" stroke="${s}" stroke-width="2.2"/>
-                </g>
-            </svg>
-        `;
+    function drawSvg(sk) {
+        const f = sk.f, s = sk.s, e = sk.e, ck = sk.c, ey = sk.eye || s;
+        let ears = `<path d="M26 26 Q23 14 32 18" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linecap="round"/><path d="M74 26 Q77 14 68 18" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linecap="round"/><circle cx="28" cy="21" r="2" fill="${e}"/><circle cx="72" cy="21" r="2" fill="${e}"/>`;
+        if (sk.id === "pup") ears = `<path d="M26 24 C16 23,14 35,21 37 C25 38,26 31,26 26 Z" fill="${e}" stroke="${s}" stroke-width="2.3"/><path d="M74 24 C84 23,86 35,79 37 C75 38,74 31,74 26 Z" fill="${e}" stroke="${s}" stroke-width="2.3"/>`;
+        if (sk.id === "bun") ears = `<ellipse cx="38" cy="15" rx="4.5" ry="9" transform="rotate(-12 38 15)" fill="${f}" stroke="${s}" stroke-width="2.3"/><ellipse cx="62" cy="15" rx="4.5" ry="9" transform="rotate(12 62 15)" fill="${f}" stroke="${s}" stroke-width="2.3"/>`;
+        return `<svg viewBox="0 0 100 56" style="width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.09));">
+            <g class="m4-body">${ears}
+                <path d="M21 46 C17 28,28 18,50 18 C72 18,83 28,79 46 Z" fill="${f}" stroke="${s}" stroke-width="2.4"/>
+                <ellipse cx="33" cy="39" rx="4.2" ry="2.2" fill="${ck}" opacity="0.85"/><ellipse cx="67" cy="39" rx="4.2" ry="2.2" fill="${ck}" opacity="0.85"/>
+                <g class="m4-ey-o"><circle cx="40" cy="36.5" r="2.5" fill="${ey}"/><circle cx="39.2" cy="35.6" r="0.8" fill="#FFF"/><circle cx="60" cy="36.5" r="2.5" fill="${ey}"/><circle cx="59.2" cy="35.6" r="0.8" fill="#FFF"/></g>
+                <g class="m4-ey-h"><path d="M37 37 Q40 34 43 37" fill="none" stroke="${s}" stroke-width="2.2" stroke-linecap="round"/><path d="M57 37 Q60 34 63 37" fill="none" stroke="${s}" stroke-width="2.2" stroke-linecap="round"/></g>
+                <path d="M47.2 38.2 Q48.6 40.2 50 38.5 Q51.4 40.2 52.8 38.2" fill="none" stroke="${s}" stroke-width="1.9" stroke-linecap="round"/>
+            </g>
+            <g class="m4-pl"><ellipse cx="35" cy="46.5" rx="5.5" ry="4" fill="${f}" stroke="${s}" stroke-width="2.2"/></g>
+            <g class="m4-pr"><ellipse cx="65" cy="46.5" rx="5.5" ry="4" fill="${f}" stroke="${s}" stroke-width="2.2"/></g>
+        </svg>`;
     }
 
-    const root = topDoc.createElement("div");
-    root.id = "st-bongo-pet-root";
-    topDoc.body.appendChild(root);
+    const host = topDoc.createElement("div");
+    host.id = "st-mochi-v4-host";
 
-    let toastTimer = null, happyTimer = null;
-    function showToast(msg, ms = 1800) {
-        const el = topDoc.getElementById("mc-toast-el");
-        if (!el) return;
-        el.textContent = msg;
-        el.classList.add("show");
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => el.classList.remove("show"), ms);
+    let bTimer = null, hTimer = null;
+    function say(txt, ms = 2200) {
+        const b = topDoc.getElementById("m4-bub-el");
+        if (!b) return;
+        b.textContent = txt; b.classList.add("show");
+        if (bTimer) clearTimeout(bTimer);
+        bTimer = setTimeout(() => b.classList.remove("show"), ms);
+    }
+    function cheer() {
+        host.classList.add("happy");
+        if (hTimer) clearTimeout(hTimer);
+        hTimer = setTimeout(() => host.classList.remove("happy"), 850);
     }
 
-    function makeHappy() {
-        root.classList.add("happy");
-        if (happyTimer) clearTimeout(happyTimer);
-        happyTimer = setTimeout(() => root.classList.remove("happy"), 900);
+    function openRename() {
+        topDoc.getElementById("st-mochi-v4-modal")?.remove();
+        const c = load(), sk = SKINS[c.idx % SKINS.length], cur = getNm(c, sk);
+        const md = topDoc.createElement("div");
+        md.id = "st-mochi-v4-modal";
+        md.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;padding:16px;";
+        md.innerHTML = `<div style="width:250px;background:#FFF;border-radius:16px;padding:15px;text-align:center;box-shadow:0 10px 28px rgba(0,0,0,0.18);">
+            <div style="font-size:13px;font-weight:800;color:#3D3235;margin-bottom:8px;">🐾 给${sk.sp}取名字</div>
+            <input id="m4-ren-inp" value="${cur.replace(/"/g, "&quot;")}" maxlength="8" style="width:100%;height:32px;border:1px solid #E5D8DC;border-radius:8px;text-align:center;font-size:13px;margin-bottom:10px;box-sizing:border-box;outline:none;"/>
+            <div style="display:flex;gap:8px;">
+                <span id="m4-r-no" style="flex:1;padding:6px;border-radius:99px;background:#F5F0F2;font-size:12px;cursor:pointer;">取消</span>
+                <span id="m4-r-ok" style="flex:1;padding:6px;border-radius:99px;background:#3D3235;color:#FFF;font-size:12px;font-weight:700;cursor:pointer;">保存</span>
+            </div>
+        </div>`;
+        topDoc.body.appendChild(md);
+        topDoc.getElementById("m4-r-no").onclick = () => md.remove();
+        topDoc.getElementById("m4-r-ok").onclick = () => {
+            const v = (topDoc.getElementById("m4-ren-inp").value || "").trim();
+            if (v) { c.nms = c.nms || {}; c.nms[sk.id] = v; save(c); render(false); cheer(); say(`以后叫我「${v}」啦🤍`); }
+            md.remove();
+        };
     }
 
-    function renderMochi(keepMenu = false) {
-        const cfg = loadCfg();
-        const sk = MOCHI_SKINS[cfg.skinIdx % MOCHI_SKINS.length] || MOCHI_SKINS[0];
-        const sz = SIZES[cfg.sizeIdx % SIZES.length] || SIZES[1];
-        const nm = getName(cfg, sk);
+    function render(keepOpen = false) {
+        const c = load(), sk = SKINS[c.idx % SKINS.length], nm = getNm(c, sk), lv = getLv(c);
+        const w = Number(c.sz) || 46, h = Math.round(w * 0.58);
+        host.style.right = `${c.rPct ?? 10}%`;
 
-        root.style.width = `${sz.w}px`;
-        root.style.height = `${sz.h}px`;
-
-        root.innerHTML = `
-            <div class="mc-toast" id="mc-toast-el"></div>
-
-            <!-- 点击小团子才出现的极简胶囊菜单 -->
-            <div class="mc-popover ${keepMenu ? "open" : ""}" id="mc-pop-el">
-                <div class="mc-pop-row" style="padding-bottom:3px;border-bottom:1px solid #F2ECEE;">
-                    <span id="mc-btn-name" style="font-size:10.5px;font-weight:800;color:#3D3235;cursor:pointer;" title="点击改名">${nm.replace(/</g, "&lt;")} ✎</span>
-                    <span style="font-size:9.5px;color:#998E90;font-family:monospace;">🐾${cfg.taps || 0}</span>
+        host.innerHTML = `
+            <div class="m4-bub" id="m4-bub-el"></div>
+            <div class="m4-pan ${keepOpen ? "open" : ""}" id="m4-pan-el">
+                <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:#3D3235;padding-bottom:3px;border-bottom:1px solid #F2EAEC;">
+                    <span>${nm.replace(/</g, "&lt;")} · Lv.${lv}</span>
+                    <span style="color:#998A8E;font-family:monospace;">🐾${c.taps || 0}</span>
                 </div>
-                <div class="mc-pop-row">
-                    <span class="mc-chip" id="mc-btn-feed">摸摸/投喂</span>
-                    <span class="mc-chip" id="mc-btn-skin">换团子</span>
-                    <span class="mc-chip" id="mc-btn-size">尺寸:${sz.label}</span>
+                <div class="m4-grid">
+                    <div class="m4-btn" id="m4-b-feed">🍓 喂甜品</div>
+                    <div class="m4-btn" id="m4-b-luck">🎲 抽运势</div>
+                    <div class="m4-btn" id="m4-b-skin">🐾 换萌宠</div>
+                    <div class="m4-btn" id="m4-b-name">✏️ 改名字</div>
+                    <div class="m4-btn" id="m4-b-pos">↔ 挪位置</div>
+                    <div class="m4-btn" id="m4-b-sz">🔍 调大小</div>
                 </div>
             </div>
-
-            <div id="mc-body-hit" style="width:100%;height:100%;">${buildMochiSvg(sk)}</div>
+            <div id="m4-pet-clk" style="width:${w}px;height:${h}px;cursor:pointer;">${drawSvg(sk)}</div>
+            <div class="m4-tag" id="m4-tag-clk">${nm.replace(/</g, "&lt;")} <span style="color:#A69398;">Lv.${lv}</span></div>
         `;
 
-        topDoc.getElementById("mc-btn-name").onclick = (e) => {
+        topDoc.getElementById("m4-pet-clk").onclick = (e) => {
             e.stopPropagation();
-            const c = loadCfg(), s = MOCHI_SKINS[c.skinIdx % MOCHI_SKINS.length];
-            const nv = prompt(`给这只「${s.species}」取个名字：`, getName(c, s));
-            if (nv && nv.trim()) {
-                c.names = c.names || {};
-                c.names[s.id] = nv.trim().slice(0, 8);
-                saveCfg(c); renderMochi(false); makeHappy();
-                showToast(`${nv.trim()} 记住名字啦~`);
-            }
+            const p = topDoc.getElementById("m4-pan-el");
+            const show = !p.classList.contains("open");
+            p.classList.toggle("open", show);
+            cheer();
+            if (show) say(`${nm}：${sk.w[Math.floor(Math.random() * sk.w.length)]}`);
         };
-
-        topDoc.getElementById("mc-btn-feed").onclick = (e) => {
+        topDoc.getElementById("m4-tag-clk").onclick = (e) => { e.stopPropagation(); openRename(); };
+        topDoc.getElementById("m4-b-name").onclick = (e) => { e.stopPropagation(); openRename(); };
+        topDoc.getElementById("m4-b-feed").onclick = (e) => {
             e.stopPropagation();
-            const c = loadCfg(), s = MOCHI_SKINS[c.skinIdx % MOCHI_SKINS.length];
-            topDoc.getElementById("mc-pop-el")?.classList.remove("open");
-            makeHappy();
-            showToast(`${getName(c, s)}：${s.words[Math.floor(Math.random() * s.words.length)]}`);
+            const c2 = load(); c2.feeds = (c2.feeds || 0) + 1; save(c2);
+            render(false); cheer();
+            say(FOODS[Math.floor(Math.random() * FOODS.length)], 2600);
         };
-
-        topDoc.getElementById("mc-btn-skin").onclick = (e) => {
+        topDoc.getElementById("m4-b-luck").onclick = (e) => {
             e.stopPropagation();
-            const c = loadCfg();
-            c.skinIdx = ((c.skinIdx || 0) + 1) % MOCHI_SKINS.length;
-            saveCfg(c); renderMochi(true); makeHappy();
-            const ns = MOCHI_SKINS[c.skinIdx];
-            showToast(`${getName(c, ns)} (${ns.species})`);
+            topDoc.getElementById("m4-pan-el")?.classList.remove("open");
+            cheer(); say(LUCKS[Math.floor(Math.random() * LUCKS.length)], 2800);
         };
-
-        topDoc.getElementById("mc-btn-size").onclick = (e) => {
+        topDoc.getElementById("m4-b-skin").onclick = (e) => {
             e.stopPropagation();
-            const c = loadCfg();
-            c.sizeIdx = ((c.sizeIdx ?? 1) + 1) % SIZES.length;
-            saveCfg(c); renderMochi(true); syncPos();
+            const c2 = load(); c2.idx = ((c2.idx || 0) + 1) % SKINS.length; save(c2);
+            render(true); cheer();
+            const ns = SKINS[c2.idx]; say(`变身：${getNm(c2, ns)} (${ns.sp})！`);
+        };
+        topDoc.getElementById("m4-b-pos").onclick = (e) => {
+            e.stopPropagation();
+            const c2 = load(), list = [8, 28, 50, 72];
+            const cur = list.indexOf(c2.rPct);
+            c2.rPct = list[(cur + 1) % list.length]; save(c2); render(true);
+        };
+        topDoc.getElementById("m4-b-sz").onclick = (e) => {
+            e.stopPropagation();
+            const c2 = load(), szs = [38, 46, 56];
+            c2.sz = szs[(szs.indexOf(c2.sz) + 1) % szs.length]; save(c2); render(true);
         };
     }
 
-    renderMochi(false);
-
-    let lastTop = topWin.innerHeight - 90;
-    let lastRect = { left: 12, right: topWin.innerWidth - 12, width: topWin.innerWidth - 24 };
-
-    function findInputRect() {
-        const sels = [
-            "#seoul-mini-theater-modal #wx-chat-input",
-            "#seoul-mini-theater-modal textarea:focus",
-            "#seoul-mini-theater-modal input[type='text']:focus",
-            "#send_textarea",
-            "#send_form"
-        ];
-        for (const s of sels) {
-            const el = topDoc.querySelector(s);
-            if (el) {
-                const r = el.getBoundingClientRect();
-                if (r.width > 40 && r.height > 10) return r;
-            }
+    // 核心：直接挂载进当前输入框父容器内部，随输入框一体升降，打字100%永不消失！
+    function ensureMounted() {
+        const wxBar = topDoc.querySelector("#seoul-mini-theater-modal #wx-chat-input")?.parentElement;
+        const stForm = topDoc.getElementById("send_form") || topDoc.getElementById("send_textarea")?.parentElement;
+        const target = (wxBar && wxBar.offsetParent !== null) ? wxBar : stForm;
+        if (target && host.parentElement !== target) {
+            const pos = topWin.getComputedStyle(target).position;
+            if (pos === "static") target.style.position = "relative";
+            target.style.overflow = "visible";
+            target.appendChild(host);
+            render(false);
         }
-        return null;
     }
 
-    function syncPos() {
-        const cfg = loadCfg();
-        const sz = SIZES[cfg.sizeIdx % SIZES.length] || SIZES[1];
-        const r = findInputRect();
-        const vpH = topWin.visualViewport ? topWin.visualViewport.height : topWin.innerHeight;
+    let paw = "l", pTimer = null, combo = 0, cTimer = null;
+    function slap(txtVal = "") {
+        ensureMounted();
+        host.classList.add(paw === "l" ? "paw-l" : "paw-r", "typing");
+        host.classList.remove(paw === "l" ? "paw-r" : "paw-l");
+        paw = paw === "l" ? "r" : "l";
 
-        if (r) {
-            lastRect = r;
-            lastTop = Math.max(4, Math.min(vpH - sz.h - 4, r.top - sz.topOff));
+        const c = load(); c.taps = (c.taps || 0) + 1; save(c);
+        const sk = SKINS[c.idx % SKINS.length], tag = topDoc.getElementById("m4-tag-clk");
+        if (tag) tag.innerHTML = `${getNm(c, sk).replace(/</g, "&lt;")} <span style="color:#A69398;">Lv.${getLv(c)}</span>`;
+
+        combo++;
+        if (cTimer) clearTimeout(cTimer);
+        cTimer = setTimeout(() => { combo = 0; }, 2000);
+
+        // 关键词趣味感应吐槽 + 连击狂欢
+        if (/(喜欢|爱|亲亲|抱抱|想你)/.test(txtVal.slice(-4))) {
+            cheer(); say("哇哦~ 闻到恋爱酸臭味啦🤍");
+        } else if (/(呜呜|难过|委屈|哭)/.test(txtVal.slice(-4))) {
+            cheer(); say("摸摸头不难过，团子抱抱你🐾");
+        } else if (combo > 0 && combo % 25 === 0) {
+            cheer(); say(`🔥 手速爆发 Combo ×${combo}！`);
         }
-        root.style.top = `${lastTop}px`;
 
-        const pct = Number.isFinite(Number(cfg.offsetX)) ? Number(cfg.offsetX) : 82;
-        let lx = lastRect.left + (lastRect.width - sz.w) * (Math.max(2, Math.min(98, pct)) / 100);
-        lx = Math.max(6, Math.min(topWin.innerWidth - sz.w - 6, lx));
-        root.style.left = `${lx}px`;
-    }
-
-    let nextPaw = "l", relTimer = null;
-    function slap() {
-        if (nextPaw === "l") {
-            root.classList.add("paw-l", "typing"); root.classList.remove("paw-r"); nextPaw = "r";
-        } else {
-            root.classList.add("paw-r", "typing"); root.classList.remove("paw-l"); nextPaw = "l";
-        }
-        const c = loadCfg();
-        c.taps = (c.taps || 0) + 1;
-        saveCfg(c);
-
-        if (c.taps % 80 === 0) {
-            const sk = MOCHI_SKINS[c.skinIdx % MOCHI_SKINS.length];
-            makeHappy();
-            showToast(`${getName(c, sk)}：${sk.words[Math.floor(Math.random() * sk.words.length)]}`);
-        }
-        if (relTimer) clearTimeout(relTimer);
-        relTimer = setTimeout(() => root.classList.remove("paw-l", "paw-r", "typing"), 100);
+        if (pTimer) clearTimeout(pTimer);
+        pTimer = setTimeout(() => host.classList.remove("paw-l", "paw-r", "typing"), 100);
     }
 
     ["keydown", "input", "compositionupdate"].forEach((ev) => {
         topDoc.addEventListener(ev, (e) => {
-            const tag = e.target?.tagName;
-            if (tag === "TEXTAREA" || tag === "INPUT" || e.target?.isContentEditable) {
-                if (ev === "keydown" && ["Shift", "Control", "Alt", "Meta", "CapsLock"].includes(e.key)) return;
-                slap(); syncPos();
+            const t = e.target;
+            if (t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT" || t.isContentEditable)) {
+                if (ev === "keydown" && ["Shift", "Control", "Alt", "Meta"].includes(e.key)) return;
+                slap(t.value || "");
             }
         }, true);
     });
 
-    let down = false, moved = false, sx = 0, initL = 0;
-    root.addEventListener("pointerdown", (e) => {
-        if (e.target.closest("#mc-pop-el")) return;
-        down = true; moved = false; sx = e.clientX;
-        initL = root.getBoundingClientRect().left;
-        root.setPointerCapture?.(e.pointerId);
-    });
-    root.addEventListener("pointermove", (e) => {
-        if (!down) return;
-        const dx = e.clientX - sx;
-        if (Math.abs(dx) > 4) {
-            moved = true;
-            const c = loadCfg(), sz = SIZES[c.sizeIdx % SIZES.length] || SIZES[1];
-            const nl = Math.max(lastRect.left, Math.min(lastRect.right - sz.w, initL + dx));
-            root.style.left = `${nl}px`;
-            c.offsetX = Math.round(((nl - lastRect.left) / Math.max(1, lastRect.width - sz.w)) * 100);
-            saveCfg(c);
-        }
-    });
-    root.addEventListener("pointerup", () => {
-        if (!down) return;
-        down = false;
-        if (moved) return;
-        const pop = topDoc.getElementById("mc-pop-el");
-        const isOpen = pop?.classList.contains("open");
-        if (isOpen) pop.classList.remove("open");
-        else {
-            pop?.classList.add("open");
-            makeHappy();
-        }
-    });
-
-    topDoc.addEventListener("pointerdown", (e) => {
-        if (!e.target.closest("#st-bongo-pet-root")) topDoc.getElementById("mc-pop-el")?.classList.remove("open");
+    topDoc.addEventListener("click", (e) => {
+        if (!e.target.closest("#st-mochi-v4-host")) topDoc.getElementById("m4-pan-el")?.classList.remove("open");
     }, true);
 
-    topWin.addEventListener("resize", syncPos);
-    topWin.visualViewport?.addEventListener("resize", syncPos);
-    topDoc.addEventListener("scroll", syncPos, true);
-    setInterval(syncPos, 250);
-    setTimeout(syncPos, 60);
+    setInterval(ensureMounted, 400);
+    setTimeout(ensureMounted, 60);
 })();
