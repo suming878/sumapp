@@ -9683,3 +9683,974 @@ bootSumoulApp();
 
     mountKoreanNativeDiaryApp();
 })();
+// ==========================================================================
+// 𝕏 【Sumoul App 内置应用融合补丁：X 纯白人设主页 (v10.7 · 自动挂载至App主页 + 顶栏双入口 + 整页HTML导入)】
+// 用法：直接粘贴在你现有 Git 仓库的 index.js 最末尾，Commit 后在酒馆点更新即可同步！
+// ==========================================================================
+(function () {
+    let topWin = window, topDoc = document;
+    try {
+        if (window.parent && window.parent.document) { topWin = window.parent; topDoc = window.parent.document; }
+    } catch (e) {}
+
+    const STORE_KEY = "st_x_profile_official_v10";
+    const DEF_BANNER = "https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?auto=format&fit=crop&w=1000&q=80";
+
+    [
+        "st-x8-css", "st-x8-fix-css", "st-x8-overlay", "st-x8-fab",
+        "st-x9-css", "st-x9-overlay", "st-x9-fab", "st-x9-user-css",
+        "st-x10-css", "st-x10-overlay", "st-x10-fab", "st-x10-user-css"
+    ].forEach((id) => {
+        try { topDoc.getElementById(id)?.remove(); } catch (e) {}
+    });
+
+    const ICO = {
+        back: `<svg viewBox="0 0 24 24" width="20" height="20" fill="#0F1419"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/></svg>`,
+        close: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/></svg>`,
+        chevDown: `<svg viewBox="0 0 24 24" width="16" height="16" fill="#536471" style="flex-shrink:0;margin-left:2px;"><path d="M12 15.414l-5.707-5.707 1.414-1.414L12 12.586l4.293-4.293 1.414 1.414L12 15.414z"/></svg>`,
+        check: `<svg viewBox="0 0 24 24" width="18" height="18" fill="#1D9BF0"><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"/></svg>`,
+        xApp: `<svg viewBox="0 0 24 24" width="20" height="20" fill="#1E2028"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+        xTop: `<svg viewBox="0 0 24 24" width="18" height="18" fill="#0F1419"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+        v: `<svg viewBox="0 0 22 22" width="17" height="17" fill="#1D9BF0" style="vertical-align:-3px;margin-left:3px;flex-shrink:0;"><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>`,
+        dots: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>`,
+        mail: `<svg viewBox="0 0 24 24" width="16" height="16" fill="#0F1419"><path d="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"/></svg>`,
+        imgBlue: `<svg viewBox="0 0 24 24" width="20" height="20" fill="#1D9BF0"><path d="M3 5.5C3 4.119 4.119 3 5.5 3h13C19.881 3 21 4.119 21 5.5v13c0 1.381-1.119 2.5-2.5 2.5h-13C4.119 21 3 19.881 3 18.5v-13zM5.5 5c-.276 0-.5.224-.5.5v9.086l3-3 3 3 5-5 3 3V5.5c0-.276-.224-.5-.5-.5h-13zM19 15.414l-3-3-5 5-3-3-3 3V18.5c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-3.086zM9.75 7C8.784 7 8 7.784 8 8.75s.784 1.75 1.75 1.75 1.75-.784 1.75-1.75S10.716 7 9.75 7z"/></svg>`,
+        upload: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+        globe: `<svg viewBox="0 0 24 24" width="15" height="15" fill="#1D9BF0"><path d="M12 1.75C6.34 1.75 1.75 6.34 1.75 12S6.34 22.25 12 22.25 22.25 17.66 22.25 12 17.66 1.75 12 1.75zm-.25 10.48L10.5 17.5l-2-1.5v-3.5L7.5 9 5.03 7.59c1.42-2.24 3.89-3.75 6.72-3.84L11 6l-2 .5L8.5 9l5 1.5-1.75 1.73zM17 14v-3l-1.5-3 2.88-1.23c1.17 1.42 1.87 3.24 1.87 5.23 0 1.3-.3 2.52-.83 3.61L17 14z"/></svg>`,
+        camWhite: `<svg viewBox="0 0 24 24" width="19" height="19" fill="#FFFFFF"><path d="M9.697 3H11v2h-.697l-3 2H5c-.276 0-.5.224-.5.5v11c0 .276.224.5.5.5h14c.276 0 .5-.224.5-.5v-11c0-.276-.224-.5-.5-.5h-2.303l-3-2H13V3h1.303l3 2H19c1.381 0 2.5 1.119 2.5 2.5v11c0 1.381-1.119 2.5-2.5 2.5H5c-1.381 0-2.5-1.119-2.5-2.5v-11C2.5 6.119 3.619 5 5 5h1.697l3-2zM12 10.5c-1.933 0-3.5 1.567-3.5 3.5s1.567 3.5 3.5 3.5 3.5-1.567 3.5-3.5-1.567-3.5-3.5-3.5zM6.5 14c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5-5.5-2.462-5.5-5.5z"/></svg>`,
+        pin: `<svg viewBox="0 0 24 24" width="13" height="13" fill="#536471"><path d="M7 4.5C7 3.12 8.12 2 9.5 2h5C15.88 2 17 3.12 17 4.5v5.26L20.12 16H13v5l-1 2-1-2v-5H3.88L7 9.76V4.5z"/></svg>`,
+        brief: `<svg viewBox="0 0 24 24" width="14" height="14" fill="#536471"><path d="M17 6V4c0-1.1-.9-2-2-2H9c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-3zM9 4h6v2H9V4zm11 15H4V8h16v11z"/></svg>`,
+        loc: `<svg viewBox="0 0 24 24" width="14" height="14" fill="#536471"><path d="M12 7c-1.93 0-3.5 1.57-3.5 3.5S10.07 14 12 14s3.5-1.57 3.5-3.5S13.93 7 12 7zm0 5c-.827 0-1.5-.673-1.5-1.5S11.173 9 12 9s1.5.673 1.5 1.5S12.827 12 12 12zm0-10c-4.687 0-8.5 3.813-8.5 8.5 0 5.967 7.621 11.116 7.945 11.332l.555.37.555-.37c.324-.216 7.945-5.365 7.945-11.332C20.5 5.813 16.687 2 12 2zm0 17.77c-1.665-1.241-6.5-5.196-6.5-9.27C5.5 6.916 8.416 4 12 4s6.5 2.916 6.5 6.5c0 4.073-4.835 8.028-6.5 9.27z"/></svg>`,
+        link: `<svg viewBox="0 0 24 24" width="14" height="14" fill="#536471"><path d="M18.36 5.64c-1.95-1.96-5.11-1.96-7.07 0L9.88 7.05 8.46 5.64l1.42-1.42c2.73-2.73 7.16-2.73 9.9 0 2.73 2.74 2.73 7.17 0 9.9l-1.42 1.42-1.41-1.42 1.41-1.41c1.96-1.96 1.96-5.12 0-7.07zm-2.12 3.53l-7.07 7.07-1.41-1.41 7.07-7.07 1.41 1.41zm-12.02.71l1.42-1.42 1.41 1.42-1.41 1.41c-1.96 1.96-1.96 5.12 0 7.07 1.95 1.96 5.11 1.96 7.07 0l1.41-1.41 1.42 1.41-1.42 1.42c-2.73 2.73-7.16 2.73-9.9 0-2.73-2.74-2.73-7.17 0-9.9z"/></svg>`,
+        cal: `<svg viewBox="0 0 24 24" width="14" height="14" fill="#536471"><path d="M7 4V3h2v1h6V3h2v1h1.5C19.89 4 21 5.12 21 6.5v12c0 1.38-1.11 2.5-2.5 2.5h-13C4.12 21 3 19.88 3 18.5v-12C3 5.12 4.12 4 5.5 4H7zm0 2H5.5c-.27 0-.5.22-.5.5v12c0 .28.23.5.5.5h13c.28 0 .5-.22.5-.5v-12c0-.28-.22-.5-.5-.5H17v1h-2V6H9v1H7V6z"/></svg>`,
+        reply: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01zm8.005-6c-3.317 0-6.005 2.69-6.005 6 0 3.37 2.77 6.08 6.138 6.01l.351-.01h1.761v2.3l5.087-2.81c1.951-1.08 3.163-3.13 3.163-5.36 0-3.39-2.744-6.13-6.129-6.13H9.756z"/></svg>`,
+        rt: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>`,
+        heartOff: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"/></svg>`,
+        heartOn: `<svg viewBox="0 0 24 24" width="16" height="16" fill="#F91880"><path d="M20.884 13.19c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"/></svg>`,
+        views: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"/></svg>`,
+        bm: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5zM6.5 4c-.276 0-.5.22-.5.5v14.56l6-4.29 6 4.29V4.5c0-.28-.224-.5-.5-.5h-11z"/></svg>`,
+        feather: `<svg viewBox="0 0 24 24" width="22" height="22" fill="#FFFFFF"><path d="M23 3c-6.62-.1-10.38 2.421-13.05 6.03C7.29 12.61 6 17.331 6 22h2c0-1.007.07-2.012.19-3H12c4.1 0 7.48-3.082 7.94-7.054C22.79 10.147 23.17 6.359 23 3zm-7 8h-1.5v2H16c.63-.016 1.2-.08 1.72-.188C16.95 15.24 14.68 17 12 17H8.55c.57-2.512 1.57-4.851 3-6.78 2.16-2.912 5.29-4.911 9.45-5.187C20.95 8.079 19.9 11 16 11zM4 9V6H1V4h3V1h2v3h3v2H6v3H4z"/></svg>`
+    };
+
+    function fmtNum(n) {
+        const v = Number(n) || 0;
+        if (v >= 10000) return `${(v / 10000).toFixed(1)}万`;
+        if (v >= 1000) return v.toLocaleString();
+        return String(v);
+    }
+
+    function genViralStats() {
+        const likes = Math.floor(18000 + Math.random() * 78000);
+        return {
+            replies: Math.floor(620 + Math.random() * 2800),
+            rts: Math.floor(2400 + Math.random() * 14000),
+            likes,
+            views: Math.floor(likes * (6 + Math.random() * 5))
+        };
+    }
+
+    function loadCfg() {
+        const def = {
+            tab: "posts",
+            banner: DEF_BANNER,
+            handle: "@seoul_archive",
+            category: "Personal Archive · 偏爱与唯一",
+            bio: "在平行世界里，只做你一个人的偏爱与例外。🤍\n#Persona #Seoul #Exclusive",
+            loc: "Seoul, Republic of Korea",
+            link: "persona.x.com",
+            date: "2026年11月 加入",
+            followers: "52.0万",
+            tweets: null,
+            media: [
+                { img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", txt: "海风与手心的温度 🌊 #Daily" },
+                { img: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=600&q=80", txt: "今日份日常碎片 ✨ #Record" }
+            ],
+            useHtml: false,
+            fullPageHtml: true,
+            html: "",
+            css: ""
+        };
+        try {
+            const c = Object.assign(def, JSON.parse(localStorage.getItem(STORE_KEY) || "{}"));
+            if (!Array.isArray(c.tweets)) {
+                c.tweets = (c.media || []).map((m, i) => Object.assign({
+                    id: Date.now() - i * 1000,
+                    txt: m.txt || "",
+                    imgs: m.img ? [m.img] : [],
+                    date: "11月19日",
+                    liked: false
+                }, genViralStats()));
+            } else {
+                c.tweets.forEach((t) => {
+                    if (!t.views || t.likes < 1000) Object.assign(t, genViralStats());
+                });
+            }
+            return c;
+        } catch (e) {
+            def.tweets = [];
+            return def;
+        }
+    }
+    function saveCfg(c) {
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(c)); }
+        catch (e) { alert("图片太大了，建议少选几张或换小一点的图片。"); }
+    }
+
+    function compressImg(file, max = 720) {
+        return new Promise((res) => {
+            const r = new FileReader();
+            r.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = topDoc.createElement("canvas");
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > max) { h = Math.round(h * max / w); w = max; } }
+                    else { if (h > max) { w = Math.round(w * max / h); h = max; } }
+                    c.width = w; c.height = h;
+                    c.getContext("2d").drawImage(img, 0, 0, w, h);
+                    res(c.toDataURL("image/jpeg", 0.78));
+                };
+                img.src = String(ev.target?.result || "");
+            };
+            r.readAsDataURL(file);
+        });
+    }
+
+    function formatXText(raw) {
+        const safe = String(raw || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return safe.replace(/(#[a-zA-Z0-9_\u4e00-\u9fa5]+|@[a-zA-Z0-9_\u4e00-\u9fa5]+)/g, `<span style="color:#1D9BF0;cursor:pointer;">$1</span>`);
+    }
+
+    function renderTweetImages(imgs, removable = false) {
+        const list = (imgs || []).filter(Boolean);
+        if (!list.length) return "";
+        const wrapImg = (u, idx, style) => `
+            <div style="position:relative;${style}overflow:hidden;">
+                <img src="${u}" style="width:100%;height:100%;object-fit:cover;display:block;" />
+                ${removable ? `<span data-rmdraft="${idx}" style="position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(15,20,25,0.75);color:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">${ICO.close.replace('width="18" height="18"', 'width="13" height="13"')}</span>` : ""}
+            </div>
+        `;
+        if (list.length === 1) return `<div style="margin-top:8px;max-width:92%;border-radius:14px;overflow:hidden;border:1px solid #EFF3F4;">${wrapImg(list[0], 0, "width:100%;max-height:192px;")}</div>`;
+        if (list.length === 2) return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:8px;max-width:94%;border-radius:14px;overflow:hidden;border:1px solid #EFF3F4;">${list.map((u, i) => wrapImg(u, i, "height:134px;")).join("")}</div>`;
+        if (list.length === 3) return `<div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:76px 76px;gap:2px;margin-top:8px;max-width:94%;border-radius:14px;overflow:hidden;border:1px solid #EFF3F4;">${wrapImg(list[0], 0, "grid-row:1/3;height:100%;")}${wrapImg(list[1], 1, "height:100%;")}${wrapImg(list[2], 2, "height:100%;")}</div>`;
+        return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:8px;max-width:94%;border-radius:14px;overflow:hidden;border:1px solid #EFF3F4;">${list.slice(0, 4).map((u, i) => wrapImg(u, i, "height:94px;")).join("")}</div>`;
+    }
+
+    let pendingSwitch = null;
+
+    function scanPersonas() {
+        let curName = "User", curAva = "https://i.postimg.cc/rydS6NvG/IMG-3866.jpg", curDesc = "", charName = "Partner", charAva = "https://i.postimg.cc/QC3CQ218/IMG-4147.jpg";
+        const list = [];
+        try {
+            const ctx = topWin.SillyTavern?.getContext?.();
+            const pu = ctx?.powerUserSettings || topWin.power_user || {};
+            const personasMap = pu.personas || {};
+            const descMap = pu.persona_descriptions || {};
+
+            if (ctx) {
+                if (ctx.name1) curName = ctx.name1;
+                if (ctx.name2) charName = ctx.name2;
+                if (ctx.characterId !== undefined && ctx.characters?.[ctx.characterId]?.avatar) {
+                    charAva = `/characters/${encodeURIComponent(ctx.characters[ctx.characterId].avatar)}`;
+                }
+            }
+            const descEl = topDoc.getElementById("persona_description");
+            if (descEl) curDesc = descEl.value || "";
+
+            const avaBlocks = topDoc.querySelectorAll("#user_avatar_block .avatar-container, #user_avatar_block .avatar_container, #user_avatar_block .avatar");
+            const seen = new Set();
+            let foundSelected = false;
+
+            avaBlocks.forEach((el) => {
+                const box = el.closest(".avatar-container, .avatar_container") || el;
+                const avaEl = box.querySelector(".avatar") || (el.classList.contains("avatar") ? el : box);
+                const img = avaEl.querySelector("img") || box.querySelector("img") || (el.tagName === "IMG" ? el : null);
+                const imgfile = avaEl.getAttribute("imgfile") || box.getAttribute("imgfile") || box.getAttribute("data-avatar-id") || avaEl.getAttribute("data-avatar-id") || img?.getAttribute("src") || "";
+                if (!imgfile || seen.has(imgfile)) return;
+                seen.add(imgfile);
+
+                const isSel = box.classList.contains("selected") || avaEl.classList.contains("selected") || Boolean(box.querySelector(".selected"));
+                const nmFromDom = box.querySelector(".ch_name, .persona_name, .avatar_name, span")?.textContent?.trim();
+                const nm = personasMap[imgfile] || nmFromDom || imgfile.replace(/\.(png|jpg|jpeg|webp|gif)$/i, "");
+                const src = img?.src || `/User Avatars/${encodeURIComponent(imgfile)}`;
+                const pDesc = descMap[imgfile]?.description ?? "";
+
+                if (isSel) {
+                    foundSelected = true;
+                    curAva = src;
+                    if (nm) curName = nm;
+                    if (!curDesc && pDesc) curDesc = pDesc;
+                }
+                list.push({ id: imgfile, name: nm || "人设", src, desc: pDesc, isSelected: isSel, clickTarget: avaEl, boxTarget: box });
+            });
+
+            if (pendingSwitch && Date.now() - pendingSwitch.ts < 1200) {
+                const match = list.find((x) => x.id === pendingSwitch.id);
+                if (match) {
+                    list.forEach((x) => { x.isSelected = x.id === match.id; });
+                    curAva = match.src;
+                    curName = match.name;
+                    if (descEl && descEl.value) curDesc = descEl.value;
+                    else if (match.desc) curDesc = match.desc;
+                    foundSelected = true;
+                }
+            }
+
+            if (!foundSelected) {
+                const topAvaImg = topDoc.querySelector("#user_avatar_block .avatar.selected img, #your_avatar_button img");
+                if (topAvaImg?.src) curAva = topAvaImg.src;
+            }
+            if (!list.length) list.push({ id: "cur", name: curName, src: curAva, desc: curDesc, isSelected: true, clickTarget: null, boxTarget: null });
+        } catch (e) {}
+        return { curName, curAva, curDesc, charName, charAva, list };
+    }
+
+    function switchPersonaReal(target) {
+        if (!target) return;
+        pendingSwitch = { id: target.id, ts: Date.now() };
+        const el = target.clickTarget || target.boxTarget;
+        if (el) {
+            try { el.click(); } catch (e) {}
+            try { el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: topWin })); } catch (e) {}
+            try { if (topWin.jQuery) topWin.jQuery(el).trigger("click"); } catch (e) {}
+        }
+        renderX("");
+        setTimeout(() => renderX(""), 220);
+        setTimeout(() => { pendingSwitch = null; renderX(""); }, 600);
+    }
+
+    function clickNative(sels) {
+        for (const s of sels) {
+            const el = topDoc.querySelector(s);
+            if (el) { el.click(); return true; }
+        }
+        return false;
+    }
+
+    const st = topDoc.createElement("style");
+    st.id = "st-x10-css";
+    st.innerHTML = `
+        #st-x10-overlay {
+            position: fixed !important; inset: 0 !important; z-index: 2147483647 !important;
+            background: #FFFFFF !important;
+            display: none; align-items: center !important; justify-content: center !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif !important;
+            -webkit-font-smoothing: antialiased !important;
+        }
+        #st-x10-overlay.open { display: flex !important; }
+        #st-x10-overlay .x10-shell {
+            width: 100% !important; max-width: 550px !important; height: 100% !important; max-height: 100vh !important;
+            background: #FFFFFF !important; color: #0F1419 !important;
+            border-left: 1px solid #EFF3F4 !important; border-right: 1px solid #EFF3F4 !important;
+            overflow-y: auto !important; overflow-x: hidden !important;
+            box-sizing: border-box !important; padding-bottom: 90px !important;
+            display: block !important; position: relative !important;
+        }
+        #st-x10-overlay .x10-top {
+            position: sticky !important; top: 0 !important; z-index: 40 !important;
+            background: rgba(255, 255, 255, 0.94) !important; backdrop-filter: blur(12px) !important;
+            display: flex !important; align-items: center !important; gap: 14px !important;
+            padding: max(8px, env(safe-area-inset-top, 8px)) 14px 8px 14px !important;
+            border-bottom: 1px solid #EFF3F4 !important;
+        }
+        #st-x10-overlay .x10-top-ico {
+            width: 34px !important; height: 34px !important; border-radius: 50% !important;
+            display: inline-flex !important; align-items: center !important; justify-content: center !important;
+            cursor: pointer !important; flex-shrink: 0 !important; transition: background 0.15s ease !important;
+        }
+        #st-x10-overlay .x10-top-ico:hover { background: #F5F8FA !important; }
+        #st-x10-overlay .x10-hero-grid {
+            display: grid !important; grid-template-rows: 118px 39px 45px !important; grid-template-columns: 16px 82px 1fr 16px !important;
+            background: #FFFFFF !important;
+        }
+        #st-x10-overlay .x10-banner {
+            grid-row: 1 / 3 !important; grid-column: 1 / 5 !important;
+            background-size: cover !important; background-position: center !important;
+            background-color: #FFFFFF !important; cursor: pointer !important;
+        }
+        #st-x10-overlay .x10-ava {
+            grid-row: 2 / 4 !important; grid-column: 2 / 3 !important; z-index: 10 !important;
+            width: 82px !important; height: 82px !important; border-radius: 50% !important;
+            background-size: cover !important; background-position: center !important;
+            background-color: #FFFFFF !important; border: 4px solid #FFFFFF !important;
+            box-shadow: 0 0 0 1px #EFF3F4 !important; box-sizing: border-box !important; cursor: pointer !important;
+        }
+        #st-x10-overlay .x10-actions {
+            grid-row: 3 / 4 !important; grid-column: 3 / 4 !important;
+            display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 7px !important; padding-top: 4px !important;
+        }
+        #st-x10-overlay .x10-circle-btn {
+            width: 34px !important; height: 34px !important; border-radius: 50% !important;
+            background: #FFFFFF !important; border: 1px solid #CFD9DE !important;
+            display: inline-flex !important; align-items: center !important; justify-content: center !important;
+            cursor: pointer !important; flex-shrink: 0 !important; color: #0F1419 !important;
+        }
+        #st-x10-overlay .x10-pill-btn {
+            height: 34px !important; padding: 0 14px !important; border-radius: 999px !important;
+            background: #FFFFFF !important; border: 1px solid #CFD9DE !important;
+            font-size: 13px !important; font-weight: 700 !important; color: #0F1419 !important;
+            display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important;
+            cursor: pointer !important; white-space: nowrap !important;
+        }
+        #st-x10-overlay .x10-pill-btn.dark { background: #0F1419 !important; border-color: #0F1419 !important; color: #FFFFFF !important; }
+        #st-x10-overlay .x10-pill-btn.blue { background: #1D9BF0 !important; border-color: #1D9BF0 !important; color: #FFFFFF !important; }
+        #st-x10-overlay .x10-pill-btn.blue.dim { opacity: 0.45 !important; }
+        #st-x10-overlay .x10-tabs {
+            display: grid !important; grid-template-columns: repeat(4, 1fr) !important;
+            border-bottom: 1px solid #EFF3F4 !important; background: #FFFFFF !important;
+            position: sticky !important; top: 51px !important; z-index: 30 !important;
+        }
+        #st-x10-overlay .x10-tab {
+            height: 46px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+            font-size: 14px !important; font-weight: 500 !important; color: #536471 !important; position: relative !important; cursor: pointer !important;
+        }
+        #st-x10-overlay .x10-tab.on { color: #0F1419 !important; font-weight: 700 !important; }
+        #st-x10-overlay .x10-tab.on::after {
+            content: "" !important; position: absolute !important; bottom: 0 !important;
+            width: 52px !important; height: 4px !important; border-radius: 99px !important; background: #1D9BF0 !important;
+        }
+        #st-x10-overlay .x10-tweet {
+            display: flex !important; gap: 11px !important; padding: 12px 16px !important;
+            border-bottom: 1px solid #EFF3F4 !important; background: #FFFFFF !important;
+        }
+        #st-x10-overlay .x10-tweet-bar {
+            display: flex !important; justify-content: space-between !important; align-items: center !important;
+            margin-top: 10px !important; max-width: 390px !important; color: #536471 !important; font-size: 12.5px !important;
+        }
+        #st-x10-overlay .x10-tweet-bar > span { display: inline-flex !important; align-items: center !important; gap: 4px !important; cursor: pointer !important; }
+        #st-x10-overlay .x10-compose-fab {
+            position: fixed !important; right: max(20px, calc((100vw - 550px)/2 + 18px)) !important; bottom: 24px !important; z-index: 45 !important;
+            width: 54px !important; height: 54px !important; border-radius: 50% !important;
+            background: #1D9BF0 !important; box-shadow: 0 4px 16px rgba(29,155,240,0.42) !important;
+            display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important;
+        }
+        #st-x10-overlay .x10-modal-mask {
+            position: fixed !important; inset: 0 !important; z-index: 80 !important;
+            background: rgba(15, 20, 25, 0.42) !important;
+            display: none; align-items: flex-start !important; justify-content: center !important;
+            padding: max(24px, 6vh) 14px 14px 14px !important; box-sizing: border-box !important;
+        }
+        #st-x10-overlay .x10-modal-mask.show { display: flex !important; }
+        #st-x10-overlay .x10-tool-ico {
+            width: 34px !important; height: 34px !important; border-radius: 50% !important;
+            display: inline-flex !important; align-items: center !important; justify-content: center !important;
+            cursor: pointer !important; color: #1D9BF0 !important; font-size: 15px !important; font-weight: 700 !important;
+        }
+        #st-x10-overlay .x10-cam-overlay {
+            width: 38px !important; height: 38px !important; border-radius: 50% !important;
+            background: rgba(15, 20, 25, 0.58) !important;
+            display: inline-flex !important; align-items: center !important; justify-content: center !important;
+            cursor: pointer !important; color: #FFFFFF !important; font-size: 11px !important; font-weight: 700 !important;
+        }
+        #st-x10-overlay .x10-field {
+            border: 1px solid #CFD9DE !important; border-radius: 8px !important;
+            padding: 6px 10px !important; margin-bottom: 12px !important; background: #FFFFFF !important;
+        }
+        #st-x10-overlay .x10-field:focus-within { border-color: #1D9BF0 !important; }
+        #st-x10-overlay .x10-field-lbl { font-size: 11.5px !important; color: #536471 !important; margin-bottom: 2px !important; }
+        #st-x10-overlay .x10-field-inp {
+            width: 100% !important; border: none !important; outline: none !important;
+            font-size: 14px !important; color: #0F1419 !important; background: transparent !important; padding: 0 !important;
+        }
+    `;
+    topDoc.head.appendChild(st);
+
+    const overlay = topDoc.createElement("div");
+    overlay.id = "st-x10-overlay";
+    topDoc.body.appendChild(overlay);
+
+    let draftTxt = "";
+    let draftImgs = [];
+
+    topWin.__ST_PERSONA_API__ = {
+        getData: () => scanPersonas(),
+        open: () => openModal(),
+        close: () => overlay.classList.remove("open"),
+        uploadAvatar: () => clickNative(["#your_avatar_button", "#upload_avatar_button"]),
+        toggleBind: () => { clickNative(["#persona_lock_button", "#lock_user_name", ".persona_lock_icon"]); setTimeout(() => renderX(""), 200); },
+        createNew: () => { clickNative(["#create_dummy_persona", "#add_persona_button", ".fa-plus"]); setTimeout(() => renderX(""), 400); },
+        switchByIndex: (idx) => switchPersonaReal(scanPersonas().list[Number(idx)]),
+        setDesc: (text) => {
+            const nd = topDoc.getElementById("persona_description");
+            if (nd) { nd.value = String(text || ""); nd.dispatchEvent(new Event("input", { bubbles: true })); nd.dispatchEvent(new Event("change", { bubbles: true })); }
+        },
+        exitCustomHtml: () => { const c = loadCfg(); c.useHtml = false; c.tab = "html"; saveCfg(c); renderX(""); }
+    };
+
+    function renderTweetCard(tw, info, handle, safeAva) {
+        return `
+            <div class="x10-tweet">
+                <div style="width:40px;height:40px;border-radius:50%;background-image:url('${safeAva}');background-size:cover;background-position:center;border:1px solid #EFF3F4;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div style="display:flex;align-items:center;gap:4px;min-width:0;">
+                            <span style="font-size:15px;font-weight:700;color:#0F1419;">${info.curName.replace(/</g, "&lt;")}</span>
+                            ${ICO.v}
+                            <span style="font-size:13.5px;color:#536471;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${handle.replace(/</g, "&lt;")} · ${(tw.date || "刚刚").replace(/</g, "&lt;")}</span>
+                        </div>
+                        <span data-deltw="${tw.id}" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;color:#8899A6;cursor:pointer;" title="删除推文">${ICO.close.replace('width="18" height="18"', 'width="14" height="14"')}</span>
+                    </div>
+                    ${tw.txt ? `<div style="font-size:14.5px;color:#0F1419;margin-top:4px;line-height:1.6;white-space:pre-wrap;word-break:break-word;">${formatXText(tw.txt)}</div>` : ""}
+                    ${renderTweetImages(tw.imgs, false)}
+                    <div class="x10-tweet-bar">
+                        <span>${ICO.reply}<span>${fmtNum(tw.replies || 1280)}</span></span>
+                        <span>${ICO.rt}<span>${fmtNum(tw.rts || 5640)}</span></span>
+                        <span data-liketw="${tw.id}" style="color:${tw.liked ? "#F91880" : "#536471"};">${tw.liked ? ICO.heartOn : ICO.heartOff}<span>${fmtNum(tw.likes || 38400)}</span></span>
+                        <span>${ICO.views}<span>${fmtNum(tw.views || 326000)}</span></span>
+                        <span>${ICO.bm}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderX(openState = "") {
+        const cfg = loadCfg();
+        const info = scanPersonas();
+
+        // 同步更新 App 主页上的角标人数
+        const badgeEl = topDoc.querySelector("#ab-app-xpersona .ab-app-floating-badge");
+        if (badgeEl) badgeEl.textContent = `${info.list.length}人设`;
+
+        let uCss = topDoc.getElementById("st-x10-user-css");
+        if (!uCss) { uCss = topDoc.createElement("style"); uCss.id = "st-x10-user-css"; topDoc.head.appendChild(uCss); }
+        uCss.innerHTML = cfg.css || "";
+
+        if (cfg.useHtml && cfg.fullPageHtml && cfg.html && cfg.html.trim()) {
+            const compiled = cfg.html
+                .replace(/\{\{\s*name\s*\}\}/gi, info.curName.replace(/</g, "&lt;"))
+                .replace(/\{\{\s*avatar\s*\}\}/gi, info.curAva)
+                .replace(/\{\{\s*desc\s*\}\}/gi, (info.curDesc || "").replace(/</g, "&lt;"))
+                .replace(/\{\{\s*char\s*\}\}/gi, info.charName.replace(/</g, "&lt;"))
+                .replace(/\{\{\s*charAvatar\s*\}\}/gi, info.charAva);
+
+            overlay.innerHTML = `
+                <div id="x10-fullpage-host" style="position:relative;width:100%;height:100%;overflow-y:auto;background:#FFFFFF;">
+                    <div style="position:fixed;top:max(10px,env(safe-area-inset-top,10px));right:12px;z-index:2147483647;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.88);backdrop-filter:blur(8px);padding:4px 10px;border-radius:999px;border:1px solid #EAEAEA;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+                        <span id="x10-fp-exit" style="font-size:11px;font-weight:700;color:#0F1419;cursor:pointer;padding:2px 4px;">还原X页</span>
+                        <span style="color:#DDD;">|</span>
+                        <span id="x10-fp-close" style="display:inline-flex;align-items:center;color:#536471;cursor:pointer;">${ICO.close.replace('width="18" height="18"', 'width="14" height="14"')}</span>
+                    </div>
+                    <div id="x10-fp-mount" style="width:100%;min-height:100%;"></div>
+                </div>
+            `;
+
+            const mount = topDoc.getElementById("x10-fp-mount");
+            mount.innerHTML = compiled;
+            mount.querySelectorAll("script").forEach((oldSc) => {
+                const newSc = topDoc.createElement("script");
+                if (oldSc.src) newSc.src = oldSc.src; else newSc.textContent = oldSc.textContent;
+                oldSc.replaceWith(newSc);
+            });
+            mount.querySelectorAll("[data-st-action]").forEach((el) => {
+                el.onclick = () => {
+                    const act = el.getAttribute("data-st-action");
+                    if (act === "avatar") topWin.__ST_PERSONA_API__.uploadAvatar();
+                    else if (act === "bind") topWin.__ST_PERSONA_API__.toggleBind();
+                    else if (act === "new") topWin.__ST_PERSONA_API__.createNew();
+                    else if (act === "close") topWin.__ST_PERSONA_API__.close();
+                    else if (act === "switch") topWin.__ST_PERSONA_API__.switchByIndex(el.getAttribute("data-persona-idx") || 0);
+                };
+            });
+
+            topDoc.getElementById("x10-fp-exit").onclick = () => { const c = loadCfg(); c.useHtml = false; c.tab = "html"; saveCfg(c); renderX(""); };
+            topDoc.getElementById("x10-fp-close").onclick = () => overlay.classList.remove("open");
+            return;
+        }
+
+        const lockBtn = topDoc.querySelector("#persona_lock_button, #lock_user_name, .persona_lock_icon");
+        const isBound = lockBtn?.classList?.contains("locked") || lockBtn?.classList?.contains("fa-lock");
+        const nativeDepthInp = topDoc.querySelector("#persona_depth, input[name='persona_depth']");
+        const curDepth = nativeDepthInp ? nativeDepthInp.value : "2";
+
+        const isWhiteBanner = cfg.banner === "white" || !cfg.banner;
+        const safeBanner = isWhiteBanner ? "" : String(cfg.banner).replace(/'/g, "\\'");
+        const bannerBgStyle = isWhiteBanner ? "background:#FFFFFF;border-bottom:1px solid #EFF3F4;" : `background-image:url('${safeBanner}');`;
+
+        const safeAva = String(info.curAva || "").replace(/'/g, "\\'");
+        const safeCharAva = String(info.charAva || "").replace(/'/g, "\\'");
+        const handle = (cfg.handle || "@seoul_archive").startsWith("@") ? cfg.handle : `@${cfg.handle}`;
+        const cleanDesc = (info.curDesc || "点击此处直接编写你的人设设定...").trim();
+
+        const htmlBanner = (cfg.useHtml && !cfg.fullPageHtml && cfg.html.trim())
+            ? `<div style="padding:10px 16px;border-bottom:1px solid #EFF3F4;background:#FFFFFF;">${
+                cfg.html.replace(/\{\{\s*name\s*\}\}/gi, info.curName).replace(/\{\{\s*avatar\s*\}\}/gi, info.curAva).replace(/\{\{\s*desc\s*\}\}/gi, cleanDesc).replace(/\{\{\s*char\s*\}\}/gi, info.charName)
+              }</div>`
+            : "";
+
+        let bodyHtml = "";
+        if (cfg.tab === "posts") {
+            const userTweetsHtml = (cfg.tweets || []).map((tw) => renderTweetCard(tw, info, handle, safeAva)).join("");
+            bodyHtml = `
+                <div class="x10-tweet" id="x10-pin-tweet" style="flex-direction:column!important;gap:4px!important;cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:6px;padding-left:30px;font-size:12.5px;font-weight:700;color:#536471;">
+                        ${ICO.pin}<span>已置顶</span>
+                    </div>
+                    <div style="display:flex;gap:11px;">
+                        <div style="width:40px;height:40px;border-radius:50%;background-image:url('${safeAva}');background-size:cover;background-position:center;border:1px solid #EFF3F4;flex-shrink:0;"></div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;">
+                                <div style="display:flex;align-items:center;gap:4px;min-width:0;">
+                                    <span style="font-size:15px;font-weight:700;color:#0F1419;">${info.curName.replace(/</g, "&lt;")}</span>
+                                    ${ICO.v}
+                                    <span style="font-size:14px;color:#536471;">${handle.replace(/</g, "&lt;")}</span>
+                                </div>
+                                <span style="color:#536471;display:inline-flex;">${ICO.dots}</span>
+                            </div>
+                            <div style="font-size:14.5px;color:#0F1419;line-height:1.65;margin-top:5px;white-space:pre-wrap;word-break:break-word;">${formatXText(cleanDesc)}</div>
+                            <div class="x10-tweet-bar">
+                                <span>${ICO.reply}<span>3,280</span></span>
+                                <span>${ICO.rt}<span>1.4万</span></span>
+                                <span style="color:#F91880;">${ICO.heartOn}<span>8.9万</span></span>
+                                <span>${ICO.views}<span>76.4万</span></span>
+                                <span>${ICO.bm}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${userTweetsHtml}
+            `;
+        } else if (cfg.tab === "edit") {
+            bodyHtml = `
+                <div style="padding:14px 16px;background:#FFFFFF;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px;">
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            <span class="x10-pill-btn" id="x10-act-ava" style="height:28px!important;font-size:12px!important;padding:0 11px!important;">换头像</span>
+                            <span class="x10-pill-btn" id="x10-act-ren" style="height:28px!important;font-size:12px!important;padding:0 11px!important;">改名字</span>
+                            <span class="x10-pill-btn" id="x10-act-dup" style="height:28px!important;font-size:12px!important;padding:0 11px!important;">复制</span>
+                            <span class="x10-pill-btn" id="x10-act-def" style="height:28px!important;font-size:12px!important;padding:0 11px!important;">设默认</span>
+                            <span class="x10-pill-btn" id="x10-act-del" style="height:28px!important;font-size:12px!important;padding:0 11px!important;color:#F4212E!important;">删除</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:#536471;">
+                            <span>深度</span>
+                            <input type="number" id="x10-depth" value="${curDepth}" style="width:42px;height:26px;background:#FFFFFF;border:1px solid #CFD9DE;border-radius:6px;text-align:center;font-size:12px;outline:none;" />
+                        </div>
+                    </div>
+                    <div style="background:#FFFFFF;border:1px solid #EFF3F4;border-radius:16px;padding:14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13.5px;font-weight:700;">
+                            <span>正在编辑：${info.curName.replace(/</g, "&lt;")}</span>
+                            <span style="color:#1D9BF0;font-size:12px;">已同步底层</span>
+                        </div>
+                        <textarea id="x10-desc-area" rows="11" placeholder="在此编写你的人设外貌、性格、身份与背景设定..." style="width:100%;background:#FFFFFF;border:1px solid #CFD9DE;border-radius:12px;padding:12px;font-size:14px;color:#0F1419;line-height:1.68;box-sizing:border-box;outline:none;resize:vertical;">${(info.curDesc || "").replace(/</g, "&lt;")}</textarea>
+                    </div>
+                </div>
+            `;
+        } else if (cfg.tab === "media") {
+            const mediaTweets = (cfg.tweets || []).filter((tw) => (tw.imgs || []).length > 0);
+            bodyHtml = mediaTweets.length
+                ? mediaTweets.map((tw) => renderTweetCard(tw, info, handle, safeAva)).join("")
+                : `<div style="padding:48px 16px;text-align:center;color:#536471;font-size:13.5px;">还没有带图推文，点右下角蓝色羽毛按钮即可发多图帖子</div>`;
+        } else if (cfg.tab === "html") {
+            bodyHtml = `
+                <div style="padding:14px 16px;background:#FFFFFF;">
+                    <div style="background:#FFFFFF;border:1px solid #EFF3F4;border-radius:16px;padding:14px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+                            <span style="font-size:14px;font-weight:800;color:#0F1419;">整页 HTML 美化主题导入</span>
+                            <label class="x10-pill-btn dark" style="height:28px!important;font-size:12px!important;padding:0 12px!important;cursor:pointer;">
+                                ${ICO.upload}<span>导入 .html 文件</span>
+                                <input type="file" id="x10-h-file" accept=".html,.htm,.txt" style="position:fixed;left:-9999px;opacity:0;" />
+                            </label>
+                        </div>
+                        <div style="font-size:12px;color:#536471;line-height:1.55;margin-bottom:10px;padding:8px 10px;border:1px solid #EFF3F4;border-radius:10px;">
+                            导入外部 <code>.html</code> 文件并勾选<b>「整页完全替换」</b>，整个 User 页面将 100% 变成该美化主题（支持 <code>{{name}}</code> <code>{{avatar}}</code> <code>{{desc}}</code> <code>{{char}}</code> 及内置 JS）。
+                        </div>
+                        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:13px;font-weight:700;">
+                            <label style="cursor:pointer;"><input type="checkbox" id="x10-h-chk" ${cfg.useHtml ? "checked" : ""} /> 启用自定义 HTML</label>
+                            <label style="cursor:pointer;"><input type="checkbox" id="x10-h-full" ${cfg.fullPageHtml !== false ? "checked" : ""} /> 整页完全替换</label>
+                        </div>
+                        <textarea id="x10-h-code" rows="6" placeholder="粘贴完整的 HTML + <style> + <script> 美化代码，或点右上角导入 .html 文件..." style="width:100%;background:#FFFFFF;border:1px solid #CFD9DE;border-radius:10px;padding:8px;font-size:11.5px;font-family:monospace;box-sizing:border-box;margin-bottom:8px;">${(cfg.html || "").replace(/</g, "&lt;")}</textarea>
+                        <textarea id="x10-c-code" rows="3" placeholder="额外全局 CSS（仅微调当前 X 样式时可填）..." style="width:100%;background:#FFFFFF;border:1px solid #CFD9DE;border-radius:10px;padding:8px;font-size:11.5px;font-family:monospace;box-sizing:border-box;margin-bottom:10px;">${(cfg.css || "").replace(/</g, "&lt;")}</textarea>
+                        <div class="x10-pill-btn dark" id="x10-h-save" style="width:100%!important;box-sizing:border-box!important;">保存并立即切换主题</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const canPost = Boolean(draftTxt.trim() || draftImgs.length > 0);
+        const switcherListHtml = info.list.map((p, idx) => {
+            const pAva = String(p.src || "").replace(/'/g, "\\'");
+            return `
+                <div data-swidx="${idx}" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #EFF3F4;cursor:pointer;background:#FFFFFF;">
+                    <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                        <div style="width:42px;height:42px;border-radius:50%;background-image:url('${pAva}');background-size:cover;background-position:center;border:1px solid #EFF3F4;flex-shrink:0;"></div>
+                        <div style="min-width:0;">
+                            <div style="font-size:15px;font-weight:700;color:#0F1419;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name.replace(/</g, "&lt;")}</div>
+                            <div style="font-size:13px;color:#536471;">@${p.name.toLowerCase().replace(/\s+/g, "_").replace(/</g, "&lt;")}</div>
+                        </div>
+                    </div>
+                    <span style="display:inline-flex;align-items:center;">${p.isSelected ? ICO.check : ""}</span>
+                </div>
+            `;
+        }).join("");
+
+        overlay.innerHTML = `
+            <div class="x10-shell" id="x10-shell-el">
+                <div class="x10-top">
+                    <div id="x10-close" class="x10-top-ico" title="返回">${ICO.back}</div>
+                    <div id="x10-open-sw" style="flex:1;min-width:0;cursor:pointer;" title="点击切换人设账号">
+                        <div style="font-size:17px;font-weight:800;color:#0F1419;display:inline-flex;align-items:center;line-height:1.2;max-width:100%;">
+                            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${info.curName.replace(/</g, "&lt;")}</span>
+                            ${ICO.v}
+                            ${ICO.chevDown}
+                        </div>
+                        <div style="font-size:12px;color:#536471;margin-top:1px;">${(cfg.tweets || []).length + 1} 帖子</div>
+                    </div>
+                    <div id="x10-top-logo" class="x10-top-ico" title="回到顶部">${ICO.xTop}</div>
+                    <input type="file" id="x10-bn-file" accept="image/*" style="position:fixed;left:-9999px;opacity:0;" />
+                </div>
+
+                <div class="x10-hero-grid">
+                    <label class="x10-banner" for="x10-bn-file" style="${bannerBgStyle}" title="点击更换顶部横幅"></label>
+                    <div class="x10-ava" id="x10-ava-btn" style="background-image:url('${safeAva}');" title="点击更换头像"></div>
+                    <div class="x10-actions">
+                        <span class="x10-circle-btn" id="x10-open-edit-modal" title="编辑主页资料">${ICO.dots}</span>
+                        <span class="x10-circle-btn" id="x10-go-edit-tab" title="编写人设正文">${ICO.mail}</span>
+                        <span class="x10-pill-btn" id="x10-btn-edit-modal">编辑个人资料</span>
+                        <span class="x10-pill-btn ${isBound ? "dark" : ""}" id="x10-do-bind">${isBound ? "已绑定" : "绑定角色"}</span>
+                    </div>
+                </div>
+
+                <div style="padding:8px 16px 14px 16px;background:#FFFFFF;">
+                    <div style="font-size:20px;font-weight:800;color:#0F1419;display:flex;align-items:center;line-height:1.25;">
+                        <span>${info.curName.replace(/</g, "&lt;")}</span>${ICO.v}
+                    </div>
+                    <div style="font-size:14px;color:#536471;margin-top:1px;">${handle.replace(/</g, "&lt;")}</div>
+                    <div id="x10-bio-click" style="font-size:14.5px;color:#0F1419;line-height:1.5;margin-top:10px;white-space:pre-wrap;word-break:break-word;cursor:pointer;">${formatXText(cfg.bio)}</div>
+                    <div id="x10-meta-click" style="display:flex;flex-wrap:wrap;column-gap:14px;row-gap:6px;margin-top:10px;font-size:13px;color:#536471;cursor:pointer;">
+                        <span style="display:inline-flex;align-items:center;gap:4px;">${ICO.brief}<span>${(cfg.category || "Personal Archive").replace(/</g, "&lt;")}</span></span>
+                        <span style="display:inline-flex;align-items:center;gap:4px;">${ICO.loc}<span>${(cfg.loc || "Seoul").replace(/</g, "&lt;")}</span></span>
+                        <span style="display:inline-flex;align-items:center;gap:4px;">${ICO.link}<span style="color:#1D9BF0;">${(cfg.link || "persona.x.com").replace(/</g, "&lt;")}</span></span>
+                        <span style="display:inline-flex;align-items:center;gap:4px;">${ICO.cal}<span>${(cfg.date || "2026年11月 加入").replace(/</g, "&lt;")}</span></span>
+                    </div>
+                    <div style="display:flex;gap:18px;margin-top:11px;font-size:13.5px;color:#536471;">
+                        <span id="x10-do-bind-2" style="cursor:pointer;"><b style="color:#0F1419;font-weight:700;">1</b> 正在关注</span>
+                        <span id="x10-flw-click" style="cursor:pointer;"><b style="color:#0F1419;font-weight:700;">${(cfg.followers || "52.0万").replace(/</g, "&lt;")}</b> 关注者</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:7px;margin-top:10px;font-size:12.5px;color:#536471;">
+                        <div style="width:18px;height:18px;border-radius:50%;background-image:url('${safeCharAva}');background-size:cover;background-position:center;border:1px solid #EFF3F4;flex-shrink:0;"></div>
+                        <span>你绑定的角色 <b style="color:#0F1419;">${info.charName.replace(/</g, "&lt;")}</b> 正在关注此人设 (${isBound ? "已绑定" : "点击上方可绑定"})</span>
+                    </div>
+                </div>
+
+                ${htmlBanner}
+
+                <div class="x10-tabs">
+                    <div class="x10-tab ${cfg.tab === "posts" ? "on" : ""}" data-xt="posts">帖子</div>
+                    <div class="x10-tab ${cfg.tab === "edit" ? "on" : ""}" data-xt="edit">设定</div>
+                    <div class="x10-tab ${cfg.tab === "media" ? "on" : ""}" data-xt="media">媒体</div>
+                    <div class="x10-tab ${cfg.tab === "html" ? "on" : ""}" data-xt="html">美化</div>
+                </div>
+
+                <div>${bodyHtml}</div>
+
+                <div class="x10-compose-fab" id="x10-fab-compose" title="发新帖子">${ICO.feather}</div>
+
+                <div class="x10-modal-mask ${openState === "switch" ? "show" : ""}" id="x10-switch-modal">
+                    <div style="width:100%;max-width:440px;max-height:80vh;overflow-y:auto;background:#FFFFFF;border-radius:16px;box-shadow:0 12px 36px rgba(0,0,0,0.22);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #EFF3F4;">
+                            <span style="font-size:16px;font-weight:800;color:#0F1419;">切换人设账号 (${info.list.length})</span>
+                            <span id="x10-sw-close" class="x10-top-ico" style="width:30px!important;height:30px!important;color:#0F1419;">${ICO.close}</span>
+                        </div>
+                        <div>${switcherListHtml}</div>
+                        <div style="padding:12px 16px;display:flex;justify-content:center;">
+                            <span class="x10-pill-btn dark" id="x10-sw-new" style="width:100%!important;box-sizing:border-box!important;">新建人设账号</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="x10-modal-mask ${openState === "compose" ? "show" : ""}" id="x10-compose-modal">
+                    <div style="width:100%;max-width:480px;max-height:86vh;overflow-y:auto;background:#FFFFFF;border-radius:16px;box-shadow:0 12px 36px rgba(0,0,0,0.22);display:flex;flex-direction:column;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
+                            <span id="x10-cm-close" style="font-size:15px;color:#0F1419;cursor:pointer;">取消</span>
+                            <span class="x10-pill-btn blue ${canPost ? "" : "dim"}" id="x10-pub-btn" style="height:32px!important;padding:0 18px!important;font-size:14px!important;">发帖</span>
+                        </div>
+                        <div style="display:flex;gap:12px;padding:6px 16px 14px 16px;">
+                            <div style="width:40px;height:40px;border-radius:50%;background-image:url('${safeAva}');background-size:cover;background-position:center;border:1px solid #EFF3F4;flex-shrink:0;"></div>
+                            <div style="flex:1;min-width:0;">
+                                <textarea id="x10-compose-txt" rows="4" placeholder="有什么新鲜事？" style="width:100%;border:none;outline:none;font-size:16.5px;color:#0F1419;background:#FFFFFF;resize:none;line-height:1.55;box-sizing:border-box;padding-top:4px;">${draftTxt.replace(/</g, "&lt;")}</textarea>
+                                ${renderTweetImages(draftImgs, true)}
+                            </div>
+                        </div>
+                        <div style="padding:0 16px 10px 68px;display:flex;align-items:center;gap:6px;color:#1D9BF0;font-size:13px;font-weight:700;">
+                            ${ICO.globe}<span>所有人都可以回复</span>
+                        </div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid #EFF3F4;">
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <label class="x10-tool-ico" title="添加照片（最多4张）">
+                                    ${ICO.imgBlue}
+                                    <input type="file" id="x10-draft-files" accept="image/*" multiple style="position:fixed;left:-9999px;opacity:0;" />
+                                </label>
+                                <span class="x10-tool-ico" id="x10-insert-hash" title="插入话题标签">#</span>
+                            </div>
+                            <div style="font-size:12px;color:#536471;font-family:monospace;">
+                                ${draftImgs.length ? `图 ${draftImgs.length}/4 · ` : ""}<span id="x10-char-cnt">${draftTxt.length}</span> 字
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="x10-modal-mask ${openState === "edit" ? "show" : ""}" id="x10-edit-modal">
+                    <div style="width:100%;max-width:460px;max-height:88vh;overflow-y:auto;background:#FFFFFF;border-radius:16px;box-shadow:0 12px 36px rgba(0,0,0,0.2);">
+                        <div style="position:sticky;top:0;z-index:20;background:#FFFFFF;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #EFF3F4;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <span id="x10-em-close" class="x10-top-ico" style="width:30px!important;height:30px!important;color:#0F1419;">${ICO.close}</span>
+                                <span style="font-size:17px;font-weight:800;color:#0F1419;">编辑个人资料</span>
+                            </div>
+                            <span class="x10-pill-btn dark" id="x10-em-save" style="height:30px!important;padding:0 16px!important;font-size:13px!important;">保存</span>
+                        </div>
+                        <div style="display:grid;grid-template-rows:96px 34px 38px;grid-template-columns:16px 72px 1fr 16px;background:#FFFFFF;margin-bottom:6px;">
+                            <div style="grid-row:1/3;grid-column:1/5;${bannerBgStyle}background-size:cover;background-position:center;position:relative;display:flex;align-items:center;justify-content:center;gap:12px;">
+                                <label for="x10-bn-file" class="x10-cam-overlay" title="从相册选横幅">${ICO.camWhite}</label>
+                                <span id="x10-em-white-bn" class="x10-cam-overlay" style="width:auto!important;padding:0 12px!important;border-radius:99px!important;" title="设为纯白背景">纯白</span>
+                                <span id="x10-em-reset-bn" class="x10-cam-overlay" title="恢复默认横幅">默认</span>
+                            </div>
+                            <div id="x10-em-ava-cam" style="grid-row:2/4;grid-column:2/3;z-index:10;width:72px;height:72px;border-radius:50%;background-image:url('${safeAva}');background-size:cover;background-position:center;border:3.5px solid #FFFFFF;box-sizing:border-box;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;overflow:hidden;" title="更换头像">
+                                <div style="position:absolute;inset:0;background:rgba(0,0,0,0.28);"></div>
+                                <span style="position:relative;z-index:2;display:inline-flex;">${ICO.camWhite}</span>
+                            </div>
+                        </div>
+                        <div style="padding:8px 16px 16px 16px;">
+                            <div class="x10-field">
+                                <div class="x10-field-lbl">横幅图片链接（留空或填 white 即纯白背景）</div>
+                                <input type="text" id="x10-em-bnurl" class="x10-field-inp" value="${cfg.banner?.startsWith("data:") ? "[已使用本地相册横幅]" : (cfg.banner || "").replace(/"/g, "&quot;")}" />
+                            </div>
+                            <div class="x10-field">
+                                <div class="x10-field-lbl">@账号名</div>
+                                <input type="text" id="x10-em-handle" class="x10-field-inp" value="${handle.replace(/"/g, "&quot;")}" />
+                            </div>
+                            <div class="x10-field">
+                                <div class="x10-field-lbl">个人简介 (Bio)</div>
+                                <textarea id="x10-em-bio" class="x10-field-inp" rows="3" style="resize:none;">${(cfg.bio || "").replace(/</g, "&lt;")}</textarea>
+                            </div>
+                            <div class="x10-field">
+                                <div class="x10-field-lbl">身份类别</div>
+                                <input type="text" id="x10-em-cat" class="x10-field-inp" value="${(cfg.category || "").replace(/"/g, "&quot;")}" />
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div class="x10-field">
+                                    <div class="x10-field-lbl">位置</div>
+                                    <input type="text" id="x10-em-loc" class="x10-field-inp" value="${(cfg.loc || "").replace(/"/g, "&quot;")}" />
+                                </div>
+                                <div class="x10-field">
+                                    <div class="x10-field-lbl">关注者数量</div>
+                                    <input type="text" id="x10-em-flw" class="x10-field-inp" value="${(cfg.followers || "").replace(/"/g, "&quot;")}" />
+                                </div>
+                            </div>
+                            <div class="x10-field" style="margin-bottom:4px!important;">
+                                <div class="x10-field-lbl">当前酒馆底层人设设定</div>
+                                <textarea id="x10-em-desc" class="x10-field-inp" rows="6" style="line-height:1.6;">${(info.curDesc || "").replace(/</g, "&lt;")}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        topDoc.getElementById("x10-close").onclick = () => overlay.classList.remove("open");
+        topDoc.getElementById("x10-top-logo").onclick = () => topDoc.getElementById("x10-shell-el")?.scrollTo({ top: 0, behavior: "smooth" });
+        overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove("open"); };
+
+        const swModal = topDoc.getElementById("x10-switch-modal");
+        topDoc.getElementById("x10-open-sw").onclick = () => swModal?.classList.add("show");
+        topDoc.getElementById("x10-sw-close").onclick = () => swModal?.classList.remove("show");
+        swModal.onclick = (e) => { if (e.target === swModal) swModal.classList.remove("show"); };
+        swModal.querySelectorAll("[data-swidx]").forEach((el) => {
+            el.onclick = () => {
+                const target = info.list[Number(el.getAttribute("data-swidx"))];
+                swModal.classList.remove("show");
+                switchPersonaReal(target);
+            };
+        });
+        topDoc.getElementById("x10-sw-new").onclick = () => {
+            swModal.classList.remove("show");
+            clickNative(["#create_dummy_persona", "#add_persona_button", ".fa-plus"]);
+            setTimeout(() => renderX(""), 450);
+        };
+
+        const cmModal = topDoc.getElementById("x10-compose-modal");
+        topDoc.getElementById("x10-fab-compose").onclick = () => {
+            cmModal?.classList.add("show");
+            setTimeout(() => topDoc.getElementById("x10-compose-txt")?.focus(), 40);
+        };
+        topDoc.getElementById("x10-cm-close").onclick = () => cmModal?.classList.remove("show");
+        cmModal.onclick = (e) => { if (e.target === cmModal) cmModal.classList.remove("show"); };
+
+        const cmTxt = topDoc.getElementById("x10-compose-txt");
+        const pubBtn = topDoc.getElementById("x10-pub-btn");
+        const cntEl = topDoc.getElementById("x10-char-cnt");
+        if (cmTxt) {
+            cmTxt.oninput = (e) => {
+                draftTxt = e.target.value;
+                if (cntEl) cntEl.textContent = String(draftTxt.length);
+                if (pubBtn) pubBtn.classList.toggle("dim", !(draftTxt.trim() || draftImgs.length > 0));
+            };
+        }
+        topDoc.getElementById("x10-insert-hash").onclick = () => {
+            draftTxt = (draftTxt ? draftTxt + " #" : "#");
+            if (cmTxt) { cmTxt.value = draftTxt; cmTxt.focus(); cmTxt.oninput({ target: cmTxt }); }
+        };
+        topDoc.getElementById("x10-draft-files").onchange = async (e) => {
+            const files = Array.from(e.target.files || []);
+            for (const f of files) {
+                if (draftImgs.length >= 4) break;
+                draftImgs.push(await compressImg(f, 700));
+            }
+            e.target.value = "";
+            renderX("compose");
+        };
+        overlay.querySelectorAll("[data-rmdraft]").forEach((b) => {
+            b.onclick = () => { draftImgs.splice(Number(b.getAttribute("data-rmdraft")), 1); renderX("compose"); };
+        });
+        pubBtn.onclick = () => {
+            const txt = (topDoc.getElementById("x10-compose-txt")?.value || "").trim();
+            if (!txt && !draftImgs.length) return;
+            const c = loadCfg(), now = new Date();
+            c.tweets.unshift(Object.assign({
+                id: Date.now(), txt, imgs: draftImgs.slice(0, 4),
+                date: `${now.getMonth() + 1}月${now.getDate()}日`, liked: false
+            }, genViralStats()));
+            if (c.tab !== "posts" && c.tab !== "media") c.tab = "posts";
+            saveCfg(c); draftTxt = ""; draftImgs = []; renderX("");
+        };
+
+        overlay.querySelectorAll("[data-deltw]").forEach((b) => {
+            b.onclick = (e) => {
+                e.stopPropagation();
+                const c = loadCfg();
+                c.tweets = (c.tweets || []).filter((t) => Number(t.id) !== Number(b.getAttribute("data-deltw")));
+                saveCfg(c); renderX("");
+            };
+        });
+        overlay.querySelectorAll("[data-liketw]").forEach((b) => {
+            b.onclick = (e) => {
+                e.stopPropagation();
+                const c = loadCfg();
+                const tw = (c.tweets || []).find((t) => Number(t.id) === Number(b.getAttribute("data-liketw")));
+                if (tw) { tw.liked = !tw.liked; tw.likes = (Number(tw.likes) || 38400) + (tw.liked ? 1 : -1); saveCfg(c); renderX(""); }
+            };
+        });
+
+        const bnInput = topDoc.getElementById("x10-bn-file");
+        bnInput.onchange = async (e) => {
+            const f = e.target.files?.[0]; if (!f) return;
+            const isModal = topDoc.getElementById("x10-edit-modal")?.classList.contains("show");
+            const c = loadCfg(); c.banner = await compressImg(f, 960); saveCfg(c);
+            e.target.value = ""; renderX(isModal ? "edit" : "");
+        };
+        topDoc.getElementById("x10-em-white-bn").onclick = () => { const c = loadCfg(); c.banner = "white"; saveCfg(c); renderX("edit"); };
+        topDoc.getElementById("x10-em-reset-bn").onclick = () => { const c = loadCfg(); c.banner = DEF_BANNER; saveCfg(c); renderX("edit"); };
+        topDoc.getElementById("x10-ava-btn").onclick = () => clickNative(["#your_avatar_button", "#upload_avatar_button"]);
+        topDoc.getElementById("x10-em-ava-cam").onclick = () => clickNative(["#your_avatar_button", "#upload_avatar_button"]);
+
+        const emModal = topDoc.getElementById("x10-edit-modal");
+        const openEditModal = () => emModal?.classList.add("show");
+        ["x10-btn-edit-modal", "x10-open-edit-modal", "x10-bio-click", "x10-meta-click", "x10-flw-click"].forEach((id) => {
+            topDoc.getElementById(id).onclick = openEditModal;
+        });
+        topDoc.getElementById("x10-em-close").onclick = () => emModal?.classList.remove("show");
+        emModal.onclick = (e) => { if (e.target === emModal) emModal.classList.remove("show"); };
+        topDoc.getElementById("x10-em-save").onclick = () => {
+            const c = loadCfg();
+            const urlVal = topDoc.getElementById("x10-em-bnurl").value.trim();
+            if (urlVal === "" || urlVal.toLowerCase() === "white") c.banner = "white";
+            else if (urlVal !== "[已使用本地相册横幅]") c.banner = urlVal;
+            c.handle = topDoc.getElementById("x10-em-handle").value.trim();
+            c.bio = topDoc.getElementById("x10-em-bio").value;
+            c.category = topDoc.getElementById("x10-em-cat").value.trim();
+            c.loc = topDoc.getElementById("x10-em-loc").value.trim();
+            c.followers = topDoc.getElementById("x10-em-flw").value.trim();
+            saveCfg(c);
+            const nd = topDoc.getElementById("persona_description");
+            if (nd) { nd.value = topDoc.getElementById("x10-em-desc").value; nd.dispatchEvent(new Event("input", { bubbles: true })); nd.dispatchEvent(new Event("change", { bubbles: true })); }
+            emModal?.classList.remove("show"); renderX("");
+        };
+
+        const doBind = () => { clickNative(["#persona_lock_button", "#lock_user_name", ".persona_lock_icon"]); setTimeout(() => renderX(""), 200); };
+        topDoc.getElementById("x10-do-bind").onclick = doBind;
+        topDoc.getElementById("x10-do-bind-2").onclick = doBind;
+
+        const goEditTab = () => { const c = loadCfg(); c.tab = "edit"; saveCfg(c); renderX(""); };
+        topDoc.getElementById("x10-go-edit-tab").onclick = goEditTab;
+        topDoc.getElementById("x10-pin-tweet")?.addEventListener("click", goEditTab);
+
+        overlay.querySelectorAll("[data-xt]").forEach((t) => t.onclick = () => { const c = loadCfg(); c.tab = t.getAttribute("data-xt"); saveCfg(c); renderX(""); });
+
+        const area = topDoc.getElementById("x10-desc-area");
+        if (area) {
+            area.oninput = () => {
+                const nd = topDoc.getElementById("persona_description");
+                if (nd) { nd.value = area.value; nd.dispatchEvent(new Event("input", { bubbles: true })); nd.dispatchEvent(new Event("change", { bubbles: true })); }
+            };
+        }
+        topDoc.getElementById("x10-act-ava")?.addEventListener("click", () => clickNative(["#your_avatar_button", "#upload_avatar_button"]));
+        topDoc.getElementById("x10-act-ren")?.addEventListener("click", () => { clickNative(["#your_name_button", "#persona_rename_button", ".fa-pencil"]); setTimeout(() => renderX(""), 400); });
+        topDoc.getElementById("x10-act-dup")?.addEventListener("click", () => { clickNative(["#duplicate_persona_button", ".fa-clone"]); setTimeout(() => renderX(""), 400); });
+        topDoc.getElementById("x10-act-def")?.addEventListener("click", () => { clickNative(["#default_persona_button", ".fa-crown"]); setTimeout(() => renderX(""), 200); });
+        topDoc.getElementById("x10-act-del")?.addEventListener("click", () => { clickNative(["#delete_persona_button", ".fa-trash"]); setTimeout(() => renderX(""), 400); });
+        topDoc.getElementById("x10-depth")?.addEventListener("change", (e) => {
+            if (nativeDepthInp) { nativeDepthInp.value = e.target.value; nativeDepthInp.dispatchEvent(new Event("input", { bubbles: true })); nativeDepthInp.dispatchEvent(new Event("change", { bubbles: true })); }
+        });
+
+        topDoc.getElementById("x10-h-file")?.addEventListener("change", (e) => {
+            const f = e.target.files?.[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = (ev) => {
+                topDoc.getElementById("x10-h-code").value = String(ev.target?.result || "");
+                topDoc.getElementById("x10-h-chk").checked = true;
+                topDoc.getElementById("x10-h-full").checked = true;
+            };
+            r.readAsText(f); e.target.value = "";
+        });
+        topDoc.getElementById("x10-h-save")?.addEventListener("click", () => {
+            const c = loadCfg();
+            c.useHtml = topDoc.getElementById("x10-h-chk").checked;
+            c.fullPageHtml = topDoc.getElementById("x10-h-full").checked;
+            c.html = topDoc.getElementById("x10-h-code").value;
+            c.css = topDoc.getElementById("x10-c-code").value;
+            saveCfg(c); renderX("");
+        });
+    }
+
+    function openModal() {
+        const nd = topDoc.querySelector("#persona-management-button .drawer-content");
+        if (nd && nd.classList.contains("closedDrawer")) topDoc.querySelector("#persona-management-button .drawer-icon")?.click();
+        overlay.classList.add("open");
+        setTimeout(() => renderX(""), 80);
+    }
+
+    // ── 自动挂载到你原有 App 主页 (#smt-page-home) 的应用图标网格中 ──
+    function mountIntoSumoulApp() {
+        const homePage = topDoc.getElementById("smt-page-home");
+        if (!homePage) { setTimeout(mountIntoSumoulApp, 300); return; }
+
+        const existingItem = homePage.querySelector(".ab-app-item");
+        if (!existingItem || !existingItem.parentElement) { setTimeout(mountIntoSumoulApp, 300); return; }
+        if (topDoc.getElementById("ab-app-xpersona")) return;
+
+        // 克隆现有 App 图标节点以 100% 继承你原本的主页网格样式
+        const appTile = existingItem.cloneNode(true);
+        appTile.id = "ab-app-xpersona";
+        appTile.setAttribute("data-app", "xpersona");
+
+        // 替换图标、标题、韩文副标与角标
+        const svgEl = appTile.querySelector("svg");
+        if (svgEl) svgEl.outerHTML = ICO.xApp;
+        const zhEl = appTile.querySelector(".ab-app-title");
+        if (zhEl) zhEl.textContent = "X 人设";
+        const krEl = appTile.querySelector(".ab-app-kr");
+        if (krEl) krEl.textContent = "프로필 · X";
+        const badgeEl = appTile.querySelector(".ab-app-floating-badge");
+        if (badgeEl) badgeEl.textContent = `${scanPersonas().list.length}人设`;
+
+        appTile.onclick = (e) => {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            openModal();
+        };
+        existingItem.parentElement.appendChild(appTile);
+    }
+
+    mountIntoSumoulApp();
+    // 保留酒馆顶栏 User 图标同步触发入口
+    topDoc.getElementById("persona-management-button")?.addEventListener("click", () => setTimeout(openModal, 80));
+})();
